@@ -1,0 +1,57 @@
+{
+  "voice": "<name>",
+  "description": "Mechanically checkable subset of voices/<name>.md. Judgment rules stay in the markdown; only put a rule here if a regex can decide it.",
+  "default_priority": "P0",
+
+  "_how_to_use": [
+    "Copy to voices/<name>.rules.json and edit. Delete every underscore-prefixed key.",
+    "default_priority sets the tier for entries that do not name one. P0 = a hit is a defect.",
+    "Anything you leave out is simply not enforced. An empty file is valid.",
+    "Run: scan.py draft.md --voice-rules voices/<name>.rules.json"
+  ],
+
+  "mechanics": {
+    "_options": {
+      "em_dash": "forbid | allow | limit",
+      "semicolon": "forbid | allow",
+      "emoji": "forbid | allow",
+      "curly_quotes": "forbid | allow",
+      "oxford_comma": "require | forbid | allow  (advisory, reported not enforced)",
+      "one_word_sentence": "forbid | allow",
+      "max_paragraph_sentences": "integer, or omit",
+      "max_avg_sentence_words": "integer, or omit",
+      "max_em_dashes_per_1000w": "number, used when em_dash is 'limit'",
+      "date_format": "dmy | mdy | iso | any"
+    },
+    "em_dash": "allow",
+    "semicolon": "allow",
+    "emoji": "allow",
+    "curly_quotes": "allow",
+    "oxford_comma": "allow",
+    "one_word_sentence": "allow",
+    "date_format": "any"
+  },
+
+  "_banned_words_note": "Single words, matched case-insensitively on word boundaries. Inflections are not automatic, list them.",
+  "banned_words": [],
+
+  "_banned_phrases_note": "Multi-word strings. Whitespace between words matches any run of whitespace, so a phrase still matches across a line break.",
+  "banned_phrases": [],
+
+  "_banned_regex_note": "Full control. Each entry needs id, label, rx. Optional: priority (P0/P1/P2), max_allowed (flag only past N hits, for overuse rather than a ban), note.",
+  "banned_regex": [
+    {
+      "id": "example-rule",
+      "label": "Example, delete this",
+      "rx": "(?i)\\bexample phrase you never write\\b",
+      "priority": "P0",
+      "note": "Shown so the shape is obvious. Delete it."
+    }
+  ],
+
+  "_required_when_note": "Advisory presence checks. Fires when none of any_of_rx matches. Keep these at P2: a fragment of a longer document legitimately has no greeting or sign-off.",
+  "required_when": [],
+
+  "_preferred_substitutions_note": "Not enforced. Shown to the editor as the replacement to reach for when a banned entry is hit.",
+  "preferred_substitutions": {}
+}

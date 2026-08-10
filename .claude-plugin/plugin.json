@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "rabbit-writes",
+  "description": "Write and edit in your own voice, not a chatbot's. A pluggable voice profile plus an AI-pattern detection engine merged from seven open-source humanizer skills.",
+  "version": "1.0.0",
+  "author": {
+    "name": "whit3rabbit",
+    "url": "https://github.com/whit3rabbit"
+  },
+  "homepage": "https://github.com/whit3rabbit/rabbit-writes",
+  "repository": "https://github.com/whit3rabbit/rabbit-writes",
+  "license": "MIT",
+  "keywords": [
+    "writing",
+    "editing",
+    "voice",
+    "style",
+    "humanize",
+    "ai-detection",
+    "prose",
+    "personal-style"
+  ]
+}

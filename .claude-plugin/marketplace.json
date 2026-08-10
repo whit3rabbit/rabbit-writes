@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace-manifest.json",
+  "name": "rabbit-writes",
+  "owner": {
+    "name": "whit3rabbit",
+    "url": "https://github.com/whit3rabbit"
+  },
+  "description": "Rabbit writes: a personal writing voice plus an AI-pattern detection engine, installable as a Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "rabbit-writes",
+      "source": "./",
+      "description": "Write and edit in your own voice, not a chatbot's. Ships three skills: rabbit-writes (draft in the active voice), human-writing (the generic detection and craft engine), and voice-setup (build or swap a voice profile).",
+      "category": "productivity",
+      "license": "MIT",
+      "keywords": [
+        "writing",
+        "editing",
+        "voice",
+        "style",
+        "humanize",
+        "ai-detection"
+      ]
+    }
+  ]
+}
