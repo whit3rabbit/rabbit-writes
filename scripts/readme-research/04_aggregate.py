@@ -3,12 +3,17 @@
 import glob
 import json
 import os
-import re
 import statistics
+import sys
 from collections import Counter, defaultdict
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 BASE = os.path.join(REPO_ROOT, "docs", "readme-analysis")
+RWLIB_PARENT = os.path.join(REPO_ROOT, "skills", "rabbit-writes", "scripts")
+if RWLIB_PARENT not in sys.path:
+    sys.path.insert(0, RWLIB_PARENT)
+
+from rwlib.markdown import HTML_IMG_RX, IMAGE_RX  # noqa: E402
 
 with open(f"{BASE}/02_all_stats.json") as f:
     all_data = json.load(f)
@@ -97,12 +102,13 @@ badge_keywords = {
     "sponsor": ["opencollective", "github/sponsors"],
 }
 badge_type_counts = Counter()
-# Must stay identical to 03_analyze_readme.py's IMAGE_RE. Without the optional
-# title clause, `![alt](url "title")` does not match at all and the image drops
-# out of this count while step 03 still sees it, so the two steps disagree about
-# the same corpus.
-IMAGE_RE = re.compile(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
-HTML_IMG_RE = re.compile(r"<img[^>]+src\s*=\s*[\"']([^\"']+)[\"']", re.IGNORECASE)
+# The same objects step 03 counts images with, imported rather than restated.
+# They used to be a second copy carrying a comment asking the next reader to
+# keep them identical: without the optional title clause `![alt](url "title")`
+# does not match at all, the image drops out of this count while step 03 still
+# sees it, and the two steps disagree about the same corpus.
+IMAGE_RE = IMAGE_RX
+HTML_IMG_RE = HTML_IMG_RX
 for full_name, r in all_data.items():
     meta = r["meta"]
     # Prefer the copy that ships in this repo. readme_local_path is absolute and

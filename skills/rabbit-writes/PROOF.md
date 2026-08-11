@@ -8,27 +8,33 @@ Reproduce in one command, no dependencies:
 for f in SKILL.md PROOF.md references/*.md; do echo "== $f"; python3 scripts/scan.py "$f"; done
 ```
 
-## Result (v0.1.0, measured 10 August 2026)
+Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
+
+## Result (v0.1.0, lexicon 1, registers 1, measured 10 August 2026)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 2,234 | 0 | 0 | 0 | 0.69 | 0.74 | 0.0 |
-| `PROOF.md` | 2,985 | 0 | 0 | 0 | 0.57 | 0.73 | 0.0 |
-| `references/patterns.md` | 4,776 | 0 | **15** | **4** | 0.87 | 0.76 | 2.5 |
-| `references/false-positives.md` | 812 | 0 | 0 | 0 | 0.69 | 0.81 | 0.0 |
-| `references/context.md` | 571 | 0 | 0 | 0 | 0.75 | 0.81 | 0.0 |
-| `references/voice.md` | 915 | 0 | 0 | 0 | 0.73 | 0.74 | 1.1 |
-| `references/craft.md` | 1,102 | 0 | 0 | **7** | 0.68 | 0.77 | 0.0 |
-| `references/checklist.md` | 666 | 0 | 0 | 0 | 0.49 | 0.75 | 0.0 |
-| `voices/whit3rabbit.md` | 1,223 | 0 | 0 | **9** | 0.60 | 0.80 | 0.0 |
-| `../voice-setup/SKILL.md` | 1,223 | 0 | 0 | 0 | 0.58 | 0.76 | 2.5 |
-| `../readme-writing/SKILL.md` | 2,403 | 0 | 0 | **7** | 0.63 | 0.73 | 0.0 |
+| `SKILL.md` | 2,315 | 0 | 0 | 0 | 0.70 | 0.74 | 0.0 |
+| `PROOF.md` | 4,157 | 0 | 0 | 0 | 0.60 | 0.73 | 0.0 |
+| `references/patterns.md` | 3,942 | 0 | **15** | **4** | 0.86 | 0.77 | 1.8 |
+| `references/false-positives.md` | 786 | 0 | 0 | 0 | 0.70 | 0.82 | 0.0 |
+| `references/context.md` | 567 | 0 | 0 | 0 | 0.75 | 0.81 | 0.0 |
+| `references/voice.md` | 873 | 0 | 0 | 0 | 0.75 | 0.73 | 0.0 |
+| `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
+| `references/checklist.md` | 640 | 0 | 0 | 0 | 0.46 | 0.74 | 0.0 |
+| `voices/whit3rabbit.md` | 1,183 | 0 | 0 | **7** | 0.63 | 0.79 | 0.0 |
+| `../voice-setup/SKILL.md` | 1,286 | 0 | 0 | 0 | 0.57 | 0.75 | 1.6 |
+| `../readme-writing/SKILL.md` | 2,378 | 0 | 0 | **7** | 0.63 | 0.73 | 0.0 |
 
 Scores are with the self-reference exemption applied, the rule this skill states in prose: quoted examples, code, tables, and block quotes are exempt from flagging. `apply_exemptions()` in `scan.py` is that rule's executable form. Run with `--no-exempt` to see the raw numbers.
 
+Every word count in this table dropped between the second review and the third, and no prose was cut. Item 32 below is why: heading text and block quotes used to be measured as this document's own sentences. The findings columns did not move with them, because flagging already exempted both.
+
+The counts moved again in the fourth pass, this time because the documents changed: the engine was extracted into `scripts/rwlib/`, the tolerance matrix became a data file, and three skill files gained sections. `voices/whit3rabbit.md` fell from 9 P2 hits to 7 by dropping two paraphrases of rules that are defined elsewhere, which is the same drift the one-definition tripwire in `scripts/validate.py` now fails the build over.
+
 ## What it found in our own writing
 
-**`patterns.md` scores worst, and that is structural.** A catalog listing the words it catalogs will hit its own lexicon. Three Tier-1 words, nine `-ing` analyses, and a 36-word Tier-2 cluster all come from the vocabulary tables: the comma-separated lists of the words each rule exists to catch. Those are unquoted by design, because quoting a 36-item list would make it unreadable.
+**`patterns.md` scores worst, and that is structural.** A catalog listing the words it catalogs will hit its own lexicon. Three Tier-1 words, nine `-ing` analyses, and three Tier-2 clusters all come from the vocabulary tables: the comma-separated lists of the words each rule exists to catch. Those are unquoted by design, because quoting a 36-item list would make it unreadable.
 
 Two options were available. Quote every list entry so the exemption swallows it, or leave the number visible and explain it. The number is left visible. A tool that suppresses its own findings to look clean is doing the thing this plugin exists to criticize.
 
@@ -38,7 +44,7 @@ Two options were available. Quote every list entry so the exemption swallows it,
 
 That was half right. `CLAUDE.md` states the repo's prose convention as no em dashes and no semicolons, so leaving them made the convention untrue rather than making the report honest. The prose was rewritten instead. The file now reads 0.0 per 1,000 words and 0 voice hits, and the P1 it used to carry is gone with them.
 
-**`checklist.md` has the lowest burstiness at 0.49.** A numbered checklist is supposed to be metronomic. This is the detector correctly measuring a shape that is correct for its genre and wrong for prose, which is why `context.md` exists and why a number never renders a verdict on its own.
+**`checklist.md` has the lowest burstiness at 0.46.** A numbered checklist is supposed to be metronomic. This is the detector correctly measuring a shape that is correct for its genre and wrong for prose, which is why `context.md` exists and why a number never renders a verdict on its own.
 
 ## The voice band, applied to ourselves
 
@@ -48,12 +54,12 @@ Every file is listed this time. An earlier version of this table showed five, wh
 
 | File | Voice hits | What they are |
 |---|---:|---|
-| `PROOF.md` | 1 | serial-comma advisory |
 | `references/checklist.md` | 0 | |
 | `references/craft.md` | 0 | |
 | `../readme-writing/SKILL.md` | 0 | |
+| `PROOF.md` | 1 | serial-comma advisory |
 | `references/false-positives.md` | 1 | serial-comma advisory |
-| `references/voice.md` | 2 | one attributed quotation, one serial-comma advisory |
+| `references/voice.md` | 2 | one one-word sentence, one serial-comma advisory |
 | `voices/whit3rabbit.md` | 3 | serial-comma advisories |
 | `../voice-setup/SKILL.md` | 3 | serial-comma advisories |
 | `SKILL.md` | 6 | serial-comma advisories |
@@ -92,7 +98,7 @@ A second pass, this one by a reader rather than by the tool. Two of these were s
 11. **`verify.py` counted tells from a hardcoded copy of the lexicon.** Fifteen words, frozen. It now builds the counter from `lexicon.json` and falls back to the frozen list only when the engine is not beside it.
 12. **A stray quote exempted the next 200 characters.** `QUOTED_RX` accepted a straight quote closed by a curly one, so one unpaired mark could blank a whole paragraph out of scoring. Each pair now has to close with its own kind.
 13. **`key` was a Tier-3 word.** One of the most common words in English, sitting in the list that fires on density. It dominated the count. Removed, and the phrase worth catching (`key turning point`) was already a pattern regex.
-14. **The Tier-1 table and the lexicon disagreed.** `patterns.md` listed `leverage`, `landscape`, and `unpack` as replace-on-sight, and the lexicon had the first two as cluster-only and the third not at all. `seamlessly` was in both Tier 1 and Tier 3, so one word produced a P1 and inflated the density that produced a P2. The sense-dependent words moved to Tier 2 with the reason stated, and `tests/test_scan.py` now fails if a word in the Tier-1 table does not resolve in the lexicon.
+14. **The Tier-1 table and the lexicon disagreed.** `patterns.md` listed `leverage`, `landscape`, and `unpack` as replace-on-sight, and the lexicon had the first two as cluster-only and the third not at all. `seamlessly` was in both Tier 1 and Tier 3, so one word produced a P1 and inflated the density that produced a P2. The sense-dependent words moved to Tier 2 with the reason stated, and `tests/test_engine.py` now fails if a word in the Tier-1 table does not resolve in the lexicon.
 15. **A non-breaking space was a P0.** It is correct French typography, correct before a unit, and correct in a name that must not wrap. Reporting it as a credibility killer failed documents that had been typeset properly. Space-like characters now report at P2 and only past three of them. The zero-width characters are unchanged.
 16. **`Dr.` read as a one-word sentence.** "The meeting ran late. Dr. Smith arrived" flagged the honorific as emphasis. Guarded with a narrower abbreviation list than the sentence splitter uses, deliberately leaving out `No.`, which in prose is almost always the sentence this rule exists to catch.
 17. **Three `here` links reported the same line.** The vague-link-text check searched for the link text and always found the first occurrence. It iterates matches now.
@@ -103,7 +109,7 @@ A second pass, this one by a reader rather than by the tool. Two of these were s
 Found on a second read of the fixes themselves, which is the pass that usually gets skipped.
 
 19. **Rebuilding the tell counter from the lexicon swept in `curly-quote`.** Fixing the frozen-copy bug in item 11 pulled in every fingerprint pattern, and curly quotes are one. Paste a paragraph through Word, Google Docs, or macOS and the typography curls by itself, so a correct rewrite gained tells it did not write and `verify.py` hard-failed it. That is the false positive `references/false-positives.md` warns about, produced by the tool whose job is catching silent breakage. P2 fingerprints are excluded from the counter now, and a test pins a straight-to-curly rewrite as passing.
-20. **Three relaxed matrix cells still had no allowance** after `PROFILE_RELAX` was added: hedging, boilerplate clusters, and Tier-1 vocabulary in `docs`. They sat in exactly the gap `curly-quote` had just been lifted out of. `tests/test_scan.py` now parses the tolerance matrix and fails on any cell without an implementation in either direction. It found two more the moment it was written, `docs` against future-narrative closers and social endorsement closers, plus one policy the matrix and the engine disagreed on.
+20. **Three relaxed matrix cells still had no allowance** after `PROFILE_RELAX` was added: hedging, boilerplate clusters, and Tier-1 vocabulary in `docs`. They sat in exactly the gap `curly-quote` had just been lifted out of. The suite then parsed the tolerance matrix and failed on any cell without an implementation in either direction, which `scripts/registers.json` has since made structural rather than parsed. It found two more the moment it was written, `docs` against future-narrative closers and social endorsement closers, plus one policy the matrix and the engine disagreed on.
 21. **The no-P0-relaxation rule was invented rather than inherited.** The engine's actual promise is that P0 *fingerprints* are never suppressed, because those are evidence about how a document was produced. `significance-inflation` is a craft P0, and one "plays a key role" in a reference page is the register rather than a tell. The matrix always said so. A test now asserts the real promise, that no P0 fingerprint appears in any skip or relax set, instead of the broader one that was quietly overriding the matrix.
 
 ## Bugs found by a second review
@@ -134,21 +140,37 @@ extension requirement makes it match "and/or", "TCP/IP", "human/AI", and every
 under-matching is the safe direction, so `SKILL.md` now says which half of its
 own promise is mechanically enforced.
 
+## Bugs found by a third review
+
+A read of the same six surfaces again, this time looking at the places the first
+two passes did not reach: the seams between tools, and the measurement layer that
+produces the numbers on this page. One finding had consequences outside the repo.
+
+30. **The research pipeline sent a GitHub token to a third party.** `01_fetch_candidates.py` attached `Authorization: Bearer $GITHUB_TOKEN` to every request its helper made, and one of those requests goes to `api.ossinsight.io`, which never asked for a GitHub credential and cannot use one. The header is now attached only when the host is exactly `api.github.com`, compared as a whole hostname rather than a suffix, because `api.github.com.example.net` belongs to somebody else. This is the only finding in the pass with an effect beyond this repository, and it was fixed on its own.
+31. **The two engines disagreed about a date range.** `verify.py` deliberately exempts a spaceless en dash between digits, because `2010–2023` is correct typography and the one en dash a rewrite legitimately produces, and a test pinned it. `scan.py` had no such carve-out, so under a voice that forbids em dashes the same file passed verification and failed the scan with a P0, and `em_dashes_per_1k` counted the range as a splice. Both now use one pattern, and a test asserts the two files declare it identically, because two copies of one rule drift quietly: the scan keeps reporting and the verifier keeps passing.
+32. **Heading text was measured as the sentence below it.** `strip_for_stats()` removed the `##` and left the words. A heading carries no terminal punctuation, so `split_sentences` glued it onto the first sentence of its section, and every section opener in every markdown document measured two or three words long. Block quotes were worse: they are exempt from flagging and were counted in full, so a document that is half quotation reported the rhythm of whoever it was quoting. Both are dropped now, which is the same rule `03_analyze_readme.py` applies to the corpus, and every word count in the table above moved.
+33. **Nested badge links were parsed as links to the badge.** `[![PyPI](shields.io/...)](pypi.org/...)` is one of the most common shapes in this corpus. The link regex refuses a leading `!` and then matches the outer bracket, which stops at the `]` closing the alt text, so it captured `![PyPI` as the link text and the *badge image* URL as the destination. Both link counters had it, which means the study measured link style over pseudo-links. Images are blanked before links are counted now, in both the checker and the corpus script. Regenerating moved less than expected, because a badge wrapper was counted once either way: the destinations were wrong rather than the totals, and `avg_link_text_words` went from 2.16 to 2.18.
+34. **One unclosed `<table>` could fail CI.** `find_pitch` skips `<details>` and `<table>` blocks, and the depth counter has no way to know a block was never closed. A hand-written sponsor grid missing a `</table>`, which GitHub renders anyway, kept the counter positive to the end of the file, skipped every line after it, and reported `no-pitch`: a P0, and an exit 1 under `--check`, on a README whose second paragraph says exactly what the project is. A markdown heading now closes any block still open, and a second pass that ignores the blocks entirely runs only when the first found nothing.
+35. **`classify_heading` could not classify `## API`.** The keyword was written `" api"` with a leading space, to stop it matching "apiary" and "rapid", and a leading space has nothing to sit against at the start of the string. The single most obvious API heading there is fell through to `other` in both the checker and the study. Headings are padded before the test now, so a keyword can ask for a whole word by writing its own spaces, and the plural is spelled out so `Required APIs` keeps the classification it always had. `"getting started"` was also listed under both `installation` and `usage`, and installation is tested first, so the usage copy could never win a heading. It is gone.
+36. **Smaller drift, again.** `verify.py` ran its path check over inline code, so one edit to `` `scripts/scan.py` `` reported two broken promises where there was one. `--profile` took its choices from `PROFILE_SKIP`, so a register whose skip set emptied out would vanish from the CLI and from the coverage the tests get by iterating registers: there is an explicit `REGISTERS` tuple now, pinned against the tolerance matrix's own columns. `formulaic-challenges` fired on "the team faces challenges next quarter", which is a sentence rather than a tell, and now matches the formula patterns.md section 45 actually describes. The sentence splitter protected abbreviations with U+2024 ONE DOT LEADER and replaced every one of them with a period at the end, quietly rewriting any document that legitimately contained one. `check_structure` checked the position of the *first* license heading, so a README with an early licence mention and a real License section at the end was told its license is not last. `[a][b]` in prose, `matrix[i][j]` outside a code span, was reported as a reference-style link, and a reference now has to resolve against a definition before it is named. Both scanners documented exit codes they do not use.
+
 ## Calibration
 
-`tests/test_scan.py` asserts the separation holds and fails if it drifts.
+`tests/test_calibration.py` asserts the separation holds and fails if it drifts.
 
 | Fixture | Findings | P0 | Burstiness |
 |---|---:|---:|---:|
-| `tests/samples/ai-sample.md` | 42 | 7 | 0.66 |
+| `tests/samples/ai-sample.md` | 44 | 7 | 0.66 |
 | `tests/samples/human-sample.md` | 0 | 0 | 0.62 |
 | `tests/samples/metronomic-sample.md` | 1 (uniformity) | 0 | 0.07 |
-| `tests/samples/needs-conversion.md` | 12 | 8 | 0.24 |
-| `tests/samples/already-in-voice.md` | 0 | 0 | 0.53 |
+| `tests/samples/needs-conversion.md` | 14 | 10 | 0.21 |
+| `tests/samples/already-in-voice.md` | 0 | 0 | 0.54 |
 
 The metronomic fixture matters most for the craft bands. It contains no flagged vocabulary, no chatbot artifacts, and no negation runways. It still reads as machine output because every sentence is the same length. Vocabulary and rhythm are independent axes, and a draft can pass every word check and fail the read-aloud test.
 
-The last two fixtures measure a different thing: whether the inputs to a conversion offer actually fire. `needs-conversion.md` is a report in a neutral register, structurally wrong for the active profile, and it reports 5 over-cap paragraphs, 3 banned words, a US-order date, and burstiness of 0.24 against a human floor of 0.45. `already-in-voice.md` says the same things in the profile's shape and reports nothing at all.
+The last two fixtures measure a different thing: whether the inputs to a conversion offer actually fire. `needs-conversion.md` is a report in a neutral register, structurally wrong for the active profile, and it reports 6 over-cap paragraphs, 4 banned words, a numeric date, and burstiness of 0.21 against a human floor of 0.45. `already-in-voice.md` says the same things in the profile's shape and reports nothing at all.
+
+`needs-conversion.md` gained a section in the third review pass, for a reason worth naming. Fixing the heading measurement in item 32 took the fixture from 620 measured words to 596, four short of the 600-word floor where this engine calls a sample reliable, and a fixture whose whole job is to be long enough for the numbers to mean something failed that assertion on a rounding error. The prose was extended rather than the assertion relaxed.
 
 Neither fixture proves the skill chose a deep rewrite when it should have. Mode selection is prompt behaviour and no script in this repo can assert it. What they protect is the measurement the offer is built from, so the numbers a user sees before deciding are real.
 
@@ -156,14 +178,24 @@ Neither fixture proves the skill chose a deep rewrite when it should have. Mode 
 
 The fixtures are hand-written, not drawn from a provenance-labeled corpus. Two samples establish that the detector separates an obvious case from an obvious case, which is the weakest form of evidence a detector can offer.
 
-`conorbronsdon/avoid-ai-writing` does this properly: a hash-only corpus of public-domain works, archived pre-2023 blog posts, and RAID human baseline rows, where ground truth is provenance rather than a judge, reporting false-positive rates by register with Wilson intervals. That is the right shape for this measurement and it is not implemented here.
+`conorbronsdon/avoid-ai-writing` does this properly: a hash-only corpus of public-domain works, archived pre-2023 blog posts, and RAID human baseline rows, where ground truth is provenance rather than a judge, reporting false-positive rates by register with Wilson intervals. That is the right shape for this measurement.
 
-Until it is, treat these numbers as a regression guard, not an accuracy claim.
+The harness for it now exists, in `docs/detector-corpus/` and `scripts/detector-corpus/`. It takes samples with an archive capture proving they predate 2022-11-30, stores a SHA-256 rather than the prose, refuses a human label dated after the cutoff, excludes any sample whose text no longer matches its hash, and reports the P0 false-positive rate per register with a Wilson interval. Run `python3 scripts/detector-corpus/score.py` to see it.
+
+**The corpus is empty.** The machinery works and nobody has gathered the texts, which needs network access, a few hours, and a copyright judgment about redistributing other people's writing that the hash-only design answers but does not make for anybody. `docs/detector-corpus/README.md` is the procedure.
+
+Two numbers are worth stating in the meantime, because they are what the current fixtures are actually worth. Zero false positives over two human samples is a rate somewhere between 0% and 66%. Zero over fifty would be somewhere under 7%. That gap is the whole argument for building this, and it is why the sentence below has not changed.
+
+Until the corpus is populated, treat these numbers as a regression guard, not an accuracy claim.
 
 ## Known false positive, parked on purpose
 
 `is_prose_block()` decides a block is a list when at least half its lines start with a bullet. A list whose items wrap over several lines each fails that ratio and gets scored as one long paragraph, so the voice paragraph-length cap fires on it. `CHANGELOG.md` reports five of these and every one is a bullet list.
 
 It is left alone for now because the fix moves the numbers published above, and a calibration table that changed in the same pass that published it is worth less than one that did not. The fix is to treat a block whose first non-blank line is a list item as a list regardless of the ratio. Whoever takes it should expect the self-scan table and `tests/samples/needs-conversion.md` counts to move with it, and should regenerate this file rather than editing the numbers by hand.
+
+A second one was parked in the third review, with the measurement written down this time. List items are counted as sentences by `strip_for_stats()`, and they distort rhythm the way heading text did: a one-word bullet is a one-word sentence. Dropping them was measured and rejected. It takes `checklist.md` from 640 measured words to 91, under the 120-word floor where the stylometric flags switch off, so the change would silence the uniformity detector on exactly the list-heavy documents most worth measuring.
+
+Filtering the paragraph statistics through `is_prose_block()` was measured too, and rejected for the opposite reason: what survives in a list-heavy file is the one-sentence lead-ins, whose length is uniform by nature, so `checklist.md` drops to a paragraph sd of 0.53 and newly trips `uniform-paragraphs` for having short paragraphs that are correct. A bullet is also prose a reader reads, which a `##` is not.
 
 The readme-writing skill had the same rule reading the same shape wrong, from the other direction: a block whose first line was prose and whose remaining lines were bullets scored as one long paragraph. That one was not parked, because nothing published depends on it. It is item 28 above.

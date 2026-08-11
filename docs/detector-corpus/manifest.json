@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "_comment": "Provenance-labeled samples for measuring this engine's false-positive rate. Empty on purpose: the harness exists, the texts have not been gathered. See README.md in this directory for the protocol, and PROOF.md for what the calibration rests on until then. Hash-only: the text lives in texts/, which git ignores.",
+  "cutoff": "2022-11-30",
+  "samples": []
+}

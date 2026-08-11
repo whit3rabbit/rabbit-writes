@@ -717,8 +717,8 @@
     "bare_url_count": 2,
     "total_markdown_links": 97,
     "uses_reference_style_links": false,
-    "avg_link_text_words": 3.24,
-    "internal_anchor_link_count": 21,
+    "avg_link_text_words": 3.47,
+    "internal_anchor_link_count": 24,
     "has_toc_like_anchor_list": true,
     "code_block_count": 25,
     "code_block_languages": [

@@ -1,5 +1,81 @@
 # Changelog
 
+## Unreleased
+
+Architecture and evidence. Nothing here changes what the engine flags, and the
+100-repo corpus regression, the calibration fixtures, and every published
+self-scan number were re-run to prove it.
+
+### One home per fact
+
+Four facts were stated in two or three places each, with comments asking the
+next reader to keep the copies in sync. They drifted anyway, which is where the
+last two review passes spent themselves.
+
+- **`skills/rabbit-writes/scripts/rwlib/`** holds the markdown spans, sentence
+  splitting, the lexicon, badge hosts, section keywords, the finding schema, and
+  the register tables. `scan.py`, `verify.py`, `readme_check.py`, and the corpus
+  research scripts all import it. The test that pinned two regex literals against
+  each other is gone, replaced by an identity check: two modules importing one
+  object cannot drift. Verified byte-identical over all 100 corpus READMEs.
+- **`scripts/registers.json`** is the tolerance matrix. `scan.py` derives
+  `PROFILE_SKIP`, `PROFILE_RELAX`, and `VOCAB_EXEMPT_PROFILES` from it, and the
+  table in `references/context.md` is rendered from it. The test that parsed the
+  markdown table to check the two agreed is gone with the second copy.
+- **`skills/readme-writing/scripts/corpus_summary.json`** is the corpus extract
+  the README checker compares against, produced by a new step 05 in the research
+  pipeline. It used to be a literal dict with a comment promising it mirrored the
+  aggregate and nothing checking the promise.
+- **`lexicon.json` and `registers.json` carry a `version`**, echoed in
+  `scan.py --json` and in `PROOF.md`'s heading. `validate.py` fails when they
+  disagree, so a published measurement names the catalogue that produced it.
+
+### New
+
+- **`scan.py --apply-safe`** applies only the edits with exactly one correct
+  answer (hidden characters, AI tracking parameters, and a voice's own
+  single-word substitutions), then runs `verify.py` on its own output. Dry run
+  without `--write`. Nothing inside code, a table, a quote, or a fence is
+  touched: it is reported and left alone. Converting a typed `--` into an em dash
+  was in the set until the property tests pointed out that this plugin never adds
+  an em dash, so every fix failed its own gate.
+- **`--sarif` on both checkers**, so findings land inline on a pull request diff
+  instead of in a CI log. P0 maps to `error`, P1 to `warning`, P2 to `note`.
+- **`extends` in a voice rules file.** Bans union with the parent, mechanics
+  merge key by key with the child winning. Cycles and missing parents are errors,
+  because a profile that inherits from nothing enforces nothing.
+- **`.pre-commit-hooks.yaml`**, three hooks, all gating on P0 only.
+- **An English-only scope, stated.** Every band and tier list here is calibrated
+  on English. A document whose letters are mostly non-ASCII now gets a note at
+  the top of the report. A note, never a failure: a bilingual README with an
+  English quickstart deserves an answer for the English half.
+- **`docs/detector-corpus/`**, the harness `PROOF.md` has been admitting it needs.
+  Provenance-labeled samples, hash-only storage, a human label refused after the
+  2022-11-30 cutoff, and a per-register false-positive rate with a Wilson
+  interval. The corpus is empty, and both `PROOF.md` and that directory's README
+  say so plainly rather than implying otherwise.
+
+### Tests
+
+- **Both suites split** from one ordered 900-line function into named test files
+  with memoized fixtures. `run.py` drives them with nothing installed; `pytest`
+  collects the same files. `run.py -k <substring>` selects by name.
+- **`tests/test_invariants.py`** makes the blanking invariant a property instead
+  of a comment repeated in six places. It found two live bugs in its first hour:
+  the `--apply-safe` em-dash conversion above, and a tracking-parameter fix that
+  reached into a code fence.
+- **`validate.py` gained five checks**: the register matrix against the docs, the
+  corpus extract against the aggregate, the finding schema over real findings
+  from both checkers, the version stamps, and a one-definition tripwire. The last
+  one caught a rule spelled out in three files whose copies had already stopped
+  agreeing about whether "country" was on a list.
+
+### Fixed
+
+- `readme_check.py` emitted a `detail` key that `scan.py` never did, so its own
+  reporter branched on the band to find its text and no consumer could parse both
+  with one reader. One schema now, versioned.
+
 ## 0.1.0 (unreleased)
 
 First release. Everything below was built before anything was published, so this

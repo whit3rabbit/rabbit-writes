@@ -117,14 +117,65 @@ The explicit forms are there for when you want to force one. The `rabbit-writes:
 /rabbit-writes:readme-writing   # draft or audit a README against the 100-repo study
 ```
 
-The two scripts run from a shell, not from a skill:
+The scripts run from a shell, not from a skill. Stdlib only, Python 3.8+:
 
 ```bash
 python3 scripts/validate.py                      # check manifests, skills, voices, cross-refs
 python3 skills/rabbit-writes/scripts/scan.py draft.md \
     --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json   # findings in three bands
 python3 skills/rabbit-writes/scripts/verify.py original.md rewritten.md   # did the rewrite break a promise
+python3 skills/rabbit-writes/scripts/scan.py draft.md --apply-safe        # the fixes with one right answer
+python3 skills/rabbit-writes/scripts/scan.py draft.md --sarif             # for a pull request annotation
 ```
+
+### `--apply-safe`
+
+Almost nothing here has a mechanical fix. "This paragraph is nine sentences long" needs a person, and a tool that guessed would be the humanizer-shaped thing this plugin exists not to be.
+
+Three things are different, because each has exactly one correct answer: a hidden character that carries no meaning, an AI tool's tracking parameter on a link, and a word your own profile already names a replacement for. `--apply-safe` applies those, runs `verify.py` on its own output, and prints what it did.
+
+```bash
+python3 skills/rabbit-writes/scripts/scan.py draft.md --apply-safe   # dry run, prints the diff
+python3 skills/rabbit-writes/scripts/scan.py draft.md --apply-safe --write
+```
+
+Everything else stays report-only. So does anything sitting inside a code fence, a table, a block quote, or a quoted example: the promise not to touch those outranks the fix, and the report says where the character is so you can decide.
+
+A `preferred_substitutions` entry is only applied when it is a replacement. `leverage` to `use` is a swap. `at the end of the day` to `cut it` is a note to you, and writing "cut it" into the sentence would be worse than leaving it.
+
+Converting a typed `--` into an em dash is deliberately not in the set. It was, for about an hour, until the property tests pointed out that this plugin never adds an em dash under any circumstances, so every fix failed its own gate.
+
+### `--sarif`
+
+Findings map onto SARIF 2.1.0 without inventing anything: the finding id is the rule id, P0 is `error`, P1 is `warning`, P2 is `note`. Upload it and the findings land inline on the diff instead of in a CI log.
+
+```yaml
+- name: prose scan
+  run: |
+    python3 skills/rabbit-writes/scripts/scan.py docs/guide.md \
+      --sarif --sarif-uri docs/guide.md > scan.sarif
+- uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: scan.sarif
+```
+
+`--sarif-uri` has to be the path relative to the repository root. GitHub silently drops results whose file it cannot resolve in the checkout, and silently is the operative word: the upload succeeds and nothing appears.
+
+### pre-commit
+
+`.pre-commit-hooks.yaml` ships three hooks, all gating on P0 only. A P1 is a convention worth arguing about and a P2 is polish, and a hook that blocks a commit over polish is a hook people learn to pass `--no-verify` to.
+
+```yaml
+repos:
+  - repo: https://github.com/whit3rabbit/rabbit-writes
+    rev: v0.1.0
+    hooks:
+      - id: readme-check
+      - id: rabbit-scan
+        files: ^docs/.*\.md$
+```
+
+Scope `rabbit-scan` with `files`. Unscoped it runs on every markdown file in the repository, including the generated ones nobody wrote by hand.
 
 ## Point it at a document
 
@@ -275,6 +326,8 @@ A register profile (`--profile casual`, `--profile docs`) relaxes the general ru
 - Rewrite anything inside code, tables, block quotes, frontmatter, or attributed quotations.
 - Follow instructions embedded in the text it is editing.
 
+- Work in a language other than English. Every tier list, contraction rule, sentence boundary, and stylometric band here is calibrated on English prose. Point it at Japanese or Arabic and it will still print numbers, and they will not mean anything. It says so: a document whose letters are mostly non-ASCII gets a note at the top of the report. It is a note and not a failure, because a bilingual README with an English quickstart deserves an answer for the English half.
+
 You may not add a fact or a stance. That constraint is what separates restoring a voice from installing one. Form is a different axis: converting a document into your voice reorders sections, splits paragraphs, and rewrites sentences whole, because a voice profile is mostly structural and a word swap cannot apply "lead with the conclusion".
 
 ## Verify a rewrite
@@ -327,14 +380,22 @@ Heading classification is keyword-based and sentence splitting is a regex, so re
 ## Tests
 
 ```bash
-python3 scripts/validate.py                              # manifests, skills, voices, cross-refs
-python3 skills/rabbit-writes/tests/test_scan.py          # calibration and regression
-python3 skills/readme-writing/tests/test_readme_check.py # structure, voice, 100-repo regression
+python3 scripts/validate.py                        # manifests, skills, voices, cross-refs, tripwires
+python3 skills/rabbit-writes/tests/run.py          # engine, voice, verifier, fixer, invariants
+python3 skills/readme-writing/tests/run.py         # structure, links, voice, 100-repo regression
 ```
+
+`run.py` needs nothing installed, which is the same promise the scripts make. `pytest` collects the same files if you have it, and `run.py -k <substring>` selects by name.
 
 The calibration fixtures assert that known slop scores high, known human prose scores zero, and a third sample with no flagged vocabulary at all still trips the uniformity detector because every sentence is the same length. Vocabulary and rhythm are independent axes, and that third fixture is the one that matters.
 
-`skills/rabbit-writes/PROOF.md` publishes the engine scanned by its own scanner, including the unflattering rows.
+`tests/test_invariants.py` is a different kind of test. Half the engine reports a line number taken from a blanked copy of the document, which only works because blanking preserves length.
+
+That fact was asserted in comments in six places and checked nowhere. It is now a property, tested over generated markdown built from the fragments that have caused real trouble. It found two live bugs in its first hour.
+
+`skills/rabbit-writes/PROOF.md` publishes the engine scanned by its own scanner, unflattering rows included. It also says in the file that a two-sample calibration is the weakest evidence a detector can offer.
+
+`docs/detector-corpus/` replaces that with a measured false-positive rate per register, once somebody populates it. The machinery is written and the corpus is empty. The README in that directory is the procedure.
 
 ## Where this came from
 

@@ -102,7 +102,7 @@
       "other",
       "other",
       "other",
-      "api",
+      "other",
       "other",
       "support",
       "other",
@@ -503,7 +503,7 @@
       {
         "level": 1,
         "text": "Keep context/scope/loop warnings but suppress API-rate cost estimates",
-        "category": "api"
+        "category": "other"
       },
       {
         "level": 1,
@@ -758,6 +758,7 @@
         3,
         3,
         4,
+        15,
         45,
         198,
         14,
@@ -823,12 +824,11 @@
       "features": [
         97
       ],
-      "api": [
-        15,
-        58
-      ],
       "architecture": [
         80
+      ],
+      "api": [
+        58
       ],
       "security": [
         261

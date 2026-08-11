@@ -18,19 +18,30 @@ Findings come back in three bands:
     fingerprint  evidence the text came out of a chat tool.
     craft        general writing problems, never evidence about authorship.
 
+This engine is calibrated on English. The tier lists are English words, the
+sentence splitter breaks on English punctuation, and the stylometric bands come
+from studies of English prose. It reports a note on a document that is mostly
+another script and keeps going, because a bilingual README with an English
+quickstart deserves an answer for the English half. It never fails on one.
+
 Usage:
     python3 scan.py draft.md
     python3 scan.py draft.md --json
+    python3 scan.py draft.md --sarif > scan.sarif
     python3 scan.py draft.md --profile technical-blog
     python3 scan.py draft.md --voice-rules ../../rabbit-writes/voices/whit3rabbit.rules.json
     python3 scan.py --profile casual < input.txt
     python3 scan.py draft.md --no-exempt      # score quoted examples too
+    python3 scan.py draft.md --apply-safe     # show the mechanical fixes
+    python3 scan.py draft.md --apply-safe --write
 
 A register profile relaxes the general rules. It never relaxes a voice rule:
 lowercase and loose punctuation are fine off the clock, a banned phrase is not.
 
-Exit codes: 0 always, unless --check is passed, in which case any P0 finding
-exits 1. Stdlib only; runs on Python 3.8+.
+Exit codes: 0 clean; 1 when --check is passed and a P0 finding is present; 2 when
+--voice-rules names a file that cannot be read or does not parse, because
+silently scanning without the voice rules that were asked for would report a
+clean voice band on a document nobody checked. Stdlib only; runs on Python 3.8+.
 """
 
 import argparse
@@ -42,56 +53,46 @@ import sys
 from collections import Counter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-LEXICON_PATH = os.path.join(HERE, "lexicon.json")
+# rwlib sits beside this file and is not on anybody's PYTHONPATH: a plugin runs
+# from wherever it was installed. Inserted rather than appended, so a stray
+# `markdown` or `sections` module on the host's path cannot shadow ours.
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
 
-# Registers and the categories they suppress. Mirrors the `skip` cells of the
-# tolerance matrix in references/context.md. P0 fingerprints are never
-# suppressed anywhere.
-PROFILE_SKIP = {
-    "linkedin": {"transition-stack", "generic-conclusion", "tier3-density",
-                 "uniform-paragraphs", "curly-quote"},
-    "blog": {"curly-quote"},
-    "technical-blog": {"diff-anchored"},
-    "investor-email": {"curly-quote"},
-    "docs": {"uniform-paragraphs", "rhetorical-question", "emoji-heading",
-             "generic-conclusion", "future-narrative", "social-cta",
-             "diff-anchored", "list-label-period"},
-    "casual": {"transition-stack", "generic-conclusion",
-               "em-dash-rate", "uniform-paragraphs", "tier3-density",
-               "tier2-cluster", "confidence-calibration", "signposting",
-               "tier1", "rhetorical-question", "promotional", "hedge-stack",
-               "emoji-heading", "boilerplate-phrase", "future-narrative",
-               "significance-inflation"},
-}
+from rwlib import fixes as fixes_mod             # noqa: E402
+from rwlib import language, registers, sarif     # noqa: E402
+from rwlib import findings as findings_mod       # noqa: E402
+from rwlib import lexicon as lexicon_mod         # noqa: E402
+from rwlib import voices as voices_mod           # noqa: E402
+from rwlib.artifacts import (HIDDEN_UNICODE, SPACE_LIKE_TOLERANCE,  # noqa: E402
+                             SPACE_LIKE_UNICODE)
+# QUOTED_RX and SENTENCE_SENTINEL are re-exports rather than callers. Two
+# tests assert `scan.QUOTED_RX is verify.QUOTED_RX` and pin the sentinel
+# codepoint through this module, which is what makes "one home per fact"
+# checkable from the outside instead of promised in a comment. Deleting them
+# as unused takes the tripwire with them.
+from rwlib.markdown import (BLOCKQUOTE_RX, CURLY_QUOTE_RX, FENCE_RX,  # noqa: E402,F401
+                            FRONTMATTER_RX, HEADING_LINE_RX, INLINE_CODE_RX,
+                            PROSE_DASH_RX, QUOTED_RX, TABLE_ROW_RX,
+                            URL_GREEDY_RX, apply_exemptions, excerpt,
+                            is_prose_block, line_of)
+from rwlib.sentences import (SENTENCE_SENTINEL, split_sentences,  # noqa: E402,F401
+                             syllables, tokenize)
 
-# The `relaxed` cells of the same matrix, as hit allowances: the rule still
-# runs, it just does not report until the register's tolerance is used up.
-# Relaxing and skipping are different promises, and folding one into the other
-# is how `curly-quote` ended up listed in every skip set and unable to fire in
-# any register.
+LEXICON_PATH = lexicon_mod.LEXICON_PATH
+
+# The tolerance matrix, read from registers.json rather than restated here.
+# These three names are what validate.py and the test suite check, and they used
+# to be the second of three copies of the same fact: the first was prose in
+# references/context.md and the third was a test that parsed that prose. See
+# rwlib/registers.py.
 #
-# `significance-inflation` is a P0 and is relaxed here anyway, because the
-# promise this engine makes is about P0 *fingerprints*, which are evidence about
-# how a document was produced. A craft P0 is a judgment about writing, and one
-# "plays a key role" in a reference page is the register, not a tell. The
-# fingerprint band is never skipped or relaxed in any register.
-PROFILE_RELAX = {
-    "linkedin": {"em-dash-rate": 2, "emoji-heading": 2,
-                 "rhetorical-question": 1, "promotional": 1},
-    "technical-blog": {"curly-quote": 4, "hedge-stack": 2},
-    "docs": {"curly-quote": 4, "transition-stack": 3, "em-dash-rate": 6,
-             "hedge-stack": 2, "boilerplate-phrase": 2,
-             "significance-inflation": 1},
-    "casual": {"curly-quote": 4, "social-cta": 1},
-}
-
-# Registers where the vocabulary tiers drop the words that carry real technical
-# meaning. This is what the matrix's "partial" cell means, and it is how the
-# `docs` register relaxes Tier 1: not an allowance that would let two `delve`s
-# through, but the named exemption list, which lets `robust` and `comprehensive`
-# through and keeps `delve` at full strength. A README is documentation, so the
-# same reasoning applies to it as to a technical blog post.
-VOCAB_EXEMPT_PROFILES = {"technical-blog", "docs"}
+# `blog` is the strict baseline and is the default register.
+REGISTERS = registers.registers()
+PROFILE_SKIP = registers.skip_table()
+PROFILE_RELAX = registers.relax_table()
+VOCAB_EXEMPT_PROFILES = registers.vocab_exempt_registers()
+DEFAULT_REGISTER = registers.default_register()
 
 # Human reference ranges. Sources: Copyleaks stylometric work (arXiv 2503.01659),
 # classical type-token-ratio literature, and the ranges published by
@@ -110,73 +111,16 @@ RELIABILITY_TIERS = [
     (120, "low"),
 ]
 
-FENCE_RX = re.compile(r"^```.*?^```", re.M | re.S)
-INLINE_CODE_RX = re.compile(r"`[^`\n]+`")
-FRONTMATTER_RX = re.compile(r"\A---\n.*?\n---\n", re.S)
-TABLE_RX = re.compile(r"(?m)^\s*\|.*\|\s*$")
-BLOCKQUOTE_RX = re.compile(r"(?m)^\s*>.*$")
-URL_RX = re.compile(r"https?://\S+")
-# Each pair has to close with its own kind. A single alternation over both the
-# opening and the closing marks lets one stray straight quote pair with a curly
-# one up to 200 characters later, and every word between them stops being
-# scored.
-QUOTED_RX = re.compile("\"[^\"“”\n]{4,200}\"|“[^\"“”\n]{4,200}”")
-
-# Characters that survive a copy out of a chat window and carry no meaning in
-# the prose.
-#
-# Written as escapes, never as the characters themselves. As literals these keys
-# are invisible: two that look identical in an editor merge into one and a check
-# disappears without a word, and any tool that normalizes whitespace can turn the
-# U+00A0 key into a plain space, at which point the counter below reads every
-# space in every document as a paste artifact. test_scan.py pins the exact
-# codepoints, so a normalizing save fails the build instead of the scan.
-HIDDEN_UNICODE = {
-    "\u200b": "zero-width space",
-    "\u200c": "zero-width non-joiner",
-    "\u200d": "zero-width joiner",
-    "\u2060": "word joiner",
-    "\ufeff": "byte-order mark",
-    "\u00ad": "soft hyphen",
-    "\u00a0": "non-breaking space",
-    "\u202f": "narrow no-break space",
-}
-
-# The invisible characters above have no honest use in prose, so one occurrence
-# is a paste artifact and a P0. The two space-like ones are different: a
-# non-breaking space is correct French typography, correct in front of a unit,
-# and correct in a name that must not wrap. Calling those a credibility killer
-# fails documents that were typeset properly, so they report at P2 and only
-# once there are enough of them to look mechanical.
-SPACE_LIKE_UNICODE = {"\u00a0", "\u202f"}
-SPACE_LIKE_TOLERANCE = 3
-
-ABBREV_RX = re.compile(
-    r"\b(Mr|Mrs|Ms|Dr|Prof|Sr|Jr|St|etc|vs|approx|dept|est|vol|Inc|Ltd|Fig|No)\.",
-    re.I,
-)
+# Kept as a module-level name because the reference files talk about it. The
+# definition lives in rwlib.markdown, beside the other table patterns, so
+# verify.py and readme_check.py cannot end up disagreeing with it.
+TABLE_RX = TABLE_ROW_RX
 
 
 # --------------------------------------------------------------------------
 # text preparation
 # --------------------------------------------------------------------------
 
-def blank(match):
-    """Replace a span with same-length whitespace so offsets stay stable."""
-    return re.sub(r"\S", " ", match.group(0))
-
-
-def apply_exemptions(text):
-    """Blank out the spans this skill promises never to rewrite, so a document
-    that quotes AI patterns in order to warn about them does not score as one.
-    Same escape hatch stated in SKILL.md, made executable."""
-    out = FRONTMATTER_RX.sub(blank, text)
-    out = FENCE_RX.sub(blank, out)
-    out = INLINE_CODE_RX.sub(blank, out)
-    out = TABLE_RX.sub(blank, out)
-    out = BLOCKQUOTE_RX.sub(blank, out)
-    out = QUOTED_RX.sub(blank, out)
-    return out
 
 
 def strip_for_stats(text):
@@ -185,38 +129,28 @@ def strip_for_stats(text):
     Tables are dropped as well as code: a comparison table legitimately repeats
     the same cell values, and counting those repeats as trigram repetition or
     the cell separators as prose rhythm would measure the markup, not the
-    writing."""
+    writing.
+
+    Headings and block quotes go with them. A heading is a label rather than a
+    sentence, and a block quote is somebody else's prose: apply_exemptions
+    already refuses to flag one, and a document that is half quotation used to
+    report the rhythm of whoever it was quoting. Over patterns.md that is 599
+    words and 57 "sentences" of other people's writing.
+
+    List items are deliberately kept. They distort rhythm the same way a heading
+    does, and dropping them costs too much to be worth it: checklist.md falls
+    from 666 measured words to 91, under the 120-word floor, which silences every
+    stylometric flag on exactly the list-heavy documents most worth measuring.
+    A bullet is also prose a reader reads, which a `##` is not."""
     out = FRONTMATTER_RX.sub("", text)
     out = FENCE_RX.sub("", out)
     out = INLINE_CODE_RX.sub("", out)
     out = TABLE_RX.sub("", out)
-    out = URL_RX.sub("", out)
-    out = re.sub(r"(?m)^#{1,6}\s+", "", out)
+    out = URL_GREEDY_RX.sub("", out)
+    out = HEADING_LINE_RX.sub("", out)
+    out = BLOCKQUOTE_RX.sub("", out)
     out = re.sub(r"[*_`>]", "", out)
     return out
-
-
-def split_sentences(text):
-    protected = ABBREV_RX.sub(lambda m: m.group(0).replace(".", "․"), text)
-    protected = re.sub(r"\b([A-Z])\.", r"\1․", protected)
-    protected = re.sub(r"(?m)^\s*(\d+)\.", r"\1․", protected)
-    parts = re.split(r"(?<=[.!?])[\s\n]+", protected)
-    return [p.replace("․", ".").strip() for p in parts if p.strip()]
-
-
-def tokenize(text):
-    return re.findall(r"[A-Za-z][A-Za-z'\-]*", text.lower())
-
-
-def syllables(word):
-    word = re.sub(r"[^a-z]", "", word.lower())
-    if not word:
-        return 0
-    groups = re.findall(r"[aeiouy]+", word)
-    n = len(groups)
-    if word.endswith("e") and n > 1 and not word.endswith(("le", "ee", "ye")):
-        n -= 1
-    return max(n, 1)
 
 
 # --------------------------------------------------------------------------
@@ -286,7 +220,7 @@ def compute_stats(raw_text):
     else:
         stats["trigram_repetition"] = 0.0
 
-    em = prose.count("—") + prose.count("–")
+    em = len(PROSE_DASH_RX.findall(prose))
     stats["em_dashes"] = em
     stats["em_dashes_per_1k"] = round(em / len(words) * 1000, 2)
 
@@ -318,42 +252,15 @@ def reliability(word_count):
 # findings
 # --------------------------------------------------------------------------
 
-def line_of(text, index):
-    return text.count("\n", 0, index) + 1
-
-
-def excerpt(text, start, end, pad=34):
-    lo = max(0, start - pad)
-    hi = min(len(text), end + pad)
-    frag = text[lo:hi].replace("\n", " ")
-    return re.sub(r"\s+", " ", frag).strip()
-
-
-def word_regex(entries):
-    escaped = sorted((re.escape(e) for e in entries), key=len, reverse=True)
-    return re.compile(r"(?i)(?<![\w-])(" + "|".join(escaped) + r")(?![\w-])")
-
-
-def phrase_regex(entries):
-    escaped = sorted((re.escape(e).replace(r"\ ", r"\s+") for e in entries),
-                     key=len, reverse=True)
-    return re.compile(r"(?i)\b(" + "|".join(escaped) + r")\b")
-
-
 def find(text, rx, pattern_id, label, band, priority, findings, allowed=0):
     """`allowed` is the register's tolerance: the first N hits pass unreported
     and everything past them is a finding. 0 means report every hit."""
     hits = [m for m in rx.finditer(text) if m.group(0).strip()]
     for m in hits[allowed:]:
-        findings.append({
-            "id": pattern_id,
-            "label": label,
-            "band": band,
-            "priority": priority,
-            "line": line_of(text, m.start()),
-            "match": m.group(0).strip()[:80],
-            "excerpt": excerpt(text, m.start(), m.end()),
-        })
+        findings.append(findings_mod.make(
+            pattern_id, label, band, priority, line_of(text, m.start()),
+            match=m.group(0).strip()[:80],
+            excerpt=excerpt(text, m.start(), m.end())))
 
 
 # Escaped, not literal. The last range is a bare variation selector (U+FE0F):
@@ -411,7 +318,6 @@ OXFORD_PRESENT_RX = re.compile(
     % OXFORD_CLAUSE_OPENER)
 OXFORD_MAX_REPORTED = 5
 
-LIST_ITEM_RX = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s")
 LIST_DASH_RX = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+(?:\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\)|`[^`]+`)\s*[—–]\s")
 
 
@@ -427,30 +333,9 @@ def in_list_typography(text, index):
     return bool(LIST_DASH_RX.match(text[start:index + 2]))
 
 
-def is_prose_block(block):
-    """A markdown list, table, heading, or fence is not a paragraph. Counting
-    its items as sentences turns a 12-item list into a 'paragraph of 12
-    sentences', which is noise rather than a finding."""
-    lines = [ln for ln in block.strip().split("\n") if ln.strip()]
-    if not lines:
-        return False
-    first = lines[0].lstrip()
-    if first.startswith(("#", ">", "|", "```", "    ")):
-        return False
-    listish = sum(1 for ln in lines if LIST_ITEM_RX.match(ln))
-    return listish * 2 < len(lines)
-
-
 def voice_finding(rules_id, label, priority, line, match, excerpt_text):
-    return {
-        "id": rules_id,
-        "label": label,
-        "band": "voice",
-        "priority": priority,
-        "line": line,
-        "match": match,
-        "excerpt": excerpt_text,
-    }
+    return findings_mod.make(rules_id, label, "voice", priority, line,
+                             match=match, excerpt=excerpt_text)
 
 
 def apply_voice_rules(scored, raw_text, rules, stats, findings):
@@ -466,7 +351,7 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
 
     # Punctuation and formatting mechanics.
     if mech.get("em_dash") == "forbid":
-        for m in re.finditer(r"[—–]", scored):
+        for m in PROSE_DASH_RX.finditer(scored):
             if in_list_typography(raw_text, m.start()):
                 continue
             findings.append(voice_finding(
@@ -502,7 +387,7 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
         # the thing being checked. The excerpt has to come from raw_text for the
         # same reason, or a quote inside an exempted span reports a line of
         # blanks. Blanking preserves length, so the offsets line up either way.
-        for m in re.finditer(r"[“”‘’]", raw_text):
+        for m in CURLY_QUOTE_RX.finditer(raw_text):
             findings.append(voice_finding(
                 "voice-curly-quote", "Curly quote (voice forbids)", "P2",
                 line_of(raw_text, m.start()), m.group(0),
@@ -582,14 +467,14 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
 
     # Word and phrase bans.
     if rules.get("banned_words"):
-        for m in word_regex(rules["banned_words"]).finditer(scored):
+        for m in lexicon_mod.word_regex(rules["banned_words"]).finditer(scored):
             findings.append(voice_finding(
                 "voice-banned-word", "Banned word", default,
                 line_of(scored, m.start()), m.group(0),
                 fix_hint(m.group(0))))
 
     if rules.get("banned_phrases"):
-        for m in phrase_regex(rules["banned_phrases"]).finditer(scored):
+        for m in lexicon_mod.phrase_regex(rules["banned_phrases"]).finditer(scored):
             findings.append(voice_finding(
                 "voice-banned-phrase", "Banned phrase", default,
                 line_of(scored, m.start()), m.group(0),
@@ -622,8 +507,8 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
     # Without a gate, "missing closer" fires on every document that is not a
     # letter, which is most of them.
     for entry in rules.get("required_when", []):
-        registers = entry.get("applies_to_registers")
-        if registers and stats.get("_profile") not in registers:
+        applies_to = entry.get("applies_to_registers")
+        if applies_to and stats.get("_profile") not in applies_to:
             continue
         gate = entry.get("when_rx")
         if gate and not re.search(gate, scored):
@@ -636,9 +521,9 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
                 entry.get("note", "")))
 
 
-def scan(raw_text, profile="blog", exempt=True, voice_rules=None):
-    with open(LEXICON_PATH, encoding="utf-8") as fh:
-        lex = json.load(fh)
+def scan(raw_text, profile=None, exempt=True, voice_rules=None):
+    profile = profile or DEFAULT_REGISTER
+    lex = lexicon_mod.load()
     scored = apply_exemptions(raw_text) if exempt else raw_text
     skip = PROFILE_SKIP.get(profile, set())
     relax = PROFILE_RELAX.get(profile, {})
@@ -654,28 +539,18 @@ def scan(raw_text, profile="blog", exempt=True, voice_rules=None):
         if space_like and n <= SPACE_LIKE_TOLERANCE:
             continue
         if n:
-            findings.append({
-                "id": "hidden-unicode",
-                "label": "Hidden unicode: %s" % name,
-                "band": "fingerprint",
-                "priority": "P2" if space_like else "P0",
-                "line": line_of(raw_text, raw_text.index(ch)),
-                "match": "U+%04X x%d" % (ord(ch), n),
-                "excerpt": ("%d of them, past the %d a typesetter would use. "
-                            "Check they are deliberate before replacing them."
-                            % (n, SPACE_LIKE_TOLERANCE) if space_like
-                            else "%d occurrence(s) of %s" % (n, name)),
-            })
+            findings.append(findings_mod.make(
+                "hidden-unicode", "Hidden unicode: %s" % name, "fingerprint",
+                "P2" if space_like else "P0",
+                line_of(raw_text, raw_text.index(ch)),
+                match="U+%04X x%d" % (ord(ch), n),
+                excerpt=("%d of them, past the %d a typesetter would use. "
+                         "Check they are deliberate before replacing them."
+                         % (n, SPACE_LIKE_TOLERANCE) if space_like
+                         else "%d occurrence(s) of %s" % (n, name))))
 
     # 2. Catalog regexes.
-    for p in lex["patterns"]:
-        if p["id"] in skip:
-            continue
-        try:
-            rx = re.compile(p["rx"])
-        except re.error as exc:
-            print("lexicon: bad regex %s (%s)" % (p["id"], exc), file=sys.stderr)
-            continue
+    for p, rx in lexicon_mod.compiled_patterns(skip=skip):
         allowed = relax.get(p["id"], 0)
         label = p["label"]
         if allowed:
@@ -695,103 +570,80 @@ def scan(raw_text, profile="blog", exempt=True, voice_rules=None):
 
     if "tier1" not in skip:
         t1 = [w for w in lex["tier1"] if w.lower() not in exempt_words]
-        find(scored, word_regex(t1), "tier1", "Tier-1 vocabulary",
+        find(scored, lexicon_mod.word_regex(t1), "tier1", "Tier-1 vocabulary",
              "fingerprint", "P1", findings)
-        find(scored, phrase_regex(lex["tier1_phrases"]), "tier1", "Tier-1 phrase",
+        find(scored, lexicon_mod.phrase_regex(lex["tier1_phrases"]), "tier1", "Tier-1 phrase",
              "fingerprint", "P1", findings)
 
-    find(scored, word_regex(lex["clarity"]), "clarity", "Wordiness",
+    find(scored, lexicon_mod.word_regex(lex["clarity"]), "clarity", "Wordiness",
          "craft", "P1", findings)
-    find(scored, phrase_regex(lex["clarity_phrases"]), "clarity", "Wordiness",
+    find(scored, lexicon_mod.phrase_regex(lex["clarity_phrases"]), "clarity", "Wordiness",
          "craft", "P1", findings)
 
     # Tier 2 fires only when two or more land in the same paragraph.
     if "tier2-cluster" not in skip:
         t2 = [w for w in lex["tier2"] if w.lower() not in exempt_words]
-        t2rx = word_regex(t2)
+        t2rx = lexicon_mod.word_regex(t2)
         offset = 0
         for para in re.split(r"(\n\s*\n)", scored):
             hits = [m for m in t2rx.finditer(para)]
             if len(hits) >= 2:
-                findings.append({
-                    "id": "tier2-cluster",
-                    "label": "Tier-2 cluster (%d in one paragraph)" % len(hits),
-                    "band": "craft",
-                    "priority": "P1",
-                    "line": line_of(scored, offset),
-                    "match": ", ".join(sorted({h.group(0).lower() for h in hits})),
-                    "excerpt": excerpt(para, hits[0].start(), hits[-1].end()),
-                })
+                findings.append(findings_mod.make(
+                    "tier2-cluster",
+                    "Tier-2 cluster (%d in one paragraph)" % len(hits),
+                    "craft", "P1", line_of(scored, offset),
+                    match=", ".join(sorted({h.group(0).lower() for h in hits})),
+                    excerpt=excerpt(para, hits[0].start(), hits[-1].end())))
             offset += len(para)
 
     # Tier 3 fires only at density.
     wc = stats.get("word_count", 0)
     if "tier3-density" not in skip and wc >= 120:
         t3 = [w for w in lex["tier3"] if w.lower() not in exempt_words]
-        hits = list(word_regex(t3).finditer(scored))
+        hits = list(lexicon_mod.word_regex(t3).finditer(scored))
         density = len(hits) / wc
         if density >= 0.02:
-            findings.append({
-                "id": "tier3-density",
-                "label": "Tier-3 saturation (%.1f%% of words)" % (density * 100),
-                "band": "craft",
-                "priority": "P2",
-                "line": line_of(scored, hits[0].start()) if hits else 1,
-                "match": ", ".join(sorted({h.group(0).lower() for h in hits})[:12]),
-                "excerpt": "Replace some with specifics: numbers, comparisons, examples.",
-            })
+            findings.append(findings_mod.make(
+                "tier3-density",
+                "Tier-3 saturation (%.1f%% of words)" % (density * 100),
+                "craft", "P2", line_of(scored, hits[0].start()) if hits else 1,
+                match=", ".join(sorted({h.group(0).lower() for h in hits})[:12]),
+                excerpt="Replace some with specifics: numbers, comparisons, examples."))
 
     # 4. Stylometric flags.
     if wc >= 120:
         b = stats.get("burstiness", 0)
         if "uniformity" not in skip and b < BANDS["burstiness"][0]:
-            findings.append({
-                "id": "uniformity",
-                "label": "Low burstiness (%.2f, human range %.2f-%.2f)"
-                         % (b, *BANDS["burstiness"]),
-                "band": "craft",
-                "priority": "P1",
-                "line": 1,
-                "match": "sd/mean of sentence length",
-                "excerpt": "Sentence lengths are too even. Mix 3-8 word sentences "
-                           "with 20+ word ones. Vary the sentences, not the punctuation.",
-            })
+            findings.append(findings_mod.make(
+                "uniformity", "Low burstiness (%.2f, human range %.2f-%.2f)"
+                % (b, *BANDS["burstiness"]), "craft", "P1", 1,
+                match="sd/mean of sentence length",
+                excerpt="Sentence lengths are too even. Mix 3-8 word sentences "
+                        "with 20+ word ones. Vary the sentences, not the punctuation."))
         m = stats.get("mattr")
         if m is not None and m < BANDS["mattr"][0]:
-            findings.append({
-                "id": "low-diversity",
-                "label": "Low vocabulary diversity (MATTR %.2f, human range %.2f-%.2f)"
-                         % (m, *BANDS["mattr"]),
-                "band": "craft",
-                "priority": "P2",
-                "line": 1,
-                "match": "moving-average type-token ratio",
-                "excerpt": "Broaden the what, not the thesaurus: name specific things, "
-                           "cite specific cases, replace a reused abstract noun with the instance.",
-            })
+            findings.append(findings_mod.make(
+                "low-diversity",
+                "Low vocabulary diversity (MATTR %.2f, human range %.2f-%.2f)"
+                % (m, *BANDS["mattr"]), "craft", "P2", 1,
+                match="moving-average type-token ratio",
+                excerpt="Broaden the what, not the thesaurus: name specific things, "
+                        "cite specific cases, replace a reused abstract noun with the instance."))
         tr = stats.get("trigram_repetition", 0)
         if tr > BANDS["trigram_repetition"][1]:
-            findings.append({
-                "id": "trigram-repetition",
-                "label": "Repeated 3-word phrases (%.1f%%)" % (tr * 100),
-                "band": "craft",
-                "priority": "P2",
-                "line": 1,
-                "match": "trigram repetition",
-                "excerpt": "The draft reuses the same phrasings. Rewrite the repeats or cut them.",
-            })
+            findings.append(findings_mod.make(
+                "trigram-repetition",
+                "Repeated 3-word phrases (%.1f%%)" % (tr * 100), "craft", "P2", 1,
+                match="trigram repetition",
+                excerpt="The draft reuses the same phrasings. Rewrite the repeats or cut them."))
         psd = stats.get("paragraph_sd")
         if ("uniform-paragraphs" not in skip and psd is not None
                 and psd < 0.75 and stats.get("paragraph_count", 0) >= 5):
-            findings.append({
-                "id": "uniform-paragraphs",
-                "label": "Uniform paragraph length (sd %.2f sentences)" % psd,
-                "band": "craft",
-                "priority": "P2",
-                "line": 1,
-                "match": "paragraph length",
-                "excerpt": "Every paragraph is about the same size. Some should be one sentence.",
-            })
+            findings.append(findings_mod.make(
+                "uniform-paragraphs",
+                "Uniform paragraph length (sd %.2f sentences)" % psd,
+                "craft", "P2", 1, match="paragraph length",
+                excerpt="Every paragraph is about the same size. Some should be one sentence."))
 
     if "em-dash-rate" not in skip:
         rate = stats.get("em_dashes_per_1k", 0)
@@ -800,25 +652,19 @@ def scan(raw_text, profile="blog", exempt=True, voice_rules=None):
         # rates on a document that never reaches 1,000 words.
         allowed = max(1, relax.get("em-dash-rate", 0))
         if rate > BANDS["em_dashes_per_1k"][1] and stats.get("em_dashes", 0) > allowed:
-            findings.append({
-                "id": "em-dash-rate",
-                "label": "Em-dash rate %.1f per 1,000 words" % rate,
-                "band": "craft",
-                "priority": "P1",
-                "line": 1,
-                "match": "%d em/en dashes" % stats.get("em_dashes", 0),
-                "excerpt": "Guidance, not a ban. A user's writing sample overrides this. "
-                           "Never add one during a rewrite.",
-            })
+            findings.append(findings_mod.make(
+                "em-dash-rate", "Em-dash rate %.1f per 1,000 words" % rate,
+                "craft", "P1", 1,
+                match="%d em/en dashes" % stats.get("em_dashes", 0),
+                excerpt="Guidance, not a ban. A user's writing sample overrides this. "
+                        "Never add one during a rewrite."))
 
     # Voice rules run last and are never suppressed by the register profile.
     if voice_rules:
         apply_voice_rules(scored, raw_text, voice_rules, stats, findings)
 
     stats.pop("_profile", None)
-    band_order = {"voice": 0, "fingerprint": 1, "craft": 2}
-    findings.sort(key=lambda f: ({"P0": 0, "P1": 1, "P2": 2}[f["priority"]],
-                                 band_order.get(f["band"], 3), f["line"]))
+    findings.sort(key=findings_mod.sort_key)
     return findings, stats
 
 
@@ -844,7 +690,7 @@ BAND_HEADERS = {
 }
 
 
-def report(findings, stats, profile, exempt, voice_name=None):
+def report(findings, stats, profile, exempt, voice_name=None, notes=()):
     out = []
     wc = stats.get("word_count", 0)
     rel = reliability(wc)
@@ -855,6 +701,8 @@ def report(findings, stats, profile, exempt, voice_name=None):
     if rel in ("low", "insufficient"):
         out.append("Short sample. Treat every number below as directional; "
                    "re-run on 250+ words before making any call that matters.")
+    for note in notes:
+        out.append("note: %s" % note)
     out.append("")
 
     if not findings:
@@ -914,13 +762,133 @@ def report(findings, stats, profile, exempt, voice_name=None):
     return "\n".join(out)
 
 
+def json_payload(findings, stats, profile, exempt, voice_name, notes,
+                 voice_lineage=()):
+    """The --json document. Versioned, because a consumer that pins the schema
+    finds out at parse time when the shape moves rather than by rendering
+    blanks, and because a published measurement is only reproducible if the
+    report says which lexicon produced it."""
+    return {
+        "schema_version": findings_mod.SCHEMA_VERSION,
+        "lexicon_version": lexicon_mod.version(),
+        "registers_version": registers.version(),
+        "profile": profile,
+        "voice": voice_name,
+        "voice_lineage": list(voice_lineage),
+        "exempt_applied": exempt,
+        "reliability": reliability(stats.get("word_count", 0)),
+        "notes": list(notes),
+        "stats": stats,
+        "human_ranges": BANDS,
+        "counts": findings_mod.counts(findings),
+        "findings": findings,
+    }
+
+
+def run_apply_safe(text, path, voice_rules, write, to_stdout=False,
+                   newline=None):
+    """Apply the mechanical fixes, verify the result, and say what happened.
+
+    The verification pass is the point. Anything this writes has to survive
+    verify.py, which is the same gate a model-authored rewrite goes through, so
+    a bug here fails loudly instead of quietly editing somebody's draft.
+
+    `to_stdout` emits the document instead of the report, and it runs the same
+    gate. It used to be a separate branch in main() that called the fixer and
+    printed the result with no verification at all, which is the path most likely
+    to be redirected straight into a file: `--apply-safe --stdout > new.md` wrote
+    exactly the document the gate would have rejected, silently, exit 0.
+
+    `newline` is the line ending the file was read with. Written back as it came
+    in, because rewriting every line of a CRLF document is not one of the edits
+    with exactly one correct answer, and verify.py cannot see it: both sides are
+    read through universal newlines, so the comparison it runs has already
+    normalized the difference away.
+    """
+    fixed, applied, skipped = fixes_mod.apply(text, voice_rules)
+
+    # Imported here rather than at module scope. verify.py is a sibling script
+    # and a scan is the common case: a document that never asks for a fix should
+    # not pay to load the validator, and a scan.py copied somewhere without its
+    # sibling should still scan.
+    try:
+        import verify as verify_mod
+    except ImportError:
+        verify_mod = None
+
+    if to_stdout:
+        verdict = verify_mod.validate(text, fixed) if verify_mod else None
+        if verdict and not verdict["ok"]:
+            print("scan: verify.py rejected these edits, so nothing was "
+                  "printed:", file=sys.stderr)
+            for v in verdict["violations"]:
+                print("  %-32s %s" % (v["kind"], v["detail"]), file=sys.stderr)
+            print("This is a bug in the fixer, not in your document. Report it.",
+                  file=sys.stderr)
+            return 1
+        sys.stdout.write(fixed)
+        return 0
+
+    print("rabbit-writes --apply-safe")
+    if not applied and not skipped:
+        print("Nothing mechanically fixable. Every other finding needs a "
+              "person: run the scan without this flag.")
+        return 0
+
+    for record in applied:
+        print("  L%-4d %-20s %r -> %r   (%s)"
+              % (record["line"], record["id"], record["before"],
+                 record["after"], record["note"]))
+    for record in skipped:
+        print("  L%-4d %-20s not fixed: %s"
+              % (record["line"], record["id"], record["note"]))
+
+    verdict = verify_mod.validate(text, fixed) if verify_mod else None
+    if verdict and not verdict["ok"]:
+        print("\nverify.py rejected these edits, so nothing was written:")
+        for v in verdict["violations"]:
+            print("  %-32s %s" % (v["kind"], v["detail"]))
+        print("This is a bug in the fixer, not in your document. Report it.")
+        return 1
+    if verdict:
+        print("\nverified: tells %d -> %d, em dashes %d -> %d"
+              % (verdict["tells_before"], verdict["tells_after"],
+                 verdict["em_dashes_before"], verdict["em_dashes_after"]))
+    else:
+        print("\nverify.py not found beside this script, so the edits above "
+              "were not checked against the preservation rules.")
+
+    if not write:
+        print("\nDry run. Nothing written. Pass --write to apply, or pipe "
+              "--apply-safe --stdout into a diff.")
+        return 0
+    if not path:
+        print("--write needs a file. Reading from stdin has nothing to write "
+              "back to.", file=sys.stderr)
+        return 2
+    # `newline` is a str when the file used one style throughout, a tuple when it
+    # mixed them, and None on a file with no line break at all. Only the first
+    # case can be reproduced faithfully; the other two fall back to the platform
+    # default, which is what they got before.
+    with open(path, "w", encoding="utf-8",
+              newline=newline if isinstance(newline, str) else None) as fh:
+        fh.write(fixed)
+    print("\nwrote %d edit(s) to %s" % (len(applied), path))
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("file", nargs="?", help="file to scan; omit to read stdin")
-    ap.add_argument("--profile", default="blog", choices=sorted(PROFILE_SKIP),
-                    help="register profile (default: blog)")
+    ap.add_argument("--profile", default=DEFAULT_REGISTER, choices=sorted(REGISTERS),
+                    help="register profile (default: %s)" % DEFAULT_REGISTER)
     ap.add_argument("--json", action="store_true", help="machine-readable output")
+    ap.add_argument("--sarif", action="store_true",
+                    help="SARIF 2.1.0, for GitHub pull request annotations")
+    ap.add_argument("--sarif-uri", metavar="PATH",
+                    help="the path to record in the SARIF output, relative to the "
+                         "repository root. Defaults to the file argument")
     ap.add_argument("--no-exempt", action="store_true",
                     help="also score quoted examples, code, tables, and block quotes")
     ap.add_argument("--voice-rules", metavar="PATH",
@@ -928,47 +896,64 @@ def main():
                          "'voice' band and are never relaxed by --profile")
     ap.add_argument("--check", action="store_true",
                     help="exit 1 if any P0 finding is present")
+    ap.add_argument("--apply-safe", action="store_true",
+                    help="apply only the edits with exactly one correct answer "
+                         "(hidden characters, AI tracking parameters, this "
+                         "voice's own single-word substitutions) and verify the "
+                         "result. Everything needing judgment stays report-only, "
+                         "a typed -- included: there is no mechanical answer, and "
+                         "this plugin never adds an em dash")
+    ap.add_argument("--write", action="store_true",
+                    help="with --apply-safe, write the fixes back to the file. "
+                         "Without it, --apply-safe is a dry run")
+    ap.add_argument("--stdout", action="store_true",
+                    help="with --apply-safe, print the fixed document instead of "
+                         "the report, so it can be diffed or piped")
     args = ap.parse_args()
 
+    # `newlines` records the line endings the file actually used, so --write can
+    # put them back. Reading stays universal: every regex in the engine is
+    # written against "\n", and handing it a "\r" would move the scan's own
+    # numbers to fix a problem that only exists on the write path.
+    newlines = None
     if args.file:
         with open(args.file, encoding="utf-8") as fh:
             text = fh.read()
+            newlines = fh.newlines
     else:
         text = sys.stdin.read()
 
-    voice_rules, voice_name = None, None
+    voice_rules, voice_name, lineage = None, None, []
     if args.voice_rules:
         try:
-            with open(args.voice_rules, encoding="utf-8") as fh:
-                voice_rules = json.load(fh)
-        except (OSError, ValueError) as exc:
-            print("scan: could not read voice rules: %s" % exc, file=sys.stderr)
+            voice_rules = voices_mod.load(args.voice_rules)
+            lineage = voices_mod.lineage(args.voice_rules)
+        except voices_mod.VoiceError as exc:
+            print("scan: %s" % exc, file=sys.stderr)
             return 2
         voice_name = voice_rules.get("voice", os.path.basename(args.voice_rules))
 
+    if args.apply_safe:
+        return run_apply_safe(text, args.file, voice_rules, args.write,
+                              to_stdout=args.stdout, newline=newlines)
+
     exempt = not args.no_exempt
     findings, stats = scan(text, args.profile, exempt, voice_rules)
+    notes = [n for n in (language.note(text),) if n]
 
-    if args.json:
-        print(json.dumps({
-            "profile": args.profile,
-            "voice": voice_name,
-            "exempt_applied": exempt,
-            "reliability": reliability(stats.get("word_count", 0)),
-            "stats": stats,
-            "human_ranges": BANDS,
-            "counts": {
-                "P0": sum(1 for f in findings if f["priority"] == "P0"),
-                "P1": sum(1 for f in findings if f["priority"] == "P1"),
-                "P2": sum(1 for f in findings if f["priority"] == "P2"),
-                "voice": sum(1 for f in findings if f["band"] == "voice"),
-                "fingerprint": sum(1 for f in findings if f["band"] == "fingerprint"),
-                "craft": sum(1 for f in findings if f["band"] == "craft"),
-            },
-            "findings": findings,
-        }, indent=2))
+    if args.sarif:
+        uri = args.sarif_uri or args.file or "stdin"
+        print(json.dumps(sarif.build(
+            findings, uri, "rabbit-writes/scan",
+            tool_version=lexicon_mod.version(),
+            information_uri="https://github.com/whit3rabbit/rabbit-writes",
+            extra_properties={"register": args.profile,
+                              "voice": voice_name}), indent=2))
+    elif args.json:
+        print(json.dumps(json_payload(findings, stats, args.profile, exempt,
+                                      voice_name, notes, lineage), indent=2))
     else:
-        print(report(findings, stats, args.profile, exempt, voice_name))
+        print(report(findings, stats, args.profile, exempt, voice_name, notes))
 
     if args.check and any(f["priority"] == "P0" for f in findings):
         return 1

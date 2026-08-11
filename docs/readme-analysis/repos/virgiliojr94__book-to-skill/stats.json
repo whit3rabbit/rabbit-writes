@@ -28,7 +28,7 @@
       2
     ],
     "section_order": [
-      "other",
+      "features",
       "other",
       "other",
       "other",
@@ -47,7 +47,7 @@
       {
         "level": 2,
         "text": "\ud83e\udd14 Why",
-        "category": "other"
+        "category": "features"
       },
       {
         "level": 2,
@@ -117,8 +117,10 @@
     ],
     "has_h1": true,
     "section_word_counts": {
+      "features": [
+        172
+      ],
       "other": [
-        172,
         118,
         122,
         63,

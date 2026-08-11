@@ -24,7 +24,10 @@ the README or in the working directory, then skills/rabbit-writes/voices/ACTIVE.
 A missing voice is reported as a note, never an error: plenty of projects have
 no profile, and failing the run would just teach people to pass --no-voice.
 
-Exit codes: 0, or 1 with --check when a P0 is present. Stdlib only, 3.8+.
+Exit codes: 0, or 1 with --check when a P0 is present, or 2 when the README
+itself cannot be read. A voice that cannot be resolved is a note and still exits
+0, for the reason above; a README that cannot be opened has nothing to check.
+Stdlib only, 3.8+.
 """
 
 import argparse
@@ -40,34 +43,37 @@ SKILL_ROOT = os.path.dirname(HERE)
 PLUGIN_ROOT = os.path.dirname(os.path.dirname(SKILL_ROOT))
 SCAN_PATH = os.path.join(PLUGIN_ROOT, "skills", "rabbit-writes", "scripts", "scan.py")
 VOICES_DIR = os.path.join(PLUGIN_ROOT, "skills", "rabbit-writes", "voices")
+# rwlib lives beside scan.py. Resolved from SCAN_PATH rather than spelled out
+# again, so the two cannot end up pointing at different checkouts.
+RWLIB_PARENT = os.path.dirname(SCAN_PATH)
+if RWLIB_PARENT not in sys.path:
+    sys.path.insert(0, RWLIB_PARENT)
+
+from rwlib import corpus as corpus_mod            # noqa: E402
+from rwlib import findings as findings_mod        # noqa: E402
+from rwlib import language, sarif                 # noqa: E402
+from rwlib import voices as voices_mod            # noqa: E402
+from rwlib.markdown import (BARE_URL_RX, FENCE_RX, HEADING_RX,  # noqa: E402
+                            HTML_ANCHOR_RX, HTML_IMG_RX, HTML_TAG_LINE_RX,
+                            HTML_TAG_RX, IMAGE_RX, INLINE_CODE_RX, LINK_RX,
+                            REF_DEF_RX, REF_LINK_RX, TABLE_ROW_RX, blank,
+                            is_badge, is_prose_block, line_of, strip_images,
+                            strip_wrapped_urls, word_count)
+from rwlib.sections import LATE_SECTIONS, classify_heading  # noqa: E402
 
 # ---------------------------------------------------------------------------
-# corpus constants. Every number is from docs/readme-analysis/03_aggregate_summary.json,
-# computed over 100 READMEs. Kept here rather than read from docs/ so the script
-# still works when the skill is installed without the research data.
+# corpus constants. Every number comes from docs/readme-analysis, reduced to the
+# subset this script uses and committed as corpus_summary.json so the skill
+# still works when installed without the research data.
+#
+# It used to be a literal dict here with a comment promising it mirrored the
+# aggregate. Nothing checked the promise, so regenerating the corpus silently
+# orphaned these thresholds: the script kept quoting a median that had moved.
+# scripts/validate.py now compares the two whenever the research data is
+# present, and 05_export_corpus_summary.py regenerates this file.
 # ---------------------------------------------------------------------------
 
-CORPUS = {
-    "word_count_percentiles": {"p10": 766, "p25": 1311, "p50": 1846, "p75": 3612, "p90": 6040},
-    "avg_paragraph_words": 28.4,
-    "sentence_mix_pct": {"short": 37.8, "medium": 36.5, "long": 25.6},
-    "median_badge_count": 5,
-    "link_style_pct": {"inline": 96.8, "bare": 3.0, "reference": 0.2},
-    "avg_link_text_words": 2.2,
-    "median_license_words": 13.5,
-    "section_avg_position": {
-        "features": 0.21, "toc": 0.23, "installation": 0.33, "demo": 0.38,
-        "sponsors": 0.39, "related": 0.45, "performance": 0.45,
-        "architecture": 0.46, "usage": 0.46, "api": 0.53, "examples": 0.53,
-        "security": 0.54, "configuration": 0.56, "support": 0.59, "faq": 0.61,
-        "roadmap": 0.63, "testing": 0.66, "changelog": 0.71,
-        "contributing": 0.77, "credits": 0.80, "license": 0.93,
-    },
-}
-
-# Sections that exist for people already sold on the project. A quickstart
-# appearing after one of these is the ordering inversion worth flagging.
-LATE_SECTIONS = {"contributing", "changelog", "credits", "faq", "testing", "roadmap", "license"}
+CORPUS = corpus_mod.load(os.path.join(HERE, "corpus_summary.json"))
 
 TOC_MIN_WORDS = 1500          # below this a TOC costs more scroll than it saves
 TOC_EXPECTED_WORDS = 2500     # above this its absence is worth a note
@@ -79,70 +85,9 @@ PITCH_MAX_NONBLANK_LINES = 25
 LONG_PARAGRAPH_WORDS = 60     # checklist item 8
 BADGE_WALL = 12               # corpus median 5, p75 8, p90 14
 
-# Classification copied from scripts/readme-research/03_analyze_readme.py so this
-# check and the corpus measurement agree on what counts as an "installation"
-# section. Diverging here would compare against thresholds derived from a
-# different definition.
-SECTION_KEYWORDS = [
-    ("toc", ["table of contents", "contents", "index"]),
-    ("features", ["features", "why ", "highlights", "why use", "what is"]),
-    ("demo", ["demo", "screenshot", "preview", "gallery", "in action", "showcase"]),
-    ("installation", ["install", "setup", "getting started", "quick start", "quickstart",
-                      "requirements", "prerequisites"]),
-    ("usage", ["usage", "how to use", "quick example", "getting started", "basic usage"]),
-    ("examples", ["example"]),
-    ("configuration", ["config", "options", "settings", "environment variable"]),
-    ("api", ["api reference", " api", "documentation", "docs"]),
-    ("architecture", ["architecture", "how it works", "design", "internals"]),
-    ("contributing", ["contributing", "contribute", "development guide", "developing"]),
-    ("testing", ["testing", "run tests", "tests"]),
-    ("roadmap", ["roadmap", "todo", "future work", "upcoming"]),
-    ("faq", ["faq", "frequently asked", "troubleshoot"]),
-    ("license", ["license", "licence"]),
-    ("credits", ["acknowledg", "credits", "thanks", "contributors", "inspired by"]),
-    ("support", ["support", "community", "contact", "discord", "get help", "help"]),
-    ("sponsors", ["sponsor", "backers", "funding"]),
-    ("changelog", ["changelog", "release notes", "history", "whats new", "what's new"]),
-    ("security", ["security"]),
-    ("related", ["related", "see also", "alternatives", "comparison"]),
-    ("performance", ["performance", "benchmark"]),
-]
-
-FENCE_RX = re.compile(r"^```.*?^```", re.M | re.S)
-HEADING_RX = re.compile(r"(?m)^(#{1,6})\s+(.*)$")
-IMAGE_RX = re.compile(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
-LINK_RX = re.compile(r"(?<!!)\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
-REF_LINK_RX = re.compile(r"(?<!!)\[([^\]]+)\]\[([^\]]*)\]")
-BARE_URL_RX = re.compile(r"https?://[^\s)>\]\"']+")
-HTML_ATTR_URL_RX = re.compile(r"(?:src|href)\s*=\s*[\"'][^\"']*[\"']", re.I)
-AUTOLINK_RX = re.compile(r"<https?://[^>]+>")
-REF_DEF_RX = re.compile(r"(?m)^\s*\[[^\]]+\]:\s*\S+")
-INLINE_CODE_RX = re.compile(r"`[^`\n]+`")
-HTML_TAG_RX = re.compile(r"</?[a-zA-Z][^>]*>")
-HTML_IMG_RX = re.compile(r"<img[^>]+src\s*=\s*[\"']([^\"']+)[\"']", re.I)
-# Anchor text, for the vague-link-text check. Non-greedy and DOTALL because a
-# centered header routinely puts the badge image and the anchor text on separate
-# lines. Nested <a> is not valid HTML, so there is nothing to balance.
-HTML_ANCHOR_RX = re.compile(r"<a\b[^>]*>(.*?)</a>", re.I | re.S)
-# Any line opening with a tag is markup, not the project description. Kept broad
-# on purpose: <details>, <picture>, and <p align=center> all show up in header
-# blocks, and listing tags by hand guarantees missing one.
-HTML_TAG_LINE_RX = re.compile(r"^\s*</?[a-zA-Z][a-zA-Z0-9]*(?:\s|>|/>)")
-# The named hosts come from scripts/readme-research/03_analyze_readme.py, so the
-# count here means the same thing as the corpus median it is compared against.
-#
-# The last entry is the one deliberate divergence. "/badge" catches the long tail
-# the named hosts miss (trendshift, star-history, repology, awesome.re,
-# scorecard): 625 badges against 568 over the committed snapshot, and no
-# non-badge image is caught by it in that sample. It makes this check broader
-# than the study, never narrower, so a badge-wall finding stays conservative
-# against a corpus median of 5 and a p90 of 14. Widening the corpus list to match
-# means regenerating the corpus and the CORPUS constants above together.
-BADGE_HOSTS = ("shields.io", "badge.fury.io", "img.shields", "badgen.net", "travis-ci",
-               "circleci.com/gh", "codecov.io", "coveralls.io", "actions/workflows",
-               "sonarcloud.io", "snyk.io", "discord.com/api/guilds", "opencollective.com",
-               "npmjs.com/package", "pypi.org/project", "crates.io/v", "gitpod.io/button",
-               "deepwiki.com/badge", "img.badgesize.io", "visitor-badge", "/badge")
+# Anchor text that tells a reader nothing out of context, which is how a screen
+# reader and a skimmer both encounter it. Kept here rather than in rwlib because
+# it is a README convention rather than a fact about markdown.
 VAGUE_LINK_TEXT = {"here", "click here", "this", "this link", "link", "read more", "more",
                    "learn more", "see here", "this page", "documentation here"}
 CLAIM_RX = re.compile(
@@ -161,38 +106,22 @@ MEASURE_NOUNS = {"word", "line", "char", "character", "byte", "kilobyte", "megab
                  "minute", "hour", "day", "week", "month", "year", "percent", "token", "time",
                  "step", "point", "version", "item", "case", "example", "column", "row", "level",
                  "page", "sentence", "paragraph", "commit", "star", "issue", "entrie", "entry"}
-LIST_ITEM_RX = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s")
-
-
-def blank(match):
-    """Same-length whitespace, so line numbers survive the substitution."""
-    return re.sub(r"\S", " ", match.group(0))
-
-
-def classify_heading(text):
-    t = re.sub(r"[^\w\s'-]", " ", text.strip().lower().lstrip("#").strip())
-    for cat, kws in SECTION_KEYWORDS:
-        if any(kw in t for kw in kws):
-            return cat
-    return "other"
-
-
-def is_badge(url):
-    lu = url.lower()
-    return any(h in lu for h in BADGE_HOSTS)
-
-
-def word_count(text):
-    return len(re.findall(r"\b[\w'-]+\b", text))
-
-
-def line_of(text, index):
-    return text.count("\n", 0, index) + 1
 
 
 def finding(fid, label, priority, line, detail):
-    return {"id": fid, "label": label, "band": "structure", "priority": priority,
-            "line": line, "detail": detail}
+    """A structure finding, in the schema every other checker here uses.
+
+    The explanation goes in `excerpt`, which is where a reporter looks for the
+    second line. It used to go in a key called `detail` that only this file
+    emitted, so the reporter had to branch on the band to find its own text and
+    no downstream consumer could read both checkers with one parser.
+
+    `match` is left empty on purpose. Most of these findings are about the
+    document rather than about a span in it, and inventing a span would put a
+    matched-text's worth of confidence behind a whole-file judgement.
+    """
+    return findings_mod.make(fid, label, "structure", priority, line,
+                             excerpt=detail)
 
 
 # ---------------------------------------------------------------------------
@@ -217,6 +146,34 @@ def find_pitch(raw):
     check_structure computes for itself (this one included the pitch line), and
     two live definitions of "lines above the pitch" is a drift waiting to happen.
     """
+    # Whether a markdown heading is allowed to close an open HTML block, decided
+    # once for the whole document rather than at each heading. Inside a
+    # well-formed <details> a heading is content: a language bar routinely holds
+    # `# Project` and a translated tagline, and treating that heading as the end
+    # of the block hands back the collapsed translation as the pitch. When the
+    # tags do not balance, no heading can be inside anything, so closing on one
+    # is the repair rather than the bug.
+    opens = len(HTML_BLOCK_OPEN_RX.findall(raw))
+    closes = len(HTML_BLOCK_CLOSE_RX.findall(raw))
+    line = scan_for_pitch(raw, heading_closes_blocks=opens != closes)
+    if line is None:
+        # Backstop for an unclosed <table> or <details>. The depth counter has no
+        # way to know a block was never closed, so it stays positive to the end of
+        # the file, every later line skips, and a README that describes itself
+        # perfectly well reports no-pitch, which is a P0 and a CI failure under
+        # --check. Hand-written sponsor grids drop a </table> often enough and
+        # GitHub renders them anyway. A pass that ignores the blocks cannot make
+        # that mistake, and it only runs when the careful pass found nothing at
+        # all, so it costs a well-formed README nothing.
+        line = scan_for_pitch(raw, skip_html_blocks=False)
+    return line
+
+
+HTML_BLOCK_OPEN_RX = re.compile(r"(?i)<(?:details|table)\b")
+HTML_BLOCK_CLOSE_RX = re.compile(r"(?i)</(?:details|table)>")
+
+
+def scan_for_pitch(raw, skip_html_blocks=True, heading_closes_blocks=False):
     in_comment = False
     details_depth = 0
     for i, line in enumerate(raw.splitlines(), start=1):
@@ -229,18 +186,23 @@ def find_pitch(raw):
         if s.startswith("<!--"):
             in_comment = "-->" not in s
             continue
+        if s.startswith("#"):
+            if heading_closes_blocks:
+                details_depth = 0
+            continue
         # <details> hides a language bar or an FAQ, and an HTML <table> at the
         # top of a README is a sponsor grid in almost every case. Neither is
         # where the project describes itself.
         # Clamped, because README fragments and hand-written HTML close tags
         # they never opened. Left negative, the counter never climbs back above
         # zero and the next real <details> block reads as prose.
-        details_depth += len(re.findall(r"(?i)<(?:details|table)\b", s))
-        details_depth -= len(re.findall(r"(?i)</(?:details|table)>", s))
+        details_depth += len(HTML_BLOCK_OPEN_RX.findall(s))
+        details_depth -= len(HTML_BLOCK_CLOSE_RX.findall(s))
         details_depth = max(0, details_depth)
-        if details_depth > 0 or re.search(r"(?i)<summary\b", s):
+        if skip_html_blocks and (details_depth > 0
+                                 or re.search(r"(?i)<summary\b", s)):
             continue
-        if (s.startswith("#") or s.startswith(">") or s.startswith("|")
+        if (s.startswith(">") or s.startswith("|")
                 or s.startswith("```") or set(s) <= set("-=*_ ")):
             continue
         if HTML_TAG_LINE_RX.match(s):
@@ -313,7 +275,7 @@ def check_structure(raw, scored, findings, stats):
         findings.append(finding(
             "no-install", "No installation or quickstart section", "P1", 1,
             "84% of the corpus has one and it is the earliest structural section "
-            "(avg. position 0.33). Give the reader a copy-pasteable path to running it."))
+            "(avg. position 0.34). Give the reader a copy-pasteable path to running it."))
     else:
         install_at = cats.index("installation")
         late_first = next((c for c in cats[:install_at] if c in LATE_SECTIONS), None)
@@ -321,13 +283,20 @@ def check_structure(raw, scored, findings, stats):
             findings.append(finding(
                 "install-late", "Install comes after %s" % late_first, "P1",
                 sections[install_at]["line"],
-                "%s sits at avg. position %.2f in the corpus, installation at 0.33. "
+                "%s sits at avg. position %.2f in the corpus, installation at 0.34. "
                 "Get the reader running the thing before the community mechanics."
                 % (late_first, CORPUS["section_avg_position"].get(late_first, 0.8))))
 
     # --- license: last, and short
     if "license" in cats:
-        idx = cats.index("license")
+        # The last license heading, not the first. A README that mentions the
+        # licence early, in a "License and credits" line near the header or in a
+        # feature list, and carries the real License section at the end used to
+        # have its position checked against the mention: every section between
+        # the two counted as "after the license", and a file that ends with its
+        # license reported license-not-last. The last one is the one whose
+        # position the corpus figure describes.
+        idx = len(cats) - 1 - cats[::-1].index("license")
         lic = sections[idx]
         after = [c for c in cats[idx + 1:] if c != "credits"]
         if after:
@@ -356,7 +325,8 @@ def check_structure(raw, scored, findings, stats):
 
 def check_toc(scored, findings, stats):
     words = stats["prose_words"]
-    anchor_links = [u for _, u in LINK_RX.findall(scored) if u.startswith("#")]
+    anchor_links = [u for _, u in LINK_RX.findall(strip_images(scored))
+                    if u.startswith("#")]
     has_heading = "toc" in stats["sections"]
     has_toc = has_heading or len(anchor_links) >= 3
     stats["has_toc"] = has_toc
@@ -372,29 +342,20 @@ def check_toc(scored, findings, stats):
             "anchor-list navigation in 32%), but this document is long enough to justify one."))
 
 
-def strip_wrapped_urls(scored):
-    """Blank every URL that already lives inside a link, an HTML attribute, an
-    autolink, or a reference definition. What survives is bare. Blanking keeps
-    the offsets, so the line numbers still point at the right place."""
-    out = IMAGE_RX.sub(blank, scored)
-    out = LINK_RX.sub(blank, out)
-    out = HTML_ATTR_URL_RX.sub(blank, out)
-    out = AUTOLINK_RX.sub(blank, out)
-    out = REF_DEF_RX.sub(blank, out)
-    # A URL inside backticks is part of a command or a config value, not a link
-    # the reader is meant to click. Telling someone to wrap `curl https://...`
-    # in markdown would break the thing they are supposed to paste.
-    out = INLINE_CODE_RX.sub(blank, out)
-    return out
-
-
 def check_links(scored, findings, stats):
     # Link syntax inside backticks is being talked about, not used. A doc that
     # explains `[text][ref]` should not be reported as using it.
     scored = INLINE_CODE_RX.sub(blank, scored)
-    inline_matches = list(LINK_RX.finditer(scored))
+    linkable = strip_images(scored)
+    inline_matches = list(LINK_RX.finditer(linkable))
     inline = [(m.group(1), m.group(2)) for m in inline_matches]
-    refs = REF_LINK_RX.findall(scored)
+    # An empty label means the link text is the label: `[Astro][]` resolves
+    # against `[astro]: https://...`. Labels are case-insensitive in every
+    # markdown implementation GitHub uses.
+    defined = {m.group(1).strip().lower()
+               for m in REF_DEF_RX.finditer(scored)}
+    refs = [(text, label) for text, label in REF_LINK_RX.findall(scored)
+            if (label.strip() or text.strip()).lower() in defined]
     bare = list(BARE_URL_RX.finditer(strip_wrapped_urls(scored)))
     stats["inline_links"] = len(inline)
     stats["reference_links"] = len(refs)
@@ -540,30 +501,13 @@ def check_media_and_claims(raw, scored, findings, stats):
                 "if it is not, say which is which." % shown))
 
 
-def is_paragraph(body):
-    """True when a block is prose rather than a list.
-
-    Matching only the first line lets a mixed block through: one sentence of
-    lead-in followed by eight bullets has a first line that is prose, and the
-    whole thing then scores as a single 90-word paragraph. That is the same
-    shape rabbit-writes' is_prose_block already handles, and this is the same
-    rule, so the two skills agree on what a paragraph is. A lead-in sentence
-    plus one or two bullets is still a paragraph with a list under it, which is
-    why the test is a majority rather than any bullet at all."""
-    lines = [ln for ln in body.split("\n") if ln.strip()]
-    if not lines:
-        return False
-    listish = sum(1 for ln in lines if LIST_ITEM_RX.match(ln))
-    return listish * 2 < len(lines)
-
-
-def check_prose_shape(raw, scored, findings, stats):
+def check_prose_shape(raw, findings, stats):
     # Blank rather than delete, so a reported line number still points at the
     # line in the file. Blanked fences and tables also read as paragraph breaks,
     # which is what they are.
     prose = FENCE_RX.sub(blank, raw)
     prose = HEADING_RX.sub(blank, prose)
-    prose = re.sub(r"(?m)^\|.*\|\s*$", blank, prose)
+    prose = TABLE_ROW_RX.sub(blank, prose)
     prose = IMAGE_RX.sub(blank, prose)
     paragraphs, offset = [], 0
     for block in re.split(r"(\n\s*\n)", prose):
@@ -572,7 +516,7 @@ def check_prose_shape(raw, scored, findings, stats):
         # language bar counts as several hundred "words" and would otherwise
         # dominate the findings while telling the writer nothing.
         if (body and not body.startswith(">") and not body.startswith("<")
-                and is_paragraph(body)):
+                and is_prose_block(body)):
             paragraphs.append((body, offset))
         offset += len(block)
     stats["prose_words"] = word_count(prose)
@@ -668,10 +612,9 @@ def run_prose_scan(raw, rules_path):
     rules = None
     if rules_path:
         try:
-            with open(rules_path, encoding="utf-8") as fh:
-                rules = json.load(fh)
-        except (OSError, ValueError) as exc:
-            return [], {}, "could not read voice rules: %s" % exc
+            rules = voices_mod.load(rules_path, voices_dir=VOICES_DIR)
+        except voices_mod.VoiceError as exc:
+            return [], {}, str(exc)
     # register 'docs': a README is documentation, not a blog post. The register
     # relaxes general craft rules only, never a voice rule.
     findings, stats = scan.scan(raw, "docs", True, rules)
@@ -719,28 +662,34 @@ def report(path, findings, stats, voice_name, notes):
                 shown[f["id"]] = shown.get(f["id"], 0) + 1
                 if shown[f["id"]] > 4:
                     continue
-                detail = f.get("detail") or f.get("match", "")
                 out.append("    L%-4d %s" % (f["line"], f["label"]))
-                if detail and band == "structure":
-                    out.append("           %s" % detail)
+                if band == "structure" and f["excerpt"]:
+                    out.append("           %s" % f["excerpt"])
             for fid, n in shown.items():
                 if n > 4:
                     out.append("    ... and %d more %s" % (n - 4, fid))
         out.append("")
 
     pct = CORPUS["word_count_percentiles"]
-    out.append("corpus comparison (100 trending repos)")
+    link = CORPUS["link_style_pct"]
+    out.append("corpus comparison (%d trending repos)" % CORPUS["n_repos"])
     rows = [
         ("prose words", stats.get("prose_words"), "median %d, p25 %d, p75 %d"
          % (pct["p50"], pct["p25"], pct["p75"])),
         ("paragraphs", stats.get("paragraph_count"), ""),
         ("first prose line", stats.get("pitch_line"), "the pitch belongs above the decoration"),
-        ("code blocks", stats.get("code_blocks"), "97% of the corpus has at least one"),
-        ("badges", stats.get("badge_count"), "corpus median 5, p90 14"),
-        ("inline links", stats.get("inline_links"), "96.8% of corpus links"),
-        ("bare URLs", stats.get("bare_urls"), "3.0% of corpus links, fix every one"),
-        ("avg link text words", stats.get("avg_link_text_words"), "corpus 2.2"),
-        ("license section words", stats.get("license_words"), "corpus median 13"),
+        ("code blocks", stats.get("code_blocks"),
+         "%g%% of the corpus has at least one" % CORPUS["pct_has_code_blocks"]),
+        ("badges", stats.get("badge_count"),
+         "corpus median %d, p90 14" % CORPUS["median_badge_count"]),
+        ("inline links", stats.get("inline_links"),
+         "%g%% of corpus links" % link["inline"]),
+        ("bare URLs", stats.get("bare_urls"),
+         "%g%% of corpus links, fix every one" % link["bare"]),
+        ("avg link text words", stats.get("avg_link_text_words"),
+         "corpus %g" % CORPUS["avg_link_text_words"]),
+        ("license section words", stats.get("license_words"),
+         "corpus median %g" % CORPUS["median_license_words"]),
     ]
     for name, value, note in rows:
         if value is None:
@@ -759,7 +708,10 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None):
     scored = FENCE_RX.sub(blank, raw)
     findings, stats, notes = [], {}, []
 
-    check_prose_shape(raw, scored, findings, stats)
+    # Takes raw, not scored: it blanks its own fences, because it also has to
+    # blank headings, tables, and images, and one copy blanked to one recipe is
+    # easier to reason about than a second copy blanked to another.
+    check_prose_shape(raw, findings, stats)
     stats["sections"] = []
     check_structure(raw, scored, findings, stats)
     check_toc(scored, findings, stats)
@@ -791,8 +743,11 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None):
             if key in prose_stats:
                 stats[key] = prose_stats[key]
 
-    findings.sort(key=lambda f: ({"P0": 0, "P1": 1, "P2": 2}[f["priority"]],
-                                 BAND_ORDER.get(f["band"], 9), f["line"]))
+    note = language.note(raw)
+    if note:
+        notes.append(note)
+
+    findings.sort(key=findings_mod.sort_key)
     return findings, stats, voice_name, notes
 
 
@@ -801,6 +756,11 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("file", help="the README to check")
     ap.add_argument("--json", action="store_true", help="machine-readable output")
+    ap.add_argument("--sarif", action="store_true",
+                    help="SARIF 2.1.0, for GitHub pull request annotations")
+    ap.add_argument("--sarif-uri", metavar="PATH",
+                    help="the path to record in the SARIF output, relative to the "
+                         "repository root. Defaults to the file argument")
     ap.add_argument("--no-voice", action="store_true",
                     help="skip the prose and voice scan, check structure only")
     ap.add_argument("--voice-rules", metavar="PATH",
@@ -818,22 +778,22 @@ def main():
     findings, stats, voice_name, notes = check_readme(
         raw, args.file, use_voice=not args.no_voice, voice_rules=args.voice_rules)
 
-    if args.json:
+    if args.sarif:
+        print(json.dumps(sarif.build(
+            findings, args.sarif_uri or args.file, "rabbit-writes/readme-check",
+            tool_version=CORPUS.get("schema_version"),
+            information_uri="https://github.com/whit3rabbit/rabbit-writes",
+            extra_properties={"corpusRepos": CORPUS["n_repos"],
+                              "voice": voice_name}), indent=2))
+    elif args.json:
         print(json.dumps({
+            "schema_version": findings_mod.SCHEMA_VERSION,
             "file": args.file,
             "voice": voice_name,
             "notes": notes,
             "stats": stats,
             "corpus": CORPUS,
-            "counts": {
-                "P0": sum(1 for f in findings if f["priority"] == "P0"),
-                "P1": sum(1 for f in findings if f["priority"] == "P1"),
-                "P2": sum(1 for f in findings if f["priority"] == "P2"),
-                "structure": sum(1 for f in findings if f["band"] == "structure"),
-                "voice": sum(1 for f in findings if f["band"] == "voice"),
-                "fingerprint": sum(1 for f in findings if f["band"] == "fingerprint"),
-                "craft": sum(1 for f in findings if f["band"] == "craft"),
-            },
+            "counts": findings_mod.counts(findings),
             "findings": findings,
         }, indent=2))
     else:

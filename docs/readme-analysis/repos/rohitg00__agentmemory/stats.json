@@ -110,7 +110,7 @@
       "api",
       "other",
       "other",
-      "api",
+      "other",
       "demo",
       "other",
       "other",
@@ -589,7 +589,7 @@
       {
         "level": 1,
         "text": "# api-key header + api-version query param.",
-        "category": "api"
+        "category": "other"
       },
       {
         "level": 1,
@@ -965,6 +965,7 @@
         0,
         0,
         0,
+        0,
         46,
         0,
         0,
@@ -1001,7 +1002,6 @@
         0
       ],
       "api": [
-        0,
         0,
         0,
         0

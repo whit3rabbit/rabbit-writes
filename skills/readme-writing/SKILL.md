@@ -28,7 +28,7 @@ Default to **draft** when there's no README and the user describes a project. De
 Order sections: **pitch → fastest path to running it → depth → community → license.** Measured across 100 repos (see the writeup's Layout table), this is not a style preference. It is what independently-authored, currently-popular READMEs converge on:
 
 1. **What it is and why.** The features or why section, in the first two sentences, before any badge row or sponsor content. State it before anything decorative. This is the single most-violated rule in the corpus: the READMEs flagged as anti-patterns all bury the actual description under promotional material.
-2. **Installation.** Present in 84% of the corpus, and it's the earliest structural section after the pitch (avg. relative position 0.33 of the document). Get the reader running the thing before explaining how it works internally.
+2. **Installation.** Present in 84% of the corpus, and it's the earliest structural section after the pitch (avg. relative position 0.34 of the document). Get the reader running the thing before explaining how it works internally.
 3. **Depth.** Architecture, API/docs, configuration, usage/examples. This is where a long README is allowed to be long. Put it after the quickstart, not before.
 4. **Community mechanics.** Support, FAQ, testing, changelog, contributing, credits. Comes late (contributing sits at avg. position 0.77) because it's for people who are already sold, not people deciding whether to be.
 5. **License.** Dead last (avg. position 0.93), and short. Median license section across the corpus is 13 words: name the license, link the file. Nobody reads legal text in a README.
@@ -119,7 +119,7 @@ Two things a voice profile does *not* import into a README, because they belong 
 
 | File | When |
 |---|---|
-| `scripts/readme_check.py` | Every draft, restructure, and audit. Structure, links, badges, claims, and the active voice in one pass. `--json` for machine-readable output, `--check` to exit non-zero on a P0 (useful in CI) |
+| `scripts/readme_check.py` | Every draft, restructure, and audit. Structure, links, badges, claims, and the active voice in one pass. `--json` for machine-readable output, `--check` to exit non-zero on a P0 (useful in CI), `--sarif` to put the findings inline on a pull request diff |
 | `references/patterns.md` | Any mode. The fuller catalog: exact presence rates, section-length medians, and the named-repo techniques (show-don't-tell, arguing against your own headline number, progressive disclosure) with more examples than fit here |
 | `references/checklist.md` | Always, before delivering |
 | `${CLAUDE_PLUGIN_ROOT}/docs/README_WRITEUP.md` | When the user asks *why* a rule exists, wants the underlying data, or disputes a recommendation. This is the full study with the 100-repo table and methodology |

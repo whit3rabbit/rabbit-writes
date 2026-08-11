@@ -32,20 +32,31 @@ import json
 import os
 import sys
 import time
+import urllib.parse
 import urllib.request
 import urllib.error
 from datetime import datetime, timedelta, timezone
 
 TOKEN = os.environ.get("GITHUB_TOKEN")
+# The one host the token is for. gh_request is called against api.ossinsight.io
+# as well, and a bearer header attached by default sends the user's GitHub
+# credential to a third party that never asked for it and cannot use it.
+# Compared exactly, not by suffix: "api.github.com.example.net" is somebody
+# else's domain.
+TOKEN_HOSTS = {"api.github.com"}
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT_DIR = os.path.join(REPO_ROOT, "docs", "readme-analysis")
 os.makedirs(OUT_DIR, exist_ok=True)
+
+def sends_token(url):
+    return urllib.parse.urlsplit(url).hostname in TOKEN_HOSTS
+
 
 def gh_request(url, accept="application/vnd.github+json"):
     req = urllib.request.Request(url)
     req.add_header("Accept", accept)
     req.add_header("User-Agent", "readme-research-script")
-    if TOKEN:
+    if TOKEN and sends_token(url):
         req.add_header("Authorization", f"Bearer {TOKEN}")
     for attempt in range(5):
         try:

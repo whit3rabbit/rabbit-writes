@@ -342,8 +342,8 @@
     "bare_url_count": 1,
     "total_markdown_links": 65,
     "uses_reference_style_links": false,
-    "avg_link_text_words": 1.82,
-    "internal_anchor_link_count": 25,
+    "avg_link_text_words": 1.96,
+    "internal_anchor_link_count": 39,
     "has_toc_like_anchor_list": true,
     "code_block_count": 23,
     "code_block_languages": [

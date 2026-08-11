@@ -87,6 +87,25 @@ Do not re-run the full interview. A working profile plus one correction beats a 
 
 "70% whit3rabbit, 30% dana." Interpolate the numeric dimensions. Take the **union** of both Never lists, because the stricter refusal wins and refusals are load-bearing. Take structural defaults from the higher-weighted profile. Write the lineage into the new file so it can be traced later.
 
+### 5. Extend
+
+Blending mixes two whole people. The commoner ask is smaller: my voice, plus what this repo or this client does differently. That is `extends`, and it belongs in the rules file rather than in a new profile.
+
+```json
+{
+  "voice": "whit3rabbit-acme",
+  "extends": "whit3rabbit",
+  "banned_words": ["synergy"],
+  "mechanics": {"oxford_comma": "require"}
+}
+```
+
+Bans union with the parent's. Mechanics merge key by key with the child winning, so a key the child never mentions keeps the parent's value and an override file stays four lines long. `scan.py` reports the lineage, so a report never claims a voice that is mostly somebody else's rules without saying so.
+
+A child cannot quietly drop an inherited ban. That is deliberate: a house style that silently unbans a word is a house style nobody can rely on. To soften an inherited rule, give the child a `banned_regex` entry with the **same id**. Entries merge by id and the child's wins outright, so it can lower a priority, widen a `max_allowed`, or point the pattern somewhere narrower.
+
+Reach for `extends` when a person's voice is unchanged and the context is not. Reach for a new profile when the person is.
+
 ---
 
 ## Writing the files

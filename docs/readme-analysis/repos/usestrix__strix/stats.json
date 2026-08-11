@@ -54,7 +54,7 @@
       "other",
       "security",
       "other",
-      "testing",
+      "api",
       "other",
       "other",
       "other",
@@ -202,7 +202,7 @@
       {
         "level": 3,
         "text": "API Testing (OpenAPI / Swagger / Postman)",
-        "category": "testing"
+        "category": "api"
       },
       {
         "level": 1,
@@ -352,7 +352,6 @@
         294,
         99,
         43,
-        37,
         1,
         13,
         11,
@@ -380,6 +379,7 @@
         1
       ],
       "api": [
+        37,
         24
       ],
       "contributing": [
@@ -410,7 +410,7 @@
     "bare_url_count": 0,
     "total_markdown_links": 26,
     "uses_reference_style_links": false,
-    "avg_link_text_words": 2.58,
+    "avg_link_text_words": 2.68,
     "internal_anchor_link_count": 0,
     "has_toc_like_anchor_list": false,
     "code_block_count": 10,

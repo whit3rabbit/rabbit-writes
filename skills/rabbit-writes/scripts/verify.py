@@ -34,49 +34,29 @@ Carve-outs, because the skill instructs these edits:
 """
 
 import argparse
-import importlib.util
 import json
 import os
 import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SCAN_PATH = os.path.join(HERE, "scan.py")
-LEXICON_PATH = os.path.join(HERE, "lexicon.json")
+# See scan.py: rwlib sits beside this file and is not on anybody's PYTHONPATH.
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
 
-FENCE_RX = re.compile(r"^```.*?^```", re.M | re.S)
-INLINE_CODE_RX = re.compile(r"`[^`\n]+`")
-FRONTMATTER_RX = re.compile(r"\A---\n(.*?)\n---\n", re.S)
-TABLE_ROW_RX = re.compile(r"(?m)^\s*\|.*\|\s*$")
-BLOCKQUOTE_RX = re.compile(r"(?m)^\s*>.*$")
-HEADING_RX = re.compile(r"(?m)^(#{1,6})\s+(.*?)\s*$")
-URL_RX = re.compile(r"https?://[^\s\)\]\>\"']+")
-# Same pair rule as scan.py's: each kind of quote closes with its own.
-QUOTED_RX = re.compile("\"[^\"“”\n]{4,200}\"|“[^\"“”\n]{4,200}”")
-# Em dashes, and en dashes that are not a numeric range. "2010–2023" and
-# "pp. 14–18" are correct typography and the one en dash a rewrite legitimately
-# produces; counting them fails a rewrite for getting the punctuation right.
-# Only a spaceless en dash flanked by digits is treated as a range, because a
-# spaced one is almost always standing in for an em dash.
-PROSE_DASH_RX = re.compile(r"—|–(?!\d)|(?<!\d)–")
-# File paths, and only the ones carrying an extension. An extensionless path
-# like `voices/ACTIVE` is not tracked, and that is a deliberate ceiling rather
-# than an oversight: dropping the extension requirement makes this match every
-# slash-separated pair in English prose. Over this repo's own documents that is
-# "and/or", "read/write", "TCP/IP", "human/AI", "architecture/API", and every
-# `owner/repo` slug. Requiring the right-hand side to be all-caps trims the worst
-# of it and still leaves "human/AI" and "build/CI", so a rewrite that correctly
-# turns "human/AI writing" into "human and AI writing" would hard-fail on a gate
-# that blocks file writes. Under-matching here is the safe direction: the
-# instruction to leave paths alone stays in SKILL.md and the checklist, and
-# SKILL.md says which half of it this script can actually see.
-PATH_RX = re.compile(r"(?<![\w/])(?:\.{0,2}/)?(?:[\w.-]+/)+[\w.-]+\.\w{1,6}\b")
-AI_PARAM_RX = re.compile(
-    r"(utm_source=(chatgpt|openai|copilot|claude|perplexity|gemini)[a-z.]*"
-    r"|referrer=grok\.com)\Z", re.I)
+from rwlib import lexicon as lexicon_mod                              # noqa: E402
+from rwlib.artifacts import norm_url                                  # noqa: E402
+# QUOTED_RX is a re-export, not a caller: test_verify.py asserts it is the
+# same object scan.py holds. See the note in scan.py.
+from rwlib.markdown import (BLOCKQUOTE_RX, FENCE_RX, FRONTMATTER_RX,  # noqa: E402,F401
+                            HEADING_RX, INLINE_CODE_RX, PATH_RX,
+                            PROSE_DASH_RX, QUOTED_RX, TABLE_ROW_RX,
+                            URL_RX, apply_exemptions, blank, context)
 
-# Used only when the engine is not beside this script. Kept deliberately short:
-# it is a floor, not a copy of the lexicon.
+LEXICON_PATH = lexicon_mod.LEXICON_PATH
+
+# Used only when the lexicon cannot be read. Kept deliberately short: it is a
+# floor, not a copy of the lexicon.
 FALLBACK_TELL_RX = [
     re.compile(r"(?i)\b(delve|tapestry|nestled|showcasing|testament to|"
                r"meticulous|seamless|robust|cutting-edge|pivotal|"
@@ -96,14 +76,11 @@ def load_tell_regexes():
     and the check this script exists to run passes a rewrite that added tells
     the lexicon knows about and this file did not."""
     try:
-        spec = importlib.util.spec_from_file_location("rw_scan", SCAN_PATH)
-        scan = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(scan)
-        with open(LEXICON_PATH, encoding="utf-8") as fh:
-            lex = json.load(fh)
-    except (OSError, ValueError, AttributeError, ImportError):
+        lex = lexicon_mod.load()
+    except (OSError, ValueError):
         return FALLBACK_TELL_RX
-    out = [scan.word_regex(lex["tier1"]), scan.phrase_regex(lex["tier1_phrases"])]
+    out = [lexicon_mod.word_regex(lex["tier1"]),
+           lexicon_mod.phrase_regex(lex["tier1_phrases"])]
     for p in lex["patterns"]:
         if p.get("band") != "fingerprint":
             continue
@@ -125,11 +102,6 @@ def load_tell_regexes():
 TELL_RX = load_tell_regexes()
 
 
-def blank(match):
-    """Same-length whitespace, so offsets and the multiset comparison hold."""
-    return re.sub(r"\S", " ", match.group(0))
-
-
 def extract(text):
     # Fences and inline code are compared verbatim and so are read from the raw
     # text. Everything structural is read from a copy with the fences blanked:
@@ -142,7 +114,14 @@ def extract(text):
     # inside one (.../main/README.md). Left in, an edited URL is reported twice,
     # and the utm-stripping carve-out norm_url grants does not reach the second
     # report.
-    unlinked = URL_RX.sub(blank, prose)
+    #
+    # Inline code goes with it, for the same reason and with the same fix. Most
+    # paths in a document are written as `scripts/scan.py`, and inline code is
+    # compared verbatim two checks above, which is a stricter promise than the
+    # path check makes. Left in, one edit to one span reported both "inline code
+    # altered" and "file path altered", and a reader counting violations saw two
+    # broken promises where there was one.
+    unlinked = INLINE_CODE_RX.sub(blank, URL_RX.sub(blank, prose))
     return {
         "fences": FENCE_RX.findall(text),
         "inline_code": INLINE_CODE_RX.findall(text),
@@ -156,55 +135,16 @@ def extract(text):
     }
 
 
-def norm_url(u):
-    """Drop AI-tool tracking parameters and rebuild the query string, so a URL
-    that lost only its `utm_source=chatgpt.com` compares equal. Any other change
-    to a URL is a violation."""
-    if "?" not in u:
-        return u
-    base, _, rest = u.partition("?")
-    query, hash_sep, fragment = rest.partition("#")
-    kept = [p for p in query.split("&") if p and not AI_PARAM_RX.match(p)]
-    out = base + ("?" + "&".join(kept) if kept else "")
-    # Keep a bare trailing "#". Dropping it makes a URL that ends in an empty
-    # fragment compare unequal to the identical URL on the other side, which is
-    # a violation nobody caused.
-    return out + hash_sep + fragment
-
-
-def blank_exempt(text):
-    """Blank the spans scan.py exempts, so the two engines count the same prose.
-
-    Every span blanked here is one this script separately checks for verbatim
-    preservation, so hiding it from the counters cannot hide a regression: an
-    edit to a fence, a table, a block quote, or inline code is already a
-    violation by the time these run. Leaving them in is what makes a document
-    that quotes a flagged phrase in order to warn about it fail the tell gate,
-    which is the false positive the exemption exists to prevent."""
-    out = FRONTMATTER_RX.sub(blank, text)
-    out = FENCE_RX.sub(blank, out)
-    out = INLINE_CODE_RX.sub(blank, out)
-    out = TABLE_ROW_RX.sub(blank, out)
-    out = BLOCKQUOTE_RX.sub(blank, out)
-    out = QUOTED_RX.sub(blank, out)
-    return out
-
-
-def context(text, start, end, pad=30):
-    frag = text[max(0, start - pad):end + pad].replace("\n", " ")
-    return re.sub(r"\s+", " ", frag).strip()
-
-
 def tell_hits(text):
     """Every lexicon tell in the prose, as matched strings. Returned rather than
     counted so a failure can name what got added instead of only how many."""
-    prose = blank_exempt(text)
+    prose = apply_exemptions(text)
     return [m.group(0).strip() for rx in TELL_RX for m in rx.finditer(prose)]
 
 
 def dash_hits(text):
     """Prose em and en dashes, each with its surrounding text."""
-    prose = blank_exempt(text)
+    prose = apply_exemptions(text)
     return [context(prose, m.start(), m.end())
             for m in PROSE_DASH_RX.finditer(prose)]
 

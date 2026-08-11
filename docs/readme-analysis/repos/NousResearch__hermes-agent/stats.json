@@ -39,7 +39,7 @@
       "other",
       "other",
       "installation",
-      "api",
+      "other",
       "other",
       "api",
       "other",
@@ -101,7 +101,7 @@
       {
         "level": 2,
         "text": "Skip the API-key collection \u2014 Nous Portal",
-        "category": "api"
+        "category": "other"
       },
       {
         "level": 2,
@@ -143,6 +143,7 @@
         62,
         3,
         156,
+        142,
         162,
         110
       ],
@@ -155,7 +156,6 @@
         0
       ],
       "api": [
-        142,
         237
       ],
       "contributing": [

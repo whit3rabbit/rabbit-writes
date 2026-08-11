@@ -162,11 +162,16 @@ python3 $SCAN draft.md                        # findings + stylometrics
 python3 $SCAN draft.md --json                 # machine-readable
 python3 $SCAN draft.md --profile technical-blog
 python3 $SCAN draft.md --voice-rules <path>.rules.json
+python3 $SCAN draft.md --apply-safe           # only the fixes with one right answer
 ```
 
 Outside a plugin install `${CLAUDE_PLUGIN_ROOT}` is unset, which turns every path above into an absolute path that does not exist. If that happens, resolve `scripts/scan.py` relative to this file's own directory instead.
 
 The script owns what a script does better than you: hidden unicode, AI tracking parameters, chat-citation leaks, unfilled placeholders, em-dash rate, tiered vocabulary density, burstiness, type-token ratio, sentence-length variation, trigram repetition. It reports a reliability level, because under ~150 words the numbers mean little. Treat every hit as a candidate, not a verdict.
+
+It also reports a note when a document's letters are mostly non-ASCII. Every band and tier list here is calibrated on English, so on a Japanese or Arabic document the numbers describe the English parts and guess at the rest. Repeat that note in your report. Never present a stylometric number about non-English prose as a finding.
+
+**Run `--apply-safe` before you start editing.** It applies only the edits with exactly one correct answer, hidden characters, tracking parameters, and this voice's own single-word substitutions, then runs `verify.py` on its own output. It is a dry run without `--write`. Doing that work by hand is how a `sed` job turns into a paraphrase, and every span it touches is one less thing in your diff. Everything needing judgment stays report-only and is still yours.
 
 **5. Read the catalog for what the scan cannot see.** `references/patterns.md` holds the merged pattern set with before/after pairs, grouped P0 / P1 / P2. On a quick pass, do P0 and P1 only.
 
@@ -188,7 +193,7 @@ It also does not see every path. A file path is tracked only when it has an exte
 
 Everything in the catalog is a special case of these.
 
-1. **The portability test.** If a sentence could move unchanged to another person, company, country, or product, it is filler. Cut it, or replace it with a fact, mechanism, consequence, or judgment specific to this subject.
+1. **The portability test.** A sentence that would be just as true of some other subject is filler. Cut it, or replace it with a fact, mechanism, consequence, or judgment specific to this one. `references/patterns.md` defines the test, alongside the three other checks no regex can run.
 2. **Name the actor.** Complaints do not become fixes. Decisions do not emerge. Cultures do not shift. Someone did something. Name them, or use "you" to put the reader in the seat.
 3. **Show instead of labeling.** Cut the sentence that tells the reader a point is important, surprising, contrarian, or interesting. If the content earns it, the label is redundant. If it does not, the label is a lie.
 4. **State the positive claim.** Drop the negation runway ("It's not X, it's Y", "The question isn't X"). Say Y.

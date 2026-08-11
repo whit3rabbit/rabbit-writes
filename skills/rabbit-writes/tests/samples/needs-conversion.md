@@ -20,5 +20,9 @@ Several risks remain open at the close of the quarter and should be tracked into
 
 The recommendation is to schedule the on-call training in the first two weeks of the quarter. The restore drill should follow immediately afterward while the training is still fresh. The runbook update is small enough to fold into either of those two pieces of work. Beyond that, the platform work can proceed on the schedule that was agreed at the planning session. There is no technical reason to delay it any further at this point. The team has capacity to absorb the training and the drill without moving that date. The one dependency worth naming is the security review of the new topology. That review is scheduled and the reviewer has confirmed the date in writing. Nothing else in the plan depends on work owned outside the team.
 
+## Reporting and follow-up
+
+The reporting cadence for the coming quarter has not yet been settled with the platform group. The current weekly update is longer than anyone reads and shorter than anyone needs for planning purposes. Furthermore, the metrics that appear in it were chosen for the migration and no longer describe the work that is actually underway. The proposal is to replace it with a fortnightly summary that leads with the two numbers the platform group asks about every time. Those two numbers are the ninety-ninth percentile latency and the monthly run rate against the committed budget. Everything else can move to a dashboard that anyone can open when they want the detail.
+
 Best regards,
 The infrastructure team

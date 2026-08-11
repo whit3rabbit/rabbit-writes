@@ -1,0 +1,64 @@
+# pre-commit hooks. Add this repo to a project's .pre-commit-config.yaml:
+#
+#   repos:
+#     - repo: https://github.com/whit3rabbit/rabbit-writes
+#       rev: v0.1.0
+#       hooks:
+#         - id: readme-check
+#         - id: rabbit-scan
+#           files: ^docs/.*\.md$
+#
+# `language: script`, not `system`. Both mean there is nothing to install and no
+# virtualenv to build, which is honest either way because the whole plugin is
+# stdlib. The difference is where the entry resolves: pre-commit runs a hook with
+# the *consuming* repository as the working directory, so a `system` entry of
+# `python3 scripts/precommit.py` looks for that path in the caller's tree and
+# does not find it. `script` resolves the entry against this repository, which is
+# where the file is. Either way the hook runs on whatever `python3` the committer
+# has, which is the same bargain the scripts already make.
+#
+# Each hook goes through scripts/precommit.py, which loops. pre-commit hands a
+# batch of staged paths to one invocation, and both checkers take one file
+# because each prints one report about one document.
+#
+# A flag and its value both belong in `args`, never split across `entry` and
+# `args`. pre-commit lays out entry, then args, then filenames, and precommit.py
+# reads the run from the left: it knows `--voice-rules` takes a value, so the
+# profile path stays a value instead of becoming a sixth file to scan.
+#
+# All three gate on P0 only. A P1 is a convention worth arguing about and a P2
+# is polish, and a hook that blocks a commit over polish is a hook people learn
+# to pass --no-verify to, at which point it stops catching the P0s as well.
+
+- id: readme-check
+  name: README structure and voice
+  description: >-
+    Check a README against the conventions measured across 100 trending
+    repositories, and against the active voice profile. Fails on P0 only.
+  entry: scripts/precommit.py readme --check
+  language: script
+  files: (^|/)README(\.md)?$
+  pass_filenames: true
+
+- id: rabbit-scan
+  name: prose scan
+  description: >-
+    Scan prose for chat-tool fingerprints and craft problems. Fails on P0 only,
+    which is the band that is evidence rather than opinion. Set `files` in your
+    config: unscoped, this runs on every markdown file in the repository,
+    including generated ones nobody wrote by hand.
+  entry: scripts/precommit.py scan --check
+  language: script
+  types: [markdown]
+  pass_filenames: true
+
+- id: rabbit-scan-voice
+  name: prose scan against a voice
+  description: >-
+    The same scan with a voice profile applied, so a banned word is a defect
+    rather than a note. Override `args` to point at your own profile.
+  entry: scripts/precommit.py scan --check
+  language: script
+  types: [markdown]
+  pass_filenames: true
+  args: [--voice-rules, skills/rabbit-writes/voices/whit3rabbit.rules.json]

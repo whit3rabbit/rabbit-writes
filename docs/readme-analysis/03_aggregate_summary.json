@@ -34,7 +34,7 @@
   "avg_preamble_word_count": 176.45,
   "avg_total_markdown_links": 56.75,
   "avg_bare_url_count": 1.76,
-  "avg_link_text_words": 2.16,
+  "avg_link_text_words": 2.18,
   "link_style_corpus_totals": {
     "inline_markdown_links": 5661,
     "reference_style_links": 14,
@@ -108,7 +108,7 @@
         "license",
         "related",
         "architecture",
-        "configuration"
+        "api"
       ],
       "count": 1
     },
@@ -200,7 +200,7 @@
     "other": 99.0,
     "installation": 84.0,
     "license": 72.0,
-    "features": 59.0,
+    "features": 60.0,
     "contributing": 52.0,
     "support": 46.0,
     "api": 44.0,
@@ -230,16 +230,16 @@
       "n_repos": 72
     },
     "features": {
-      "median_words": 137,
-      "n_repos": 59
+      "median_words": 140.5,
+      "n_repos": 60
     },
     "contributing": {
       "median_words": 50.5,
       "n_repos": 52
     },
     "api": {
-      "median_words": 121.0,
-      "n_repos": 46
+      "median_words": 120,
+      "n_repos": 47
     },
     "support": {
       "median_words": 158.5,
@@ -315,15 +315,15 @@
   },
   "section_avg_relative_position": {
     "features": {
-      "avg_relative_position": 0.21,
-      "n_occurrences": 86
+      "avg_relative_position": 0.2,
+      "n_occurrences": 87
     },
     "toc": {
       "avg_relative_position": 0.23,
       "n_occurrences": 15
     },
     "installation": {
-      "avg_relative_position": 0.33,
+      "avg_relative_position": 0.34,
       "n_occurrences": 311
     },
     "demo": {
@@ -338,20 +338,20 @@
       "avg_relative_position": 0.45,
       "n_occurrences": 13
     },
-    "performance": {
-      "avg_relative_position": 0.45,
-      "n_occurrences": 17
-    },
     "architecture": {
       "avg_relative_position": 0.46,
       "n_occurrences": 70
     },
-    "usage": {
+    "performance": {
       "avg_relative_position": 0.46,
+      "n_occurrences": 17
+    },
+    "usage": {
+      "avg_relative_position": 0.47,
       "n_occurrences": 30
     },
     "api": {
-      "avg_relative_position": 0.53,
+      "avg_relative_position": 0.52,
       "n_occurrences": 70
     },
     "examples": {
@@ -371,16 +371,16 @@
       "n_occurrences": 93
     },
     "faq": {
-      "avg_relative_position": 0.61,
+      "avg_relative_position": 0.62,
       "n_occurrences": 21
     },
     "roadmap": {
-      "avg_relative_position": 0.63,
+      "avg_relative_position": 0.64,
       "n_occurrences": 8
     },
     "testing": {
       "avg_relative_position": 0.66,
-      "n_occurrences": 35
+      "n_occurrences": 34
     },
     "changelog": {
       "avg_relative_position": 0.71,

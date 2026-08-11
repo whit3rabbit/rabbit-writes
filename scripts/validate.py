@@ -16,16 +16,15 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS = os.path.join(ROOT, "skills")
 VOICES = os.path.join(SKILLS, "rabbit-writes", "voices")
-SCAN = os.path.join(SKILLS, "rabbit-writes", "scripts", "scan.py")
+ENGINE = os.path.join(SKILLS, "rabbit-writes", "scripts")
+SCAN = os.path.join(ENGINE, "scan.py")
+if ENGINE not in sys.path:
+    sys.path.insert(0, ENGINE)
 
-# Findings scan.py raises itself rather than from a lexicon pattern. A register
-# may name any of these in PROFILE_SKIP or PROFILE_RELAX, so the id check below
-# has to know them.
-SYNTHETIC_FINDING_IDS = {
-    "hidden-unicode", "tier1", "clarity", "tier2-cluster", "tier3-density",
-    "uniformity", "low-diversity", "trigram-repetition", "uniform-paragraphs",
-    "em-dash-rate",
-}
+# Findings the engine raises itself rather than from a lexicon pattern. Imported
+# rather than restated: this list existed in three files, and a new synthetic
+# finding added to two of them made the third reject a register that named it.
+from rwlib.lexicon import SYNTHETIC_FINDING_IDS  # noqa: E402
 
 problems = []
 notes = []
@@ -236,40 +235,212 @@ def check_engine():
 
 
 def check_profile_ids():
-    """A typo'd id in a register's skip or relax set silently un-skips the rule.
+    """The tolerance matrix, checked against the ids the engine can actually raise.
 
+    A typo'd id in a register's skip or relax set silently un-skips the rule.
     Nothing fails, nothing warns: the register just quietly stops honouring a
-    tolerance it claims in references/context.md, and the only symptom is a
-    finding somebody eventually learns to ignore."""
-    lex_path = os.path.join(SKILLS, "rabbit-writes", "scripts", "lexicon.json")
+    tolerance it claims, and the only symptom is a finding somebody eventually
+    learns to ignore. rwlib.registers.problems knows the rest of the failure
+    modes, including a cell that claims a tolerance nothing implements.
+    """
+    lex_path = os.path.join(ENGINE, "lexicon.json")
     if not (os.path.exists(SCAN) and os.path.exists(lex_path)):
         return
     try:
-        spec = importlib.util.spec_from_file_location("rw_scan_validate", SCAN)
-        scan = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(scan)
+        from rwlib import registers
         with open(lex_path, encoding="utf-8") as fh:
             lex = json.load(fh)
-    except (OSError, ValueError, SyntaxError) as exc:
-        fail("could not load scan.py to check the register profiles: %s" % exc)
+    except (OSError, ValueError, ImportError) as exc:
+        fail("could not load the engine to check the register profiles: %s" % exc)
         return
 
-    known = {p.get("id") for p in lex.get("patterns", [])} | SYNTHETIC_FINDING_IDS
-    for name, table in (("PROFILE_SKIP", scan.PROFILE_SKIP),
-                        ("PROFILE_RELAX", scan.PROFILE_RELAX)):
-        for profile, entries in table.items():
-            for pid in sorted(entries):
-                if pid not in known:
-                    fail("scan.py %s[%r] names %r, which is not a lexicon "
-                         "pattern id or a built-in finding id" % (name, profile, pid))
-    overlap = {p: sorted(set(scan.PROFILE_SKIP.get(p, ())) & set(relaxed))
-               for p, relaxed in scan.PROFILE_RELAX.items()}
-    for profile, ids in overlap.items():
-        if ids:
-            fail("scan.py profile %r both skips and relaxes %s; skip wins, so the "
-                 "allowance never applies" % (profile, ", ".join(ids)))
-    notes.append("register profiles: %d skip sets, %d relax sets, all ids known"
-                 % (len(scan.PROFILE_SKIP), len(scan.PROFILE_RELAX)))
+    known = {p.get("id") for p in lex.get("patterns", [])} | set(SYNTHETIC_FINDING_IDS)
+    for problem in registers.problems(known):
+        fail("registers.json: %s" % problem)
+    notes.append("register profiles: %d registers, %d skip sets, %d relax sets, "
+                 "%d rules with no mechanical form"
+                 % (len(registers.registers()), len(registers.skip_table()),
+                    len(registers.relax_table()),
+                    len(registers.unimplemented_rules())))
+
+
+def check_matrix_doc():
+    """references/context.md's table is rendered from registers.json.
+
+    Editing the markdown by hand is the drift this replaced: a documented
+    tolerance the engine never had. The renderer is the only writer, and the
+    failure message says which command puts it back.
+    """
+    try:
+        from rwlib import registers
+    except ImportError as exc:
+        fail("could not import rwlib.registers: %s" % exc)
+        return
+    try:
+        if registers.doc_table() != registers.render_table():
+            fail("references/context.md's tolerance matrix no longer matches "
+                 "registers.json. Run: python3 skills/rabbit-writes/scripts/"
+                 "rwlib/registers.py --write")
+            return
+    except ValueError as exc:
+        fail("could not read the tolerance matrix out of context.md: %s" % exc)
+        return
+    notes.append("tolerance matrix in context.md matches registers.json")
+
+
+def check_corpus_summary():
+    """The committed corpus extract against the research aggregate.
+
+    readme_check.py used to carry these numbers as a literal with a comment
+    promising they mirrored the aggregate, and nothing checked the promise. A
+    corpus regeneration could orphan every threshold in the checker without a
+    word. Skipped, with a note, when the research data is not present: an
+    installed skill has no aggregate to compare against.
+    """
+    try:
+        from rwlib import corpus
+    except ImportError as exc:
+        fail("could not import rwlib.corpus: %s" % exc)
+        return
+    if not os.path.exists(corpus.SUMMARY_PATH):
+        fail("skills/readme-writing/scripts/corpus_summary.json is missing, so "
+             "readme_check.py has nothing to compare a README against")
+        return
+    if not os.path.exists(corpus.AGGREGATE_PATH):
+        notes.append("corpus summary present; no research aggregate here to "
+                     "check it against")
+        return
+    differences = corpus.drift()
+    for key, shipped, fresh in differences:
+        fail("corpus_summary.json %s is %r, the aggregate says %r. Run: "
+             "python3 scripts/readme-research/05_export_corpus_summary.py"
+             % (key, shipped, fresh))
+    if not differences:
+        notes.append("corpus summary matches the aggregate (%d repos)"
+                     % corpus.load()["n_repos"])
+
+
+def check_finding_schema():
+    """Both checkers emit the same finding shape.
+
+    They did not: readme_check.py used a `detail` key that scan.py never
+    emitted, so its own reporter had to branch on the band to find its text and
+    no consumer could parse both with one reader. Run over the two sample
+    documents in the test fixtures, because a schema that only holds on an empty
+    finding list holds trivially.
+    """
+    try:
+        from rwlib import findings as findings_mod
+        import scan as scan_mod
+    except ImportError as exc:
+        fail("could not import the engine to check the finding schema: %s" % exc)
+        return
+    sample = os.path.join(SKILLS, "rabbit-writes", "tests", "samples", "ai-sample.md")
+    if not os.path.exists(sample):
+        return
+    with open(sample, encoding="utf-8") as fh:
+        found, _ = scan_mod.scan(fh.read())
+    if not found:
+        fail("the AI calibration sample raises no findings, so the schema check "
+             "below proves nothing")
+        return
+    for index, problem in findings_mod.validate(found):
+        fail("scan.py finding %d does not match the schema: %s" % (index, problem))
+
+    check_path = os.path.join(SKILLS, "readme-writing", "scripts", "readme_check.py")
+    bad_readme = os.path.join(SKILLS, "readme-writing", "tests", "samples", "bad-readme.md")
+    if not (os.path.exists(check_path) and os.path.exists(bad_readme)):
+        return
+    spec = importlib.util.spec_from_file_location("rc_validate", check_path)
+    rc = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rc)
+    with open(bad_readme, encoding="utf-8") as fh:
+        rfound = rc.check_readme(fh.read(), bad_readme, use_voice=False)[0]
+    if not rfound:
+        fail("the bad README fixture raises no findings, so the schema check "
+             "below proves nothing")
+        return
+    for index, problem in findings_mod.validate(rfound):
+        fail("readme_check.py finding %d does not match the schema: %s"
+             % (index, problem))
+    notes.append("finding schema v%d holds for both checkers"
+                 % findings_mod.SCHEMA_VERSION)
+
+
+def check_versions():
+    """A published measurement is only reproducible if it says what produced it."""
+    try:
+        from rwlib import lexicon, registers
+    except ImportError as exc:
+        fail("could not import rwlib: %s" % exc)
+        return
+    if lexicon.version() is None:
+        fail("lexicon.json has no \"version\" key, so PROOF.md's numbers cannot "
+             "be tied to the catalogue that produced them")
+    if registers.version() is None:
+        fail("registers.json has no \"version\" key")
+    proof = os.path.join(SKILLS, "rabbit-writes", "PROOF.md")
+    if os.path.exists(proof) and lexicon.version() is not None:
+        with open(proof, encoding="utf-8") as fh:
+            text = fh.read()
+        stamp = "lexicon %s" % lexicon.version()
+        if stamp not in text:
+            fail("PROOF.md does not say %r, so its measurements are pinned to "
+                 "nothing. Regenerate it after changing the lexicon." % stamp)
+    notes.append("lexicon %s, registers %s"
+                 % (lexicon.version(), registers.version()))
+
+
+def check_single_definition():
+    """One home per rule.
+
+    The portability test was written out in full in three files, and by the time
+    anybody compared them they disagreed about whether "country" was on the list
+    of things a filler sentence could move to. Every restatement is a future
+    drift site, so the definition lives in references/patterns.md and everything
+    else points at it.
+
+    Matched on the clause that makes it a definition rather than a reference, so
+    a file may name the rule, summarize it, and link to it, and may not spell it
+    out a second time. `patterns.md` exempts itself by being the home.
+    """
+    definitions = {
+        "the portability test": (
+            re.compile(r"(?i)could move unchanged to another|"
+                       r"move unchanged to another (person|company)"),
+            os.path.join("skills", "rabbit-writes", "references", "patterns.md"),
+        ),
+    }
+    skip_dirs = {".git", "docs", "_to_delete", "__pycache__", "node_modules"}
+    for rule, (rx, home) in definitions.items():
+        home_path = os.path.join(ROOT, home)
+        if os.path.exists(home_path):
+            with open(home_path, encoding="utf-8") as fh:
+                if not rx.search(fh.read()):
+                    fail("%s is supposed to define %s and no longer does"
+                         % (home, rule))
+        strays = []
+        for base, dirs, files in os.walk(ROOT):
+            dirs[:] = [d for d in dirs if d not in skip_dirs]
+            for fn in files:
+                if not fn.endswith(".md") or fn in ("CHANGELOG.md", "PROOF.md"):
+                    continue
+                path = os.path.join(base, fn)
+                if os.path.abspath(path) == os.path.abspath(home_path):
+                    continue
+                try:
+                    with open(path, encoding="utf-8") as fh:
+                        text = fh.read()
+                except (OSError, UnicodeDecodeError):
+                    continue
+                if rx.search(text):
+                    strays.append(os.path.relpath(path, ROOT))
+        for stray in strays:
+            fail("%s spells out %s, which is defined in %s. Summarize and point "
+                 "at the definition instead: two copies of a rule drift, and "
+                 "this one already had" % (stray, rule, home))
+    notes.append("one definition each for %d cross-cutting rule(s)"
+                 % len(definitions))
 
 
 def check_no_stale_skill_name():
@@ -378,6 +549,11 @@ check_skills()
 check_voices()
 check_engine()
 check_profile_ids()
+check_matrix_doc()
+check_corpus_summary()
+check_finding_schema()
+check_versions()
+check_single_definition()
 check_no_stale_skill_name()
 check_mode_contract()
 check_scripts_compile()

@@ -42,10 +42,10 @@ jobs:
         run: python3 scripts/validate.py
 
       - name: engine calibration and preservation validator
-        run: python3 skills/rabbit-writes/tests/test_scan.py
+        run: python3 skills/rabbit-writes/tests/run.py
 
       - name: readme structure, voice, and corpus regression
-        run: python3 skills/readme-writing/tests/test_readme_check.py
+        run: python3 skills/readme-writing/tests/run.py
 
       - name: dogfood the scanner on the repo's own prose
         run: |

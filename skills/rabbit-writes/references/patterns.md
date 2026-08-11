@@ -100,7 +100,7 @@ State what happened. Let the reader judge whether it matters. **Test:** if the s
 
 Replace on sight. These run 5-20x more common in machine text (a well-supported convention, not a measurement this skill made). Inflected forms count: `delve` covers `delving`, `meticulous` covers `meticulously`.
 
-Every word in this table is in `scripts/lexicon.json` under `tier1` or `tier1_phrases`, and `tests/test_scan.py` fails if one of them is not. Words whose tell depends on the sense (`leverage` the verb, `landscape` the metaphor) live in section 14 instead, because a regex cannot read the sense and a word that fires on its literal use is a word people learn to ignore.
+Every word in this table is in `scripts/lexicon.json` under `tier1` or `tier1_phrases`, and `tests/test_engine.py` fails if one of them is not. Words whose tell depends on the sense (`leverage` the verb, `landscape` the metaphor) live in section 14 instead, because a regex cannot read the sense and a word that fires on its literal use is a word people learn to ignore.
 
 | Replace | With |
 |---|---|
@@ -571,6 +571,8 @@ No regex catches these. Run them by reading.
 ## The portability test
 
 Could this sentence move unchanged to another person, company, country, or product? Then it is filler. Cut it or make it specific to this subject.
+
+This paragraph is the definition. `SKILL.md` and the checklist point at it rather than restating it, and a voice profile that wants the rule cites it too. It was written out in full in three places once, and the copies had already stopped agreeing about whether "country" was on the list.
 
 ## Paragraph-reshuffle immunity
 

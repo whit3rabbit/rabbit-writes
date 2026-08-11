@@ -21,108 +21,81 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fi
 BASE = os.path.join(REPO_ROOT, "docs", "readme-analysis")
 REPOS_DIR = f"{BASE}/repos"
 
-# ---------------------------------------------------------------- section map
-SECTION_KEYWORDS = [
-    ("toc", ["table of contents", "contents", "index"]),
-    ("features", ["features", "why ", "highlights", "why use", "what is"]),
-    ("demo", ["demo", "screenshot", "preview", "gallery", "in action", "showcase"]),
-    ("installation", ["install", "setup", "getting started", "quick start", "quickstart", "requirements", "prerequisites"]),
-    ("usage", ["usage", "how to use", "quick example", "getting started", "basic usage"]),
-    ("examples", ["example"]),
-    ("configuration", ["config", "options", "settings", "environment variable"]),
-    ("api", ["api reference", " api", "documentation", "docs"]),
-    ("architecture", ["architecture", "how it works", "design", "internals"]),
-    ("contributing", ["contributing", "contribute", "development guide", "developing"]),
-    ("testing", ["testing", "run tests", "tests"]),
-    ("roadmap", ["roadmap", "todo", "future work", "upcoming"]),
-    ("faq", ["faq", "frequently asked", "troubleshoot"]),
-    ("license", ["license", "licence"]),
-    ("credits", ["acknowledg", "credits", "thanks", "contributors", "inspired by"]),
-    ("support", ["support", "community", "contact", "discord", "get help", "help"]),
-    ("sponsors", ["sponsor", "backers", "funding"]),
-    ("changelog", ["changelog", "release notes", "history", "whats new", "what's new"]),
-    ("security", ["security"]),
-    ("related", ["related", "see also", "alternatives", "comparison"]),
-    ("performance", ["performance", "benchmark"]),
-]
+# The study and the checker have to agree on what an "installation" heading is,
+# what a badge host is, and where a link ends, or readme_check.py compares a
+# README against thresholds derived from a different definition of the same
+# word. They used to agree by hand, via comments asking the next reader to keep
+# two copies in sync, and they drifted anyway. Now there is one copy, in the
+# skill, and this script imports it.
+RWLIB_PARENT = os.path.join(REPO_ROOT, "skills", "rabbit-writes", "scripts")
+if RWLIB_PARENT not in sys.path:
+    sys.path.insert(0, RWLIB_PARENT)
 
-def classify_heading(text):
-    t = text.strip().lower().lstrip("#").strip()
-    t = re.sub(r"[^\w\s'-]", " ", t)
-    for cat, kws in SECTION_KEYWORDS:
-        for kw in kws:
-            if kw in t:
-                return cat
-    return "other"
+from rwlib.markdown import (AUTOLINK_RX, BARE_URL_RX, BADGE_HOSTS_CORPUS,  # noqa: E402
+                            FENCE_PARTS_RX, HEADING_RX, HTML_ATTR_URL_RX,
+                            HTML_CENTER_RX, HTML_IMG_RX, HTML_LINK_RX,
+                            IMAGE_RX, INLINE_CODE_RX, LINK_RX, REF_DEF_RX,
+                            REF_LINK_RX, is_badge, strip_images,
+                            strip_wrapped_urls, word_count)
+from rwlib.sections import classify_heading  # noqa: E402
 
-CODE_FENCE_RE = re.compile(r"```(\w*)\n(.*?)```", re.DOTALL)
-HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$", re.MULTILINE)
-IMAGE_RE = re.compile(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
-LINK_RE = re.compile(r"(?<!!)\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
-REF_LINK_RE = re.compile(r"(?<!!)\[([^\]]+)\]\[([^\]]*)\]")
-REF_DEF_RE = re.compile(r"^\s*\[([^\]]+)\]:\s*(\S+)", re.MULTILINE)
-# A URL only counts as bare when nothing already wraps it. The first pass of this
-# study matched inside HTML href/src attributes and inside inline code, which put
-# 2,009 attribute URLs in the "bare" bucket and inflated the rate by an order of
-# magnitude. strip_wrapped_urls below is the fix.
-BARE_URL_RE = re.compile(r"https?://[^\s)>\]\"']+")
-INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
-HTML_ATTR_URL_RE = re.compile(r"(?:src|href)\s*=\s*[\"'][^\"']*[\"']", re.IGNORECASE)
-HTML_IMG_RE = re.compile(r"<img[^>]+src\s*=\s*[\"']([^\"']+)[\"']", re.IGNORECASE)
-HTML_LINK_RE = re.compile(r"<a[^>]+href\s*=\s*[\"']([^\"']+)[\"']", re.IGNORECASE)
-AUTOLINK_RE = re.compile(r"<https?://[^>]+>")
-HTML_CENTER_RE = re.compile(r"<(p|div|h[1-6])\s+align=[\"']center[\"']", re.IGNORECASE)
+# Names the body of this script has always used. Aliased rather than renamed, so
+# the diff that introduced rwlib stayed readable.
+CODE_FENCE_RE = FENCE_PARTS_RX
+HEADING_RE = HEADING_RX
+IMAGE_RE = IMAGE_RX
+LINK_RE = LINK_RX
+REF_LINK_RE = REF_LINK_RX
+REF_DEF_RE = REF_DEF_RX
+BARE_URL_RE = BARE_URL_RX
+INLINE_CODE_RE = INLINE_CODE_RX
+HTML_ATTR_URL_RE = HTML_ATTR_URL_RX
+HTML_IMG_RE = HTML_IMG_RX
+HTML_LINK_RE = HTML_LINK_RX
+AUTOLINK_RE = AUTOLINK_RX
+HTML_CENTER_RE = HTML_CENTER_RX
+BADGE_HOST_HINTS = BADGE_HOSTS_CORPUS
+
+# Two definitions this study keeps to itself, on purpose.
+#
+# The table patterns are looser here than in the skill (no leading whitespace,
+# at least one cell character). Every committed stats.json was measured with
+# these, so widening them silently changes a published number. The skill's
+# copies are the ones a live document is checked against, and the two counts
+# answer different questions.
+#
+# The sentence splitter is lighter than rwlib.sentences.split_sentences: it
+# protects decimals and a shorter abbreviation list and requires a capital after
+# the break. Same reasoning. The corpus medians in corpus_summary.json are what
+# this splitter produced, and swapping it in would move numbers that other files
+# quote as measurements.
 TABLE_ROW_RE = re.compile(r"^\|.+\|\s*$", re.MULTILINE)
 TABLE_SEP_RE = re.compile(r"^\|?[\s:|-]+\|[\s:|-]+\|?\s*$", re.MULTILINE)
-# Substrings, not patterns: is_badge_url does `h in url`, so a regex written here
-# is a literal that never matches. GitHub Actions badges are covered by
-# "actions/workflows".
-#
-# readme_check.py in the readme-writing skill carries this list plus one extra
-# entry, "/badge", which catches the long tail (trendshift, star-history,
-# repology, awesome.re) that named hosts miss: 625 badges against 568 over the
-# committed snapshot, with no non-badge image caught either way. The checker is
-# deliberately the broader of the two. Do not narrow it to match this list;
-# widen this list and regenerate the corpus if the two should ever converge.
-BADGE_HOST_HINTS = ["shields.io", "badge.fury.io", "img.shields", "badgen.net", "travis-ci",
-                     "circleci.com/gh", "codecov.io", "coveralls.io",
-                     "actions/workflows", "sonarcloud.io", "snyk.io", "discord.com/api/guilds",
-                     "opencollective.com", "npmjs.com/package", "pypi.org/project", "crates.io/v",
-                     "gitpod.io/button", "deepwiki.com/badge", "img.badgesize.io", "visitor-badge"]
+
 
 def strip_code_blocks(text):
     return CODE_FENCE_RE.sub("", text)
 
-def strip_wrapped_urls(text):
-    """Blank every URL that is already inside a markdown link, an HTML attribute,
-    an autolink, a reference definition, or inline code. What survives is bare."""
-    out = IMAGE_RE.sub(" ", text)
-    out = LINK_RE.sub(" ", out)
-    out = HTML_ATTR_URL_RE.sub(" ", out)
-    out = AUTOLINK_RE.sub(" ", out)
-    out = REF_DEF_RE.sub(" ", out)
-    out = INLINE_CODE_RE.sub(" ", out)
-    return out
 
 def is_badge_url(url):
-    lu = url.lower()
-    return any(h in lu for h in BADGE_HOST_HINTS)
+    """Badge detection at the study's width, which is narrower than the
+    checker's. See rwlib.markdown: the checker adds a "/badge" catch-all, and
+    that divergence is deliberate and one-directional."""
+    return is_badge(url, BADGE_HOST_HINTS)
+
 
 def sentence_split(text):
-    # Very light sentence splitter: split on . ! ? followed by whitespace+capital or newline,
-    # while trying not to split on common abbreviations / decimal numbers / version strings.
+    # Very light sentence splitter: split on . ! ? followed by whitespace+capital
+    # or newline, while trying not to split on common abbreviations, decimal
+    # numbers, or version strings.
     text = re.sub(r"\s+", " ", text).strip()
     if not text:
         return []
-    # protect decimals and versions like v1.2.3, e.g., i.e.
     protected = re.sub(r"(\d)\.(\d)", r"\1<DOT>\2", text)
     protected = re.sub(r"\b(e\.g|i\.e|etc|vs|Mr|Mrs|Dr|Inc|Ltd)\.", r"\1<DOT>", protected)
     parts = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9\"'`(*_])", protected)
-    sentences = [p.replace("<DOT>", ".").strip() for p in parts if p.strip()]
-    return sentences
+    return [p.replace("<DOT>", ".").strip() for p in parts if p.strip()]
 
-def word_count(text):
-    return len(re.findall(r"\b[\w'-]+\b", text))
 
 def analyze_readme(text, full_name=""):
     stats = {}
@@ -193,7 +166,7 @@ def analyze_readme(text, full_name=""):
 
     # ---- links
     text_no_code = strip_code_blocks(text)
-    inline_links = LINK_RE.findall(text_no_code)
+    inline_links = LINK_RE.findall(strip_images(text_no_code))
     ref_links = REF_LINK_RE.findall(text_no_code)
     ref_defs = REF_DEF_RE.findall(text_no_code)
     bare_urls = BARE_URL_RE.findall(strip_wrapped_urls(text_no_code))

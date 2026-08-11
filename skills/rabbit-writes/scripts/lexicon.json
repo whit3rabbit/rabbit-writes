@@ -1,4 +1,6 @@
 {
+  "version": 1,
+  "_version_note": "Bumped whenever a word, a phrase, or a pattern changes, so a published measurement can name the catalogue that produced it. scan.py --json echoes it, PROOF.md's header quotes it, and scripts/validate.py fails when the two disagree. Numbers measured against one version mean nothing against another.",
   "_comment": "Tiered vocabulary and pattern regexes for scan.py. Edit freely; scan.py reads this at runtime. Word entries are matched case-insensitively on word boundaries and cover the listed inflections.",
 
   "tier1": [
@@ -347,7 +349,8 @@
       "label": "Formulaic challenges section",
       "band": "craft",
       "priority": "P1",
-      "rx": "(?i)(faces (several |a number of )?challenges|challenges and (future prospects|legacy)|future outlook)"
+      "_rx_note": "Matches the formula patterns.md section 45 names, not the words in it. A bare `faces challenges` is an ordinary English sentence: \"the team faces challenges next quarter\" is a fact, and a P1 that fires on it is the false positive references/false-positives.md warns about. The tell is the pairing, \"faces challenges typical of ... Despite these challenges, X continues to thrive\". The two heading forms are anchored to a real heading, because \"the future outlook is uncertain\" in running prose is a financial report, not slop.",
+      "rx": "(?im)(faces (?:several |a number of )?challenges typical of|despite (?:these|those) challenges|continues to thrive|^#{1,6}\\s*challenges and (?:future prospects|legacy)\\b|^#{1,6}\\s*future outlook\\b)"
     },
     {
       "id": "novelty-inflation",

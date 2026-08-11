@@ -310,8 +310,8 @@
     "bare_url_count": 2,
     "total_markdown_links": 60,
     "uses_reference_style_links": false,
-    "avg_link_text_words": 2.12,
-    "internal_anchor_link_count": 5,
+    "avg_link_text_words": 2.29,
+    "internal_anchor_link_count": 9,
     "has_toc_like_anchor_list": true,
     "code_block_count": 6,
     "code_block_languages": [

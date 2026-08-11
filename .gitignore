@@ -69,6 +69,9 @@ venv.bak/
 .idea/
 node_modules/
 
+# Local search index, rebuilt on demand and machine-specific.
+.syntext/
+
 # Personal Claude Code notes and settings, machine-specific.
 # settings.local.json holds per-machine permissions and skill overrides. It is
 # ignored here rather than only in a contributor's global excludes, because the
@@ -77,3 +80,9 @@ node_modules/
 CLAUDE.local.md
 .claude.local.md
 .claude/settings.local.json
+
+# Labeled-corpus texts. The manifest commits a SHA-256, a source URL, and an
+# archive URL for each sample; the prose itself stays with whoever wrote it.
+# scripts/detector-corpus/score.py --verify refetches nothing and checks hashes,
+# so a claim in the manifest is checkable without this directory being public.
+docs/detector-corpus/texts/

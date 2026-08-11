@@ -6,19 +6,19 @@ Backing data for `SKILL.md`. Every number here is from `${CLAUDE_PLUGIN_ROOT}/do
 
 | Section | Present in | Avg. position (0=start, 1=end) | Median length when present |
 |---|---:|---:|---:|
-| Features / Why | 59% | 0.21 | 137 words |
+| Features / Why | 60% | 0.20 | 140 words |
 | Table of contents | 12% | 0.23 | 58 words |
-| Installation / Setup | 84% | 0.33 | 112 words |
+| Installation / Setup | 84% | 0.34 | 112 words |
 | Demo / Screenshots | 24% | 0.38 | 49 words |
 | Sponsors | 13% | 0.39 | 143 words |
 | Architecture / How it works | 41% | 0.46 | 92 words |
-| Usage | 24% | 0.46 | 36 words |
-| API / Docs | 44% | 0.53 | 121 words |
+| Usage | 24% | 0.47 | 36 words |
+| API / Docs | 44% | 0.52 | 120 words |
 | Examples | 13% | 0.53 | 8 words |
 | Security | 16% | 0.54 | 151 words |
 | Configuration | 33% | 0.56 | 135 words |
 | Support / Community | 46% | 0.59 | 158 words |
-| FAQ | 17% | 0.61 | 253 words |
+| FAQ | 17% | 0.62 | 253 words |
 | Testing | 14% | 0.66 | 53 words |
 | Changelog | 32% | 0.71 | 60 words |
 | Contributing | 52% | 0.77 | 50 words |

@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+"""
+The README corpus figures readme_check.py compares against.
+
+readme_check.py used to carry these as a literal dict with a comment promising
+it mirrored docs/readme-analysis/03_aggregate_summary.json. Nothing checked the
+promise, so regenerating the corpus silently orphaned the checker's thresholds:
+the script kept quoting "corpus median 5" at a corpus whose median had moved.
+
+Now there is a committed extract, skills/readme-writing/scripts/corpus_summary.json,
+which is what ships and what the checker reads. It is small enough that shipping
+it costs nothing, and it keeps the skill working when installed without the
+research data. `derive` is the function that produces it from the aggregate, so
+the exporter and validate.py's drift check run the same code over the same
+input and cannot disagree about what "mirrors" means.
+
+Regenerate with:
+
+    cd scripts/readme-research
+    python3 03_analyze_readme.py --batch && python3 04_aggregate.py
+    python3 05_export_corpus_summary.py
+
+Stdlib only, 3.8+.
+"""
+
+import json
+import os
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+# rwlib -> scripts -> rabbit-writes -> skills -> the plugin root. Walked rather
+# than hardcoded, so the skill directory can be renamed without editing this.
+PLUGIN_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(HERE))))
+SUMMARY_PATH = os.path.join(PLUGIN_ROOT, "skills", "readme-writing", "scripts",
+                            "corpus_summary.json")
+AGGREGATE_PATH = os.path.join(PLUGIN_ROOT, "docs", "readme-analysis",
+                              "03_aggregate_summary.json")
+
+# Bumped when `derive` changes which keys it emits or how it rounds them, so a
+# committed extract from an older shape fails the drift check loudly instead of
+# comparing unequal for a reason nobody can see.
+SCHEMA_VERSION = 1
+
+_CACHE = {}
+
+
+def derive(aggregate):
+    """The subset of the aggregate that readme_check.py actually uses.
+
+    Rounded here rather than at the point of use, because these numbers are
+    quoted verbatim in findings ("Corpus median is 5") and a number that renders
+    differently in two findings reads as two different measurements.
+    """
+    pos = aggregate["section_avg_relative_position"]
+    lic = aggregate.get("section_median_word_count", {}).get("license", {})
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "n_repos": aggregate["n_repos"],
+        "word_count_percentiles": dict(aggregate["readme_word_count_percentiles"]),
+        "avg_paragraph_words": round(aggregate["avg_paragraph_words"], 1),
+        "sentence_mix_pct": {
+            "short": round(aggregate["avg_short_sentence_pct"], 1),
+            "medium": round(aggregate["avg_medium_sentence_pct"], 1),
+            "long": round(aggregate["avg_long_sentence_pct"], 1),
+        },
+        "median_badge_count": int(aggregate["median_badge_count"]),
+        "link_style_pct": {
+            "inline": aggregate["link_style_corpus_totals"]["pct_inline"],
+            "bare": aggregate["link_style_corpus_totals"]["pct_bare_url"],
+            "reference": aggregate["link_style_corpus_totals"]["pct_reference_style"],
+        },
+        "avg_link_text_words": round(aggregate["avg_link_text_words"], 1),
+        "median_license_words": lic.get("median_words"),
+        "pct_has_installation_section": aggregate["pct_has_installation_section"],
+        "pct_has_code_blocks": aggregate["pct_has_code_blocks"],
+        "pct_has_license_section_or_badge": aggregate["pct_has_license_section_or_badge"],
+        "pct_has_toc": aggregate["pct_has_toc"],
+        "section_avg_position": {
+            cat: v["avg_relative_position"] for cat, v in pos.items()
+        },
+    }
+
+
+def load(path=SUMMARY_PATH):
+    if path not in _CACHE:
+        with open(path, encoding="utf-8") as fh:
+            _CACHE[path] = json.load(fh)
+    return _CACHE[path]
+
+
+def load_aggregate(path=AGGREGATE_PATH):
+    """The full research aggregate, or None when the study data is not installed."""
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def drift(summary_path=SUMMARY_PATH, aggregate_path=AGGREGATE_PATH):
+    """[(key, shipped, derived)] where the committed extract has fallen behind.
+
+    Empty when the research data is absent: an installed skill has no aggregate
+    to compare against, and refusing to run would punish the common case for a
+    check that only means something in this repo.
+    """
+    aggregate = load_aggregate(aggregate_path)
+    if aggregate is None or not os.path.exists(summary_path):
+        return []
+    shipped = load(summary_path)
+    derived = derive(aggregate)
+    out = []
+    for key in sorted(set(shipped) | set(derived)):
+        if shipped.get(key) != derived.get(key):
+            out.append((key, shipped.get(key), derived.get(key)))
+    return out
