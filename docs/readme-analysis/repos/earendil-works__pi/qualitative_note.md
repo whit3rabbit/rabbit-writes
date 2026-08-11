@@ -1,0 +1,7 @@
+# earendil-works/pi — qualitative note
+
+This README is notably terse and utilitarian compared to the others in this batch — a two-badge header (Discord, npm) and a single blockquote warning about auto-closed issues, then straight into a monorepo package table with no marketing framing at all. Its most distinctive content is the "Supply-chain hardening" section, a nine-bullet list of concrete dependency-security practices (`save-exact=true`, `min-release-age=2`, npm audit signatures, lockfile pre-commit blocking) — a rare level of specificity for a README and a good example of documenting security posture as verifiable facts rather than vague assurances. It also has an unusual "Share your OSS coding agent sessions" section written in first person by a named maintainer ("I regularly publish my own `pi-mono` work sessions here"), which breaks from the otherwise impersonal, package-index tone and signals a community/research angle distinct from the product pitch. The plain package table ("| Package | Description |") doing double duty as both navigation and feature summary is an efficient, low-effort structural choice. Overall the voice is dry and engineer-to-engineer, trusting the reader to follow links to docs rather than over-explaining.
+
+**Quotes:**
+- "We treat npm dependency changes as reviewed code changes."
+- "Public OSS session data helps improve coding agents with real-world tasks, tool use, failures, and fixes instead of toy benchmarks."

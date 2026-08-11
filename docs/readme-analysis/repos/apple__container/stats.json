@@ -1,0 +1,144 @@
+{
+  "meta": {
+    "full_name": "apple/container",
+    "html_url": "https://github.com/apple/container",
+    "description": "A tool for creating and running Linux containers using lightweight virtual machines on a Mac. It is written in Swift, and optimized for Apple silicon. ",
+    "stars_total": 48805,
+    "forks": 1701,
+    "watchers": 218,
+    "created_at": "2025-05-30T21:26:05Z",
+    "pushed_at": "2026-08-08T01:36:01Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/apple__container/README.md",
+    "readme_bytes": 3973,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 573,
+    "est_stars_gained_1y": 2292,
+    "slug": "apple__container"
+  },
+  "stats": {
+    "total_lines": 92,
+    "non_blank_lines": 58,
+    "total_chars": 3973,
+    "heading_count": 8,
+    "heading_levels_used": [
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "contributing",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Get started",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Requirements",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Initial install",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Upgrade or downgrade",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Uninstall",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Next steps",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Project Status",
+        "category": "other"
+      }
+    ],
+    "has_h1": false,
+    "section_word_counts": {
+      "other": [
+        0,
+        80,
+        72,
+        54
+      ],
+      "installation": [
+        65,
+        55,
+        41
+      ],
+      "contributing": [
+        25
+      ]
+    },
+    "preamble_word_count": 120,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 2,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 2,
+    "gif_count": 1,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 12,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 12,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.67,
+    "internal_anchor_link_count": 1,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 7,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 1.14,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 18,
+    "avg_paragraph_words": 23.89,
+    "median_paragraph_words": 19.0,
+    "sentence_count": 27,
+    "avg_sentence_words": 15.93,
+    "median_sentence_words": 16,
+    "stdev_sentence_words": 7.3,
+    "short_sentence_pct": 22.2,
+    "medium_sentence_pct": 51.9,
+    "long_sentence_pct": 25.9,
+    "total_prose_words": 502,
+    "has_license_section_or_badge": false,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

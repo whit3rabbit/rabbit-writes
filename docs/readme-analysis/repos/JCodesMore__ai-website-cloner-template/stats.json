@@ -1,0 +1,209 @@
+{
+  "meta": {
+    "full_name": "JCodesMore/ai-website-cloner-template",
+    "html_url": "https://github.com/JCodesMore/ai-website-cloner-template",
+    "description": "Clone any website with one command using AI coding agents",
+    "stars_total": 31493,
+    "forks": 4574,
+    "watchers": 159,
+    "created_at": "2026-03-13T11:14:39Z",
+    "pushed_at": "2026-08-10T02:19:27Z",
+    "default_branch": "master",
+    "readme_branch_used": "master",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/JCodesMore__ai-website-cloner-template/README.md",
+    "readme_bytes": 9119,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 385,
+    "est_stars_gained_1y": 1540,
+    "slug": "JCodesMore__ai-website-cloner-template"
+  },
+  "stats": {
+    "total_lines": 191,
+    "non_blank_lines": 136,
+    "total_chars": 9077,
+    "heading_count": 16,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "demo",
+      "installation",
+      "support",
+      "installation",
+      "other",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "changelog",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "AI Website Cloner Template",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Clone any website with one command",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Demo",
+        "category": "demo"
+      },
+      {
+        "level": 2,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Supported Platforms",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Tech Stack",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How It Works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Use Cases",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Not Intended For",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Project Structure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Commands",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "If using docker",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Updating for Other Platforms",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        0,
+        204,
+        32,
+        62,
+        50,
+        0,
+        0,
+        0,
+        57
+      ],
+      "demo": [
+        22
+      ],
+      "installation": [
+        202,
+        14
+      ],
+      "support": [
+        95
+      ],
+      "architecture": [
+        98
+      ],
+      "changelog": [
+        7
+      ],
+      "license": [
+        12
+      ]
+    },
+    "preamble_word_count": 3,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 1,
+    "uses_centering": true,
+    "image_count_total": 8,
+    "badge_count": 5,
+    "screenshot_or_logo_image_count": 3,
+    "gif_count": 0,
+    "has_video_embed": true,
+    "badges_in_header_block": 5,
+    "html_link_count": 4,
+    "inline_link_count": 22,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 22,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.77,
+    "internal_anchor_link_count": 4,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 7,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 5.29,
+    "table_row_count": 19,
+    "table_present": true,
+    "paragraph_count": 26,
+    "avg_paragraph_words": 15.38,
+    "median_paragraph_words": 11.0,
+    "sentence_count": 36,
+    "avg_sentence_words": 11.11,
+    "median_sentence_words": 7.5,
+    "stdev_sentence_words": 13.0,
+    "short_sentence_pct": 58.3,
+    "medium_sentence_pct": 30.6,
+    "long_sentence_pct": 11.1,
+    "total_prose_words": 696,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

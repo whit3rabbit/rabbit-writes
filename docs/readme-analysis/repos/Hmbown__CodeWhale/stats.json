@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "full_name": "Hmbown/CodeWhale",
+    "html_url": "https://github.com/Hmbown/CodeWhale",
+    "description": "Open-source, community-driven agent harness",
+    "stars_total": 40610,
+    "forks": 3510,
+    "watchers": 157,
+    "created_at": "2026-01-19T18:21:01Z",
+    "pushed_at": "2026-08-09T16:43:54Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/Hmbown__CodeWhale/README.md",
+    "readme_bytes": 7188,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1408,
+    "est_stars_gained_1y": 5632,
+    "slug": "Hmbown__CodeWhale"
+  },
+  "stats": {
+    "total_lines": 133,
+    "non_blank_lines": 107,
+    "total_chars": 7082,
+    "heading_count": 7,
+    "heading_levels_used": [
+      1,
+      2
+    ],
+    "section_order": [
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Codewhale",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Use",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What it does",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Learn more",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        359,
+        88,
+        223,
+        138
+      ],
+      "installation": [
+        43
+      ],
+      "contributing": [
+        137
+      ],
+      "license": [
+        36
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 6,
+    "badge_count": 4,
+    "screenshot_or_logo_image_count": 2,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 40,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 40,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.88,
+    "internal_anchor_link_count": 1,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 2,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 2.5,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 14,
+    "avg_paragraph_words": 41,
+    "median_paragraph_words": 44.0,
+    "sentence_count": 28,
+    "avg_sentence_words": 20.5,
+    "median_sentence_words": 14.0,
+    "stdev_sentence_words": 15.05,
+    "short_sentence_pct": 28.6,
+    "medium_sentence_pct": 28.6,
+    "long_sentence_pct": 42.9,
+    "total_prose_words": 954,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

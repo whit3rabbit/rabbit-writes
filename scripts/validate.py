@@ -97,7 +97,7 @@ def check_skills():
         elif len(desc.group(1)) < 60:
             fail("skills/%s: description is too short to trigger reliably" % name)
         found.append(name)
-    for required in ("rabbit-writes", "human-writing", "voice-setup"):
+    for required in ("rabbit-writes", "voice-setup", "readme-writing"):
         if required not in found:
             fail("expected skill missing: %s" % required)
     notes.append("skills: %s" % ", ".join(found))
@@ -177,9 +177,9 @@ def check_voices():
 
 
 def check_engine():
-    lex = os.path.join(SKILLS, "human-writing", "scripts", "lexicon.json")
+    lex = os.path.join(SKILLS, "rabbit-writes", "scripts", "lexicon.json")
     if not os.path.exists(lex):
-        fail("human-writing/scripts/lexicon.json is missing")
+        fail("rabbit-writes/scripts/lexicon.json is missing")
         return
     try:
         data = json.loads(open(lex, encoding="utf-8").read())
@@ -198,29 +198,130 @@ def check_engine():
 
     for ref in ("patterns.md", "false-positives.md", "context.md",
                 "voice.md", "craft.md", "checklist.md"):
-        if not os.path.exists(os.path.join(SKILLS, "human-writing", "references", ref)):
-            fail("human-writing/references/%s is missing" % ref)
+        if not os.path.exists(os.path.join(SKILLS, "rabbit-writes", "references", ref)):
+            fail("rabbit-writes/references/%s is missing" % ref)
+
+    for ref in ("patterns.md", "checklist.md"):
+        if not os.path.exists(os.path.join(SKILLS, "readme-writing", "references", ref)):
+            fail("readme-writing/references/%s is missing" % ref)
+
+    check_path = os.path.join(SKILLS, "readme-writing", "scripts", "readme_check.py")
+    if not os.path.exists(check_path):
+        fail("readme-writing/scripts/readme_check.py is missing")
+    else:
+        # readme_check imports scan.py by path. A rename on either side breaks it
+        # at runtime, inside a subagent, where nobody sees the traceback.
+        text = open(check_path, encoding="utf-8").read()
+        if 'os.path.join(PLUGIN_ROOT, "skills", "rabbit-writes", "scripts", "scan.py")' not in text:
+            notes.append("note: readme_check.py no longer resolves scan.py the documented "
+                         "way; check the engine hand-off still works")
+        elif not os.path.exists(os.path.join(SKILLS, "rabbit-writes", "scripts", "scan.py")):
+            fail("readme_check.py expects rabbit-writes/scripts/scan.py, which is missing")
+
+
+def check_no_stale_skill_name():
+    """The `human-writing` skill merged into `rabbit-writes` in 2.0.0. A leftover
+    path points at a directory that no longer exists, and fails at runtime inside
+    a subagent where nobody sees the traceback. CHANGELOG is exempt: it documents
+    the rename and rewriting history is worse than a stale name."""
+    skip_dirs = {".git", "docs", "_to_delete", "__pycache__", "node_modules"}
+    hits = []
+    for base, dirs, files in os.walk(ROOT):
+        dirs[:] = [d for d in dirs if d not in skip_dirs]
+        for fn in files:
+            if not fn.endswith((".md", ".py", ".json")) or fn == "CHANGELOG.md":
+                continue
+            path = os.path.join(base, fn)
+            if os.path.abspath(path) == os.path.abspath(__file__):
+                continue  # this file has to name the string in order to search for it
+            try:
+                if "human-writing" in open(path, encoding="utf-8").read():
+                    hits.append(os.path.relpath(path, ROOT))
+            except (OSError, UnicodeDecodeError):
+                continue
+    for h in hits:
+        fail("%s still references the removed `human-writing` skill" % h)
+    if not hits:
+        notes.append("no stale human-writing references")
+
+
+def check_mode_contract():
+    """The wording that fixes the shallow-edit bug is load-bearing and easy to
+    undo by accident. These four assertions pin it. They are deliberately
+    annoying to anyone rewording SKILL.md, which is the point."""
+    path = os.path.join(SKILLS, "rabbit-writes", "SKILL.md")
+    if not os.path.exists(path):
+        fail("rabbit-writes/SKILL.md is missing")
+        return
+    text = open(path, encoding="utf-8").read()
+
+    for mode in ("detect", "deslop", "voice", "draft"):
+        if not re.search(r"(?m)^\|\s*\*\*%s\*\*" % mode, text):
+            fail("rabbit-writes/SKILL.md: mode %r is not a row in the mode table" % mode)
+
+    guardrails = text.split("## Modes")[0]
+    if "minimum effective edit" in guardrails:
+        fail("rabbit-writes/SKILL.md: 'minimum effective edit' is back in the guardrails. "
+             "It belongs to deslop only; as a guardrail it outranks the voice profile "
+             "and caps every conversion at a word swap")
+    if "A file path tells you where the text lives" not in text:
+        fail("rabbit-writes/SKILL.md: the rule that a file path is not a mode is gone. "
+             "Without it, file-pointed requests route to the most conservative mode")
+    voice_row = [ln for ln in text.split("\n") if ln.startswith("| **voice**")]
+    if voice_row and "order" not in voice_row[0]:
+        fail("rabbit-writes/SKILL.md: the voice row no longer says it may change order")
+    notes.append("mode contract intact")
+
+
+def check_scripts_compile():
+    """A syntax error in a bundled script only surfaces when a skill runs it."""
+    import ast
+    for rel in ("rabbit-writes/scripts/scan.py", "rabbit-writes/scripts/verify.py",
+                "readme-writing/scripts/readme_check.py"):
+        path = os.path.join(SKILLS, rel)
+        if not os.path.exists(path):
+            continue
+        try:
+            ast.parse(open(path, encoding="utf-8").read(), filename=path)
+        except SyntaxError as exc:
+            fail("%s does not parse: %s" % (rel, exc))
+    notes.append("bundled scripts compile")
 
 
 def check_cross_references():
     """A ${CLAUDE_PLUGIN_ROOT} path that points nowhere fails silently at runtime."""
     rx = re.compile(r"\$\{CLAUDE_PLUGIN_ROOT\}/([A-Za-z0-9_./-]+)")
     for skill in sorted(os.listdir(SKILLS)):
-        path = os.path.join(SKILLS, skill, "SKILL.md")
-        if not os.path.exists(path):
+        skill_dir = os.path.join(SKILLS, skill)
+        if not os.path.isdir(skill_dir):
             continue
-        text = open(path, encoding="utf-8").read()
-        for rel in set(rx.findall(text)):
-            if "<" in rel or rel.endswith("/"):
+        # References and bundled scripts cite these paths too, and a dead path in
+        # a reference file fails exactly as silently as one in SKILL.md.
+        targets = [os.path.join(skill_dir, "SKILL.md")]
+        for sub in ("references", "scripts", "voices"):
+            subdir = os.path.join(skill_dir, sub)
+            if os.path.isdir(subdir):
+                targets += [os.path.join(subdir, f) for f in sorted(os.listdir(subdir))
+                            if f.endswith((".md", ".py"))]
+        for path in targets:
+            if not os.path.exists(path):
                 continue
-            if not os.path.exists(os.path.join(ROOT, rel)):
-                fail("skills/%s references a missing path: %s" % (skill, rel))
+            text = open(path, encoding="utf-8").read()
+            for rel in set(rx.findall(text)):
+                if "<" in rel or rel.endswith("/"):
+                    continue
+                if not os.path.exists(os.path.join(ROOT, rel)):
+                    fail("%s references a missing path: %s"
+                         % (os.path.relpath(path, ROOT), rel))
 
 
 check_manifests()
 check_skills()
 check_voices()
 check_engine()
+check_no_stale_skill_name()
+check_mode_contract()
+check_scripts_compile()
 check_cross_references()
 
 for note in notes:

@@ -1,0 +1,947 @@
+{
+  "meta": {
+    "full_name": "CloakHQ/CloakBrowser",
+    "html_url": "https://github.com/CloakHQ/CloakBrowser",
+    "description": "Stealth Chromium that passes every bot detection test. Drop-in Playwright replacement with source-level fingerprint patches. 30/30 tests passed.",
+    "stars_total": 29802,
+    "forks": 2449,
+    "watchers": 140,
+    "created_at": "2026-02-22T08:09:57Z",
+    "pushed_at": "2026-08-09T20:13:15Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/CloakHQ__CloakBrowser/README.md",
+    "readme_bytes": 68695,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1813,
+    "est_stars_gained_1y": 7252,
+    "slug": "CloakHQ__CloakBrowser"
+  },
+  "stats": {
+    "total_lines": 1440,
+    "non_blank_lines": 1060,
+    "total_chars": 68277,
+    "heading_count": 118,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "features",
+      "other",
+      "license",
+      "other",
+      "other",
+      "related",
+      "architecture",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "license",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "api",
+      "other",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "examples",
+      "other",
+      "other",
+      "other",
+      "examples",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "faq",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "demo",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "faq",
+      "other",
+      "security",
+      "other",
+      "other",
+      "other",
+      "license",
+      "contributing",
+      "credits",
+      "changelog"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "With Playwright",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "With Puppeteer",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "... rest of your code works unchanged",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Latest: v0.5.6 \u2014 71 source-level stealth patches (Chromium 150.0.7871.114.3 \u2014 all platforms)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Why CloakBrowser?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "CloakBrowser Pro",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "...or set it directly (env var, license_key= param, or ~/.cloakbrowser/license.key):",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "Test Results",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Proof",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Comparison",
+        "category": "related"
+      },
+      {
+        "level": 2,
+        "text": "How It Works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "API",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "`launch()`",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Basic \u2014 headless, default stealth config",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Headed mode (see the browser window)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Latest binary \u2014 pass a key (free via `cloakbrowser login`, or paid) or set CLOAKBROWSER_LICENSE_KEY",
+        "category": "license"
+      },
+      {
+        "level": 1,
+        "text": "With proxy (HTTP or SOCKS5)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "With proxy dict (bypass, separate auth fields)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "With extra Chrome args",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "With timezone and locale (sets binary flags \u2014 no detectable CDP emulation)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Auto-detect timezone/locale from proxy IP (requires: pip install cloakbrowser[geoip])",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Also auto-injects --fingerprint-webrtc-ip to prevent WebRTC IP leaks (no extra cost)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Note: makes HTTP calls through your proxy to resolve exit IP (ipify.org, checkip.amazonaws.com)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Explicit timezone/locale always win over auto-detection",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "WebRTC IP spoofing only (no geoip dep needed \u2014 resolves exit IP via HTTP call through proxy)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Explicit WebRTC IP (no network call)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Human-like mouse, keyboard, and scroll behavior",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "With slower, more deliberate movements",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Without default stealth args (bring your own fingerprint flags)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "`launch_async()`",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "`launch_context()`",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Restore a saved session (cookies, localStorage) from a JSON file",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Save state back for next run",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "`launch_context_async()`",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "`launch_persistent_context()`",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "First run \u2014 creates the profile",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Next run \u2014 cookies, localStorage restored automatically",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Load Chrome extensions",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Widevine / DRM",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "WidevineCdm sideloaded next to the binary -> Widevine works on first launch",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "CLI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Utility Functions",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Check binary installation status",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "{'version': '146.0.7680.177.5', 'platform': 'linux-x64', 'installed': True, ...}",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Force re-download",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Pre-download binary (e.g., during Docker build)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "JavaScript / Node.js API",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "Playwright (default)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Puppeteer",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Utility Functions (JS)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Human Behavior",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 2,
+        "text": "Fingerprint Management",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Default Fingerprint",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Additional Flags",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Font Setup on Linux",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Examples",
+        "category": "examples"
+      },
+      {
+        "level": 1,
+        "text": "Pin a seed for a persistent identity",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Full control \u2014 disable defaults, set everything yourself",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Override GPU to look like a specific machine",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Examples",
+        "category": "examples"
+      },
+      {
+        "level": 3,
+        "text": "Framework Integrations",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Option 1: Framework launches our binary directly (Selenium, Stagehand, UC)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Option 2: CloakBrowser launches first, framework connects via CDP (browser-use, Crawl4AI, Scrapling)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Connect your framework to http://127.0.0.1:9242 \u2014 all stealth flags are set",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Note: humanize requires the wrapper (see below)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Deployment Integrations",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Platforms",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Docker",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Quick test",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Run a script",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Inline script",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Mount your own script",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "With a proxy",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "CDP server mode",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "ws://localhost:9222/devtools/browser/<browser-id>",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "ws://localhost:9222/fingerprint/11111/devtools/browser/<browser-id>",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "With proxy",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Headed mode (renders to Xvfb inside container)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Reap disconnected per-seed browser processes after 5 minutes",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Docker Compose",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Each seed gets unique canvas noise, client rects, and other browser signals",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Full identity control via query params",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Auto-detect timezone/locale from proxy exit IP",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Extend with your own image",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Troubleshooting",
+        "category": "faq"
+      },
+      {
+        "level": 3,
+        "text": "Still getting blocked on aggressive sites (DataDome, Turnstile)?",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install Xvfb (virtual framebuffer)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Start virtual display",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Headed mode + residential proxy for maximum stealth",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Recommended config for anti-bot sites",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Detected by FingerprintJS?",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Blocked on Kasada / Akamai sites despite correct config?",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Sites challenge fresh sessions but work after first visit",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "First run: warm up with --disable-http2",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Future runs \u2014 no --disable-http2 needed",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Something not working? Make sure you're on the latest version",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Preview release channel",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "New update broke something? Roll back",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Free \u2014 pin a public release",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Pro \u2014 pin a previous Pro version",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "macOS: \"App is damaged\" or Gatekeeper blocks launch",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\"playwright install\" vs CloakBrowser binary",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Site detects incognito / private browsing mode",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "reCAPTCHA v3 scores are low (0.1\u20130.3)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Bad \u2014 sends CDP commands, reCAPTCHA detects this",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Good \u2014 invisible to the browser",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "FAQ",
+        "category": "faq"
+      },
+      {
+        "level": 2,
+        "text": "Links",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Security",
+        "category": "security"
+      },
+      {
+        "level": 1,
+        "text": "Verify GPG signature (binary release tag)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Verify GitHub binary attestation (Sigstore)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Verify Docker image signature (Cosign/Sigstore)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Contributors",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "installation": [
+        5,
+        0,
+        2,
+        0,
+        239,
+        4,
+        18
+      ],
+      "other": [
+        4,
+        41,
+        19,
+        306,
+        155,
+        156,
+        156,
+        0,
+        5,
+        4,
+        16,
+        14,
+        4,
+        7,
+        0,
+        8,
+        11,
+        9,
+        12,
+        4,
+        6,
+        21,
+        0,
+        42,
+        13,
+        7,
+        9,
+        95,
+        17,
+        5,
+        14,
+        144,
+        186,
+        193,
+        7,
+        1,
+        1,
+        33,
+        41,
+        0,
+        231,
+        219,
+        128,
+        437,
+        5,
+        9,
+        11,
+        11,
+        20,
+        10,
+        0,
+        140,
+        19,
+        98,
+        34,
+        0,
+        1,
+        26,
+        14,
+        32,
+        62,
+        11,
+        11,
+        19,
+        17,
+        63,
+        24,
+        18,
+        20,
+        102,
+        73,
+        19,
+        13,
+        45,
+        178,
+        37,
+        18,
+        107,
+        12,
+        26,
+        8,
+        69,
+        14,
+        53,
+        16,
+        3,
+        49,
+        56,
+        14,
+        9,
+        17
+      ],
+      "features": [
+        146
+      ],
+      "license": [
+        23,
+        4,
+        67
+      ],
+      "related": [
+        70
+      ],
+      "architecture": [
+        135
+      ],
+      "configuration": [
+        2,
+        162,
+        51,
+        53
+      ],
+      "api": [
+        17
+      ],
+      "examples": [
+        1,
+        93
+      ],
+      "faq": [
+        0,
+        288
+      ],
+      "demo": [
+        62
+      ],
+      "security": [
+        38
+      ],
+      "contributing": [
+        20
+      ],
+      "credits": [
+        181
+      ],
+      "changelog": [
+        70
+      ]
+    },
+    "preamble_word_count": 463,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 10,
+    "uses_centering": true,
+    "image_count_total": 16,
+    "badge_count": 8,
+    "screenshot_or_logo_image_count": 8,
+    "gif_count": 1,
+    "has_video_embed": false,
+    "badges_in_header_block": 8,
+    "html_link_count": 9,
+    "inline_link_count": 93,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 93,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.88,
+    "internal_anchor_link_count": 19,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 80,
+    "code_block_languages": [
+      "bash",
+      "csharp",
+      "diff",
+      "dockerfile",
+      "javascript",
+      "js",
+      "nginx",
+      "python",
+      "yaml"
+    ],
+    "avg_code_block_lines": 6.29,
+    "table_row_count": 106,
+    "table_present": true,
+    "paragraph_count": 146,
+    "avg_paragraph_words": 21.97,
+    "median_paragraph_words": 16.0,
+    "sentence_count": 225,
+    "avg_sentence_words": 14.25,
+    "median_sentence_words": 11,
+    "stdev_sentence_words": 14.87,
+    "short_sentence_pct": 42.2,
+    "medium_sentence_pct": 40.4,
+    "long_sentence_pct": 17.3,
+    "total_prose_words": 5032,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,442 @@
+{
+  "meta": {
+    "full_name": "usestrix/strix",
+    "html_url": "https://github.com/usestrix/strix",
+    "description": "Open-source AI penetration testing tool to find and fix your app\u2019s vulnerabilities.",
+    "stars_total": 50349,
+    "forks": 5362,
+    "watchers": 224,
+    "created_at": "2025-08-05T21:28:30Z",
+    "pushed_at": "2026-08-10T00:44:53Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/usestrix__strix/README.md",
+    "readme_bytes": 15924,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 368,
+    "est_stars_gained_1y": 1472,
+    "slug": "usestrix__strix"
+  },
+  "stats": {
+    "total_lines": 355,
+    "non_blank_lines": 232,
+    "total_chars": 15891,
+    "heading_count": 48,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "testing",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "installation",
+      "configuration",
+      "security",
+      "other",
+      "other",
+      "features",
+      "testing",
+      "other",
+      "testing",
+      "other",
+      "other",
+      "other",
+      "other",
+      "usage",
+      "usage",
+      "other",
+      "security",
+      "other",
+      "testing",
+      "other",
+      "other",
+      "other",
+      "other",
+      "testing",
+      "testing",
+      "testing",
+      "other",
+      "other",
+      "testing",
+      "other",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "testing",
+      "api",
+      "contributing",
+      "support",
+      "support",
+      "credits"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Strix",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "The open-source AI pentesting tool. Autonomous AI hackers that find and fix your app\u2019s vulnerabilities.",
+        "category": "testing"
+      },
+      {
+        "level": 2,
+        "text": "Strix Overview",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Use Cases",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Installation & First Scan",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Install Strix",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Configure your AI provider",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Run your first security assessment",
+        "category": "security"
+      },
+      {
+        "level": 2,
+        "text": "\u2601\ufe0f Strix Platform",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd16 Use Strix from Your Coding Agent",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u2728 Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Agentic Pentesting Tools",
+        "category": "testing"
+      },
+      {
+        "level": 3,
+        "text": "Comprehensive Vulnerability Scanner",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Graph of Agents (Multi-Agent Pentesting)",
+        "category": "testing"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udda5\ufe0f Local Web Viewer",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Open the most recent run",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "...or open a specific run by name",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "What's in the dashboard",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Usage Examples",
+        "category": "usage"
+      },
+      {
+        "level": 3,
+        "text": "Basic Usage",
+        "category": "usage"
+      },
+      {
+        "level": 1,
+        "text": "Scan a local codebase",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Security review of a GitHub repository",
+        "category": "security"
+      },
+      {
+        "level": 1,
+        "text": "Black-box web application assessment",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "API Testing (OpenAPI / Swagger / Postman)",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "OpenAPI / Swagger file (.json / .yaml)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Postman collection export",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Postman collection pulled live by id (no manual export)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "...with a Postman environment to resolve {{baseUrl}} / token variables",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Advanced Testing Scenarios",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Grey-box authenticated testing",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Multi-target testing (source code + deployed app)",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Targets from a file, one target per non-empty, non-comment line",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "White-box source-aware scan (local repository)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Focused testing with custom instructions",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Provide detailed instructions through file (e.g., rules of engagement, scope, exclusions)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Force PR diff-scope against a specific base branch",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Headless Mode",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "CI/CD (GitHub Actions)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Optional",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Sign in with a ChatGPT subscription",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Enterprise Pentesting",
+        "category": "testing"
+      },
+      {
+        "level": 2,
+        "text": "Documentation",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Join Our Community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Support the Project",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Acknowledgements",
+        "category": "credits"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        0,
+        128,
+        52,
+        102,
+        131,
+        87,
+        22,
+        2,
+        66,
+        78,
+        3,
+        5,
+        9,
+        10,
+        7,
+        6,
+        4,
+        5,
+        8,
+        10,
+        37,
+        50,
+        49,
+        78
+      ],
+      "testing": [
+        294,
+        99,
+        43,
+        37,
+        1,
+        13,
+        11,
+        14,
+        52
+      ],
+      "installation": [
+        21,
+        1,
+        7
+      ],
+      "configuration": [
+        8,
+        9
+      ],
+      "security": [
+        18,
+        7
+      ],
+      "features": [
+        0
+      ],
+      "usage": [
+        0,
+        1
+      ],
+      "api": [
+        24
+      ],
+      "contributing": [
+        40
+      ],
+      "support": [
+        15,
+        7
+      ],
+      "credits": [
+        113
+      ]
+    },
+    "preamble_word_count": 30,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 3,
+    "uses_centering": true,
+    "image_count_total": 13,
+    "badge_count": 6,
+    "screenshot_or_logo_image_count": 7,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 3,
+    "html_link_count": 12,
+    "inline_link_count": 26,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 26,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.58,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 10,
+    "code_block_languages": [
+      "bash",
+      "yaml"
+    ],
+    "avg_code_block_lines": 9.2,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 41,
+    "avg_paragraph_words": 24.44,
+    "median_paragraph_words": 21,
+    "sentence_count": 48,
+    "avg_sentence_words": 20.88,
+    "median_sentence_words": 17.5,
+    "stdev_sentence_words": 18.7,
+    "short_sentence_pct": 35.4,
+    "medium_sentence_pct": 20.8,
+    "long_sentence_pct": 43.8,
+    "total_prose_words": 1629,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

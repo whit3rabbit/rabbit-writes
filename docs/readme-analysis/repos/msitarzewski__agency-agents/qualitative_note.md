@@ -1,0 +1,7 @@
+# msitarzewski/agency-agents — qualitative note
+
+This README's defining structural choice is scale-as-proof: rather than describing the product abstractly, it lays out an enormous set of division tables (Engineering, Design, Marketing, Sales, Security, Game Development, Academic, GIS, etc.), each row a one-line agent pitch with a "When to Use" column that doubles as a mini use-case index. The tone is playful and confident — heavy emoji use as visual anchors for each division and agent, and cover copy that leans into a "dream team" conceit rather than dry feature description. A notable technique is the tiered "Quick Start" with four numbered install options (native app, Claude Code script, reference-only, other-tools matrix), letting readers self-select their entry point instead of forcing one workflow; it also surfaces a specific upstream limitation ("OpenCode's runtime currently registers only ~119 agents and silently drops the rest") with a workaround, which is a good example of documenting a real constraint rather than glossing over it. The anti-pattern risk here is sheer length/density — the roster tables run for hundreds of lines, which is exhaustive-as-reference but works against skimmability for someone just trying to get started.
+
+**Quotes:**
+- "Think of it as: Assembling your dream team, except they're AI specialists who never sleep, never complain, and always deliver."
+- "**Install only the teams you need** (not everyone wants every division)"

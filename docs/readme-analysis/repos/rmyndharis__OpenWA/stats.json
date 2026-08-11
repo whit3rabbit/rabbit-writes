@@ -1,0 +1,431 @@
+{
+  "meta": {
+    "full_name": "rmyndharis/OpenWA",
+    "html_url": "https://github.com/rmyndharis/OpenWA",
+    "description": "Free, Open Source, Self-Hosted WhatsApp API Gateway",
+    "stars_total": 12600,
+    "forks": 2869,
+    "watchers": 61,
+    "created_at": "2026-02-02T12:14:45Z",
+    "pushed_at": "2026-08-10T00:46:39Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/rmyndharis__OpenWA/README.md",
+    "readme_bytes": 25838,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 515,
+    "est_stars_gained_1y": 2060,
+    "slug": "rmyndharis__OpenWA"
+  },
+  "stats": {
+    "total_lines": 461,
+    "non_blank_lines": 346,
+    "total_chars": 25404,
+    "heading_count": 47,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "features",
+      "features",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "api",
+      "other",
+      "api",
+      "api",
+      "other",
+      "other",
+      "installation",
+      "configuration",
+      "other",
+      "other",
+      "api",
+      "api",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "examples",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "api",
+      "contributing",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "\u2728 Why OpenWA?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "\u26a0\ufe0f Before you connect a number \u2014 please read",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "What this means in practice",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Safe-sending guidelines",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Known platform behaviour (not bugs)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Compliance",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfaf Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Core Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Messaging",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Advanced",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Infrastructure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Option A: Docker (Recommended)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Clone and start",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Access (the dashboard is bundled into the API image and served on the same port)",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": "Dashboard: http://localhost:2785",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "API: http://localhost:2785/api",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": "Swagger: http://localhost:2785/api/docs",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "Option B: Local Development",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Clone repository",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install the locked dependencies (includes dashboard)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Start API + Dashboard (config is auto-generated on first run)",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Access (in dev the dashboard runs on the Vite server with hot reload)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Dashboard: http://localhost:2886",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "API: http://localhost:2785/api",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": "Swagger: http://localhost:2785/api/docs",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd12 Security Architecture",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "Docker Socket Proxy",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Non-root Container Execution",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfed Production Deployment",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Basic production (SQLite, local storage)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "With PostgreSQL database",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Full stack (PostgreSQL, Redis, MinIO)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd0c Ports",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udce1 API Examples",
+        "category": "examples"
+      },
+      {
+        "level": 3,
+        "text": "Create a Session",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Start Session & Get QR Code",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Start the session",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Get QR code (scan with WhatsApp)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Send a Message",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Setup Webhook",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd16 MCP Server (AI Agents)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udee0 Tech Stack",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc1 Project Structure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcda Documentation",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd1d Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc4 License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "features": [
+        164,
+        0,
+        43
+      ],
+      "other": [
+        50,
+        149,
+        207,
+        100,
+        93,
+        46,
+        86,
+        35,
+        1,
+        18,
+        0,
+        1,
+        10,
+        0,
+        0,
+        130,
+        98,
+        11,
+        4,
+        6,
+        115,
+        32,
+        0,
+        1,
+        13,
+        11,
+        0,
+        269,
+        39,
+        0
+      ],
+      "installation": [
+        0,
+        2,
+        53
+      ],
+      "api": [
+        0,
+        0,
+        32,
+        0,
+        33,
+        66
+      ],
+      "configuration": [
+        3
+      ],
+      "architecture": [
+        0
+      ],
+      "examples": [
+        0
+      ],
+      "contributing": [
+        61
+      ],
+      "license": [
+        76
+      ]
+    },
+    "preamble_word_count": 182,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 6,
+    "uses_centering": true,
+    "image_count_total": 8,
+    "badge_count": 7,
+    "screenshot_or_logo_image_count": 1,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 2,
+    "html_link_count": 7,
+    "inline_link_count": 23,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 23,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.78,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 13,
+    "code_block_languages": [
+      "bash",
+      "json"
+    ],
+    "avg_code_block_lines": 7.77,
+    "table_row_count": 78,
+    "table_present": true,
+    "paragraph_count": 48,
+    "avg_paragraph_words": 20.35,
+    "median_paragraph_words": 14.5,
+    "sentence_count": 49,
+    "avg_sentence_words": 19.94,
+    "median_sentence_words": 16,
+    "stdev_sentence_words": 18.93,
+    "short_sentence_pct": 24.5,
+    "medium_sentence_pct": 40.8,
+    "long_sentence_pct": 34.7,
+    "total_prose_words": 1718,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

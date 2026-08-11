@@ -1,0 +1,168 @@
+{
+  "meta": {
+    "full_name": "anthropics/knowledge-work-plugins",
+    "html_url": "https://github.com/anthropics/knowledge-work-plugins",
+    "description": "Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork",
+    "stars_total": 23398,
+    "forks": 2825,
+    "watchers": 168,
+    "created_at": "2026-01-23T20:11:54Z",
+    "pushed_at": "2026-08-09T18:08:14Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/anthropics__knowledge-work-plugins/README.md",
+    "readme_bytes": 6109,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 599,
+    "est_stars_gained_1y": 2396,
+    "slug": "anthropics__knowledge-work-plugins"
+  },
+  "stats": {
+    "total_lines": 80,
+    "non_blank_lines": 54,
+    "total_chars": 6059,
+    "heading_count": 11,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "features",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "contributing"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Knowledge Work Plugins",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Why Plugins",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Plugin Marketplace",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Getting Started",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Cowork",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Claude Code",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Add the marketplace first",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Then install a specific plugin",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "How Plugins Work",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Making Them Yours",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        32,
+        314,
+        10,
+        1,
+        6,
+        82,
+        130
+      ],
+      "features": [
+        110
+      ],
+      "installation": [
+        0,
+        28
+      ],
+      "contributing": [
+        15
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 0,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 0,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 15,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 15,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.33,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 2,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 5,
+    "table_row_count": 13,
+    "table_present": true,
+    "paragraph_count": 12,
+    "avg_paragraph_words": 24.58,
+    "median_paragraph_words": 18.5,
+    "sentence_count": 20,
+    "avg_sentence_words": 14.75,
+    "median_sentence_words": 13.5,
+    "stdev_sentence_words": 8.06,
+    "short_sentence_pct": 20.0,
+    "medium_sentence_pct": 65.0,
+    "long_sentence_pct": 15.0,
+    "total_prose_words": 429,
+    "has_license_section_or_badge": false,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": false
+  }
+}

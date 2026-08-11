@@ -1,0 +1,280 @@
+{
+  "meta": {
+    "full_name": "TencentCloud/TencentDB-Agent-Memory",
+    "html_url": "https://github.com/TencentCloud/TencentDB-Agent-Memory",
+    "description": "TencentDB Agent Memory is a team-level memory hub for AI Agents \u2014 turning conversations, docs, and code into four reusable memory assets (Chat Memory, Skill, LLM-Wiki, Code-Graph) that are governed, shared, and equipped across agents and frameworks.",
+    "stars_total": 18827,
+    "forks": 1696,
+    "watchers": 66,
+    "created_at": "2026-04-07T06:34:26Z",
+    "pushed_at": "2026-08-06T12:07:09Z",
+    "default_branch": "feat/server_team",
+    "readme_branch_used": "feat/server_team",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/TencentCloud__TencentDB-Agent-Memory/README.md",
+    "readme_bytes": 18578,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 554,
+    "est_stars_gained_1y": 2216,
+    "slug": "TencentCloud__TencentDB-Agent-Memory"
+  },
+  "stats": {
+    "total_lines": 329,
+    "non_blank_lines": 214,
+    "total_chars": 18301,
+    "heading_count": 26,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "installation",
+      "other",
+      "features",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "performance",
+      "other",
+      "api",
+      "credits",
+      "contributing",
+      "credits"
+    ],
+    "section_order_detail": [
+      {
+        "level": 3,
+        "text": "Agents remember. Humans innovate.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Migrating data from an older version",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "What is TencentDB Agent Memory?",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Let experience accumulate, flow, and pass on to the next Agent",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udde0 A brain that remembers people and context",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u26a1 A Skill library that accumulates expertise",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcd6 A knowledge map that reads both docs and code",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udee1\ufe0f A team memory panel controlled by humans",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Cold Start: Load the Save File, Then Get to Work",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "One Play Style: Build a Growing Agent Team for a One-Person Company",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Recruit first, then equip",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Memory Assets, Not a Chat Log Warehouse",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Memory Hub Is Not a Display Board \u2014 It's a Control Panel",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Every Loop Gains Experience",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "One Agent Team: Shared Experience, Not Shared Privacy",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Technical Implementation",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "1. Memory isn't flat records \u2014 it grows in layers",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "2. Memory isn't a global prompt \u2014 it's the Agent's loadout",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "3. Knowledge isn't injected wholesale \u2014 it's called on demand",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Benchmark",
+        "category": "performance"
+      },
+      {
+        "level": 2,
+        "text": "Notes",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Related Documentation",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Acknowledgements",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "Community & Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "\u2728 Contributors",
+        "category": "credits"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        175,
+        49,
+        112,
+        73,
+        93,
+        120,
+        109,
+        28,
+        28,
+        66,
+        104,
+        78,
+        81,
+        51,
+        132,
+        66,
+        67,
+        66
+      ],
+      "installation": [
+        49
+      ],
+      "features": [
+        85
+      ],
+      "api": [
+        96,
+        67
+      ],
+      "performance": [
+        29
+      ],
+      "credits": [
+        115,
+        134
+      ],
+      "contributing": [
+        124
+      ]
+    },
+    "preamble_word_count": 15,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 3,
+    "uses_centering": true,
+    "image_count_total": 19,
+    "badge_count": 7,
+    "screenshot_or_logo_image_count": 12,
+    "gif_count": 0,
+    "has_video_embed": true,
+    "badges_in_header_block": 6,
+    "html_link_count": 3,
+    "inline_link_count": 29,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 29,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.03,
+    "internal_anchor_link_count": 5,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 4,
+    "code_block_languages": [
+      "bash",
+      "text"
+    ],
+    "avg_code_block_lines": 6.5,
+    "table_row_count": 31,
+    "table_present": true,
+    "paragraph_count": 59,
+    "avg_paragraph_words": 19.39,
+    "median_paragraph_words": 18,
+    "sentence_count": 67,
+    "avg_sentence_words": 17.07,
+    "median_sentence_words": 16,
+    "stdev_sentence_words": 10.35,
+    "short_sentence_pct": 23.9,
+    "medium_sentence_pct": 46.3,
+    "long_sentence_pct": 29.9,
+    "total_prose_words": 1919,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,702 @@
+[
+  {
+    "full_name": "mattpocock/skills",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 4905,
+    "est_stars_gained_1y": 19620,
+    "description_hint": "Skills for Real Engineers. Straight from my .claude directory."
+  },
+  {
+    "full_name": "NousResearch/hermes-agent",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 4042,
+    "est_stars_gained_1y": 16168,
+    "description_hint": "The agent that grows with you"
+  },
+  {
+    "full_name": "colbymchenry/codegraph",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 3401,
+    "est_stars_gained_1y": 13604,
+    "description_hint": "Pre-indexed code knowledge graph, auto syncs on code changes, for Claude Code, Codex, Gemini, Cursor, OpenCode, AntiGravity, Kiro, and Hermes Agent \u2014 fewer tokens, fewer tool calls, 100% local"
+  },
+  {
+    "full_name": "obra/superpowers",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 3348,
+    "est_stars_gained_1y": 13392,
+    "description_hint": "An agentic skills framework & software development methodology that works."
+  },
+  {
+    "full_name": "Egonex-AI/Understand-Anything",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 3324,
+    "est_stars_gained_1y": 13296,
+    "description_hint": "Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more."
+  },
+  {
+    "full_name": "affaan-m/ECC",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 2992,
+    "est_stars_gained_1y": 11968,
+    "description_hint": "The agent harness performance optimization system. Skills, instincts, memory, security, and research-first development for Claude Code, Codex, Opencode, Cursor and beyond."
+  },
+  {
+    "full_name": "pewdiepie-archdaemon/odysseus",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 2689,
+    "est_stars_gained_1y": 10756,
+    "description_hint": "Self-hosted AI workspace. "
+  },
+  {
+    "full_name": "farion1231/cc-switch",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 2608,
+    "est_stars_gained_1y": 10432,
+    "description_hint": "A cross-platform desktop All-in-One assistant for Claude Code, Codex, OpenCode, OpenClaw, Grok Build & Hermes Agent. Only official website: ccswitch.io"
+  },
+  {
+    "full_name": "tinyhumansai/openhuman",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 2377,
+    "est_stars_gained_1y": 9508,
+    "description_hint": "Your Personal AI super intelligence. A brain that builds a local-first memory of your life, a fantastic orchestrator of agent fleets and workflows, and a deep researcher."
+  },
+  {
+    "full_name": "nexu-io/open-design",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 2366,
+    "est_stars_gained_1y": 9464,
+    "description_hint": "\ud83c\udfa8 The open-source Claude Design alternative. \ud83d\udda5\ufe0f Local-first desktop app. \ud83d\uddbc\ufe0f Your coding agent becomes the design engine: prototypes, landing pages, dashboards, slides, images & video \u2014 real files, HTML/PDF/PPTX/MP4 export. \ud83e\udd16 Claude Code / Codex / Cursor / Gemini / OpenCode / Qwen & 20+ CLIs via BYOK."
+  },
+  {
+    "full_name": "rohitg00/ai-engineering-from-scratch",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1959,
+    "est_stars_gained_1y": 7836,
+    "description_hint": "Learn it. Build it. Ship it for others."
+  },
+  {
+    "full_name": "DietrichGebert/ponytail",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1833,
+    "est_stars_gained_1y": 7332,
+    "description_hint": "Makes your AI agent think like the laziest senior dev in the room. The best code is the code you never wrote."
+  },
+  {
+    "full_name": "Imbad0202/academic-research-skills",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1816,
+    "est_stars_gained_1y": 7264,
+    "description_hint": "Academic Research Skills for Claude Code: research \u2192 write \u2192 review \u2192 revise \u2192 finalize"
+  },
+  {
+    "full_name": "CloakHQ/CloakBrowser",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1813,
+    "est_stars_gained_1y": 7252,
+    "description_hint": "Stealth Chromium that passes every bot detection test. Drop-in Playwright replacement with source-level fingerprint patches. 30/30 tests passed."
+  },
+  {
+    "full_name": "addyosmani/agent-skills",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1799,
+    "est_stars_gained_1y": 7196,
+    "description_hint": "Production-grade engineering skills for AI coding agents."
+  },
+  {
+    "full_name": "headroomlabs-ai/headroom",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1731,
+    "est_stars_gained_1y": 6924,
+    "description_hint": "Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 20% fewer tokens for coding agents, 60-95% fewer tokens for JSON, same answers. Library, proxy, MCP server."
+  },
+  {
+    "full_name": "Graphify-Labs/graphify",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1693,
+    "est_stars_gained_1y": 6772,
+    "description_hint": "Turn any codebase, with its docs, SQL schemas, configs, and PDFs, into a queryable knowledge graph. A /graphify skill for Claude Code, Cursor, Codex, and Gemini CLI: local deterministic AST parsing, every edge explained, no vector store."
+  },
+  {
+    "full_name": "github/spec-kit",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1610,
+    "est_stars_gained_1y": 6440,
+    "description_hint": "\ud83d\udcab Toolkit to help you get started with Spec-Driven Development"
+  },
+  {
+    "full_name": "msitarzewski/agency-agents",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1595,
+    "est_stars_gained_1y": 6380,
+    "description_hint": "A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas, from whimsy injectors to reality checkers. Each agent is a specialized expert with personality, processes, and proven deliverables."
+  },
+  {
+    "full_name": "ruvnet/RuView",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1567,
+    "est_stars_gained_1y": 6268,
+    "description_hint": "\u03c0 RuView turns commodity WiFi signals into real-time spatial intelligence, vital sign monitoring, and presence detection \u2014 all without a single pixel of video."
+  },
+  {
+    "full_name": "rohitg00/agentmemory",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1555,
+    "est_stars_gained_1y": 6220,
+    "description_hint": "#1 Persistent memory for AI coding agents based on real-world benchmarks"
+  },
+  {
+    "full_name": "garrytan/gstack",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1554,
+    "est_stars_gained_1y": 6216,
+    "description_hint": "Use Garry Tan's exact Claude Code setup: 23 opinionated tools that serve as CEO, Designer, Eng Manager, Release Manager, Doc Engineer, and QA"
+  },
+  {
+    "full_name": "VoltAgent/awesome-design-md",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1501,
+    "est_stars_gained_1y": 6004,
+    "description_hint": "A collection of DESIGN.md files analysis by popular brand design systems. Drop one into your project and let coding agents generate a matching UI."
+  },
+  {
+    "full_name": "anthropics/financial-services",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1415,
+    "est_stars_gained_1y": 5660,
+    "description_hint": ""
+  },
+  {
+    "full_name": "microsoft/markitdown",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1413,
+    "est_stars_gained_1y": 5652,
+    "description_hint": "Python tool for converting files and office documents to Markdown."
+  },
+  {
+    "full_name": "Hmbown/CodeWhale",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1408,
+    "est_stars_gained_1y": 5632,
+    "description_hint": "Open-source, community-driven agent harness"
+  },
+  {
+    "full_name": "JuliusBrussee/caveman",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1296,
+    "est_stars_gained_1y": 5184,
+    "description_hint": "\ud83e\udea8 why use many token when few token do trick \u2014 Claude Code skill that cuts 65% of tokens by talking like caveman"
+  },
+  {
+    "full_name": "esengine/DeepSeek-Reasonix",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1280,
+    "est_stars_gained_1y": 5120,
+    "description_hint": "DeepSeek-native AI coding agent for your terminal. Engineered around prefix-cache stability \u2014 leave it running."
+  },
+  {
+    "full_name": "earendil-works/pi",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1265,
+    "est_stars_gained_1y": 5060,
+    "description_hint": "AI agent toolkit: unified LLM API, agent loop, TUI, coding agent CLI"
+  },
+  {
+    "full_name": "harry0703/MoneyPrinterTurbo",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1246,
+    "est_stars_gained_1y": 4984,
+    "description_hint": "\u5229\u7528 AI \u5927\u6a21\u578b\u548c\u81ea\u52a8\u5316\u5de5\u4f5c\u6d41\uff0c\u6839\u636e\u4e3b\u9898\u6216\u5173\u952e\u8bcd\u4e00\u952e\u751f\u6210\u9ad8\u6e05\u77ed\u89c6\u9891\u3002Generate HD short videos from a topic or keyword with an automated AI workflow."
+  },
+  {
+    "full_name": "nextlevelbuilder/ui-ux-pro-max-skill",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1242,
+    "est_stars_gained_1y": 4968,
+    "description_hint": "An AI SKILL that provide design intelligence for building professional UI/UX multiple platforms"
+  },
+  {
+    "full_name": "antirez/ds4",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1226,
+    "est_stars_gained_1y": 4904,
+    "description_hint": "DeepSeek 4 Flash and PRO local inference engine for Metal, CUDA and ROCm"
+  },
+  {
+    "full_name": "datawhalechina/hello-agents",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1190,
+    "est_stars_gained_1y": 4760,
+    "description_hint": "\ud83d\udcda \u300a\u4ece\u96f6\u5f00\u59cb\u6784\u5efa\u667a\u80fd\u4f53\u300b\u2014\u2014\u4ece\u96f6\u5f00\u59cb\u7684\u667a\u80fd\u4f53\u539f\u7406\u4e0e\u5b9e\u8df5\u6559\u7a0b"
+  },
+  {
+    "full_name": "Panniantong/Agent-Reach",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1158,
+    "est_stars_gained_1y": 4632,
+    "description_hint": "Give your AI agent eyes to see the entire internet. Read & search Twitter, Reddit, YouTube, GitHub, Bilibili, XiaoHongShu \u2014 one CLI, zero API fees."
+  },
+  {
+    "full_name": "Yuan1z0825/nature-skills",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1157,
+    "est_stars_gained_1y": 4628,
+    "description_hint": "\u7b26\u5408nature\u8bba\u6587\u5b66\u672f\u8868\u8fbe\u548c\u79d1\u7814\u7ed8\u56fe\u7684Skill"
+  },
+  {
+    "full_name": "TauricResearch/TradingAgents",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1156,
+    "est_stars_gained_1y": 4624,
+    "description_hint": "TradingAgents: Multi-Agents LLM Financial Trading Framework"
+  },
+  {
+    "full_name": "rtk-ai/rtk",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1142,
+    "est_stars_gained_1y": 4568,
+    "description_hint": "CLI proxy that reduces LLM token consumption by 60-90% on common dev commands. Single Rust binary, zero dependencies"
+  },
+  {
+    "full_name": "hugohe3/ppt-master",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1131,
+    "est_stars_gained_1y": 4524,
+    "description_hint": "AI turns documents or topics into real, native PowerPoint decks\u2014with native shapes, transitions and animations, data-backed charts and tables on demand, audio narration from speaker notes, and support for your own .pptx templates. \u00b7 by Hugo He"
+  },
+  {
+    "full_name": "BigPizzaV3/CodexPlusPlus",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1127,
+    "est_stars_gained_1y": 4508,
+    "description_hint": "An enhanced tool for CodexApp, striving to make Codex better to use and more comfortable \u4e00\u4e2aCodexApp\u7684\u589e\u5f3a\u5de5\u5177\uff0c\u52aa\u529b\u8ba9Codex\u53d8\u5f97\u66f4\u597d\u7528\u66f4\u8212\u670d"
+  },
+  {
+    "full_name": "ruvnet/ruflo",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1088,
+    "est_stars_gained_1y": 4352,
+    "description_hint": "\ud83c\udf0a The original agent meta-harness. Deploy intelligent multi-player swarms, coordinate autonomous workflows, and build conversational AI systems. Features adaptive memory, self-learning intelligence, RAG integration, and native Claude Code / Codex / Hermes and many more Integrated"
+  },
+  {
+    "full_name": "mvanhorn/last30days-skill",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1084,
+    "est_stars_gained_1y": 4336,
+    "description_hint": "AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary"
+  },
+  {
+    "full_name": "decolua/9router",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1033,
+    "est_stars_gained_1y": 4132,
+    "description_hint": "Unlimited FREE AI coding. Connect Claude Code, Codex, Cursor, Cline, Copilot, Antigravity to FREE Claude/GPT/Gemini via 40+ providers. Auto-fallback, RTK -40% tokens, never hit limits."
+  },
+  {
+    "full_name": "D4Vinci/Scrapling",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1029,
+    "est_stars_gained_1y": 4116,
+    "description_hint": "\ud83d\udd77\ufe0f An adaptive Web Scraping framework that handles everything from a single request to a full-scale crawl!"
+  },
+  {
+    "full_name": "anthropics/claude-plugins-official",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1011,
+    "est_stars_gained_1y": 4044,
+    "description_hint": "Official, Anthropic-managed directory of high quality Claude Code Plugins."
+  },
+  {
+    "full_name": "heygen-com/hyperframes",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 885,
+    "est_stars_gained_1y": 3540,
+    "description_hint": "Write HTML. Render video. Built for agents."
+  },
+  {
+    "full_name": "Alishahryar1/free-claude-code",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 878,
+    "est_stars_gained_1y": 3512,
+    "description_hint": "Use Claude Code, Codex and Pi for free from your terminal, app, IDE, or phone like OpenClaw (voice supported)"
+  },
+  {
+    "full_name": "yikart/AiToEarn",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 872,
+    "est_stars_gained_1y": 3488,
+    "description_hint": "Let's use AI to Earn!"
+  },
+  {
+    "full_name": "floci-io/floci",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 852,
+    "est_stars_gained_1y": 3408,
+    "description_hint": "Light, fluffy, and always free - The AWS Local Emulator alternative"
+  },
+  {
+    "full_name": "datawhalechina/easy-vibe",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 846,
+    "est_stars_gained_1y": 3384,
+    "description_hint": "\ud83d\udcbb vibe coding 2026 | Your First Modern Coding Course Beginners to Master Step by Step."
+  },
+  {
+    "full_name": "ZhuLinsen/daily_stock_analysis",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 823,
+    "est_stars_gained_1y": 3292,
+    "description_hint": "LLM \u9a71\u52a8\u7684\u591a\u5e02\u573a\u80a1\u7968\u667a\u80fd\u5206\u6790\u7cfb\u7edf\uff1a\u591a\u6e90\u884c\u60c5\u3001\u5b9e\u65f6\u65b0\u95fb\u3001\u51b3\u7b56\u770b\u677f\u4e0e\u81ea\u52a8\u63a8\u9001\uff0c\u652f\u6301\u96f6\u6210\u672c\u5b9a\u65f6\u8fd0\u884c\u3002  LLM-powered multi-market stock analysis system with multi-source market data, real-time news, decision dashboard, automated notifications, and cost-free scheduled runs."
+  },
+  {
+    "full_name": "multica-ai/multica",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 809,
+    "est_stars_gained_1y": 3236,
+    "description_hint": "The open-source managed agents platform. Turn coding agents into real teammates \u2014 assign tasks, track progress, compound skills."
+  },
+  {
+    "full_name": "supertone-inc/supertonic",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 805,
+    "est_stars_gained_1y": 3220,
+    "description_hint": "Lightning-Fast, On-Device, Multilingual TTS \u2014 running natively via ONNX."
+  },
+  {
+    "full_name": "pbakaus/impeccable",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 789,
+    "est_stars_gained_1y": 3156,
+    "description_hint": "The design language that makes your AI harness better at design."
+  },
+  {
+    "full_name": "AIDC-AI/Pixelle-Video",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 765,
+    "est_stars_gained_1y": 3060,
+    "description_hint": "\ud83d\ude80 AI \u5168\u81ea\u52a8\u77ed\u89c6\u9891\u5f15\u64ce | AI Fully Automated Short Video Engine"
+  },
+  {
+    "full_name": "fathah/hermes-desktop",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 740,
+    "est_stars_gained_1y": 2960,
+    "description_hint": "Desktop Companion for Hermes Agent"
+  },
+  {
+    "full_name": "mukul975/Anthropic-Cybersecurity-Skills",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 724,
+    "est_stars_gained_1y": 2896,
+    "description_hint": "754 structured cybersecurity skills for AI agents \u00b7 Mapped to 5 frameworks: MITRE ATT&CK, NIST CSF 2.0, MITRE ATLAS, D3FEND & NIST AI RMF \u00b7 agentskills.io standard \u00b7 Works with Claude Code, GitHub Copilot, Codex CLI, Cursor, Gemini CLI & 20+ platforms \u00b7 26 security domains \u00b7 Apache 2.0"
+  },
+  {
+    "full_name": "garrytan/gbrain",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 720,
+    "est_stars_gained_1y": 2880,
+    "description_hint": "Garry's Opinionated OpenClaw/Hermes Agent Brain"
+  },
+  {
+    "full_name": "calesthio/OpenMontage",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 718,
+    "est_stars_gained_1y": 2872,
+    "description_hint": "World's first open-source, agentic video production system. 12 production pipelines, 100+ tools, 700+ agent skill and production-knowledge files. Turn your AI coding assistant into a full video production studio."
+  },
+  {
+    "full_name": "santifer/career-ops",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 716,
+    "est_stars_gained_1y": 2864,
+    "description_hint": "Open-source AI job search: scan job portals, evaluate listings with a structured A-F rubric into a 1.0-5.0 score, tailor your CV, track applications \u2014 runs locally in your AI coding CLI (Claude Code, Codex, OpenCode, Antigravity\u2026)"
+  },
+  {
+    "full_name": "elder-plinius/CL4R1T4S",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 701,
+    "est_stars_gained_1y": 2804,
+    "description_hint": "LEAKED SYSTEM PROMPTS FOR CHATGPT, CLAUDE, GEMINI, GROK, PERPLEXITY, CURSOR, LOVABLE, REPLIT, AND MORE! - AI SYSTEMS TRANSPARENCY FOR ALL! \ud83d\udc50"
+  },
+  {
+    "full_name": "anthropics/claude-for-legal",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 698,
+    "est_stars_gained_1y": 2792,
+    "description_hint": "A suite of plugins for legal workflows"
+  },
+  {
+    "full_name": "K-Dense-AI/scientific-agent-skills",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 679,
+    "est_stars_gained_1y": 2716,
+    "description_hint": "Turn any AI agent into an AI Scientist. The #1 Agent Skills library for science, used by 170,000+ scientists worldwide. 158 ready-to-use skills plus 100+ scientific databases covering biology, chemistry, medicine, and drug discovery. Compatible with Cursor, Claude Code, Codex, Pi, Antigravity, and the open Agent Skills standard."
+  },
+  {
+    "full_name": "Anil-matcha/Open-Generative-AI",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 677,
+    "est_stars_gained_1y": 2708,
+    "description_hint": "Unrestricted Open-source alternative to AI video platforms \u2014 Free AI image & video generation studio with 200+ models (Flux, Midjourney, Kling, Sora, Veo). No content filters. Self-hosted, MIT licensed."
+  },
+  {
+    "full_name": "crynta/terax-ai",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 671,
+    "est_stars_gained_1y": 2684,
+    "description_hint": "Lightweight (7MB) Terminal-first AI-native dev workspace"
+  },
+  {
+    "full_name": "DeusData/codebase-memory-mcp",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 670,
+    "est_stars_gained_1y": 2680,
+    "description_hint": "High-performance code intelligence MCP server. Indexes codebases into a persistent knowledge graph \u2014 average repo in milliseconds. 158 languages, sub-ms queries, 99% fewer tokens. Single static binary, zero dependencies."
+  },
+  {
+    "full_name": "tashfeenahmed/freellmapi",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 668,
+    "est_stars_gained_1y": 2672,
+    "description_hint": "OpenAI-compatible proxy that stacks the free tiers of 16 LLM providers (~1.7B tokens/month) behind one /v1 endpoint \u2014 plus any custom OpenAI-compatible endpoint. Smart routing, automatic failover, encrypted keys. Personal experimentation only."
+  },
+  {
+    "full_name": "can1357/oh-my-pi",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 654,
+    "est_stars_gained_1y": 2616,
+    "description_hint": "\u2325  AI Coding agent for the terminal \u2014 hash-anchored edits, optimized tool harness, LSP, Python, browser, subagents, and more"
+  },
+  {
+    "full_name": "op7418/guizang-ppt-skill",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 650,
+    "est_stars_gained_1y": 2600,
+    "description_hint": "AI-agent Skill for generating polished HTML slide decks: editorial magazine and Swiss layouts, image prompts, social covers, and a WebGL/low-power presentation runtime."
+  },
+  {
+    "full_name": "jamiepine/voicebox",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 648,
+    "est_stars_gained_1y": 2592,
+    "description_hint": "The open-source AI voice studio. Clone, dictate, create."
+  },
+  {
+    "full_name": "Wei-Shaw/sub2api",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 647,
+    "est_stars_gained_1y": 2588,
+    "description_hint": "Sub2API \u4e00\u7ad9\u5f0f\u5f00\u6e90\u4e2d\u8f6c\u670d\u52a1\uff0c\u8ba9 Claude\u3001Openai \u3001Gemini\u3001Grok\u8ba2\u9605\u7edf\u4e00\u63a5\u5165\uff0c\u652f\u6301\u62fc\u8f66\u5171\u4eab\uff0c\u66f4\u9ad8\u6548\u5206\u644a\u6210\u672c\uff0c\u539f\u751f\u5de5\u5177\u65e0\u7f1d\u4f7f\u7528\u3002"
+  },
+  {
+    "full_name": "HKUDS/CLI-Anything",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 642,
+    "est_stars_gained_1y": 2568,
+    "description_hint": "\"CLI-Anything: Making ALL Software Agent-Native\" -- CLI-Hub: https://clianything.cc/"
+  },
+  {
+    "full_name": "RyanCodrai/turbovec",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 632,
+    "est_stars_gained_1y": 2528,
+    "description_hint": "A vector index built on TurboQuant, written in Rust with Python bindings"
+  },
+  {
+    "full_name": "bytedance/UI-TARS-desktop",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 625,
+    "est_stars_gained_1y": 2500,
+    "description_hint": "The Open-Source Multimodal AI Agent Stack: Connecting Cutting-Edge AI Models and Agent Infra"
+  },
+  {
+    "full_name": "anthropics/knowledge-work-plugins",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 599,
+    "est_stars_gained_1y": 2396,
+    "description_hint": "Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork"
+  },
+  {
+    "full_name": "OpenBMB/VoxCPM",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 575,
+    "est_stars_gained_1y": 2300,
+    "description_hint": "VoxCPM2: Tokenizer-Free TTS for Multilingual Speech Generation, Creative Voice Design, and True-to-Life Cloning"
+  },
+  {
+    "full_name": "apple/container",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 573,
+    "est_stars_gained_1y": 2292,
+    "description_hint": "A tool for creating and running Linux containers using lightweight virtual machines on a Mac. It is written in Swift, and optimized for Apple silicon. "
+  },
+  {
+    "full_name": "HKUDS/Vibe-Trading",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 570,
+    "est_stars_gained_1y": 2280,
+    "description_hint": "\"Vibe-Trading: Your Personal Trading Agent\""
+  },
+  {
+    "full_name": "Fincept-Corporation/FinceptTerminal",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 567,
+    "est_stars_gained_1y": 2268,
+    "description_hint": "FinceptTerminal is a modern finance application offering advanced market analytics, investment research, and economic data tools, designed for interactive exploration and data-driven decision-making in a user-friendly environment."
+  },
+  {
+    "full_name": "TencentCloud/TencentDB-Agent-Memory",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 554,
+    "est_stars_gained_1y": 2216,
+    "description_hint": "TencentDB Agent Memory is a team-level memory hub for AI Agents \u2014 turning conversations, docs, and code into four reusable memory assets (Chat Memory, Skill, LLM-Wiki, Code-Graph) that are governed, shared, and equipped across agents and frameworks."
+  },
+  {
+    "full_name": "QuantumNous/new-api",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 551,
+    "est_stars_gained_1y": 2204,
+    "description_hint": "A unified AI model hub for aggregation & distribution. It supports cross-converting various LLMs into OpenAI-compatible, Claude-compatible, or Gemini-compatible formats. A centralized gateway for personal and enterprise model management. \ud83c\udf65"
+  },
+  {
+    "full_name": "google/skills",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 550,
+    "est_stars_gained_1y": 2200,
+    "description_hint": "Agent Skills for Google products and technologies"
+  },
+  {
+    "full_name": "herdrdev/herdr",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 534,
+    "est_stars_gained_1y": 2136,
+    "description_hint": "the runtime your coding agents live on"
+  },
+  {
+    "full_name": "google-labs-code/design.md",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 524,
+    "est_stars_gained_1y": 2096,
+    "description_hint": "A format specification for describing a visual identity to coding agents. DESIGN.md gives agents a persistent, structured understanding of a design system."
+  },
+  {
+    "full_name": "rmyndharis/OpenWA",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 515,
+    "est_stars_gained_1y": 2060,
+    "description_hint": "Free, Open Source, Self-Hosted WhatsApp API Gateway"
+  },
+  {
+    "full_name": "coreyhaines31/marketingskills",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 507,
+    "est_stars_gained_1y": 2028,
+    "description_hint": "Marketing skills for Claude Code and AI agents. CRO, copywriting, SEO, analytics, and growth engineering."
+  },
+  {
+    "full_name": "ChromeDevTools/chrome-devtools-mcp",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 503,
+    "est_stars_gained_1y": 2012,
+    "description_hint": "Chrome DevTools for coding agents"
+  },
+  {
+    "full_name": "lfnovo/open-notebook",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 492,
+    "est_stars_gained_1y": 1968,
+    "description_hint": "An Open Source implementation of Notebook LM with more flexibility and features"
+  },
+  {
+    "full_name": "alibaba/open-code-review",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 490,
+    "est_stars_gained_1y": 1960,
+    "description_hint": "Open-source & free \u2014 Battle-tested at Alibaba's scale. Hybrid architecture code review tool: deterministic pipelines + LLM Agent, precise line-level comments, built-in fine-tuned ruleset (NPE, thread-safety, XSS, SQL injection), OpenAI & Anthropic compatible."
+  },
+  {
+    "full_name": "FULU-Foundation/OrcaSlicer-bambulab",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 486,
+    "est_stars_gained_1y": 1944,
+    "description_hint": ""
+  },
+  {
+    "full_name": "blader/humanizer",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 484,
+    "est_stars_gained_1y": 1936,
+    "description_hint": "Agent skill that removes signs of AI-generated writing from text"
+  },
+  {
+    "full_name": "stablyai/orca",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 475,
+    "est_stars_gained_1y": 1900,
+    "description_hint": "Orca is the ADE for working with a fleet of parallel agents. Run any coding agent with your own subscription. Available on desktop and mobile."
+  },
+  {
+    "full_name": "nesquena/hermes-webui",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 473,
+    "est_stars_gained_1y": 1892,
+    "description_hint": "Hermes WebUI: The best way to use Hermes Agent from the web or from your phone!"
+  },
+  {
+    "full_name": "diegosouzapw/OmniRoute",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 403,
+    "est_stars_gained_1y": 1612,
+    "description_hint": "Never stop coding. Free MIT AI gateway: one endpoint, 290+ providers (90+ free), 500+ models \u2014 Kimi, Claude, GPT, OpenAI, Gemini, GLM, DeepSeek, MiniMax. Works with Claude Code, Codex, Cursor, OpenCode, Cline & Copilot. Quota-aware auto-fallback, RTK+Caveman compression saves 15-95% tokens, MCP/A2A, Desktop/PWA. Built by 500+ contributors"
+  },
+  {
+    "full_name": "phuryn/pm-skills",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 399,
+    "est_stars_gained_1y": 1596,
+    "description_hint": "PM Skills Marketplace: 100+ agentic skills, commands, and plugins \u2014 from discovery to strategy, execution, launch, and growth."
+  },
+  {
+    "full_name": "virgiliojr94/book-to-skill",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 395,
+    "est_stars_gained_1y": 1580,
+    "description_hint": "Turn any technical book PDF into a Claude Code skill \u2014 ready to study, reference, and use while you work."
+  },
+  {
+    "full_name": "JCodesMore/ai-website-cloner-template",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 385,
+    "est_stars_gained_1y": 1540,
+    "description_hint": "Clone any website with one command using AI coding agents"
+  },
+  {
+    "full_name": "XiaomiMiMo/MiMo-Code",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 385,
+    "est_stars_gained_1y": 1540,
+    "description_hint": "MiMo Code: Where Models and Agents Co-Evolve"
+  },
+  {
+    "full_name": "usestrix/strix",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 368,
+    "est_stars_gained_1y": 1472,
+    "description_hint": "Open-source AI penetration testing tool to find and fix your app\u2019s vulnerabilities."
+  },
+  {
+    "full_name": "MadsLorentzen/ai-job-search",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 340,
+    "est_stars_gained_1y": 1360,
+    "description_hint": "The job search that runs on your machine. AI job application framework built on Claude Code: evaluate postings, tailor CVs, write cover letters, prep interviews. Fork it and own it."
+  },
+  {
+    "full_name": "k1tbyte/Wand-Enhancer",
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 146,
+    "est_stars_gained_1y": 584,
+    "description_hint": "Advanced UX and interoperability extension for Wand (WeMod) app"
+  }
+]

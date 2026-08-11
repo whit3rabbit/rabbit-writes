@@ -1,0 +1,228 @@
+{
+  "meta": {
+    "full_name": "datawhalechina/hello-agents",
+    "html_url": "https://github.com/datawhalechina/hello-agents",
+    "description": "\ud83d\udcda \u300a\u4ece\u96f6\u5f00\u59cb\u6784\u5efa\u667a\u80fd\u4f53\u300b\u2014\u2014\u4ece\u96f6\u5f00\u59cb\u7684\u667a\u80fd\u4f53\u539f\u7406\u4e0e\u5b9e\u8df5\u6559\u7a0b",
+    "stars_total": 71848,
+    "forks": 8946,
+    "watchers": 212,
+    "created_at": "2025-09-07T09:50:24Z",
+    "pushed_at": "2026-08-07T09:09:57Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/datawhalechina__hello-agents/README.md",
+    "readme_bytes": 20119,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1190,
+    "est_stars_gained_1y": 4760,
+    "slug": "datawhalechina__hello-agents"
+  },
+  "stats": {
+    "total_lines": 221,
+    "non_blank_lines": 169,
+    "total_chars": 13142,
+    "heading_count": 20,
+    "heading_levels_used": [
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "changelog",
+      "other",
+      "other",
+      "other",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "\ud83c\udfaf \u9879\u76ee\u4ecb\u7ecd",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcda \u5feb\u901f\u5f00\u59cb",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u5728\u7ebf\u9605\u8bfb",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u672c\u5730\u9605\u8bfb",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u2728 \u4f60\u5c06\u6536\u83b7\u4ec0\u4e48\uff1f",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcd6 \u5185\u5bb9\u5bfc\u822a",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u793e\u533a\u8d21\u732e\u7cbe\u9009 (Community Blog)",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "PDF \u7248\u672c\u4e0b\u8f7d",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udca1 \u5982\u4f55\u5b66\u4e60",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u4e0b\u4e00\u6b65\u89c4\u5212",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd1d \u5982\u4f55\u8d21\u732e",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude4f \u81f4\u8c22",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u6838\u5fc3\u8d21\u732e\u8005",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Extra-Chapter \u8d21\u732e\u8005",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u7279\u522b\u611f\u8c22",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "\u8bfb\u8005\u4ea4\u6d41\u7fa4",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5173\u4e8e Datawhale",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf93 \u5f15\u7528",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcdc \u5f00\u6e90\u534f\u8bae",
+        "category": "other"
+      }
+    ],
+    "has_h1": false,
+    "section_word_counts": {
+      "other": [
+        69,
+        0,
+        13,
+        2,
+        57,
+        195,
+        34,
+        146,
+        42,
+        27,
+        0,
+        75,
+        71,
+        34,
+        16,
+        20,
+        4,
+        13
+      ],
+      "support": [
+        215
+      ],
+      "changelog": [
+        23
+      ]
+    },
+    "preamble_word_count": 167,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 7,
+    "uses_centering": true,
+    "image_count_total": 13,
+    "badge_count": 6,
+    "screenshot_or_logo_image_count": 7,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 5,
+    "html_link_count": 6,
+    "inline_link_count": 54,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 54,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.43,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 1,
+    "code_block_languages": [
+      "bibtex"
+    ],
+    "avg_code_block_lines": 7,
+    "table_row_count": 41,
+    "table_present": true,
+    "paragraph_count": 23,
+    "avg_paragraph_words": 19.74,
+    "median_paragraph_words": 13,
+    "sentence_count": 21,
+    "avg_sentence_words": 21.62,
+    "median_sentence_words": 14,
+    "stdev_sentence_words": 31.8,
+    "short_sentence_pct": 33.3,
+    "medium_sentence_pct": 38.1,
+    "long_sentence_pct": 28.6,
+    "total_prose_words": 830,
+    "has_license_section_or_badge": false,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": false,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,368 @@
+{
+  "meta": {
+    "full_name": "anthropics/claude-for-legal",
+    "html_url": "https://github.com/anthropics/claude-for-legal",
+    "description": "A suite of plugins for legal workflows",
+    "stars_total": 9066,
+    "forks": 1757,
+    "watchers": 109,
+    "created_at": "2026-04-21T15:43:42Z",
+    "pushed_at": "2026-08-02T04:03:49Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/anthropics__claude-for-legal/README.md",
+    "readme_bytes": 53485,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 698,
+    "est_stars_gained_1y": 2792,
+    "slug": "anthropics__claude-for-legal"
+  },
+  "stats": {
+    "total_lines": 577,
+    "non_blank_lines": 473,
+    "total_chars": 53249,
+    "heading_count": 39,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "installation",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Claude for Legal",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Getting started in Cowork",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Agents",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Repository Layout",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Getting Started",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Claude Cowork",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Claude Code",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Add the marketplace (use the absolute path to this repo or a GitHub URL)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install a plugin \u2014 pick the ones that match your practice",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Restart Claude Code, then run setup for each plugin you installed.",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "This writes your practice profile to ~/.claude/plugins/config/claude-for-legal/<plugin>/CLAUDE.md",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Claude Managed Agents",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How It Fits Together",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Vertical Plugins",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Transactional & advisory",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Litigation",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Learning & practice",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Ecosystem",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "External / partner-built",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "The trust layer for community legal skills",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "MCP Connectors",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Claude for Microsoft 365",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Making It Yours",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Skill & Command Reference",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "ai-governance-legal",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "legal-builder-hub",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "legal-clinic",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "commercial-legal",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "corporate-legal",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "employment-legal",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "ip-legal",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "litigation-legal",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "privacy-legal",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "product-legal",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "regulatory-legal",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "law-student",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "cocounsel-legal (Thomson Reuters)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        114,
+        1515,
+        7,
+        59,
+        1,
+        4,
+        101,
+        147,
+        19,
+        183,
+        37,
+        77,
+        36,
+        81,
+        425,
+        205,
+        242,
+        18,
+        108,
+        96,
+        127,
+        113,
+        123,
+        179,
+        121,
+        193,
+        84,
+        74,
+        88,
+        126,
+        20
+      ],
+      "installation": [
+        299,
+        0,
+        12,
+        0
+      ],
+      "configuration": [
+        135
+      ],
+      "support": [
+        205
+      ],
+      "contributing": [
+        140
+      ],
+      "license": [
+        13
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 0,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 0,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 29,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 1,
+    "total_markdown_links": 29,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.66,
+    "internal_anchor_link_count": 2,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 4,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 12.25,
+    "table_row_count": 314,
+    "table_present": true,
+    "paragraph_count": 32,
+    "avg_paragraph_words": 28.16,
+    "median_paragraph_words": 24.5,
+    "sentence_count": 57,
+    "avg_sentence_words": 15.81,
+    "median_sentence_words": 13,
+    "stdev_sentence_words": 11.56,
+    "short_sentence_pct": 36.8,
+    "medium_sentence_pct": 33.3,
+    "long_sentence_pct": 29.8,
+    "total_prose_words": 1846,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": false
+  }
+}

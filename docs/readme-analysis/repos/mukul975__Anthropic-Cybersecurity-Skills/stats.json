@@ -1,0 +1,344 @@
+{
+  "meta": {
+    "full_name": "mukul975/Anthropic-Cybersecurity-Skills",
+    "html_url": "https://github.com/mukul975/Anthropic-Cybersecurity-Skills",
+    "description": "817 structured cybersecurity skills for AI agents \u00b7 Mapped to 6 frameworks: MITRE ATT&CK, NIST CSF 2.0, MITRE ATLAS, D3FEND, NIST AI RMF & MITRE F3 (Fight Fraud) \u00b7 agentskills.io standard \u00b7 Works with Claude Code, GitHub Copilot, Codex CLI, Cursor, Gemini CLI & 20+ platforms \u00b7 29 security domains \u00b7 Apache 2.0",
+    "stars_total": 27519,
+    "forks": 3334,
+    "watchers": 214,
+    "created_at": "2026-02-25T09:47:50Z",
+    "pushed_at": "2026-08-08T14:55:19Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/mukul975__Anthropic-Cybersecurity-Skills/README.md",
+    "readme_bytes": 28948,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 724,
+    "est_stars_gained_1y": 2896,
+    "slug": "mukul975__Anthropic-Cybersecurity-Skills"
+  },
+  "stats": {
+    "total_lines": 450,
+    "non_blank_lines": 326,
+    "total_chars": 28597,
+    "heading_count": 34,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "security",
+      "security",
+      "security",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "features",
+      "security",
+      "other",
+      "other",
+      "examples",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "changelog",
+      "other",
+      "contributing",
+      "credits",
+      "support",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Anthropic Cybersecurity Skills",
+        "category": "security"
+      },
+      {
+        "level": 3,
+        "text": "The largest open-source cybersecurity skills library for AI agents",
+        "category": "security"
+      },
+      {
+        "level": 2,
+        "text": "Give any AI agent the security skills of a senior analyst",
+        "category": "security"
+      },
+      {
+        "level": 2,
+        "text": "Six frameworks, one skill library",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udd95 MITRE Fight Fraud Framework (F3) \u2014 94 fraud-relevant skills",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "MITRE ATT&CK v19.1 \u2014 805/817 skills mapped",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Quick start",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Option 1: npx (recommended)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Option 2: Git clone",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf0d GARS-2026 \u2014 Global Agentic AI Readiness Survey",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 Try it on the Playground",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Why this exists",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "What's inside \u2014 29 security domains",
+        "category": "security"
+      },
+      {
+        "level": 2,
+        "text": "How AI agents use these skills",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Skill anatomy",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "YAML frontmatter (real example)",
+        "category": "examples"
+      },
+      {
+        "level": 3,
+        "text": "Markdown body sections",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "When to Use",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Workflow",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Verification",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "MITRE ATLAS 2026.07 \u2014 AI/ML adversarial threats",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "MITRE D3FEND v1.4.0 \u2014 Defensive countermeasures",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "NIST AI RMF 1.0 + GenAI Profile (AI 600-1)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Compatible platforms",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What people are saying",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Featured in",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Star history",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "Releases",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude4f Thanks to our contributors",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "Community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Citation",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "security": [
+        0,
+        322,
+        131,
+        307
+      ],
+      "other": [
+        219,
+        187,
+        112,
+        5,
+        32,
+        88,
+        66,
+        63,
+        7,
+        1,
+        10,
+        9,
+        401,
+        68,
+        58,
+        74,
+        72,
+        60,
+        80,
+        82,
+        9
+      ],
+      "installation": [
+        1,
+        7
+      ],
+      "features": [
+        161
+      ],
+      "examples": [
+        0
+      ],
+      "changelog": [
+        61
+      ],
+      "contributing": [
+        141
+      ],
+      "credits": [
+        236
+      ],
+      "support": [
+        33
+      ],
+      "license": [
+        79
+      ]
+    },
+    "preamble_word_count": 18,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 5,
+    "uses_centering": true,
+    "image_count_total": 25,
+    "badge_count": 15,
+    "screenshot_or_logo_image_count": 10,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 10,
+    "html_link_count": 10,
+    "inline_link_count": 60,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 60,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.12,
+    "internal_anchor_link_count": 5,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 6,
+    "code_block_languages": [
+      "bash",
+      "bibtex",
+      "markdown",
+      "yaml"
+    ],
+    "avg_code_block_lines": 11.67,
+    "table_row_count": 96,
+    "table_present": true,
+    "paragraph_count": 70,
+    "avg_paragraph_words": 27.99,
+    "median_paragraph_words": 18.0,
+    "sentence_count": 102,
+    "avg_sentence_words": 19.21,
+    "median_sentence_words": 15.0,
+    "stdev_sentence_words": 21.66,
+    "short_sentence_pct": 27.5,
+    "medium_sentence_pct": 39.2,
+    "long_sentence_pct": 33.3,
+    "total_prose_words": 2162,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

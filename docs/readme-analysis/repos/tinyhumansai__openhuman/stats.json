@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "full_name": "tinyhumansai/openhuman",
+    "html_url": "https://github.com/tinyhumansai/openhuman",
+    "description": "Your Personal AI super intelligence. A brain that builds a local-first memory of your life, a fantastic orchestrator of agent fleets and workflows, and a deep researcher.",
+    "stars_total": 36134,
+    "forks": 3597,
+    "watchers": 182,
+    "created_at": "2026-02-18T20:01:27Z",
+    "pushed_at": "2026-08-09T07:54:51Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/tinyhumansai__openhuman/README.md",
+    "readme_bytes": 19493,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 2377,
+    "est_stars_gained_1y": 9508,
+    "slug": "tinyhumansai__openhuman"
+  },
+  "stats": {
+    "total_lines": 189,
+    "non_blank_lines": 137,
+    "total_chars": 19218,
+    "heading_count": 13,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "installation",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "other",
+      "credits"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "What is OpenHuman?",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udde0 The brain",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd78\ufe0f The orchestrator",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd2c The deep researcher & doer",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\uddcd Human, private, yours",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Context in minutes, not weeks",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "An orchestrator, not a chatbot",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Workflows you can see",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "OpenHuman vs Other Agent Harnesses",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing from source",
+        "category": "contributing"
+      },
+      {
+        "level": 1,
+        "text": "Star us on GitHub",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Contributors Hall of Fame",
+        "category": "credits"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "installation": [
+        45
+      ],
+      "features": [
+        59
+      ],
+      "other": [
+        185,
+        138,
+        248,
+        104,
+        248,
+        119,
+        105,
+        191,
+        89
+      ],
+      "contributing": [
+        145
+      ],
+      "credits": [
+        47
+      ]
+    },
+    "preamble_word_count": 601,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 12,
+    "uses_centering": true,
+    "image_count_total": 15,
+    "badge_count": 4,
+    "screenshot_or_logo_image_count": 11,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 21,
+    "inline_link_count": 50,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 50,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.26,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 0,
+    "code_block_languages": [],
+    "avg_code_block_lines": 0,
+    "table_row_count": 17,
+    "table_present": true,
+    "paragraph_count": 27,
+    "avg_paragraph_words": 45.81,
+    "median_paragraph_words": 27,
+    "sentence_count": 48,
+    "avg_sentence_words": 25.77,
+    "median_sentence_words": 15.0,
+    "stdev_sentence_words": 46.13,
+    "short_sentence_pct": 27.1,
+    "medium_sentence_pct": 37.5,
+    "long_sentence_pct": 35.4,
+    "total_prose_words": 2166,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

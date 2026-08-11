@@ -1,0 +1,226 @@
+{
+  "meta": {
+    "full_name": "VoltAgent/awesome-design-md",
+    "html_url": "https://github.com/VoltAgent/awesome-design-md",
+    "description": "A collection of DESIGN.md files analysis by popular brand design systems. Drop one into your project and let coding agents generate a matching UI.",
+    "stars_total": 107466,
+    "forks": 12273,
+    "watchers": 418,
+    "created_at": "2026-03-31T16:37:01Z",
+    "pushed_at": "2026-07-31T12:32:42Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/VoltAgent__awesome-design-md/README.md",
+    "readme_bytes": 16023,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1501,
+    "est_stars_gained_1y": 6004,
+    "slug": "VoltAgent__awesome-design-md"
+  },
+  "stats": {
+    "total_lines": 250,
+    "non_blank_lines": 169,
+    "total_chars": 15998,
+    "heading_count": 19,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "architecture",
+      "features",
+      "architecture",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "architecture",
+      "usage",
+      "contributing",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Awesome DESIGN.md",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "What is DESIGN.md?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Request a DESIGN.md",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "AI Design + Build Ecosystem Tools",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Collection",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "AI & LLM Platforms",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Developer Tools & IDEs",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Backend, Database & DevOps",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Productivity & SaaS",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Design & Creative Tools",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "Fintech & Crypto",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "E-commerce & Retail",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Media & Consumer Tech",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Automotive",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Retro Web \u00b7 DESIGN.md Nostalgia",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "What's Inside Each DESIGN.md",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "How to Use",
+        "category": "usage"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "architecture": [
+        49,
+        20,
+        190,
+        83,
+        99,
+        127
+      ],
+      "features": [
+        117
+      ],
+      "other": [
+        0,
+        184,
+        100,
+        127,
+        95,
+        103,
+        80,
+        190,
+        109
+      ],
+      "usage": [
+        18
+      ],
+      "contributing": [
+        50
+      ],
+      "license": [
+        58
+      ]
+    },
+    "preamble_word_count": 111,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 3,
+    "uses_centering": true,
+    "image_count_total": 8,
+    "badge_count": 4,
+    "screenshot_or_logo_image_count": 4,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 1,
+    "html_link_count": 4,
+    "inline_link_count": 84,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 84,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.24,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 0,
+    "code_block_languages": [],
+    "avg_code_block_lines": 0,
+    "table_row_count": 20,
+    "table_present": true,
+    "paragraph_count": 35,
+    "avg_paragraph_words": 15.6,
+    "median_paragraph_words": 16,
+    "sentence_count": 45,
+    "avg_sentence_words": 12.13,
+    "median_sentence_words": 10,
+    "stdev_sentence_words": 9.33,
+    "short_sentence_pct": 42.2,
+    "medium_sentence_pct": 42.2,
+    "long_sentence_pct": 15.6,
+    "total_prose_words": 1726,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": false,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

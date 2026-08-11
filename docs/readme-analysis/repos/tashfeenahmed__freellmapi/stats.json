@@ -1,0 +1,274 @@
+{
+  "meta": {
+    "full_name": "tashfeenahmed/freellmapi",
+    "html_url": "https://github.com/tashfeenahmed/freellmapi",
+    "description": "OpenAI-compatible proxy that stacks the free tiers of 28 LLM providers (~4B tokens/month) behind one /v1 endpoint \u2014 plus any custom OpenAI-compatible endpoint. Smart routing, automatic failover, encrypted keys. Personal experimentation only.",
+    "stars_total": 18186,
+    "forks": 2663,
+    "watchers": 74,
+    "created_at": "2026-04-21T13:38:59Z",
+    "pushed_at": "2026-08-07T07:45:03Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/tashfeenahmed__freellmapi/README.md",
+    "readme_bytes": 48377,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 668,
+    "est_stars_gained_1y": 2672,
+    "slug": "tashfeenahmed__freellmapi"
+  },
+  "stats": {
+    "total_lines": 441,
+    "non_blank_lines": 338,
+    "total_chars": 48208,
+    "heading_count": 24,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "toc",
+      "features",
+      "support",
+      "other",
+      "other",
+      "features",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "demo",
+      "other",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "other",
+      "contributing",
+      "credits",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "FreeLLMAPI",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contents",
+        "category": "toc"
+      },
+      {
+        "level": 2,
+        "text": "Why this exists",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Supported providers",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Compatible CLIs & coding agents",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How it compares",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Quick start",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Desktop app",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Works with OpenAI-compatible clients",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Languages",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Premium (live catalog)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Using the API",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Screenshots",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "Models",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Keys",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Playground",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Analytics",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How it works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Limitations",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 3,
+        "text": "Contributors",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "Disclaimer",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        256,
+        418,
+        18,
+        89,
+        193,
+        1378,
+        247,
+        39,
+        30,
+        72,
+        24,
+        56,
+        112
+      ],
+      "toc": [
+        87
+      ],
+      "features": [
+        183,
+        546
+      ],
+      "support": [
+        331
+      ],
+      "installation": [
+        145
+      ],
+      "api": [
+        52
+      ],
+      "demo": [
+        0
+      ],
+      "architecture": [
+        87
+      ],
+      "contributing": [
+        213
+      ],
+      "credits": [
+        2850
+      ],
+      "license": [
+        2
+      ]
+    },
+    "preamble_word_count": 3,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 3,
+    "uses_centering": true,
+    "image_count_total": 187,
+    "badge_count": 6,
+    "screenshot_or_logo_image_count": 181,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 6,
+    "html_link_count": 96,
+    "inline_link_count": 69,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 51,
+    "total_markdown_links": 69,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.41,
+    "internal_anchor_link_count": 19,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 3,
+    "code_block_languages": [
+      "bash",
+      "python"
+    ],
+    "avg_code_block_lines": 5,
+    "table_row_count": 12,
+    "table_present": true,
+    "paragraph_count": 59,
+    "avg_paragraph_words": 109.69,
+    "median_paragraph_words": 31,
+    "sentence_count": 101,
+    "avg_sentence_words": 64.08,
+    "median_sentence_words": 20,
+    "stdev_sentence_words": 304.71,
+    "short_sentence_pct": 18.8,
+    "medium_sentence_pct": 34.7,
+    "long_sentence_pct": 46.5,
+    "total_prose_words": 7226,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,226 @@
+{
+  "meta": {
+    "full_name": "BigPizzaV3/CodexPlusPlus",
+    "html_url": "https://github.com/BigPizzaV3/CodexPlusPlus",
+    "description": "An enhanced tool for CodexApp, striving to make Codex better to use and more comfortable \u4e00\u4e2aCodexApp\u7684\u589e\u5f3a\u5de5\u5177\uff0c\u52aa\u529b\u8ba9Codex\u53d8\u5f97\u66f4\u597d\u7528\u66f4\u8212\u670d",
+    "stars_total": 28403,
+    "forks": 1803,
+    "watchers": 62,
+    "created_at": "2026-05-06T09:32:49Z",
+    "pushed_at": "2026-08-07T10:16:31Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/BigPizzaV3__CodexPlusPlus/README.md",
+    "readme_bytes": 19367,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1127,
+    "est_stars_gained_1y": 4508,
+    "slug": "BigPizzaV3__CodexPlusPlus"
+  },
+  "stats": {
+    "total_lines": 308,
+    "non_blank_lines": 245,
+    "total_chars": 12820,
+    "heading_count": 20,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Codex++",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5feb\u901f\u4f7f\u7528",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u8d5e\u52a9\u5546",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u4ea4\u6d41\u4e0e\u652f\u6301",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5f53\u524d\u529f\u80fd",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u4f9b\u5e94\u5546\u6a21\u5f0f",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Codex \u754c\u9762\u589e\u5f3a",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u81ea\u52a8\u66f4\u65b0\u4e0e\u5b89\u88c5\u5305",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u6570\u636e\u4f4d\u7f6e",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5e38\u89c1\u95ee\u9898",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Codex++ \u83dc\u5355\u6ca1\u51fa\u73b0",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u5207\u6362\u4f9b\u5e94\u5546\u540e\u8bf7\u6c42\u5931\u8d25",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Upstream worktree \u548c Codex \u539f\u751f\u521b\u5efa\u6709\u4ec0\u4e48\u533a\u522b",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "macOS \u63d0\u793a\u65e0\u6cd5\u6253\u5f00\u6216\u5df2\u635f\u574f",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "macOS Intel \u80fd\u7528\u5417",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5f00\u53d1",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\u524d\u7aef\u68c0\u67e5",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Rust \u68c0\u67e5",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5f00\u6e90\u534f\u8bae",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u517c\u5bb9\u6027\u8bf4\u660e",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        107,
+        57,
+        1086,
+        45,
+        76,
+        101,
+        29,
+        23,
+        28,
+        0,
+        10,
+        14,
+        29,
+        26,
+        18,
+        1,
+        12,
+        51,
+        32,
+        7
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 6,
+    "uses_centering": true,
+    "image_count_total": 22,
+    "badge_count": 5,
+    "screenshot_or_logo_image_count": 17,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 5,
+    "html_link_count": 39,
+    "inline_link_count": 2,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 2,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 4.5,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 4,
+    "code_block_languages": [
+      "bash",
+      "text"
+    ],
+    "avg_code_block_lines": 6.25,
+    "table_row_count": 14,
+    "table_present": true,
+    "paragraph_count": 34,
+    "avg_paragraph_words": 43.53,
+    "median_paragraph_words": 10.0,
+    "sentence_count": 34,
+    "avg_sentence_words": 43.53,
+    "median_sentence_words": 10.0,
+    "stdev_sentence_words": 170.57,
+    "short_sentence_pct": 47.1,
+    "medium_sentence_pct": 38.2,
+    "long_sentence_pct": 14.7,
+    "total_prose_words": 1561,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": false,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

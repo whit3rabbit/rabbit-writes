@@ -1,0 +1,515 @@
+{
+  "meta": {
+    "full_name": "can1357/oh-my-pi",
+    "html_url": "https://github.com/can1357/oh-my-pi",
+    "description": "\u2325  AI Coding agent for the terminal \u2014 hash-anchored edits, optimized tool harness, LSP, Python, browser, subagents, and more",
+    "stars_total": 23327,
+    "forks": 2213,
+    "watchers": 69,
+    "created_at": "2025-12-31T14:01:28Z",
+    "pushed_at": "2026-08-09T23:56:18Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/can1357__oh-my-pi/README.md",
+    "readme_bytes": 43185,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 654,
+    "est_stars_gained_1y": 2616,
+    "slug": "can1357__oh-my-pi"
+  },
+  "stats": {
+    "total_lines": 656,
+    "non_blank_lines": 438,
+    "total_chars": 42817,
+    "heading_count": 59,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "demo",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "security",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Shell completions",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "zsh \u2014 add to ~/.zshrc (or write the output into a file on your $fpath)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "bash \u2014 add to ~/.bashrc",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "fish",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Every tool, _benchmaxxed_.",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "The Pi _you love_, with **batteries included**.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "01 \u00b7 Code execution w/ tool-calling",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "02 \u00b7 LSP wired into every write",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "03 \u00b7 Drives a real debugger",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "04 \u00b7 Time-traveling stream rules",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "05 \u00b7 First-class subagents",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "06 \u00b7 A second model, watching every turn.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "07 \u00b7 Hand someone the link, they're in.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "08 \u00b7 Read a pdf on arxiv, why not?",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "09 \u00b7 Unapologetically native. Even on Windows.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "10 \u00b7 Code review with priorities and a verdict",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "11 \u00b7 Hashline: edit by content hash",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "12 \u00b7 GitHub is just another filesystem",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "13 \u00b7 Memory the agent curates",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "14 \u00b7 ACP: editor-drivable agent",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "15 \u00b7 Inherits what your other tools already wrote",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "16 \u00b7 omp commit: atomic splits, validated messages",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "17 \u00b7 Read PRs. _Walk skills._ Pull JSON out of subagents.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "18 \u00b7 Conflict resolution, made easy.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "19 \u00b7 Preview, then accept.",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "20 \u00b7 Drives a _real browser_. _Or your Slack?_",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "21 \u00b7 Hands on the desktop itself",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Whatever the task needs, _it's already in the box_.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Prompt controls",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Session controls",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Sixty-plus providers, a thousand models, _one /model away_.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Frontier APIs",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "Coding plans",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Run it yourself",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Custom OpenAI-compatible providers",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Four knobs that make routing useful",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Twenty-three backends. _One tool the agent already knows_.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Search providers",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Specialised handlers",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Security databases",
+        "category": "security"
+      },
+      {
+        "level": 2,
+        "text": "Roughly **~80,000** lines of Rust, doing the work other harnesses shell out for.",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Four entry points: _interactive_, _one-shot_, RPC, and ACP.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Interactive \u2014 when in doubt, the agent asks",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "SDK \u2014 embed in Node",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "RPC \u2014 drive over stdio",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "ACP \u2014 speak to editors",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "A harness worth keeping is one you _don't_ outgrow.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Primitives",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Discovery",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Extensibility",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Philosophy",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Development",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Getting started from source",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Debug Command",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Monorepo Packages",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Rust Crates",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "installation": [
+        40,
+        44
+      ],
+      "other": [
+        51,
+        4,
+        4,
+        8,
+        132,
+        22,
+        99,
+        95,
+        112,
+        118,
+        159,
+        122,
+        122,
+        86,
+        49,
+        55,
+        43,
+        65,
+        58,
+        55,
+        52,
+        83,
+        62,
+        77,
+        37,
+        412,
+        76,
+        53,
+        92,
+        58,
+        21,
+        55,
+        127,
+        43,
+        106,
+        61,
+        449,
+        39,
+        85,
+        27,
+        35,
+        61,
+        65,
+        24,
+        29,
+        23,
+        49,
+        0,
+        22,
+        217,
+        123
+      ],
+      "features": [
+        99
+      ],
+      "demo": [
+        88
+      ],
+      "api": [
+        55
+      ],
+      "security": [
+        31
+      ],
+      "contributing": [
+        39
+      ],
+      "license": [
+        61
+      ]
+    },
+    "preamble_word_count": 363,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 4,
+    "uses_centering": true,
+    "image_count_total": 20,
+    "badge_count": 8,
+    "screenshot_or_logo_image_count": 12,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 8,
+    "html_link_count": 11,
+    "inline_link_count": 62,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 62,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.02,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 12,
+    "code_block_languages": [
+      "powershell",
+      "sh",
+      "ts",
+      "yaml"
+    ],
+    "avg_code_block_lines": 4.17,
+    "table_row_count": 100,
+    "table_present": true,
+    "paragraph_count": 112,
+    "avg_paragraph_words": 25.56,
+    "median_paragraph_words": 18.0,
+    "sentence_count": 204,
+    "avg_sentence_words": 14.03,
+    "median_sentence_words": 11.0,
+    "stdev_sentence_words": 17.1,
+    "short_sentence_pct": 41.7,
+    "medium_sentence_pct": 38.7,
+    "long_sentence_pct": 19.6,
+    "total_prose_words": 3606,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

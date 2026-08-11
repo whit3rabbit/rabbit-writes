@@ -1,0 +1,7 @@
+# pewdiepie-archdaemon/odysseus — qualitative note
+
+This is the leanest README of the batch — roughly 75 lines covering a centered wordmark/tagline/badge header, a four-command Quick Start, one feature bullet list, and short Contributing/Security/License sections, with almost no verbose explanation anywhere. Its Quick Start is a strong minimal-friction example: four copy-pasteable shell lines (`git clone` → `cd` → `cp .env.example .env` → `docker compose up -d --build`) followed by a single sentence telling the user exactly where to look next ("Open `http://localhost:7000`... The first admin password is printed in `docker compose logs odysseus`"), answering the "now what?" question a lot of quick-starts leave hanging. The Features section is a flat bulleted list of bolded capability names each followed by a one-line elaboration, which is compact but gives no visual hierarchy or grouping despite covering eight fairly different feature areas (chat, research, documents, email, calendar). A nice practical touch is the explicit dev-vs-main branch callout in a blockquote right at the top of Quick Start, preempting confusion about which branch to clone. The Security section is short but directly actionable rather than boilerplate, naming three concrete precautions instead of a vague warning.
+
+**Quotes:**
+- "`dev` is the default branch and gets the newest changes first. Use `main` if you want the more curated branch."
+- "Keep auth enabled, keep private data out of Git, and do not expose raw model/service ports publicly."

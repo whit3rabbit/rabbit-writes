@@ -1,0 +1,284 @@
+{
+  "meta": {
+    "full_name": "obra/superpowers",
+    "html_url": "https://github.com/obra/superpowers",
+    "description": "An agentic skills framework & software development methodology that works.",
+    "stars_total": 269760,
+    "forks": 24120,
+    "watchers": 1025,
+    "created_at": "2025-10-09T19:45:18Z",
+    "pushed_at": "2026-08-08T01:45:49Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/obra__superpowers/README.md",
+    "readme_bytes": 10695,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 3348,
+    "est_stars_gained_1y": 13392,
+    "slug": "obra__superpowers"
+  },
+  "stats": {
+    "total_lines": 281,
+    "non_blank_lines": 172,
+    "total_chars": 10693,
+    "heading_count": 27,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "installation",
+      "architecture",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "other",
+      "license",
+      "other",
+      "support"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Superpowers",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Quickstart",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "How it works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Commercial Services",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Claude Code",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Official Marketplace",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Superpowers Marketplace",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Antigravity",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Codex App",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Codex CLI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Cursor",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Factory Droid",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Gemini CLI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "GitHub Copilot CLI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Kimi Code",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "OpenCode",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Pi",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "The Basic Workflow",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What's Inside",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Skills Library",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Philosophy",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Updating",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "Visual companion telemetry",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Community",
+        "category": "support"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        31,
+        29,
+        14,
+        7,
+        22,
+        29,
+        41,
+        25,
+        15,
+        6,
+        5,
+        6,
+        36,
+        30,
+        65,
+        163,
+        0,
+        86,
+        38,
+        10,
+        115
+      ],
+      "installation": [
+        34,
+        16
+      ],
+      "architecture": [
+        198
+      ],
+      "contributing": [
+        126
+      ],
+      "license": [
+        7
+      ],
+      "support": [
+        61
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 0,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 0,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 22,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 1,
+    "total_markdown_links": 22,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.36,
+    "internal_anchor_link_count": 11,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 18,
+    "code_block_languages": [
+      "bash",
+      "text"
+    ],
+    "avg_code_block_lines": 1.83,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 39,
+    "avg_paragraph_words": 24.62,
+    "median_paragraph_words": 18,
+    "sentence_count": 74,
+    "avg_sentence_words": 12.97,
+    "median_sentence_words": 12.0,
+    "stdev_sentence_words": 8.85,
+    "short_sentence_pct": 40.5,
+    "medium_sentence_pct": 40.5,
+    "long_sentence_pct": 18.9,
+    "total_prose_words": 1215,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": false
+  }
+}

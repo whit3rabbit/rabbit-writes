@@ -1,0 +1,339 @@
+{
+  "meta": {
+    "full_name": "mvanhorn/last30days-skill",
+    "html_url": "https://github.com/mvanhorn/last30days-skill",
+    "description": "AI agent skill that researches any topic across Reddit, X, YouTube, HN, Polymarket, and the web - then synthesizes a grounded summary",
+    "stars_total": 57766,
+    "forks": 5018,
+    "watchers": 215,
+    "created_at": "2026-01-23T20:37:37Z",
+    "pushed_at": "2026-08-09T18:44:11Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/mvanhorn__last30days-skill/README.md",
+    "readme_bytes": 32618,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1084,
+    "est_stars_gained_1y": 4336,
+    "slug": "mvanhorn__last30days-skill"
+  },
+  "stats": {
+    "total_lines": 382,
+    "non_blank_lines": 248,
+    "total_chars": 32580,
+    "heading_count": 34,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "features",
+      "other",
+      "other",
+      "changelog",
+      "other",
+      "api",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "configuration",
+      "demo",
+      "architecture",
+      "other",
+      "other",
+      "changelog"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "/last30days",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Why this exists",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Sources, scored by the people",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What people actually use it for",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What's new",
+        "category": "changelog"
+      },
+      {
+        "level": 3,
+        "text": "First-class on OpenAI Codex",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "arXiv, Techmeme, and Digg - free, no API keys",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "Free Reddit grew real scores and top comments",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "The best comments in every brief",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "One doctor command",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "X search, rebuilt",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "More sources joined",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Hardened by the community",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Reaches further",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Still in the box from v3",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Claude Code (recommended)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Grok (xAI Build CLI)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Codex, Cursor, Copilot, Gemini CLI, and other Agent Skills hosts",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "claude.ai (web)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Claude Desktop",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "OpenClaw",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Manual (developer)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Bring your own keys",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "macOS Keychain (optional)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Interactive setup \u2014 prompts for each known key, skip with empty input",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Or store a single key by hand",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Inspect / clean up",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 2,
+        "text": "Showcase: community research feeds",
+        "category": "demo"
+      },
+      {
+        "level": 2,
+        "text": "How it works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "What people are saying",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Open source",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        501,
+        404,
+        451,
+        70,
+        53,
+        53,
+        36,
+        54,
+        42,
+        79,
+        82,
+        90,
+        86,
+        195,
+        65,
+        211,
+        54,
+        68,
+        210,
+        35,
+        8,
+        85,
+        115,
+        69
+      ],
+      "features": [
+        131
+      ],
+      "changelog": [
+        31,
+        69
+      ],
+      "api": [
+        55
+      ],
+      "support": [
+        93
+      ],
+      "installation": [
+        130,
+        5
+      ],
+      "configuration": [
+        518
+      ],
+      "demo": [
+        62
+      ],
+      "architecture": [
+        185
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 2,
+    "uses_centering": true,
+    "image_count_total": 4,
+    "badge_count": 1,
+    "screenshot_or_logo_image_count": 3,
+    "gif_count": 1,
+    "has_video_embed": false,
+    "badges_in_header_block": 1,
+    "html_link_count": 3,
+    "inline_link_count": 54,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 54,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.91,
+    "internal_anchor_link_count": 1,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 14,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 2,
+    "table_row_count": 41,
+    "table_present": true,
+    "paragraph_count": 82,
+    "avg_paragraph_words": 40.21,
+    "median_paragraph_words": 36.0,
+    "sentence_count": 202,
+    "avg_sentence_words": 16.32,
+    "median_sentence_words": 13.0,
+    "stdev_sentence_words": 14.01,
+    "short_sentence_pct": 36.1,
+    "medium_sentence_pct": 41.6,
+    "long_sentence_pct": 22.3,
+    "total_prose_words": 3749,
+    "has_license_section_or_badge": false,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

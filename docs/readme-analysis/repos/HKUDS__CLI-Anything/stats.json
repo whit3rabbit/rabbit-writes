@@ -1,0 +1,887 @@
+{
+  "meta": {
+    "full_name": "HKUDS/CLI-Anything",
+    "html_url": "https://github.com/HKUDS/CLI-Anything",
+    "description": "\"CLI-Anything: Making ALL Software Agent-Native\" -- CLI-Hub: https://clianything.cc/",
+    "stars_total": 46819,
+    "forks": 4359,
+    "watchers": 178,
+    "created_at": "2026-03-08T13:52:57Z",
+    "pushed_at": "2026-08-03T09:29:17Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/HKUDS__CLI-Anything/README.md",
+    "readme_bytes": 79083,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 642,
+    "est_stars_gained_1y": 2568,
+    "slug": "HKUDS__CLI-Anything"
+  },
+  "stats": {
+    "total_lines": 1754,
+    "non_blank_lines": 1309,
+    "total_chars": 77079,
+    "heading_count": 111,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "features",
+      "installation",
+      "features",
+      "installation",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "features",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "testing",
+      "architecture",
+      "other",
+      "demo",
+      "demo",
+      "demo",
+      "other",
+      "other",
+      "other",
+      "other",
+      "demo",
+      "other",
+      "testing",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "architecture",
+      "other",
+      "other",
+      "examples",
+      "other",
+      "other",
+      "other",
+      "other",
+      "testing",
+      "other",
+      "demo",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "testing",
+      "testing",
+      "installation",
+      "contributing",
+      "other",
+      "roadmap",
+      "api",
+      "changelog",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "\ud83d\udcf0 News",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd14 Why CLI?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Browse what is available",
+        "category": "features"
+      },
+      {
+        "level": 1,
+        "text": "Install and try a CLI immediately",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Pick Your Agent Platform",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Add the CLI-Anything marketplace",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install the cli-anything plugin from the marketplace",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "/cli-anything <software-path-or-repo>",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Generate a complete CLI for GIMP (all 7 phases)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Broad refinement \u2014 agent analyzes gaps across all capabilities",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Focused refinement \u2014 target a specific functionality area",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Clone the repo",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Copy plugin to Claude Code plugins directory",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Reload plugins",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Clone the repo",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install globally into Pi's extensions directory",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Generate a complete CLI for GIMP (all 7 phases)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Build from a GitHub repo",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Broad refinement \u2014 agent analyzes gaps across all capabilities",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Focused refinement \u2014 target a specific functionality area",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Clone the repo",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Global install (available in all projects)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Or project-level install",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Generate a complete CLI for GIMP (all 7 phases)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Build from a GitHub repo",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Broad refinement \u2014 agent analyzes gaps across all capabilities",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Focused refinement \u2014 target a specific functionality area",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Clone the repo",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install to the global skills folder",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Clone the repo",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install the skill",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Clone the repo",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install the skill",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Clone the repo",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install the skill",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Use the Generated CLI",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install to PATH",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Use from anywhere",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Enter interactive REPL",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd16 Empower Your Agents with CLI-Hub",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udca1 CLI-Anything's Vision: Building Agent-Native Software",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd27 When to Use CLI-Anything",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "CLI-Anything's Key Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "The Agent-Software Gap",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfaf What Can You Do with CLI-Anything?",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udee0\ufe0f Let Agents Take Your Workflows",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd17 Unify Scattered APIs into One CLI",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\ude80 Replace or Supercharge GUI Agents",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u2728 \u2699\ufe0f How CLI-Anything Works",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfd7\ufe0f Fully Automated 7-Phase Pipeline",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfaf Authentic Software Integration",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd01 Smart Session Management",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udce6 Zero-Config Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\uddea Production-Grade Testing",
+        "category": "testing"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udc0d Clean Package Architecture",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udd16 SKILL.md Generation",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfac Real-World Demos",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "FreeCAD &mdash; Curiosity Rover via Preview, Live Preview, and Trajectory",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "Blender &mdash; Orbital Relay Drone via Preview, Live Preview, and Trajectory",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "Draw.io &mdash; HTTPS Handshake Diagram",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Slay the Spire II &mdash; Game Automation",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "VideoCaptioner &mdash; Auto-Generated Subtitles",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "ArcGIS Pro &mdash; Live Agent Cartography via the MCP Bridge",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfac Demonstrations",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfaf General-Purpose",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfed Professional-Grade Testing",
+        "category": "testing"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfa8 Diverse Domain Coverage",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u2705 Full CLI Generation",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcca Test Results",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfd7\ufe0f CLI-Anything's Architecture",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfaf Core Design Principles",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc2 Project Structure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfaf Plugin Commands",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Examples",
+        "category": "examples"
+      },
+      {
+        "level": 1,
+        "text": "Build a complete CLI for GIMP from local source",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Build from a GitHub repo",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Refine an existing harness \u2014 broad gap analysis",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Refine with a specific focus area",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Run tests and update TEST.md",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Validate against HARNESS.md standards",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfae Demo: Using a Generated CLI",
+        "category": "demo"
+      },
+      {
+        "level": 1,
+        "text": "Create a new Writer document",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Add content",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Export to real PDF via LibreOffice headless",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "JSON mode for agent consumption",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "REPL Mode",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcd6 The Standard Playbook: HARNESS.md",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Critical Lessons",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udce6 Installation & Usage",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "For CLI-Hub Users",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install the package manager",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Browse, search, inspect, and install CLIs",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Manage installed CLIs",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "For Plugin Users (Claude Code)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Add marketplace & install (recommended)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Build a CLI for any software with a codebase",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "For Generated CLIs",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install any generated CLI",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Verify",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Use",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Running Tests",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Run tests for a specific CLI",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Force-installed mode (recommended for validation)",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd1d Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 3,
+        "text": "Limitations",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Roadmap",
+        "category": "roadmap"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcd6 Documentation",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "\u2b50 Star History",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcda Citation",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc4 License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        1311,
+        28,
+        6,
+        0,
+        3,
+        3,
+        14,
+        8,
+        7,
+        2,
+        10,
+        2,
+        7,
+        3,
+        8,
+        8,
+        2,
+        7,
+        2,
+        44,
+        8,
+        8,
+        8,
+        8,
+        17,
+        22,
+        63,
+        64,
+        34,
+        375,
+        129,
+        5,
+        47,
+        47,
+        5,
+        24,
+        31,
+        24,
+        146,
+        87,
+        60,
+        90,
+        155,
+        14,
+        18,
+        1636,
+        83,
+        25,
+        43,
+        4,
+        6,
+        5,
+        9,
+        5,
+        13,
+        29,
+        19,
+        18,
+        0,
+        39,
+        147,
+        1,
+        1,
+        2,
+        1,
+        3,
+        15,
+        105,
+        10
+      ],
+      "features": [
+        70,
+        5,
+        0
+      ],
+      "installation": [
+        132,
+        118,
+        4,
+        13,
+        15,
+        14,
+        16,
+        52,
+        35,
+        116,
+        6,
+        27,
+        0,
+        3,
+        11,
+        10,
+        8,
+        6,
+        10
+      ],
+      "api": [
+        50,
+        67
+      ],
+      "testing": [
+        25,
+        34,
+        5,
+        1,
+        10
+      ],
+      "architecture": [
+        17,
+        14,
+        137
+      ],
+      "demo": [
+        13,
+        99,
+        116,
+        0,
+        9
+      ],
+      "examples": [
+        1
+      ],
+      "contributing": [
+        64
+      ],
+      "roadmap": [
+        57
+      ],
+      "changelog": [
+        74
+      ],
+      "license": [
+        79
+      ]
+    },
+    "preamble_word_count": 512,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 20,
+    "uses_centering": true,
+    "image_count_total": 29,
+    "badge_count": 14,
+    "screenshot_or_logo_image_count": 15,
+    "gif_count": 6,
+    "has_video_embed": false,
+    "badges_in_header_block": 2,
+    "html_link_count": 42,
+    "inline_link_count": 45,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 45,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.62,
+    "internal_anchor_link_count": 12,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 45,
+    "code_block_languages": [
+      "bash",
+      "bibtex",
+      "powershell",
+      "text"
+    ],
+    "avg_code_block_lines": 7.42,
+    "table_row_count": 71,
+    "table_present": true,
+    "paragraph_count": 246,
+    "avg_paragraph_words": 21.06,
+    "median_paragraph_words": 9.0,
+    "sentence_count": 270,
+    "avg_sentence_words": 19.19,
+    "median_sentence_words": 10.0,
+    "stdev_sentence_words": 97.44,
+    "short_sentence_pct": 48.5,
+    "medium_sentence_pct": 32.2,
+    "long_sentence_pct": 19.3,
+    "total_prose_words": 7050,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

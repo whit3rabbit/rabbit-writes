@@ -1,0 +1,375 @@
+{
+  "meta": {
+    "full_name": "colbymchenry/codegraph",
+    "html_url": "https://github.com/colbymchenry/codegraph",
+    "description": "Pre-indexed code knowledge graph, auto syncs on code changes, for Claude Code, Codex, Gemini, Cursor, OpenCode, AntiGravity, Kiro, and Hermes Agent \u2014 fewer tokens, fewer tool calls, 100% local",
+    "stars_total": 65586,
+    "forks": 4129,
+    "watchers": 148,
+    "created_at": "2026-01-18T21:45:37Z",
+    "pushed_at": "2026-08-08T02:56:05Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/colbymchenry__codegraph/README.md",
+    "readme_bytes": 63459,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 3401,
+    "est_stars_gained_1y": 13604,
+    "slug": "colbymchenry__codegraph"
+  },
+  "stats": {
+    "total_lines": 869,
+    "non_blank_lines": 655,
+    "total_chars": 62486,
+    "heading_count": 38,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "api",
+      "toc",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "support",
+      "features",
+      "performance",
+      "other",
+      "features",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "usage",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "support",
+      "support",
+      "support",
+      "other",
+      "faq",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "CodeGraph",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Supercharge Claude Code, Cursor, Codex, OpenCode, Hermes Agent, Gemini, Antigravity, Kiro, and GitHub Copilot with Semantic Code Intelligence",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "[Documentation & Website \u2192](https://colbymchenry.github.io/codegraph/)",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Contents",
+        "category": "toc"
+      },
+      {
+        "level": 2,
+        "text": "Get Started",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "1. Install the CLI",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "macOS / Linux",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Windows (PowerShell)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "2. Wire up your agent(s)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "3. Initialize each project",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "4. No more syncing!",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Uninstall",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Language Support",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Why CodeGraph?",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Benchmark Results",
+        "category": "performance"
+      },
+      {
+        "level": 2,
+        "text": "Built for speed \u2014 the Rust kernel",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Key Features",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Framework-aware Routes",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Mixed iOS / React Native / Expo bridging",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "1. Run the Installer",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "2. Restart Your Agent",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "3. Initialize Projects",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How It Works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "CLI Reference",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "`codegraph affected`",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "MCP Tools",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Library Usage",
+        "category": "usage"
+      },
+      {
+        "level": 2,
+        "text": "Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Custom file extensions",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Telemetry",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Verified releases",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Supported Platforms",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Supported Agents",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Supported Languages",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Measured cross-file coverage",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Troubleshooting",
+        "category": "faq"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        15,
+        59,
+        0,
+        12,
+        97,
+        107,
+        32,
+        40,
+        326,
+        191,
+        416,
+        34,
+        324,
+        0,
+        59,
+        242,
+        120,
+        89,
+        110,
+        306
+      ],
+      "api": [
+        261
+      ],
+      "toc": [
+        62
+      ],
+      "installation": [
+        14,
+        89,
+        0,
+        204
+      ],
+      "support": [
+        756,
+        58,
+        59,
+        692
+      ],
+      "features": [
+        405,
+        563
+      ],
+      "performance": [
+        908
+      ],
+      "architecture": [
+        120
+      ],
+      "usage": [
+        150
+      ],
+      "configuration": [
+        292
+      ],
+      "faq": [
+        430
+      ],
+      "license": [
+        42
+      ]
+    },
+    "preamble_word_count": 3,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 4,
+    "uses_centering": true,
+    "image_count_total": 55,
+    "badge_count": 17,
+    "screenshot_or_logo_image_count": 38,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 1,
+    "html_link_count": 2,
+    "inline_link_count": 65,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 1,
+    "total_markdown_links": 65,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.82,
+    "internal_anchor_link_count": 25,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 23,
+    "code_block_languages": [
+      "bash",
+      "json",
+      "typescript"
+    ],
+    "avg_code_block_lines": 5.43,
+    "table_row_count": 157,
+    "table_present": true,
+    "paragraph_count": 127,
+    "avg_paragraph_words": 34.48,
+    "median_paragraph_words": 19,
+    "sentence_count": 193,
+    "avg_sentence_words": 22.69,
+    "median_sentence_words": 15,
+    "stdev_sentence_words": 52.64,
+    "short_sentence_pct": 27.5,
+    "medium_sentence_pct": 36.3,
+    "long_sentence_pct": 36.3,
+    "total_prose_words": 5486,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "full_name": "CloakHQ/CloakBrowser",
+  "html_url": "https://github.com/CloakHQ/CloakBrowser",
+  "description": "Stealth Chromium that passes every bot detection test. Drop-in Playwright replacement with source-level fingerprint patches. 30/30 tests passed.",
+  "stars_total": 29802,
+  "forks": 2449,
+  "watchers": 140,
+  "created_at": "2026-02-22T08:09:57Z",
+  "pushed_at": "2026-08-09T20:13:15Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/CloakHQ__CloakBrowser/README.md",
+  "readme_bytes": 68695,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 1813,
+  "est_stars_gained_1y": 7252,
+  "slug": "CloakHQ__CloakBrowser"
+}

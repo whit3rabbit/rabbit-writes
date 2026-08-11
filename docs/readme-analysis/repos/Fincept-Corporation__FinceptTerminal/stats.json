@@ -1,0 +1,275 @@
+{
+  "meta": {
+    "full_name": "Fincept-Corporation/FinceptTerminal",
+    "html_url": "https://github.com/Fincept-Corporation/FinceptTerminal",
+    "description": "FinceptTerminal is a modern finance application offering advanced market analytics, investment research, and economic data tools, designed for interactive exploration and data-driven decision-making in a user-friendly environment.",
+    "stars_total": 30061,
+    "forks": 4241,
+    "watchers": 162,
+    "created_at": "2024-08-29T14:38:08Z",
+    "pushed_at": "2026-07-25T20:22:10Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/Fincept-Corporation__FinceptTerminal/README.md",
+    "readme_bytes": 19936,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 567,
+    "est_stars_gained_1y": 2268,
+    "slug": "Fincept-Corporation__FinceptTerminal"
+  },
+  "stats": {
+    "total_lines": 306,
+    "non_blank_lines": 212,
+    "total_chars": 19778,
+    "heading_count": 26,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "features",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "roadmap",
+      "contributing",
+      "other",
+      "license",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Fincept Terminal",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "**Your Thinking is the Only Limit. The Data Isn't.**",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "About",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Option 1 \u2014 Download Installer (Recommended)",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Option 2 \u2014 Quick Start (One-Click Build)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Linux / macOS",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Option 3 \u2014 Docker (CI / Developer Environments)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Build from source (Linux + X11 required)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Option 4 \u2014 Build from Source (Manual)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Prerequisites (exact versions)",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Install Qt 6.8.3",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Build (using CMake presets \u2014 recommended)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Build (manual \u2014 if presets can't resolve your Qt path)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Windows (PowerShell)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Linux",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "macOS",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Run",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Troubleshooting",
+        "category": "faq"
+      },
+      {
+        "level": 2,
+        "text": "What Sets Us Apart",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Roadmap",
+        "category": "roadmap"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "For Universities & Educators",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      },
+      {
+        "level": 3,
+        "text": "**Your Thinking is the Only Limit. The Data Isn't.**",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        374,
+        230,
+        32,
+        44,
+        36,
+        26,
+        23,
+        95,
+        1,
+        20,
+        19,
+        22,
+        0,
+        134,
+        57,
+        96
+      ],
+      "features": [
+        156
+      ],
+      "installation": [
+        1,
+        142,
+        16,
+        91,
+        75
+      ],
+      "faq": [
+        69
+      ],
+      "roadmap": [
+        40
+      ],
+      "contributing": [
+        52
+      ],
+      "license": [
+        373
+      ]
+    },
+    "preamble_word_count": 68,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 3,
+    "uses_centering": true,
+    "image_count_total": 26,
+    "badge_count": 17,
+    "screenshot_or_logo_image_count": 9,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 8,
+    "html_link_count": 6,
+    "inline_link_count": 44,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 44,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.7,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 8,
+    "code_block_languages": [
+      "bash",
+      "powershell"
+    ],
+    "avg_code_block_lines": 4.12,
+    "table_row_count": 36,
+    "table_present": true,
+    "paragraph_count": 52,
+    "avg_paragraph_words": 19.87,
+    "median_paragraph_words": 9.0,
+    "sentence_count": 53,
+    "avg_sentence_words": 19.49,
+    "median_sentence_words": 14,
+    "stdev_sentence_words": 24.37,
+    "short_sentence_pct": 34.0,
+    "medium_sentence_pct": 39.6,
+    "long_sentence_pct": 26.4,
+    "total_prose_words": 1476,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

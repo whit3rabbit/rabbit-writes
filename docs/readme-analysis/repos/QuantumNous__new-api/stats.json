@@ -1,0 +1,380 @@
+{
+  "meta": {
+    "full_name": "QuantumNous/new-api",
+    "html_url": "https://github.com/QuantumNous/new-api",
+    "description": "A unified AI model hub for aggregation & distribution. It supports cross-converting various LLMs into OpenAI-compatible, Claude-compatible, or Gemini-compatible formats. A centralized gateway for personal and enterprise model management. \ud83c\udf65",
+    "stars_total": 44750,
+    "forks": 10568,
+    "watchers": 142,
+    "created_at": "2023-11-10T19:33:36Z",
+    "pushed_at": "2026-08-09T12:31:14Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/QuantumNous__new-api/README.md",
+    "readme_bytes": 21739,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 551,
+    "est_stars_gained_1y": 2204,
+    "slug": "QuantumNous__new-api"
+  },
+  "stats": {
+    "total_lines": 511,
+    "non_blank_lines": 377,
+    "total_chars": 21432,
+    "heading_count": 39,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "api",
+      "other",
+      "other",
+      "credits",
+      "installation",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "api",
+      "features",
+      "other",
+      "usage",
+      "security",
+      "features",
+      "support",
+      "support",
+      "other",
+      "installation",
+      "configuration",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "related",
+      "other",
+      "support",
+      "support",
+      "api",
+      "other",
+      "license",
+      "changelog",
+      "api"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "New API",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcdd Project Description",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd1d Trusted Partners",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude4f Special Thanks",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Using Docker Compose (Recommended)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Clone the project",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Edit docker-compose.yml configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Start the service",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Pull the latest image",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Using SQLite (default)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Using MySQL",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcda Documentation",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcd6 [Official Documentation](https://docs.newapi.pro/en/docs) | [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/QuantumNous/new-api)",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "\u2728 Key Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfa8 Core Functions",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcb0 Authorized Usage Accounting and Billing",
+        "category": "usage"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd10 Authorization and Security",
+        "category": "security"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\ude80 Advanced Features",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd16 Model Support",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udce1 Supported Interfaces",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udea2 Deployment",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udccb Deployment Requirements",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "\u2699\ufe0f Environment Variable Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd27 Deployment Methods",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Clone the project",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Edit configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Start service",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u26a0\ufe0f Multi-machine Deployment Considerations",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd04 Channel Retry and Cache",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd17 Related Projects",
+        "category": "related"
+      },
+      {
+        "level": 3,
+        "text": "Upstream Projects",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Supporting Tools",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcac Help Support",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcd6 Documentation Resources",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udd1d Contribution Guide",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcdc License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf1f Star History",
+        "category": "changelog"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udc96 Thank you for using New API",
+        "category": "api"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "api": [
+        274,
+        3,
+        62,
+        46,
+        44
+      ],
+      "other": [
+        102,
+        135,
+        1,
+        10,
+        4,
+        5,
+        20,
+        121,
+        42,
+        7,
+        11,
+        10,
+        117,
+        226,
+        19,
+        21,
+        14
+      ],
+      "credits": [
+        60
+      ],
+      "installation": [
+        0,
+        36
+      ],
+      "configuration": [
+        3,
+        333,
+        3
+      ],
+      "features": [
+        18,
+        206
+      ],
+      "usage": [
+        40
+      ],
+      "security": [
+        23
+      ],
+      "support": [
+        138,
+        144,
+        23,
+        0
+      ],
+      "related": [
+        0
+      ],
+      "license": [
+        131
+      ],
+      "changelog": [
+        26
+      ]
+    },
+    "preamble_word_count": 8,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 12,
+    "uses_centering": true,
+    "image_count_total": 17,
+    "badge_count": 4,
+    "screenshot_or_logo_image_count": 13,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 1,
+    "html_link_count": 24,
+    "inline_link_count": 53,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 53,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.25,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 5,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 9.2,
+    "table_row_count": 77,
+    "table_present": true,
+    "paragraph_count": 73,
+    "avg_paragraph_words": 15,
+    "median_paragraph_words": 6,
+    "sentence_count": 63,
+    "avg_sentence_words": 17.38,
+    "median_sentence_words": 9,
+    "stdev_sentence_words": 24.32,
+    "short_sentence_pct": 54.0,
+    "medium_sentence_pct": 19.0,
+    "long_sentence_pct": 27.0,
+    "total_prose_words": 1609,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

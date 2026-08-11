@@ -1,0 +1,356 @@
+{
+  "meta": {
+    "full_name": "harry0703/MoneyPrinterTurbo",
+    "html_url": "https://github.com/harry0703/MoneyPrinterTurbo",
+    "description": "\u5229\u7528 AI \u5927\u6a21\u578b\u548c\u81ea\u52a8\u5316\u5de5\u4f5c\u6d41\uff0c\u6839\u636e\u4e3b\u9898\u6216\u5173\u952e\u8bcd\u4e00\u952e\u751f\u6210\u9ad8\u6e05\u77ed\u89c6\u9891\u3002Generate HD short videos from a topic or keyword with an automated AI workflow.",
+    "stars_total": 102345,
+    "forks": 15434,
+    "watchers": 649,
+    "created_at": "2024-03-11T02:57:34Z",
+    "pushed_at": "2026-08-07T04:44:30Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/harry0703__MoneyPrinterTurbo/README.md",
+    "readme_bytes": 29240,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1246,
+    "est_stars_gained_1y": 4984,
+    "slug": "harry0703__MoneyPrinterTurbo"
+  },
+  "stats": {
+    "total_lines": 515,
+    "non_blank_lines": 371,
+    "total_chars": 22592,
+    "heading_count": 39,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4,
+      6
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "changelog"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "MoneyPrinterTurbo \ud83d\udcb8",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u4e00\u7ad9\u5f0f AI \u77ed\u89c6\u9891\u751f\u6210\u5de5\u5177",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u754c\u9762\u9884\u89c8 \ud83d\udda5\ufe0f",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u7279\u522b\u611f\u8c22 \u2764\ufe0f",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u4f5c\u8005\u7684\u53e6\u4e00\u4e2a\u5f00\u6e90\u9879\u76ee\uff1aMangoDisk \u2b50",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u529f\u80fd\u7279\u6027 \ud83c\udfaf",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u4f5c\u54c1\u5c55\u793a \ud83c\udfac",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u7ad6\u5c4f 9:16",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u6a2a\u5c4f 16:9",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u914d\u7f6e\u8981\u6c42 \ud83d\udce6",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5feb\u901f\u5f00\u59cb \ud83d\ude80",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u63a8\u8350\u4f7f\u7528\u65b9\u5f0f",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u4f7f\u7528 AI Agent \u751f\u6210\u89c6\u9891",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u5728 Google Colab \u4e2d\u8fd0\u884c",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Windows \u4e00\u952e\u542f\u52a8\u5305",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5b89\u88c5\u90e8\u7f72 \ud83d\udce5",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u524d\u63d0\u6761\u4ef6",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u2460 \u514b\u9686\u4ee3\u7801",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u2461 \u914d\u7f6e\u9879\u76ee\uff08\u53ef\u9009\uff09",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Docker \u90e8\u7f72 \ud83d\udc33",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u2460 \u542f\u52a8 Docker",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u2461 \u8bbf\u95ee WebUI",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u2462 \u8bbf\u95ee API \u6587\u6863",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "\u624b\u52a8\u90e8\u7f72 \ud83d\udce6",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u2460 \u521b\u5efa\u865a\u62df\u73af\u5883",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u2461 \u542f\u52a8 WebUI \ud83c\udf10",
+        "category": "other"
+      },
+      {
+        "level": 6,
+        "text": "Windows",
+        "category": "other"
+      },
+      {
+        "level": 6,
+        "text": "macOS \u6216 Linux",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u2462 \u542f\u52a8 API \u670d\u52a1 \ud83d\ude80",
+        "category": "api"
+      },
+      {
+        "level": 4,
+        "text": "\u2463 \u7eaf\u547d\u4ee4\u884c\u65b9\u5f0f\uff08\u65e0\u6d4f\u89c8\u5668\uff09\u2328\ufe0f",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u8bed\u97f3\u5408\u6210 \ud83d\udde3",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5b57\u5e55\u751f\u6210 \ud83d\udcdc",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u80cc\u666f\u97f3\u4e50 \ud83c\udfb5",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5b57\u5e55\u5b57\u4f53 \ud83c\udd70",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5e38\u89c1\u95ee\u9898 \ud83e\udd14",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\u8bf7\u6839\u636e\u4f60\u7684\u5b9e\u9645\u8def\u5f84\u8bbe\u7f6e\uff0c\u6ce8\u610f Windows \u8def\u5f84\u5206\u9694\u7b26\u4e3a \\\\",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u53cd\u9988\u5efa\u8bae \ud83d\udce2",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u8bb8\u53ef\u8bc1 \ud83d\udcdd",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        0,
+        166,
+        16,
+        772,
+        85,
+        129,
+        3,
+        364,
+        364,
+        67,
+        0,
+        19,
+        19,
+        30,
+        34,
+        0,
+        8,
+        0,
+        16,
+        0,
+        58,
+        8,
+        15,
+        40,
+        5,
+        31,
+        13,
+        6,
+        53,
+        61,
+        11,
+        6,
+        64,
+        129,
+        17,
+        4
+      ],
+      "api": [
+        17,
+        2
+      ],
+      "changelog": [
+        76
+      ]
+    },
+    "preamble_word_count": 3,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 7,
+    "uses_centering": true,
+    "image_count_total": 35,
+    "badge_count": 4,
+    "screenshot_or_logo_image_count": 31,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 4,
+    "html_link_count": 48,
+    "inline_link_count": 22,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 14,
+    "total_markdown_links": 22,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.55,
+    "internal_anchor_link_count": 1,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 21,
+    "code_block_languages": [
+      "powershell",
+      "shell",
+      "text",
+      "toml"
+    ],
+    "avg_code_block_lines": 2.52,
+    "table_row_count": 5,
+    "table_present": true,
+    "paragraph_count": 67,
+    "avg_paragraph_words": 32.69,
+    "median_paragraph_words": 8,
+    "sentence_count": 65,
+    "avg_sentence_words": 33.69,
+    "median_sentence_words": 8,
+    "stdev_sentence_words": 100.46,
+    "short_sentence_pct": 55.4,
+    "medium_sentence_pct": 24.6,
+    "long_sentence_pct": 20.0,
+    "total_prose_words": 2525,
+    "has_license_section_or_badge": false,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": false,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

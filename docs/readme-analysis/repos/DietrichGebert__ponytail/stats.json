@@ -1,0 +1,275 @@
+{
+  "meta": {
+    "full_name": "DietrichGebert/ponytail",
+    "html_url": "https://github.com/DietrichGebert/ponytail",
+    "description": "Makes your AI agent think like the laziest senior dev in the room. The best code is the code you never wrote.",
+    "stars_total": 99405,
+    "forks": 5468,
+    "watchers": 246,
+    "created_at": "2026-06-12T00:52:37Z",
+    "pushed_at": "2026-08-07T21:44:01Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/DietrichGebert__ponytail/README.md",
+    "readme_bytes": 20888,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1833,
+    "est_stars_gained_1y": 7332,
+    "slug": "DietrichGebert__ponytail"
+  },
+  "stats": {
+    "total_lines": 369,
+    "non_blank_lines": 246,
+    "total_chars": 20853,
+    "heading_count": 25,
+    "heading_levels_used": [
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "architecture",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "faq",
+      "sponsors",
+      "license",
+      "changelog"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Before / after",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Numbers",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How it works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Claude Code",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Codex",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "GitHub Copilot CLI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Pi agent harness",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "OpenCode",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Gemini CLI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Qoder",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Antigravity CLI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Hermes Agent",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "CodeWhale",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Swival",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Devin CLI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "OpenClaw",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Grok Build",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Uninstall",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Commands",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Development",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "FAQ",
+        "category": "faq"
+      },
+      {
+        "level": 2,
+        "text": "Sponsors",
+        "category": "sponsors"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      }
+    ],
+    "has_h1": false,
+    "section_word_counts": {
+      "other": [
+        30,
+        414,
+        56,
+        37,
+        20,
+        0,
+        90,
+        48,
+        140,
+        80,
+        48,
+        28,
+        46,
+        17,
+        51,
+        504,
+        123,
+        87
+      ],
+      "architecture": [
+        63
+      ],
+      "installation": [
+        62,
+        145
+      ],
+      "faq": [
+        119
+      ],
+      "sponsors": [
+        29
+      ],
+      "license": [
+        7
+      ],
+      "changelog": [
+        60
+      ]
+    },
+    "preamble_word_count": 418,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 11,
+    "uses_centering": true,
+    "image_count_total": 13,
+    "badge_count": 5,
+    "screenshot_or_logo_image_count": 8,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 5,
+    "html_link_count": 9,
+    "inline_link_count": 23,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 23,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.96,
+    "internal_anchor_link_count": 3,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 20,
+    "code_block_languages": [
+      "bash",
+      "html",
+      "json",
+      "text",
+      "toml"
+    ],
+    "avg_code_block_lines": 1.75,
+    "table_row_count": 21,
+    "table_present": true,
+    "paragraph_count": 78,
+    "avg_paragraph_words": 32.97,
+    "median_paragraph_words": 25.0,
+    "sentence_count": 147,
+    "avg_sentence_words": 17.5,
+    "median_sentence_words": 14,
+    "stdev_sentence_words": 15.0,
+    "short_sentence_pct": 32.7,
+    "medium_sentence_pct": 37.4,
+    "long_sentence_pct": 29.9,
+    "total_prose_words": 2572,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

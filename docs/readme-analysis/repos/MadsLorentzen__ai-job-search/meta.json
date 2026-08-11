@@ -1,0 +1,19 @@
+{
+  "full_name": "MadsLorentzen/ai-job-search",
+  "html_url": "https://github.com/MadsLorentzen/ai-job-search",
+  "description": "The job search that runs on your machine. AI job application framework built on Claude Code: evaluate postings, tailor CVs, write cover letters, prep interviews. Fork it and own it.",
+  "stars_total": 30982,
+  "forks": 10610,
+  "watchers": 118,
+  "created_at": "2026-03-18T14:33:04Z",
+  "pushed_at": "2026-08-09T18:28:38Z",
+  "default_branch": "master",
+  "readme_branch_used": "master",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/MadsLorentzen__ai-job-search/README.md",
+  "readme_bytes": 32435,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 340,
+  "est_stars_gained_1y": 1360,
+  "slug": "MadsLorentzen__ai-job-search"
+}

@@ -1,0 +1,751 @@
+{
+  "meta": {
+    "full_name": "K-Dense-AI/scientific-agent-skills",
+    "html_url": "https://github.com/K-Dense-AI/scientific-agent-skills",
+    "description": "Turn any AI agent into an AI Scientist. The #1 Agent Skills library for science, used by 170,000+ scientists worldwide. 158 ready-to-use skills plus 100+ scientific databases covering biology, chemistry, medicine, and drug discovery. Compatible with Cursor, Claude Code, Codex, Pi, Antigravity, and the open Agent Skills standard.",
+    "stars_total": 33064,
+    "forks": 3251,
+    "watchers": 155,
+    "created_at": "2025-10-19T20:54:15Z",
+    "pushed_at": "2026-08-09T04:19:29Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/K-Dense-AI__scientific-agent-skills/README.md",
+    "readme_bytes": 65322,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 679,
+    "est_stars_gained_1y": 2716,
+    "slug": "K-Dense-AI__scientific-agent-skills"
+  },
+  "stats": {
+    "total_lines": 895,
+    "non_blank_lines": 662,
+    "total_chars": 64875,
+    "heading_count": 94,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "changelog",
+      "other",
+      "toc",
+      "features",
+      "other",
+      "other",
+      "other",
+      "support",
+      "installation",
+      "support",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "security",
+      "support",
+      "credits",
+      "installation",
+      "installation",
+      "usage",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "performance",
+      "security",
+      "other",
+      "contributing",
+      "contributing",
+      "contributing",
+      "other",
+      "testing",
+      "other",
+      "other",
+      "other",
+      "security",
+      "other",
+      "support",
+      "faq",
+      "other",
+      "faq",
+      "other",
+      "installation",
+      "contributing",
+      "support",
+      "other",
+      "other",
+      "other",
+      "license",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Scientific Agent Skills",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udce6 What's Included",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udccb Table of Contents",
+        "category": "toc"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 Why Use This?",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "\u26a1 **Accelerate Your Research**",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfaf **Comprehensive Coverage**",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd27 **Easy Integration**",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udf1f **Maintained & Supported**",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfaf Getting Started",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Option 1: npx (supported hosts)",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Option 2: GitHub CLI (`gh skill`)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Browse and install interactively",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Install a specific skill directly",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Target a specific agent host",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Version pinning",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Pin to a release tag",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Pin to a commit SHA",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Keeping skills up to date",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Check for updates interactively",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Update all installed skills",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Other Agent Skills hosts (OpenClaw, NemoClaw, Pi, Hermes, \u2026)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u26a0\ufe0f Security Disclaimer",
+        "category": "security"
+      },
+      {
+        "level": 2,
+        "text": "\u2764\ufe0f Support the Open Source Community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude4f Skill Credits",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "\u2699\ufe0f Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Installing uv",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udca1 Quick Examples",
+        "category": "usage"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\uddea Drug Discovery Pipeline",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd2c Single-Cell RNA-seq Analysis",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\uddec Multi-Omics Biomarker Discovery",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfaf Virtual Screening Campaign",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfe5 Research Variant Evidence Review",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udf10 Systems Biology Network Analysis",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd2c Use Cases",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\uddea Drug Discovery & Medicinal Chemistry",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\uddec Bioinformatics & Genomics",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfe5 Clinical Research & Evidence Workflows",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd2c Multi-Omics & Systems Biology",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcca Data Analysis & Visualization",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\uddea Laboratory Automation",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcda Available Skills",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Skill Categories",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83e\uddec **Bioinformatics & Genomics** (26 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83e\uddea **Cheminformatics & Drug Discovery** (10 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83d\udd2c **Proteomics & Mass Spectrometry** (2 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83c\udfe5 **Clinical Research & Evidence Workflows** (8 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83d\uddbc\ufe0f **Medical Imaging & Digital Pathology** (4 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83e\udde0 **Neuroscience & Electrophysiology** (3 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83e\udd16 **Machine Learning & AI** (14 core skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83d\udd2e **Materials Science, Chemistry & Physics** (7 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u2699\ufe0f **Engineering & Simulation** (5 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83d\udcca **Data Analysis & Visualization** (22 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83e\uddea **Laboratory Automation** (6 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83d\udd2c **Multi-omics & Systems Biology** (3 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83e\uddec **Protein Engineering & Design** (4 skills)",
+        "category": "architecture"
+      },
+      {
+        "level": 4,
+        "text": "\ud83d\udcda **Scientific Communication** (27 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83d\udd2c **Scientific Databases & Data Access** (11 skills \u2192 100+ databases total)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83d\udd27 **Infrastructure & Platforms** (11 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83c\udf93 **Research Methodology & Planning** (13 skills)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u2696\ufe0f **Regulatory & Standards** (2 skills)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcdd From the Blog",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Start here",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Skill benchmarks and deep dives",
+        "category": "performance"
+      },
+      {
+        "level": 3,
+        "text": "Security and safe deployment",
+        "category": "security"
+      },
+      {
+        "level": 3,
+        "text": "Complementary open-source projects",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd1d Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 3,
+        "text": "Ways to Contribute",
+        "category": "contributing"
+      },
+      {
+        "level": 3,
+        "text": "How to Contribute",
+        "category": "contributing"
+      },
+      {
+        "level": 3,
+        "text": "Contribution Guidelines",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Testing",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Structural contract and coverage guard \u2014 seconds, no scientific packages needed",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "One skill's suite",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Every suite, each in its own throwaway environment",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Security Scanning",
+        "category": "security"
+      },
+      {
+        "level": 3,
+        "text": "Recognition",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Support Open Source",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd27 Troubleshooting",
+        "category": "faq"
+      },
+      {
+        "level": 3,
+        "text": "Common Issues",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u2753 FAQ",
+        "category": "faq"
+      },
+      {
+        "level": 3,
+        "text": "General Questions",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Installation & Setup",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcac Support",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcd6 Citation",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Collection Citation",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "BibTeX",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "APA",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "MLA",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Plain Text",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Individual Skill Citation",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc4 License",
+        "category": "license"
+      },
+      {
+        "level": 3,
+        "text": "Key Points:",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Individual Skill Licenses",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        156,
+        321,
+        38,
+        73,
+        37,
+        26,
+        48,
+        13,
+        9,
+        7,
+        1,
+        3,
+        229,
+        18,
+        19,
+        18,
+        17,
+        22,
+        40,
+        0,
+        58,
+        165,
+        129,
+        36,
+        55,
+        44,
+        30,
+        59,
+        118,
+        42,
+        4,
+        118,
+        41,
+        38,
+        49,
+        25,
+        60,
+        146,
+        76,
+        13,
+        202,
+        325,
+        117,
+        134,
+        194,
+        25,
+        74,
+        96,
+        85,
+        8,
+        10,
+        46,
+        39,
+        180,
+        271,
+        126,
+        0,
+        0,
+        0,
+        0,
+        0,
+        41,
+        37
+      ],
+      "changelog": [
+        843
+      ],
+      "toc": [
+        50
+      ],
+      "features": [
+        0
+      ],
+      "support": [
+        56,
+        46,
+        86,
+        27,
+        85
+      ],
+      "installation": [
+        0,
+        5,
+        6,
+        4,
+        64,
+        51,
+        78
+      ],
+      "security": [
+        363,
+        84,
+        80
+      ],
+      "credits": [
+        66
+      ],
+      "usage": [
+        22
+      ],
+      "architecture": [
+        52
+      ],
+      "performance": [
+        302
+      ],
+      "contributing": [
+        46,
+        60,
+        92,
+        51
+      ],
+      "testing": [
+        66
+      ],
+      "faq": [
+        0,
+        0
+      ],
+      "license": [
+        17,
+        51
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 12,
+    "badge_count": 11,
+    "screenshot_or_logo_image_count": 1,
+    "gif_count": 0,
+    "has_video_embed": true,
+    "badges_in_header_block": 11,
+    "html_link_count": 1,
+    "inline_link_count": 97,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 97,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 3.24,
+    "internal_anchor_link_count": 21,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 25,
+    "code_block_languages": [
+      "bash",
+      "bibtex",
+      "powershell",
+      "text"
+    ],
+    "avg_code_block_lines": 3.56,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 116,
+    "avg_paragraph_words": 23.41,
+    "median_paragraph_words": 13.0,
+    "sentence_count": 137,
+    "avg_sentence_words": 19.82,
+    "median_sentence_words": 14,
+    "stdev_sentence_words": 32.05,
+    "short_sentence_pct": 31.4,
+    "medium_sentence_pct": 41.6,
+    "long_sentence_pct": 27.0,
+    "total_prose_words": 6960,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

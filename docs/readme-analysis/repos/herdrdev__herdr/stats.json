@@ -1,0 +1,141 @@
+{
+  "meta": {
+    "full_name": "herdrdev/herdr",
+    "html_url": "https://github.com/herdrdev/herdr",
+    "description": "the runtime your coding agents live on",
+    "stars_total": 26477,
+    "forks": 1865,
+    "watchers": 88,
+    "created_at": "2026-03-27T17:54:33Z",
+    "pushed_at": "2026-08-09T22:55:28Z",
+    "default_branch": "master",
+    "readme_branch_used": "master",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/herdrdev__herdr/README.md",
+    "readme_bytes": 4518,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 534,
+    "est_stars_gained_1y": 2136,
+    "slug": "herdrdev__herdr"
+  },
+  "stats": {
+    "total_lines": 86,
+    "non_blank_lines": 57,
+    "total_chars": 4467,
+    "heading_count": 7,
+    "heading_levels_used": [
+      1,
+      2
+    ],
+    "section_order": [
+      "other",
+      "installation",
+      "api",
+      "credits",
+      "other",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "herdr",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "install",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "docs",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "thanks",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "agent instructions",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "development",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "license",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        395,
+        29,
+        0
+      ],
+      "installation": [
+        55
+      ],
+      "api": [
+        74
+      ],
+      "credits": [
+        38
+      ],
+      "license": [
+        10
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 4,
+    "uses_centering": true,
+    "image_count_total": 8,
+    "badge_count": 6,
+    "screenshot_or_logo_image_count": 2,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 4,
+    "html_link_count": 12,
+    "inline_link_count": 20,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 1,
+    "total_markdown_links": 20,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.85,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 3,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 2.67,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 17,
+    "avg_paragraph_words": 26.06,
+    "median_paragraph_words": 13,
+    "sentence_count": 16,
+    "avg_sentence_words": 27.69,
+    "median_sentence_words": 13.0,
+    "stdev_sentence_words": 38.96,
+    "short_sentence_pct": 31.2,
+    "medium_sentence_pct": 37.5,
+    "long_sentence_pct": 31.2,
+    "total_prose_words": 601,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "meta": {
+    "full_name": "stablyai/orca",
+    "html_url": "https://github.com/stablyai/orca",
+    "description": "Orca is the ADE for working with a fleet of parallel agents. Run any coding agent with your own subscription. Available on desktop, mobile and VPS.",
+    "stars_total": 40902,
+    "forks": 2868,
+    "watchers": 90,
+    "created_at": "2026-03-17T03:28:57Z",
+    "pushed_at": "2026-08-10T02:25:28Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/stablyai__orca/README.md",
+    "readme_bytes": 16618,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 475,
+    "est_stars_gained_1y": 1900,
+    "slug": "stablyai__orca"
+  },
+  "stats": {
+    "total_lines": 268,
+    "non_blank_lines": 196,
+    "total_chars": 16533,
+    "heading_count": 20,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "features",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "contributing",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Mobile Companion",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Parallel Worktrees",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Terminal Splits",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Design Mode",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "GitHub &amp; Linear, Native",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "SSH Worktrees",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Annotate AI Diffs",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Drag Files to Agents",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Orca CLI",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Supported Agents",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Desktop \u2014 macOS, Windows, Linux",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "macOS (Homebrew)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Arch Linux (AUR) \u2014 or stably-orca-git to build from source",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Mobile Companion \u2014 iOS, Android",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Community &amp; Support",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Developing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Signed Builds",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "features": [
+        7
+      ],
+      "other": [
+        111,
+        75,
+        64,
+        78,
+        73,
+        75,
+        75,
+        214,
+        96,
+        6,
+        3,
+        55,
+        18
+      ],
+      "architecture": [
+        80
+      ],
+      "support": [
+        952,
+        110
+      ],
+      "installation": [
+        0
+      ],
+      "contributing": [
+        56
+      ],
+      "license": [
+        11
+      ]
+    },
+    "preamble_word_count": 297,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 7,
+    "uses_centering": true,
+    "image_count_total": 49,
+    "badge_count": 5,
+    "screenshot_or_logo_image_count": 44,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 5,
+    "html_link_count": 51,
+    "inline_link_count": 37,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 37,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.3,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 1,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 5,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 49,
+    "avg_paragraph_words": 42.47,
+    "median_paragraph_words": 18,
+    "sentence_count": 46,
+    "avg_sentence_words": 45.24,
+    "median_sentence_words": 19.0,
+    "stdev_sentence_words": 134.96,
+    "short_sentence_pct": 28.3,
+    "medium_sentence_pct": 32.6,
+    "long_sentence_pct": 39.1,
+    "total_prose_words": 2446,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

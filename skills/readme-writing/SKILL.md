@@ -1,0 +1,125 @@
+---
+name: readme-writing
+description: Draft a new README.md, or audit and improve an existing one, using patterns measured from 100 real, currently-trending GitHub repos rather than generic advice, and written in the user's own saved voice rather than a generated open-source register. Use when the user asks to write a README, create a project README, improve or clean up their README, review a README against best practices, add badges or a table of contents, restructure a README's sections, make a README look more professional, or make one sound like they wrote it. Covers new-project READMEs and edits to existing files.
+license: MIT
+metadata:
+  version: "0.1.0"
+---
+
+# README writing
+
+Write or edit `README.md` using conventions measured from real data, not folklore. The full study — methodology, the 100-repo table, every stat cited below — lives in `${CLAUDE_PLUGIN_ROOT}/docs/README_WRITEUP.md`. This file is the operational summary; read `references/patterns.md` for the fuller catalog with more examples, and `references/checklist.md` at the end of any draft or edit.
+
+**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand. `${CLAUDE_PLUGIN_ROOT}/docs/` only exists in a full-repo install. When it's missing, `references/patterns.md` carries the same numbers and `scripts/readme_check.py` still runs, since it resolves its siblings from its own location.
+
+## Modes
+
+| Mode | Trigger | Deliver |
+|---|---|---|
+| **draft** | New project, no README yet, or "write me a README" | A complete `README.md` built in the measured section order |
+| **audit** | "review my README", "does this follow best practices" | Findings against the checklist, ordered by impact, no rewrite unless asked |
+| **restructure** | Content exists but is disorganized, or reordering is the ask | Same content, reordered into the measured convention, noting what moved |
+| **section** | "add a badges row", "write the install section" | Just that section, matching the surrounding document's register |
+
+Default to **draft** when there's no README and the user describes a project. Default to **audit** when a README exists and the ask is open-ended ("can you look at my README").
+
+## The structural rule
+
+Order sections: **pitch → fastest path to running it → depth → community → license.** Measured across 100 repos (see the writeup's Layout table), this isn't a style preference — it's what independently-authored, currently-popular READMEs converge on:
+
+1. **What it is and why** (features/why) — first two sentences, before any badge row or sponsor content. State it before anything decorative. This is the single most-violated rule in the corpus: the READMEs flagged as anti-patterns all bury the actual description under promotional material.
+2. **Installation** — present in 84% of the corpus, and it's the earliest structural section after the pitch (avg. relative position 0.33 of the document). Get the reader running the thing before explaining how it works internally.
+3. **Depth** — architecture, API/docs, configuration, usage/examples. This is where a long README is allowed to be long; put it after the quickstart, not before.
+4. **Community mechanics** — support, FAQ, testing, changelog, contributing, credits. Comes late (contributing sits at avg. position 0.77) because it's for people who are already sold, not people deciding whether to be.
+5. **License** — dead last (avg. position 0.93), and short. Median license section across the corpus is 13 words: name the license, link the file. Nobody reads legal text in a README.
+
+A table of contents is genuinely optional: 12% of the corpus has one under an explicit heading, 32% counting unlabelled anchor-link navigation, and either way it correlates with document length (spec-kit, RuView) rather than being a default courtesy. Add one past roughly 1,500–2,000 words; skip it below that.
+
+## Craft rules (apply within every section)
+
+- **Open with the point.** First two sentences state what the project is and why it exists — no throat-clearing, no "In today's world of...".
+- **Vary sentence length on purpose.** The measured mix across strong READMEs in the corpus is roughly 38% short (<10 words), 37% medium (10–20), 26% long (>20) — not uniform. Keep paragraphs to 2–3 sentences (corpus median: 28 words per paragraph). For the general mechanics of this — burstiness, the portability test, cutting filler — this is exactly what `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/references/craft.md` already teaches; apply it at register `docs`. `scripts/readme_check.py` runs that engine for you, so there's no need to invoke `scan.py` separately.
+- **Show the mechanism, don't just claim it.** A real terminal transcript, a before/after code diff, or a small ASCII pipeline diagram outperforms a paragraph of adjectives. If there's a concrete example available, use it instead of describing the feature abstractly.
+- **If a number is a headline claim, say what it doesn't cover.** The most credible READMEs in the study all argue against their own best stat somewhere ("this measures output tokens, not input," "results vary run to run and here's why"). A number with no caveat reads as marketing; a number with one caveat reads as engineering.
+- **Links: inline Markdown, not bare URLs, not reference-style.** `[text](url)` is the corpus convention at 96.8% of Markdown-syntax links; reference-style (`[text][ref]`) is functionally extinct (0.2%) and bare URLs are a minority slip (3.0%, in half the repos). Wrap every URL: a bare one gives a screen reader nothing to announce and renders as a wall of characters. Link text should name the destination in a couple of words ("the comparison doc," "our Discord"), not "here" or "this link."
+- **Badges: typed, wired, and roughly half a dozen.** 80% of the corpus carries at least one and the median count is 5, so a badge row is the convention rather than a concession. What the corpus keeps is a small set of types: license, version/package registry, stars, chat/community, build status. Don't add a badge that isn't wired to something real (a real CI pipeline, a real package registry entry); an aspirational badge is worse than no badge, and past roughly a dozen the marginal badge stops carrying information (ECC's 17 is the tail case).
+- **Centering the header block is now majority convention (76%).** A centered logo/title/tagline/badge row at the top is the expected look for a project with visual assets; a plainer left-aligned open reads as a deliberate, slightly more technical choice (see spec-kit, pi) rather than a default. Ask or infer which fits the project's audience.
+- **Security/trust disclosures go near the top, not a buried footer**, if the tool touches the filesystem, network, or untrusted input.
+- **Progressive disclosure for anything with more than ~4 branches** (install variants, per-platform steps, a long FAQ): collapse into `<details>` blocks, but leave the one path most readers want expanded by default. Don't flatten a decision tree into the main scroll, and don't collapse the one section a first-time reader actually needs.
+
+## Anti-patterns to flag or avoid
+
+- Promotional/sponsor content, a hero image, or a badge wall standing between the top of the file and the actual "what is this" sentence. If auditing an existing README, this is the highest-impact single fix — check what comes before the first real description and cut or move anything that isn't earning its place there.
+- An install section branched into a decision tree (multiple nested `<details>` with warnings not to combine methods) instead of one clear quickstart plus links for edge cases.
+- A README that's grown into the entire reference manual (the corpus's 90th percentile is 6,040 words) instead of linking out to `docs/`. Long is fine when it's depth after a real quickstart; long is a problem when the quickstart is buried in it.
+- Bare URLs, "click here" links, and unexplained jargon in the first screen.
+- A headline performance/efficiency number with no caveat anywhere in the document.
+
+## Voice: whose README is this
+
+A README is published under someone's name, so it gets written in their voice by default, not in a neutral house style. Whoever is active is the one that governs. This skill has no opinion about which person that is, and the profile that ships with the plugin is an example, not a default worth preserving.
+
+Load the active profile before drafting:
+
+1. Read `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices/ACTIVE` for the voice name, unless the project directory has a `.rabbit-voice` file, which pins that repo's own voice and wins.
+2. **Read `voices/<name>.md` in full.** Not skimmed, and not skipped because the script exists. This is the half of the profile no regex can reach: structure habits, how this person calibrates certainty, how much warmth they carry, what they refuse to put their name on, and their own final check. `readme_check.py` cannot apply any of it.
+3. `voices/<name>.rules.json` is the mechanically checkable subset, and `readme_check.py` picks it up automatically. Passing it is the floor, not the goal. A document can clear every rule in that file and still sound nothing like the person, which is the failure this skill is trying to avoid.
+
+When there's no `ACTIVE` and no pin, `readme_check.py` falls back to the single profile installed in `voices/` and says so in a note. Repeat that in your report rather than letting it pass. A fallback profile is a stand-in whose rules are worth obeying (they are mostly good writing rules) but whose personality is probably somebody else's, so offer `voice-setup` in the same breath. With several profiles installed and none active, ask which one instead of picking.
+
+If no profile exists at all, say so, write in the project's existing register, and offer `voice-setup`. Don't invent a personality to fill the gap: a generic "friendly open-source" register is itself a recognizable voice, and installing one uninvited is the failure `rabbit-writes` exists to prevent.
+
+**What the voice governs, and what this skill governs.** The split is clean because the two rarely collide: structure is a fact about how strangers read a document, mechanics are a fact about how this person writes.
+
+| Layer | Beats | Example |
+|---|---|---|
+| **Accuracy** | everything | No profile authorizes an install command the project doesn't have. The most common README failure isn't tone, it's asserting something false about how to install or run the thing |
+| **Structure here** | the voice's structural habits | A voice that opens with a story still gets pitch-first ordering. A README is read by someone deciding in fifteen seconds whether to trust the project |
+| **Voice mechanics and hard nos** | everything below | A profile banning em dashes means no em dashes in the README, including in headings and table cells |
+| **Voice tone and register** | the craft engine's defaults | Terse and dry, or warm and chatty, is the profile's call |
+| **the engine at register `docs`** | nothing | The default whenever the profile is silent |
+
+Two things a voice profile does *not* import into a README, because they belong to correspondence rather than documentation: greetings and sign-offs (`required_when` rules are gated by register and won't fire on `docs`), and the profile's first-person defaults. A README usually speaks for the project, not for the author, unless the profile is explicitly personal and the user wants it that way. Ask once if it's genuinely unclear, then commit.
+
+**When the voice and the corpus disagree**, the corpus wins on structure and the voice wins on sentences. A profile that loves long flowing paragraphs still gets 2-3 sentence paragraphs here, because that's a property of the medium (a README is scrolled, not settled into), and a profile that bans exclamation marks keeps banning them even where a corpus README would use one. If a genuine conflict survives that test, say which rule you followed and why, in one line.
+
+## Workflow
+
+0. **Open with at most two questions, and only the ones the repo can't already answer.**
+
+   - **Voice.** Name whose it is and confirm: "I'll write this in *name*'s voice. Say so if you'd rather have a neutral project register." Some maintainers deliberately keep their personal register out of a README that strangers read. Skip the question when the user already asked for their voice, when they asked for it to sound like them, or when no profile exists.
+   - **Purpose.** What the project does and who it's for. Skip it when the repo answers it: an existing README's pitch, a package manifest description, the entry points, a `docs/` folder. Ask only where you'd otherwise be guessing, and ask it once rather than running an interview.
+
+   Two is the ceiling. Everything else is readable from the repo, and a draft that arrives with its assumptions stated plainly beats four questions asked before anything exists.
+1. **Load the voice** (above) before writing a sentence, including the profile markdown. Retrofitting a voice onto a finished draft produces a document that is neither.
+2. **Gather what the project actually is.** Read existing code, package manifests, or ask directly: what does it do, who's it for, what's the install method, is there a license file, is there a demo/screenshot available. Don't invent capabilities, install commands, or a license the project doesn't have — a README's most common failure mode isn't tone, it's asserting something false about how to install or use the thing.
+3. **Draft or audit in the structural order above.** For draft mode, write the pitch first and get it right before anything else — everything downstream is easier once the pitch is honest and specific. For audit mode, walk the existing file top to bottom and note where it violates the order (usually: promotional content before the pitch, or license/contributing pulled up near the top out of habit).
+4. **Apply the craft rules** within each section as you go, not as a separate pass.
+5. **Run the checker.** It covers structure, links, badges, claims, and the active voice's rules in one pass:
+
+   ```bash
+   python3 ${CLAUDE_PLUGIN_ROOT}/skills/readme-writing/scripts/readme_check.py README.md
+   ```
+
+   Findings come back in four bands. `structure` is this skill's; `voice` is the writer's own rules and a hit there is a defect, not a suggestion; `fingerprint` and `craft` come from the `rabbit-writes` engine running at register `docs`. Fix P0s always. P1s need a reason to keep. P2s are judgment. Pass `--voice-rules <path>` to check against a different profile, or `--no-voice` when the README is not written in anyone's voice (a generated API reference, a fork's README you're only restructuring).
+6. **Read the draft against the profile markdown.** The script cleared the rules file. Now do the half it can't: take the profile's structure habits, its certainty calibration, its warmth setting, its Hard nos, and its own final check, and read the document against them. Two questions do most of the work. Would this person have written these sentences? And is anything here a rule they hold that a regex was never going to catch, like leading with the conclusion, or refusing to claim more than the evidence supports?
+
+   For a README specifically, expect the answer to be "mostly yes, and the drift is in the connective tissue": the pitch, the transitions, the sentence that explains why a section exists. That is where a generic documentation register creeps back in.
+
+   **Sort what you find into two piles, and treat them differently.** The test is whether the medium pushes back on the rule:
+
+   - **Drift you fix.** The profile states a rule, the README gives no reason it shouldn't apply, and the fix is obvious. Register inconsistencies (Title Case headings in a sentence-case document), a hype word in a profile that bans hype, a number asserted where the profile demands precision, a section that buries its own conclusion in a profile that leads with it. Apply these the way you'd apply a P1 from the script.
+   - **Judgment calls you surface.** The profile's rule and the medium genuinely disagree, so following it is a real choice rather than a correction. Warmth level, signposted transitions ("However", "Additionally") in a document that signposts with headings instead, first person, humor, and how much personality belongs in front of strangers evaluating a project. Report these with the tradeoff stated in one line each and let the user decide.
+
+   Why the split matters: a README is the one document where a person's own voice can legitimately lose to audience clarity, and only they can make that trade. Quietly rewriting the warmth and personality out of somebody's project page, or into it, is the same failure in two directions. Name it, don't resolve it.
+7. **Self-check** against `references/checklist.md`. The checker can't decide whether the pitch is honest or the example runs; that's what the checklist is for. Fix every "no" once, re-check once, stop.
+8. **Report what you did.** For audit mode, a plain list of findings ordered by impact (structural first, voice second, craft third), each pointing at the actual line or section. Keep three groups visibly apart: what the script found, what reading the profile found and you fixed, and the judgment calls you deliberately left open. The last group is the one the user is most likely to overrule, and burying it inside the others quietly makes their decision for them. For draft/restructure, say what changed and why, briefly — not a re-explanation of the whole file.
+
+## Reference files
+
+| File | When |
+|---|---|
+| `scripts/readme_check.py` | Every draft, restructure, and audit. Structure, links, badges, claims, and the active voice in one pass. `--json` for machine-readable output, `--check` to exit non-zero on a P0 (useful in CI) |
+| `references/patterns.md` | Any mode — the fuller catalog: exact presence rates, section-length medians, and the named-repo techniques (show-don't-tell, arguing against your own headline number, progressive disclosure) with more examples than fit here |
+| `references/checklist.md` | Always, before delivering |
+| `${CLAUDE_PLUGIN_ROOT}/docs/README_WRITEUP.md` | When the user asks *why* a rule exists, wants the underlying data, or disputes a recommendation — this is the full study with the 100-repo table and methodology |

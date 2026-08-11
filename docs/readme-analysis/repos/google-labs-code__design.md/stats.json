@@ -1,0 +1,264 @@
+{
+  "meta": {
+    "full_name": "google-labs-code/design.md",
+    "html_url": "https://github.com/google-labs-code/design.md",
+    "description": "A format specification for describing a visual identity to coding agents. DESIGN.md gives agents a persistent, structured understanding of a design system.",
+    "stars_total": 27094,
+    "forks": 2259,
+    "watchers": 170,
+    "created_at": "2026-04-10T17:54:59Z",
+    "pushed_at": "2026-07-27T21:15:07Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/google-labs-code__design.md/README.md",
+    "readme_bytes": 13148,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 524,
+    "est_stars_gained_1y": 2096,
+    "slug": "google-labs-code__design.md"
+  },
+  "stats": {
+    "total_lines": 365,
+    "non_blank_lines": 276,
+    "total_chars": 13112,
+    "heading_count": 24,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "architecture",
+      "other",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "DESIGN.md",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "The Format",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Overview",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Colors",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Getting Started",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "The Specification",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "File Structure",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Token Schema",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Token Types",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Section Order",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Component Tokens",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Consumer Behavior for Unknown Content",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "CLI Reference",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Installation",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "`npm error ENOVERSIONS` (\u201cNo versions available for @google/design.md\u201d)",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "`lint`",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "`diff`",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "`export`",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "`spec`",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Linting Rules",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Programmatic API",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Design Token Interoperability",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Status",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Disclaimer",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "architecture": [
+        23,
+        154,
+        106
+      ],
+      "other": [
+        76,
+        18,
+        73,
+        19,
+        47,
+        0,
+        47,
+        41,
+        36,
+        39,
+        0,
+        36,
+        51,
+        101,
+        42,
+        184,
+        26,
+        19
+      ],
+      "installation": [
+        41,
+        92
+      ],
+      "api": [
+        8
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 0,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 0,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 5,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 5,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 4.8,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 18,
+    "code_block_languages": [
+      "bash",
+      "json",
+      "jsonc",
+      "md",
+      "typescript",
+      "yaml"
+    ],
+    "avg_code_block_lines": 6.5,
+    "table_row_count": 60,
+    "table_present": true,
+    "paragraph_count": 32,
+    "avg_paragraph_words": 18.78,
+    "median_paragraph_words": 15.0,
+    "sentence_count": 46,
+    "avg_sentence_words": 13.07,
+    "median_sentence_words": 11.0,
+    "stdev_sentence_words": 8.01,
+    "short_sentence_pct": 39.1,
+    "medium_sentence_pct": 50.0,
+    "long_sentence_pct": 10.9,
+    "total_prose_words": 766,
+    "has_license_section_or_badge": false,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": false
+  }
+}

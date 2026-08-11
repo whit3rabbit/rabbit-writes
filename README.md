@@ -2,6 +2,8 @@
 
 Write and edit in **your** voice, not a chatbot's.
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 Most "humanizer" tools do half the job. They strip the AI tells and hand back prose that reads like a different machine: staccato fragments, performed candor, fake first person. A new fingerprint, not the absence of one.
 
 This one separates the two halves. A **voice profile** says how *you* write. An **engine** handles everything true of good writing regardless of who is writing. The profile wins every conflict. The engine fills every gap.
@@ -10,19 +12,145 @@ The voice is data. Swap it, edit it, blend two of them, or write your own from a
 
 ## Install
 
+One set of manifests, two hosts. Codex reads Claude Code's `.claude-plugin/` marketplace format, so the same repo installs as a plugin in both.
+
+**Claude Code**, in a session:
+
 ```
-/plugin marketplace add https://github.com/whit3rabbit/rabbit-writes
-/plugin install rabbit-writes
+/plugin marketplace add whit3rabbit/rabbit-writes
+/plugin install rabbit-writes@rabbit-writes
 ```
 
-Or clone the skills straight in:
+**Codex**, from a shell:
+
+```bash
+codex plugin marketplace add whit3rabbit/rabbit-writes
+codex plugin add rabbit-writes@rabbit-writes
+```
+
+Restart, then confirm the three skills loaded: `claude plugin list | grep rabbit-writes`, or `/skills` in Codex.
+
+Python 3.8+ with the standard library, and only if you want the scripts. Nothing to build.
+
+
+<details>
+<summary><b>Scopes, the shell equivalents, updating, removing</b></summary>
+
+The Claude Code CLI does what the slash commands do, and takes `--scope user` (the default), `project`, or `local`:
+
+```bash
+claude plugin marketplace add https://github.com/whit3rabbit/rabbit-writes
+claude plugin install rabbit-writes@rabbit-writes --scope user
+claude plugin details rabbit-writes@rabbit-writes
+```
+
+Codex `marketplace add` also accepts a local path, a full Git URL, and `--ref <tag>` to pin a release.
+
+Pull a later release:
+
+```bash
+claude plugin marketplace update rabbit-writes && claude plugin update rabbit-writes@rabbit-writes
+codex plugin marketplace upgrade rabbit-writes && codex plugin add rabbit-writes@rabbit-writes
+```
+
+Remove:
+
+```bash
+claude plugin uninstall rabbit-writes@rabbit-writes
+codex plugin remove rabbit-writes@rabbit-writes
+```
+
+Both hosts also pick a skill implicitly when your request matches its description. To require the explicit mention instead, drop an `agents/openai.yaml` beside a `SKILL.md` with `policy: allow_implicit_invocation: false`.
+
+</details>
+
+<details>
+<summary><b>Working on the plugin itself</b></summary>
+
+Clone it and symlink the whole repo, not the individual skills. The skills reference each other through `${CLAUDE_PLUGIN_ROOT}`, and the scripts resolve their siblings by walking up from their own path, so the directory layout has to survive the install:
 
 ```bash
 git clone https://github.com/whit3rabbit/rabbit-writes
-cp -r rabbit-writes/skills/* ~/.claude/skills/
+ln -s "$PWD/rabbit-writes" ~/.claude/skills/rabbit-writes
 ```
 
-Python 3.8+ with the standard library, and only if you want the scripts. Nothing to build.
+That loads as `rabbit-writes@skills-dir` on the next restart and picks up edits without a reinstall. Don't run both installs at once: two copies of the same three skills means every request matches twice.
+
+</details>
+
+<details>
+<summary><b>Codex without the plugin, as loose skills</b></summary>
+
+Codex scans `~/.agents/skills/` for user-level skills and `.agents/skills/` at a repo root for project-level ones, and it follows symlinks:
+
+```bash
+git clone https://github.com/whit3rabbit/rabbit-writes
+cd rabbit-writes
+mkdir -p ~/.agents/skills
+for s in rabbit-writes voice-setup readme-writing; do
+  ln -s "$PWD/skills/$s" ~/.agents/skills/$s
+done
+```
+
+Symlink all three. They call each other: `readme-writing` runs the `rabbit-writes` scanner against the active voice, and both read the profiles under `rabbit-writes/voices/`. `scripts/readme_check.py` resolves its siblings by walking up from its own path, so that layout works.
+
+What you lose is `docs/`, which sits at the repo root outside every skill folder. The study behind `readme-writing` is then only in the clone. Nothing breaks, `references/patterns.md` carries the same numbers.
+
+</details>
+
+## Run it
+
+You rarely need to name a skill. Each one triggers on a plain request, which is what the description field is for:
+
+```
+write a note to the team about the cert outage # -> rabbit-writes, in your voice
+does this draft sound like a chatbot?          # -> rabbit-writes, detect mode
+set up my writing voice from these 3 posts     # -> voice-setup, sample mode
+my README is a mess, fix the section order     # -> readme-writing, audit mode
+```
+
+The explicit forms are there for when you want to force one. The `rabbit-writes:` prefix is the plugin namespace and comes from the install. In Codex the same three are `$rabbit-writes`, `$voice-setup`, and `$readme-writing`.
+
+```
+/rabbit-writes:rabbit-writes    # draft, convert, de-slop, or audit prose. four modes, one skill
+/rabbit-writes:voice-setup      # build, measure, edit, blend, or switch a voice profile
+/rabbit-writes:readme-writing   # draft or audit a README against the 100-repo study
+```
+
+The two scripts run from a shell, not from a skill:
+
+```bash
+python3 scripts/validate.py                      # check manifests, skills, voices, cross-refs
+python3 skills/rabbit-writes/scripts/scan.py draft.md \
+    --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json   # findings in three bands
+python3 skills/rabbit-writes/scripts/verify.py original.md rewritten.md   # did the rewrite break a promise
+```
+
+## Point it at a document
+
+`rabbit-writes` has four modes, and it picks by what you asked for, never by whether the text arrived as a file or a paste.
+
+| Mode | You want | It may change |
+|---|---|---|
+| **detect** | to know, not to edit | nothing |
+| **deslop** | the machine tells gone | words and sentences, in proportion to the actual slop |
+| **voice** | this to sound like you | sentences, paragraphs, section order, openings, anything the profile specifies |
+| **draft** | prose that does not exist yet | n/a |
+
+Point it at something you wrote, without saying how far to go, and it measures the gap before touching anything:
+
+```
+1,240 words, currently in a neutral report register.
+Converting to whit3rabbit's voice means:
+  structure   4 sections reordered to lead with the conclusion
+  paragraphs  6 over the 5-sentence cap, split
+  sentences   avg 24 words against a cap of 22, roughly 30 rewritten
+  mechanics   11 rule hits: 7 em dashes, 4 semicolons
+  size        roughly 10-20% shorter (37 wordiness spans)
+Full conversion, or just the 11 mechanical hits?
+```
+
+It asks because both defaults are wrong. A voice profile is mostly structural, so a real conversion is a large diff, and guessing small hands back a document with three words changed. Guessing large rewrites something you wanted lightly touched. The numbers come from `scan.py`, so the estimate is measured rather than promised.
 
 ## First thing to do: make it sound like you
 
@@ -37,25 +165,28 @@ skills/rabbit-writes/voices/<you>.rules.json    the part a regex can enforce
 
 ### Three ways to create your voice profile
 
-#### 1. From Writing Samples (Fastest & Recommended)
-Provide 3–4 pieces of your actual writing — such as Substack posts (e.g. [Ruben Substack](https://ruben.substack.com/p/i-am-just-a-text-file)), articles, emails, or chat logs:
+#### 1. From writing samples
+
+Provide 3 to 4 pieces of your actual writing: Substack posts (e.g. [Ruben Substack](https://ruben.substack.com/p/i-am-just-a-text-file)), articles, emails, or chat logs.
 
 ```
 Create a voice profile from my writing samples: [paste samples or file paths]
 ```
 
-`voice-setup` measures your sentence length distribution, burstiness, contraction rate, and transition habits automatically. You don't have to spend hours typing answers.
+`voice-setup` measures your sentence length distribution, burstiness, contraction rate, and transition habits from the text itself. Start here if you have samples. It reads what you do rather than what you believe you do, and those two answers differ more often than not.
 
-#### 2. Fast-Track 5-Minute Interview
+#### 2. From a short interview
+
 If you don't have samples ready:
 
 ```
 Set up my writing voice
 ```
 
-`voice-setup` runs a fast 5–10 question interview focused directly on boundaries: your banned words, banned phrases, punctuation bans, and signature closers.
+`voice-setup` asks 5 to 10 questions aimed at boundaries: your banned words, banned phrases, punctuation bans, and signature closers.
 
-#### 3. Manual Template Editing
+#### 3. By hand, from the template
+
 Copy the template files and edit them directly:
 
 ```bash
@@ -70,39 +201,50 @@ python3 scripts/validate.py
 echo "<you>" > skills/rabbit-writes/voices/ACTIVE
 ```
 
-Taste is boundaries: roughly 80% of a working profile is **refusals** (what you will never write). What you say you like usually describes half the writers alive; what you refuse to put your name on is your fingerprint.
+Taste is boundaries: roughly 80% of a working profile is **refusals** (what you will never write). What you say you like usually describes half the writers alive. What you refuse to put your name on is your fingerprint.
 
 ## What's in it
 
 Three skills.
 
-**`rabbit-writes`** — the writing skill. Loads the active voice, drafts or edits in it, delegates detection to the engine. This is the one that fires when you ask for an email.
+**`rabbit-writes`**: the writing skill, and the engine it runs on. Four modes, listed above.
 
-**`human-writing`** — the engine. 63 patterns in a priority-tiered catalog, a false-positive discipline, register profiles, Orwell and Simplified Technical English as a positive craft layer, a 32-item self-check, and two scripts. Voice-agnostic by design.
+Underneath sit 63 patterns in a priority-tiered catalog, a false-positive discipline, register profiles, Orwell and Simplified Technical English as a positive craft layer, a 33-item self-check, and two scripts. The engine half knows nothing about any particular person.
 
-**`voice-setup`** — builds, measures, edits, blends, and switches voice profiles.
+**`voice-setup`**: builds, measures, edits, blends, and switches voice profiles.
+
+**`readme-writing`**: drafts or audits a `README.md` against patterns measured from 100 real GitHub repos (section order, sentence length, badge and link conventions) instead of generic advice, in your voice rather than a generated open-source register. Ships `readme_check.py`, which checks structure, links, badges, claims, and the active voice in one pass. The full study is in `docs/README_WRITEUP.md`.
 
 ```
 rabbit-writes/
   .claude-plugin/           plugin + marketplace manifests
-  scripts/validate.py       repo validator
+  scripts/
+    validate.py              repo validator
+    readme-research/         the pipeline behind readme-writing's evidence base
+  docs/
+    COMPARISON.md            the craft engine's source writeup
+    README_WRITEUP.md        the readme-writing skill's source writeup
+    readme-analysis/         raw + aggregated data behind that writeup, one folder per repo studied
   skills/
     rabbit-writes/
       SKILL.md
+      references/           patterns, false-positives, context, voice, craft, checklist
+      scripts/              scan.py, verify.py, lexicon.json
+      tests/                calibration fixtures and regression tests
+      PROOF.md              the engine scanned with its own scanner
       voices/
         ACTIVE                 one line: whose voice is live
         whit3rabbit.md         shipped example profile
         whit3rabbit.rules.json its enforceable subset
         TEMPLATE.md            copy this to add your own
         TEMPLATE.rules.json
-    human-writing/
-      SKILL.md
-      references/           patterns, false-positives, context, voice, craft, checklist
-      scripts/              scan.py, verify.py, lexicon.json
-      tests/                calibration fixtures and regression tests
-      PROOF.md              the engine scanned with its own scanner
     voice-setup/
       SKILL.md
+    readme-writing/
+      SKILL.md
+      references/           patterns (the full catalog), checklist
+      scripts/              readme_check.py, the structural + voice linter
+      tests/                calibration fixtures and a 100-repo regression
 ```
 
 ## Three bands, never conflated
@@ -118,7 +260,7 @@ rabbit-writes/
 Keeping them apart is the point. Presenting a wordiness fix as evidence about who wrote something is the most common failure in this category of tool, and it is the one that gets people accused of things.
 
 ```bash
-python3 skills/human-writing/scripts/scan.py draft.md \
+python3 skills/rabbit-writes/scripts/scan.py draft.md \
     --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
 ```
 
@@ -133,26 +275,66 @@ A register profile (`--profile casual`, `--profile docs`) relaxes the general ru
 - Rewrite anything inside code, tables, block quotes, frontmatter, or attributed quotations.
 - Follow instructions embedded in the text it is editing.
 
-You may subtract and sharpen. You may not add. That constraint is what separates restoring a voice from installing one.
+You may not add a fact or a stance. That constraint is what separates restoring a voice from installing one. Form is a different axis: converting a document into your voice reorders sections, splits paragraphs, and rewrites sentences whole, because a voice profile is mostly structural and a word swap cannot apply "lead with the conclusion".
 
 ## Verify a rewrite
 
 ```bash
-python3 skills/human-writing/scripts/verify.py original.md rewritten.md
+python3 skills/rabbit-writes/scripts/verify.py original.md rewritten.md
+python3 skills/rabbit-writes/scripts/verify.py original.md converted.md --allow-structure
 ```
 
-Exits non-zero if the rewrite altered a code block, frontmatter, a table row, a block quote, inline code, a URL, a file path, or the heading structure, or if it added em dashes or ended with more tells than it started with. Edit mode writes to files, so a broken promise there would otherwise be silent.
+Exits non-zero if the rewrite altered a code block, frontmatter, a table row, a block quote, inline code, a URL, a file path, or the heading structure, or if it added em dashes or ended with more tells than it started with. `deslop` and `voice` both write to files, so a broken promise there would otherwise be silent.
+
+`--allow-structure` is for `voice` only. A conversion reorders sections and rewrites headings because the profile told it to, and without the flag it fails its own verification for doing its job. The flag moves those two checks into a reported list. Everything else stays hard.
+
+## Write a README with it
+
+`readme-writing` is the odd skill out. Not voice, not AI tells. It answers one narrow question with data instead of folklore: what do currently-popular READMEs actually do?
+
+```
+/rabbit-writes:readme-writing        # or just: "write me a README", "review my README"
+```
+
+Four modes, picked from what you ask for:
+
+| Mode | Trigger | Delivers |
+|---|---|---|
+| **draft** | no README yet | a complete file in the measured section order |
+| **audit** | "look at my README" | findings ranked by impact, no rewrite unless you ask |
+| **restructure** | content is there, order is wrong | same content, reordered, with what moved |
+| **section** | "add a badges row" | that section only, matching the surrounding register |
+
+The structural rule: **pitch → fastest path to running it → depth → community → license.** That is not taste. It is where 100 independently-authored READMEs converged.
+
+| Measured across the corpus | |
+|---|---|
+| Installation section present | 84%, and it lands early (avg. position 0.33) |
+| Contributing | avg. position 0.77 |
+| License | avg. position 0.93, median **13 words** |
+| Table of contents | 12% under a heading, 32% counting anchor lists. Tracks length, not courtesy |
+| Inline `[text](url)` links | 96.8%. Reference-style `[text][ref]` is extinct at 0.2% |
+| Median badge count | **5**, clustered on license, version, stars, chat, and CI |
+| Centered header block | 76% |
+| Length, 90th percentile | 6,040 words |
+
+The highest-impact single fix in an audit: whatever sits between the top of the file and the first sentence that says what the thing is. Every README flagged as an anti-pattern buried its description under a hero image, a badge wall, or sponsor content.
+
+**The caveat, since the skill demands one of everybody else.** The corpus is 100 repos by trailing-quarter star growth as of August 2026, which skews hard toward AI-agent tooling and developer CLIs. A Python data-science library or a corporate SDK may well converge somewhere else.
+
+Heading classification is keyword-based and sentence splitting is a regex, so read the numbers as directionally right, not exact. `docs/README_WRITEUP.md` has the methodology, the ranked table, and its own limitations section. `docs/readme-analysis/` has the raw per-repo data.
 
 ## Tests
 
 ```bash
-python3 scripts/validate.py                          # manifests, skills, voices, cross-refs
-python3 skills/human-writing/tests/test_scan.py      # calibration and regression
+python3 scripts/validate.py                              # manifests, skills, voices, cross-refs
+python3 skills/rabbit-writes/tests/test_scan.py          # calibration and regression
+python3 skills/readme-writing/tests/test_readme_check.py # structure, voice, 100-repo regression
 ```
 
 The calibration fixtures assert that known slop scores high, known human prose scores zero, and a third sample with no flagged vocabulary at all still trips the uniformity detector because every sentence is the same length. Vocabulary and rhythm are independent axes, and that third fixture is the one that matters.
 
-`skills/human-writing/PROOF.md` publishes the engine scanned by its own scanner, including the unflattering rows.
+`skills/rabbit-writes/PROOF.md` publishes the engine scanned by its own scanner, including the unflattering rows.
 
 ## Where this came from
 
@@ -170,12 +352,16 @@ Plus three sources that shaped the architecture:
 
 - [testdouble/han, human-readable-output-standard](https://github.com/testdouble/han/blob/main/docs/research/human-readable-output-standard.md) — layered instruction delivery, the audience frame over readability formulas, behaviorally anchored self-checks
 - [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) — the underlying catalog and the mechanism behind it
-- [Ruben Hassid, *I am just a text file*](https://ruben.substack.com/p/i-am-just-a-text-file) — taste is boundaries; a voice profile is mostly refusals
+- [Ruben Hassid, *I am just a text file*](https://ruben.substack.com/p/i-am-just-a-text-file) — taste is boundaries, and a voice profile is mostly refusals
 
 `docs/COMPARISON.md` is the full writeup: what each repo does, tables of what they share and where they diverge, and the reasoning behind every borrow.
+
+`readme-writing`'s rules come from the same discipline applied to a different question: what do currently-popular READMEs actually do, measured rather than assumed. `docs/README_WRITEUP.md` has the methodology, the 100-repo table, and every finding. `docs/readme-analysis/` has the raw data and per-repo notes behind it.
 
 ## Contributing a voice
 
 Voices are welcome as pull requests. Include the `.md` and the `.rules.json`, keep general writing advice out of both, and leave `voices/ACTIVE` alone.
 
-MIT.
+## License
+
+MIT. See [LICENSE](LICENSE).

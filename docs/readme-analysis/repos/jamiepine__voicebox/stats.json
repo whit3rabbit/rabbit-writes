@@ -1,0 +1,339 @@
+{
+  "meta": {
+    "full_name": "jamiepine/voicebox",
+    "html_url": "https://github.com/jamiepine/voicebox",
+    "description": "The open-source AI voice studio. Clone, dictate, create.",
+    "stars_total": 49902,
+    "forks": 6168,
+    "watchers": 228,
+    "created_at": "2026-01-25T12:27:03Z",
+    "pushed_at": "2026-08-09T00:03:42Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/jamiepine__voicebox/README.md",
+    "readme_bytes": 25009,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 648,
+    "est_stars_gained_1y": 2592,
+    "slug": "jamiepine__voicebox"
+  },
+  "stats": {
+    "total_lines": 474,
+    "non_blank_lines": 346,
+    "total_chars": 24815,
+    "heading_count": 34,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "features",
+      "other",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "roadmap",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "security",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "What is Voicebox?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Download",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Multi-Engine Voice Cloning",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Emotions & Paralinguistic Tags",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Post-Processing Effects",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Unlimited Generation Length",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Generation Versions",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Async Generation Queue",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Voice Profile Management",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Stories Editor",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Global Dictation & Voice Input",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Speech-to-Text",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Captures",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Agent Voice Output",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Voice Personalities",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Model Management",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "GPU Support",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "API",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Generate speech",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Agent voice output \u2014 any app or script can speak in a cloned voice",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Transcribe an audio file",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "List voice profiles",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "MCP server",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Tech Stack",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Roadmap",
+        "category": "roadmap"
+      },
+      {
+        "level": 2,
+        "text": "Development",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Building Locally",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Adding New Voice Models",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Project Structure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Security",
+        "category": "security"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "features": [
+        317,
+        0
+      ],
+      "other": [
+        81,
+        107,
+        53,
+        98,
+        48,
+        45,
+        33,
+        33,
+        26,
+        174,
+        63,
+        107,
+        165,
+        180,
+        24,
+        17,
+        22,
+        23,
+        17,
+        34,
+        132,
+        91,
+        11,
+        0,
+        66,
+        0
+      ],
+      "support": [
+        65
+      ],
+      "roadmap": [
+        152
+      ],
+      "installation": [
+        82
+      ],
+      "contributing": [
+        26
+      ],
+      "security": [
+        15
+      ],
+      "license": [
+        19
+      ]
+    },
+    "preamble_word_count": 354,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 11,
+    "uses_centering": true,
+    "image_count_total": 10,
+    "badge_count": 5,
+    "screenshot_or_logo_image_count": 5,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 2,
+    "html_link_count": 15,
+    "inline_link_count": 21,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 21,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.95,
+    "internal_anchor_link_count": 1,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 9,
+    "code_block_languages": [
+      "bash",
+      "json",
+      "ts"
+    ],
+    "avg_code_block_lines": 7,
+    "table_row_count": 65,
+    "table_present": true,
+    "paragraph_count": 64,
+    "avg_paragraph_words": 20.67,
+    "median_paragraph_words": 17.5,
+    "sentence_count": 80,
+    "avg_sentence_words": 16.54,
+    "median_sentence_words": 15.0,
+    "stdev_sentence_words": 15.76,
+    "short_sentence_pct": 35.0,
+    "medium_sentence_pct": 40.0,
+    "long_sentence_pct": 25.0,
+    "total_prose_words": 2132,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

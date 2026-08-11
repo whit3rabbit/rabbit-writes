@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "full_name": "FULU-Foundation/OrcaSlicer-bambulab",
+    "html_url": "https://github.com/FULU-Foundation/OrcaSlicer-bambulab",
+    "description": "",
+    "stars_total": 7105,
+    "forks": 5199,
+    "watchers": 110,
+    "created_at": "2026-05-11T17:44:55Z",
+    "pushed_at": "2026-08-01T09:36:29Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/FULU-Foundation__OrcaSlicer-bambulab/README.md",
+    "readme_bytes": 941,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 486,
+    "est_stars_gained_1y": 1944,
+    "slug": "FULU-Foundation__OrcaSlicer-bambulab"
+  },
+  "stats": {
+    "total_lines": 42,
+    "non_blank_lines": 24,
+    "total_chars": 941,
+    "heading_count": 6,
+    "heading_levels_used": [
+      2,
+      3
+    ],
+    "section_order": [
+      "support",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "This version of OrcaSlicer restores full BambuNetwork support for Bambu Lab printers.",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Windows",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Linux",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "macOS",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "BMCU",
+        "category": "other"
+      }
+    ],
+    "has_h1": false,
+    "section_word_counts": {
+      "support": [
+        25
+      ],
+      "installation": [
+        0
+      ],
+      "other": [
+        22,
+        7,
+        3,
+        16
+      ]
+    },
+    "preamble_word_count": 18,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 1,
+    "uses_centering": true,
+    "image_count_total": 1,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 1,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 0,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 0,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 0,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 1,
+    "code_block_languages": [
+      "bat"
+    ],
+    "avg_code_block_lines": 2,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 11,
+    "avg_paragraph_words": 8.27,
+    "median_paragraph_words": 7,
+    "sentence_count": 12,
+    "avg_sentence_words": 7.58,
+    "median_sentence_words": 7.0,
+    "stdev_sentence_words": 4.87,
+    "short_sentence_pct": 75.0,
+    "medium_sentence_pct": 25.0,
+    "long_sentence_pct": 0.0,
+    "total_prose_words": 91,
+    "has_license_section_or_badge": false,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "meta": {
+    "full_name": "anthropics/claude-plugins-official",
+    "html_url": "https://github.com/anthropics/claude-plugins-official",
+    "description": "Official, Anthropic-managed directory of high quality Claude Code Plugins.",
+    "stars_total": 33331,
+    "forks": 3763,
+    "watchers": 204,
+    "created_at": "2025-11-20T18:36:20Z",
+    "pushed_at": "2026-08-10T00:03:30Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/anthropics__claude-plugins-official/README.md",
+    "readme_bytes": 3859,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1011,
+    "est_stars_gained_1y": 4044,
+    "slug": "anthropics__claude-plugins-official"
+  },
+  "stats": {
+    "total_lines": 97,
+    "non_blank_lines": 67,
+    "total_chars": 3807,
+    "heading_count": 11,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "installation",
+      "contributing",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "license",
+      "api"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Claude Code Plugins Directory",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Structure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Installation",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 3,
+        "text": "Internal Plugins",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "External Plugins",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Plugin Structure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Plugin names are immutable",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Skill-bundle plugins",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "Documentation",
+        "category": "api"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        58,
+        16,
+        15,
+        35,
+        6,
+        99,
+        100
+      ],
+      "installation": [
+        28
+      ],
+      "contributing": [
+        0
+      ],
+      "license": [
+        10
+      ],
+      "api": [
+        19
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 0,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 0,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 3,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 3,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.67,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 3,
+    "code_block_languages": [
+      "json"
+    ],
+    "avg_code_block_lines": 10.33,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 14,
+    "avg_paragraph_words": 20.29,
+    "median_paragraph_words": 16.5,
+    "sentence_count": 20,
+    "avg_sentence_words": 14.2,
+    "median_sentence_words": 10.5,
+    "stdev_sentence_words": 7.26,
+    "short_sentence_pct": 30.0,
+    "medium_sentence_pct": 50.0,
+    "long_sentence_pct": 20.0,
+    "total_prose_words": 386,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": false
+  }
+}

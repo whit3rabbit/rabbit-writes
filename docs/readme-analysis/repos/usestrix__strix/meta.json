@@ -1,0 +1,19 @@
+{
+  "full_name": "usestrix/strix",
+  "html_url": "https://github.com/usestrix/strix",
+  "description": "Open-source AI penetration testing tool to find and fix your app\u2019s vulnerabilities.",
+  "stars_total": 50349,
+  "forks": 5362,
+  "watchers": 224,
+  "created_at": "2025-08-05T21:28:30Z",
+  "pushed_at": "2026-08-10T00:44:53Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/usestrix__strix/README.md",
+  "readme_bytes": 15924,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 368,
+  "est_stars_gained_1y": 1472,
+  "slug": "usestrix__strix"
+}

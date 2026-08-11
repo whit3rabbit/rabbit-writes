@@ -1,0 +1,353 @@
+{
+  "meta": {
+    "full_name": "supertone-inc/supertonic",
+    "html_url": "https://github.com/supertone-inc/supertonic",
+    "description": "Lightning-Fast, On-Device, Multilingual TTS \u2014 running natively via ONNX.",
+    "stars_total": 13638,
+    "forks": 1477,
+    "watchers": 94,
+    "created_at": "2025-11-18T08:23:58Z",
+    "pushed_at": "2026-07-24T04:00:17Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/supertone-inc__supertonic/README.md",
+    "readme_bytes": 28449,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 805,
+    "est_stars_gained_1y": 3220,
+    "slug": "supertone-inc__supertonic"
+  },
+  "stats": {
+    "total_lines": 539,
+    "non_blank_lines": 397,
+    "total_chars": 28159,
+    "heading_count": 36,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "features",
+      "support",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "examples",
+      "other",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "demo",
+      "other",
+      "other",
+      "other",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Supertonic \u2014 Lightning Fast, On-Device, Accurate TTS",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u2728 Highlights",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udf0d Supported Languages (31)",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcf0 Update News",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Python",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "First run downloads the model from Hugging Face automatically.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "wav: numpy array of shape (1, num_samples,) with dtype=np.float32, sampled at 44100 Hz",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "duration: numpy array of shape (1,) containing the duration of the generated audio in seconds",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "import soundfile as sf",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "sf.write(\"output.wav\", wav.squeeze(), 44100)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Local HTTP Server",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Getting Started",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Other Runtime Examples",
+        "category": "examples"
+      },
+      {
+        "level": 3,
+        "text": "Technical Details",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Performance Highlights",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Reading Accuracy",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Supertonic 2 to Supertonic 3",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Runtime Footprint",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Model Size",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Voice Cloning",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Demo",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "Raspberry Pi",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "E-Reader",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Chrome Extension",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Programming Language Support",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Natural Text Handling",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Built with Supertonic",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Models & Versions",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Citation",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "SupertonicTTS: Main Architecture",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "Length-Aware RoPE: Text-Speech Alignment",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Self-Purifying Flow Matching: Training with Noisy Labels",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "RobustSpeechFlow: Learning Robust Text-to-Speech Trajectories via Augmentation-based Contrastive Flow Matching",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        275,
+        314,
+        5,
+        62,
+        0,
+        5,
+        0,
+        9,
+        97,
+        28,
+        292,
+        63,
+        56,
+        53,
+        133,
+        18,
+        29,
+        27,
+        526,
+        228,
+        95,
+        29,
+        15,
+        17,
+        22
+      ],
+      "features": [
+        177,
+        22
+      ],
+      "support": [
+        88,
+        86
+      ],
+      "installation": [
+        21,
+        4,
+        128
+      ],
+      "examples": [
+        67
+      ],
+      "demo": [
+        33
+      ],
+      "architecture": [
+        20
+      ],
+      "license": [
+        84
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 6,
+    "uses_centering": true,
+    "image_count_total": 13,
+    "badge_count": 7,
+    "screenshot_or_logo_image_count": 6,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 3,
+    "html_link_count": 1,
+    "inline_link_count": 97,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 3,
+    "total_markdown_links": 97,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.59,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 19,
+    "code_block_languages": [
+      "bash",
+      "bibtex",
+      "python"
+    ],
+    "avg_code_block_lines": 4.84,
+    "table_row_count": 85,
+    "table_present": true,
+    "paragraph_count": 77,
+    "avg_paragraph_words": 17.38,
+    "median_paragraph_words": 13,
+    "sentence_count": 91,
+    "avg_sentence_words": 14.7,
+    "median_sentence_words": 14,
+    "stdev_sentence_words": 11.37,
+    "short_sentence_pct": 38.5,
+    "medium_sentence_pct": 35.2,
+    "long_sentence_pct": 26.4,
+    "total_prose_words": 2117,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

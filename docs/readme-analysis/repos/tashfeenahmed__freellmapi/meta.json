@@ -1,0 +1,19 @@
+{
+  "full_name": "tashfeenahmed/freellmapi",
+  "html_url": "https://github.com/tashfeenahmed/freellmapi",
+  "description": "OpenAI-compatible proxy that stacks the free tiers of 28 LLM providers (~4B tokens/month) behind one /v1 endpoint \u2014 plus any custom OpenAI-compatible endpoint. Smart routing, automatic failover, encrypted keys. Personal experimentation only.",
+  "stars_total": 18186,
+  "forks": 2663,
+  "watchers": 74,
+  "created_at": "2026-04-21T13:38:59Z",
+  "pushed_at": "2026-08-07T07:45:03Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/tashfeenahmed__freellmapi/README.md",
+  "readme_bytes": 48377,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 668,
+  "est_stars_gained_1y": 2672,
+  "slug": "tashfeenahmed__freellmapi"
+}

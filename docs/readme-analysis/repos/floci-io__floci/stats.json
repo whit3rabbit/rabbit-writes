@@ -1,0 +1,360 @@
+{
+  "meta": {
+    "full_name": "floci-io/floci",
+    "html_url": "https://github.com/floci-io/floci",
+    "description": "Light, fluffy, and always free - The AWS Local Emulator alternative",
+    "stars_total": 19289,
+    "forks": 1968,
+    "watchers": 62,
+    "created_at": "2026-02-18T02:28:29Z",
+    "pushed_at": "2026-08-09T23:40:15Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/floci-io__floci/README.md",
+    "readme_bytes": 35148,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 852,
+    "est_stars_gained_1y": 3408,
+    "slug": "floci-io__floci"
+  },
+  "stats": {
+    "total_lines": 841,
+    "non_blank_lines": 640,
+    "total_chars": 35090,
+    "heading_count": 35,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "features",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "features",
+      "features",
+      "architecture",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "testing",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "support",
+      "sponsors",
+      "other",
+      "other",
+      "support",
+      "changelog",
+      "credits",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "What is Floci?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Watch it run",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Before",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "After",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Why Floci?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Architecture Overview",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Supported Services",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Real Docker Integration",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Overriding default images",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Persistence and Storage Modes",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Multi-Account Isolation",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "SDK Integration",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Testcontainers",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Compatibility Testing",
+        "category": "testing"
+      },
+      {
+        "level": 2,
+        "text": "Migrating from LocalStack",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Before",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "After, standard image",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "After, if init scripts need AWS CLI or boto3",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Image Tags",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Recommended",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Includes AWS CLI and boto3",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Pinned release",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Track main",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Multi-container Docker Compose",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Sponsors",
+        "category": "sponsors"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udd47 Gold",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udd48 Silver",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udd49 Community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "Contributors",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "features": [
+        71,
+        144,
+        113
+      ],
+      "installation": [
+        27
+      ],
+      "other": [
+        91,
+        4,
+        14,
+        264,
+        58,
+        121,
+        92,
+        66,
+        136,
+        28,
+        3,
+        4,
+        101,
+        53,
+        4,
+        4,
+        6,
+        4,
+        43,
+        29,
+        29
+      ],
+      "architecture": [
+        0
+      ],
+      "support": [
+        1135,
+        34,
+        27
+      ],
+      "testing": [
+        87
+      ],
+      "configuration": [
+        112
+      ],
+      "sponsors": [
+        32
+      ],
+      "changelog": [
+        76
+      ],
+      "credits": [
+        23
+      ],
+      "license": [
+        6
+      ]
+    },
+    "preamble_word_count": 256,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 5,
+    "uses_centering": true,
+    "image_count_total": 10,
+    "badge_count": 6,
+    "screenshot_or_logo_image_count": 4,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 6,
+    "html_link_count": 15,
+    "inline_link_count": 23,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 3,
+    "total_markdown_links": 23,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.04,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 25,
+    "code_block_languages": [
+      "bash",
+      "go",
+      "java",
+      "javascript",
+      "mermaid",
+      "python",
+      "rust",
+      "sh",
+      "ts",
+      "xml",
+      "yaml"
+    ],
+    "avg_code_block_lines": 11,
+    "table_row_count": 182,
+    "table_present": true,
+    "paragraph_count": 96,
+    "avg_paragraph_words": 14.8,
+    "median_paragraph_words": 11.0,
+    "sentence_count": 120,
+    "avg_sentence_words": 11.84,
+    "median_sentence_words": 9.0,
+    "stdev_sentence_words": 16.61,
+    "short_sentence_pct": 52.5,
+    "medium_sentence_pct": 37.5,
+    "long_sentence_pct": 10.0,
+    "total_prose_words": 1435,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

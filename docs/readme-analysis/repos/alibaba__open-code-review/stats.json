@@ -1,0 +1,244 @@
+{
+  "meta": {
+    "full_name": "alibaba/open-code-review",
+    "html_url": "https://github.com/alibaba/open-code-review",
+    "description": "Fast, efficient, battle-tested at Alibaba's scale. Hybrid architecture code review tool: deterministic pipelines + LLM Agent, precise line-level comments, built-in multi-language ruleset (NPE, thread-safety, XSS, SQL injection), OpenAI & Anthropic compatible.",
+    "stars_total": 19832,
+    "forks": 1388,
+    "watchers": 64,
+    "created_at": "2026-05-18T02:16:36Z",
+    "pushed_at": "2026-08-09T12:38:04Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/alibaba__open-code-review/README.md",
+    "readme_bytes": 12429,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 490,
+    "est_stars_gained_1y": 1960,
+    "slug": "alibaba__open-code-review"
+  },
+  "stats": {
+    "total_lines": 194,
+    "non_blank_lines": 138,
+    "total_chars": 12307,
+    "heading_count": 20,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "features",
+      "performance",
+      "features",
+      "other",
+      "architecture",
+      "usage",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "changelog",
+      "other",
+      "configuration",
+      "api",
+      "contributing",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "What is Open Code Review?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Benchmark",
+        "category": "performance"
+      },
+      {
+        "level": 2,
+        "text": "Why Open Code Review?",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "The Problem with General-Purpose Agents",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Core Design: Deterministic Engineering \u00d7 Agent Hybrid",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "How to Use",
+        "category": "usage"
+      },
+      {
+        "level": 3,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "CLI",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Workspace mode \u2014 review all staged, unstaged, and untracked changes",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Branch range \u2014 reviews feature-branch's changes since it diverged from main (merge-base mode)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Single commit",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Resume an interrupted range or commit review",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Full-file scan \u2014 review whole files instead of a diff (no git history needed)",
+        "category": "changelog"
+      },
+      {
+        "level": 1,
+        "text": "Delegation mode \u2014 let your AI coding agent perform the review itself",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "OCR handles file selection and rule resolution; no LLM configuration needed",
+        "category": "configuration"
+      },
+      {
+        "level": 2,
+        "text": "Documentation",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "features": [
+        148,
+        0
+      ],
+      "performance": [
+        153
+      ],
+      "other": [
+        88,
+        0,
+        2,
+        6,
+        4,
+        11,
+        0
+      ],
+      "architecture": [
+        246
+      ],
+      "usage": [
+        0
+      ],
+      "installation": [
+        17,
+        26,
+        67
+      ],
+      "changelog": [
+        26
+      ],
+      "configuration": [
+        12
+      ],
+      "api": [
+        276
+      ],
+      "contributing": [
+        45
+      ],
+      "license": [
+        6
+      ]
+    },
+    "preamble_word_count": 359,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 5,
+    "uses_centering": true,
+    "image_count_total": 18,
+    "badge_count": 11,
+    "screenshot_or_logo_image_count": 7,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 4,
+    "html_link_count": 19,
+    "inline_link_count": 25,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 25,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.68,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 3,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 9,
+    "table_row_count": 7,
+    "table_present": true,
+    "paragraph_count": 25,
+    "avg_paragraph_words": 30.76,
+    "median_paragraph_words": 18,
+    "sentence_count": 32,
+    "avg_sentence_words": 24.03,
+    "median_sentence_words": 16.0,
+    "stdev_sentence_words": 56.6,
+    "short_sentence_pct": 28.1,
+    "medium_sentence_pct": 53.1,
+    "long_sentence_pct": 18.8,
+    "total_prose_words": 1343,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

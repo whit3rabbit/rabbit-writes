@@ -1,0 +1,567 @@
+{
+  "meta": {
+    "full_name": "diegosouzapw/OmniRoute",
+    "html_url": "https://github.com/diegosouzapw/OmniRoute",
+    "description": "Never stop coding. Free MIT AI gateway: one endpoint, 290+ providers (90+ free), 500+ models \u2014 Kimi, Claude, GPT, OpenAI, Gemini, GLM, DeepSeek, MiniMax. Works with Claude Code, Codex, Cursor, OpenCode, Cline & Copilot. Quota-aware auto-fallback, RTK+Caveman compression saves 15-95% tokens, MCP/A2A, Desktop/PWA. Built by 500+ contributors",
+    "stars_total": 44334,
+    "forks": 5958,
+    "watchers": 257,
+    "created_at": "2026-02-13T12:38:31Z",
+    "pushed_at": "2026-08-10T02:05:07Z",
+    "default_branch": "release/v3.8.50",
+    "readme_branch_used": "release/v3.8.50",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/diegosouzapw__OmniRoute/README.md",
+    "readme_bytes": 102500,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 403,
+    "est_stars_gained_1y": 1612,
+    "slug": "diegosouzapw__OmniRoute"
+  },
+  "stats": {
+    "total_lines": 1430,
+    "non_blank_lines": 1106,
+    "total_chars": 99577,
+    "heading_count": 65,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "support",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "features",
+      "support",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "support",
+      "changelog",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "demo",
+      "support",
+      "other",
+      "api",
+      "installation",
+      "other",
+      "features",
+      "api",
+      "other",
+      "credits",
+      "sponsors",
+      "credits",
+      "contributing",
+      "other",
+      "other",
+      "other",
+      "other",
+      "credits",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "security",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "\ud83d\ude80 OmniRoute \u2014 The Free AI Gateway",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcb0 ~1.53B Free Tokens / Month",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcac Join the community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udde9 Available",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udd93 Works the second you install it \u2014 no keys, no config",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Fresh install, zero credentials \u2014 `auto` already works:",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "\ud83d\udca5 The Promise",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\ud83e\udd14 Why OmniRoute?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd1d Supported by our Open Source Friends",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfaf Combos \u2014 The Flagship",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u26a1 Zero-config \u2014 just use `auto`",
+        "category": "configuration"
+      },
+      {
+        "level": 2,
+        "text": "### \ud83d\udd00 Or build your own \u2014 19 routing strategies",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "### \ud83e\uddf1 Resilience is built in (3 independent layers)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfc6 What Sets OmniRoute Apart",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udc9a Support OmniRoute",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\u2728 What's New",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd16 Compatible CLIs & Coding Agents",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf10 291 AI Providers \u2014 90+ Free",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfe2 Every major lab \u2014 through one endpoint",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udd93 Free Forever \u2014 $0, no card",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udda5\ufe0f Where OmniRoute Runs \u2014 Anywhere",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd12 Private & Local-First",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd0c Full CLI + A2A & MCP",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u2328\ufe0f A real CLI (not just `start`)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udef0\ufe0f Remote mode \u2014 run the CLI here, OmniRoute on a VPS",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udd1d Connect an agent \u2014 and it controls OmniRoute itself",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Give Claude Code the full OmniRoute toolset over MCP:",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udddc\ufe0f Save 15\u201395% Tokens \u2014 Automatically",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcd6 How it works \u2014 pipeline, architecture & savings math",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\uddf1 The 12-engine stack",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udf9a\ufe0f Beyond the engines \u2014 output styles, the adaptive dial & per-request control",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\u26a1 Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udce6 More install methods \u2014 Docker, source, pnpm, Arch",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Using Nix flakes",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Or using devbox",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "1. Prepare the bind-mounted data directory",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. Linux + local rootless Podman only (never a remote Podman Machine client):",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "3. Set the runtime hint, build the local Compose image, and start",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\ud83c\udfac OmniRoute in Action",
+        "category": "demo"
+      },
+      {
+        "level": 1,
+        "text": "\ud83d\udce7 Community & Help",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udee0\ufe0f Tech Stack",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcd6 Documentation",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcd8 Getting Started",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd27 Operations & Deployment",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udde0 Features & Architecture",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udd16 Protocols & APIs",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udccb Project & Quality",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\u2b50 Top Contributors",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udc96 Sponsors",
+        "category": "sponsors"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udc65 500+ Contributors",
+        "category": "credits"
+      },
+      {
+        "level": 3,
+        "text": "How to Contribute",
+        "category": "contributing"
+      },
+      {
+        "level": 3,
+        "text": "Releasing a New Version",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Create a release \u2014 npm publish happens automatically",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcca Stars",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf0d StarMapper",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude4f Acknowledgments",
+        "category": "credits"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\uddec Lineage & gateway",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udddc\ufe0f Context & token compression \u2014 engines",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udde9 Compact formats, token research & code-aware tooling",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udde0 Memory & RAG",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udef0\ufe0f Traffic inspection, MITM & transparent proxy",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcda Model data, observability & UI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udee1\ufe0f Security",
+        "category": "security"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udded Complementary tools",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc4 License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        71,
+        362,
+        1417,
+        106,
+        82,
+        479,
+        147,
+        112,
+        876,
+        22,
+        670,
+        410,
+        315,
+        111,
+        27,
+        0,
+        108,
+        289,
+        37,
+        1,
+        712,
+        230,
+        5,
+        6,
+        3,
+        6,
+        81,
+        404,
+        211,
+        180,
+        1,
+        15,
+        80,
+        58,
+        138,
+        321,
+        477,
+        135,
+        109,
+        246,
+        21
+      ],
+      "support": [
+        178,
+        747,
+        373,
+        150
+      ],
+      "installation": [
+        88,
+        49,
+        111,
+        51,
+        179
+      ],
+      "features": [
+        203,
+        309
+      ],
+      "configuration": [
+        164
+      ],
+      "changelog": [
+        483
+      ],
+      "architecture": [
+        160
+      ],
+      "demo": [
+        167
+      ],
+      "api": [
+        1,
+        162
+      ],
+      "credits": [
+        613,
+        22,
+        78
+      ],
+      "sponsors": [
+        143
+      ],
+      "contributing": [
+        76
+      ],
+      "security": [
+        62
+      ],
+      "license": [
+        49
+      ]
+    },
+    "preamble_word_count": 16,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 36,
+    "uses_centering": true,
+    "image_count_total": 151,
+    "badge_count": 16,
+    "screenshot_or_logo_image_count": 135,
+    "gif_count": 0,
+    "has_video_embed": true,
+    "badges_in_header_block": 0,
+    "html_link_count": 180,
+    "inline_link_count": 93,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 13,
+    "total_markdown_links": 93,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.97,
+    "internal_anchor_link_count": 2,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 18,
+    "code_block_languages": [
+      "bash",
+      "txt"
+    ],
+    "avg_code_block_lines": 3.06,
+    "table_row_count": 13,
+    "table_present": true,
+    "paragraph_count": 223,
+    "avg_paragraph_words": 54.0,
+    "median_paragraph_words": 6,
+    "sentence_count": 283,
+    "avg_sentence_words": 42.55,
+    "median_sentence_words": 9,
+    "stdev_sentence_words": 113.38,
+    "short_sentence_pct": 52.3,
+    "medium_sentence_pct": 20.5,
+    "long_sentence_pct": 27.2,
+    "total_prose_words": 13384,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

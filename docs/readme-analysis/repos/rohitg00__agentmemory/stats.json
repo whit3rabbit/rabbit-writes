@@ -1,0 +1,1063 @@
+{
+  "meta": {
+    "full_name": "rohitg00/agentmemory",
+    "html_url": "https://github.com/rohitg00/agentmemory",
+    "description": "#1 Persistent memory for AI coding agents based on real-world benchmarks",
+    "stars_total": 26793,
+    "forks": 2278,
+    "watchers": 75,
+    "created_at": "2026-02-25T07:32:52Z",
+    "pushed_at": "2026-08-09T12:31:00Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/rohitg00__agentmemory/README.md",
+    "readme_bytes": 85779,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1555,
+    "est_stars_gained_1y": 6220,
+    "slug": "rohitg00__agentmemory"
+  },
+  "stats": {
+    "total_lines": 1544,
+    "non_blank_lines": 1222,
+    "total_chars": 85523,
+    "heading_count": 138,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "demo",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "other",
+      "api",
+      "demo",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "If you hit EACCES on macOS/Linux system Node installs, retry with:",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "sudo npm install -g @agentmemory/agentmemory",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Retrieval Accuracy",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Token Savings",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Try it in 30 seconds",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Terminal 1: start the server",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Terminal 2: seed sample data and see recall in action",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "Recommended: install globally",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "If you hit EACCES on macOS/Linux system Node installs, retry with:",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "sudo npm install -g @agentmemory/agentmemory",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Session Replay",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Import everything under the default ~/.claude/projects",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Or import a single file",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Upgrade / Maintenance",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Claude Code (one block, paste it)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Claude Code without the plugin install (MCP-standalone path)",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Codex CLI (Codex plugin platform)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "1. start the memory server in a separate terminal",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. register the agentmemory marketplace and install the plugin",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Codex Desktop: plugin hooks currently silent (workaround available)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "GitHub Copilot CLI",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "MCP-only wiring",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Full hooks/skills plugin from the GitHub subdir",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Other agents",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Native skills via `npx skills add` (50+ agents)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Standard MCP block",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Programmatic access (Python / Rust / Node)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "From source",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Windows",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "1. Open https://github.com/iii-hq/iii/releases/tag/iii%2Fv0.11.2 in your browser",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "(we pin to v0.11.2 until agentmemory refactors for the new sandbox",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "model that engine v0.11.6+ requires)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. Download iii-x86_64-pc-windows-msvc.zip",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "(or iii-aarch64-pc-windows-msvc.zip if you're on an ARM machine)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "3. Extract iii.exe somewhere on PATH, or place it at:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "%USERPROFILE%\\.local\\bin\\iii.exe",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "(agentmemory checks that location automatically)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "4. Verify:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Should print: 0.11.2",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "5. Then run agentmemory as usual:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "1. Install Docker Desktop for Windows",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "2. Start Docker Desktop and make sure the engine is running",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "3. Run agentmemory \u2014 it will auto-start the bundled compose file:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "or via the shim package:",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "vs built-in agent memory",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Memory Pipeline",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "4-Tier Memory Consolidation",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "What Gets Captured",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Key Capabilities",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Embedding providers",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "54 Tools",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "6 Resources \u00b7 3 Prompts \u00b7 4 Skills",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Standalone MCP",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "agentmemory viewer holds port 3113, so run the console on 3114.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Engine REST (3111), WebSocket (3112), and bridge (49134) defaults match agentmemory.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Extend agentmemory with one command",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "What iii replaces",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "LLM Providers",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Local models (Ollama / LM Studio / vLLM)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "~/.agentmemory/.env",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "~/.agentmemory/.env",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Cost-aware model selection",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Multi-agent memory (`AGENT_ID` + `AGENTMEMORY_AGENT_SCOPE`)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Ports",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "macOS / Linux \u2014 find whatever is on each port and kill it",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Windows",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Config File",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "CONSOLIDATION_ENABLED=false   # opt out of auto-consolidation",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Environment Variables",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "LLM provider (pick one \u2014 default is the no-op provider: no LLM calls)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "ANTHROPIC_API_KEY=sk-ant-...",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "ANTHROPIC_BASE_URL=...              # Optional: Anthropic-compatible proxy / Azure",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "GEMINI_API_KEY=...",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "OPENROUTER_API_KEY=...",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "MINIMAX_API_KEY=...",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "OPENAI_API_KEY=***                       # NOTE: this same key auto-activates BOTH the",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# OpenAI LLM provider (here) AND the OpenAI",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# embedding provider (further below). Set",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# OPENAI_API_KEY_FOR_LLM=false to scope it",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# to embeddings only.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "OPENAI_BASE_URL=https://api.openai.com   # Optional: override for Azure / vLLM / LM Studio / proxies",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": "# Azure: https://<resource>.openai.azure.com/openai/deployments/<deployment>",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# Auto-detected from `.openai.azure.com` hostname; uses",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# api-key header + api-version query param.",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": "OPENAI_API_VERSION=2024-08-01-preview    # Optional: Azure api-version query param",
+        "category": "demo"
+      },
+      {
+        "level": 1,
+        "text": "OPENAI_MODEL=gpt-4o-mini                 # Optional: default model",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "OPENAI_TIMEOUT_MS=60000                  # Optional: OpenAI-scoped alias for the outbound fetch",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# timeout. Takes precedence over AGENTMEMORY_LLM_TIMEOUT_MS",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# for back-compat with v0.9.17. New configs should",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "# prefer the global AGENTMEMORY_LLM_TIMEOUT_MS below.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "OPENAI_REASONING_EFFORT=none             # Optional: \"low\" | \"medium\" | \"high\" | \"none\"",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# Honored only by OpenAI's reasoning models (o1, o3,",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# gpt-*-reasoning) and providers that mirror that",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# schema (Ollama Cloud thinking models). Standard",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# chat models reject this field with 400. Set to",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# \"none\" for thinking models that return reasoning",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# but no content.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "OPENAI_API_KEY_FOR_LLM=false             # Optional: set to false to skip OpenAI auto-detection",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "# for LLM (useful if you only want OpenAI for embeddings)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Opt-in Claude-subscription fallback (spawns @anthropic-ai/claude-agent-sdk);",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "leave OFF unless you understand the Stop-hook recursion risk:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "AGENTMEMORY_ALLOW_AGENT_SDK=true",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Embedding provider (auto-detected, or override)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "EMBEDDING_PROVIDER=local",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "VOYAGE_API_KEY=...",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "OPENAI_API_KEY=sk-...",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "OPENAI_BASE_URL=https://api.openai.com   # Override for Azure / vLLM / LM Studio / proxies",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": "OPENAI_EMBEDDING_MODEL=text-embedding-3-small",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "OPENAI_EMBEDDING_DIMENSIONS=1536        # Required when the model is not in the known-models table",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Outbound LLM / embedding timeout",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "AGENTMEMORY_LLM_TIMEOUT_MS=60000       # Default: 60 000 ms (60 s). Applies to every",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Search tuning",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "BM25_WEIGHT=0.4",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "VECTOR_WEIGHT=0.6",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "TOKEN_BUDGET=2000",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Auth",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "AGENTMEMORY_SECRET=your-secret",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Ports (defaults: 3111 API, 3113 viewer)",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": "III_REST_PORT=3111",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 1,
+        "text": "AGENTMEMORY_AUTO_COMPRESS=false  # OFF by default. When on,",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "AGENTMEMORY_SLOTS=false          # OFF by default. Editable pinned",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "AGENTMEMORY_REFLECT=false        # OFF by default. Requires SLOTS=on.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "AGENTMEMORY_INJECT_CONTEXT=false # OFF by default. When on:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "GRAPH_EXTRACTION_ENABLED=false",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "CONSOLIDATION_ENABLED=false   # on by default when an LLM provider is configured",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "LESSON_DECAY_ENABLED=true",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "OBSIDIAN_AUTO_EXPORT=false",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "AGENTMEMORY_EXPORT_ROOT=~/.agentmemory",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "CLAUDE_MEMORY_BRIDGE=false",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "SNAPSHOT_ENABLED=false",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Team",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "TEAM_ID=",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "USER_ID=",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "TEAM_MODE=private",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Tool visibility: \"core\" (8 tools, lean fallback) or \"all\" (54 tools)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "AGENTMEMORY_TOOLS=core",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "installation": [
+        83,
+        0,
+        125,
+        48,
+        0,
+        80,
+        155,
+        150,
+        0
+      ],
+      "other": [
+        128,
+        863,
+        1,
+        3,
+        59,
+        4,
+        134,
+        62,
+        0,
+        1,
+        3,
+        118,
+        1,
+        3,
+        200,
+        7,
+        160,
+        854,
+        59,
+        180,
+        60,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        5,
+        0,
+        10,
+        72,
+        112,
+        0,
+        63,
+        41,
+        219,
+        221,
+        210,
+        70,
+        361,
+        0,
+        408,
+        205,
+        98,
+        144,
+        35,
+        18,
+        208,
+        246,
+        198,
+        87,
+        14,
+        41,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        46,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        18,
+        22,
+        27,
+        64,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        65
+      ],
+      "demo": [
+        52,
+        0
+      ],
+      "configuration": [
+        113,
+        4,
+        0,
+        0
+      ],
+      "api": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "features": [
+        0
+      ]
+    },
+    "preamble_word_count": 639,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 13,
+    "uses_centering": true,
+    "image_count_total": 51,
+    "badge_count": 7,
+    "screenshot_or_logo_image_count": 44,
+    "gif_count": 1,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 52,
+    "inline_link_count": 54,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 4,
+    "total_markdown_links": 54,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.48,
+    "internal_anchor_link_count": 4,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 45,
+    "code_block_languages": [
+      "bash",
+      "env",
+      "json",
+      "powershell",
+      "python",
+      "text"
+    ],
+    "avg_code_block_lines": 7.51,
+    "table_row_count": 238,
+    "table_present": true,
+    "paragraph_count": 188,
+    "avg_paragraph_words": 32.57,
+    "median_paragraph_words": 24.5,
+    "sentence_count": 290,
+    "avg_sentence_words": 21.12,
+    "median_sentence_words": 13.0,
+    "stdev_sentence_words": 55.9,
+    "short_sentence_pct": 33.1,
+    "medium_sentence_pct": 38.6,
+    "long_sentence_pct": 28.3,
+    "total_prose_words": 6765,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

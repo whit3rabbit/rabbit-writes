@@ -1,0 +1,328 @@
+{
+  "meta": {
+    "full_name": "headroomlabs-ai/headroom",
+    "html_url": "https://github.com/headroomlabs-ai/headroom",
+    "description": "Compress tool outputs, logs, files, and RAG chunks before they reach the LLM. 20% fewer tokens for coding agents, 60-95% fewer tokens for JSON, same answers. Library, proxy, MCP server.",
+    "stars_total": 65660,
+    "forks": 5013,
+    "watchers": 193,
+    "created_at": "2026-01-07T19:58:51Z",
+    "pushed_at": "2026-08-09T23:24:33Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/headroomlabs-ai__headroom/README.md",
+    "readme_bytes": 36137,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1731,
+    "est_stars_gained_1y": 6924,
+    "slug": "headroomlabs-ai__headroom"
+  },
+  "stats": {
+    "total_lines": 610,
+    "non_blank_lines": 460,
+    "total_chars": 34787,
+    "heading_count": 33,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "architecture",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "contributing",
+      "support",
+      "support",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "What it does",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How it works (30 seconds)",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Get started (60 seconds)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "1 \u2014 Install",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "2 \u2014 Pick your mode  (the `headroom` commands below come from the uv or pip install)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "or: from headroom import compress      # inline library",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "3 \u2014 Verify setup and see the savings",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Codex / global install",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Proof",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Output token reduction (cut what the model writes back)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Reduction: 31.7%  (95% CI 27.7% \u2026 35.7%)   [estimated]",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Agent compatibility matrix",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "GitHub Copilot CLI subscription mode",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "or",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "GitHub Copilot in Visual Studio Code",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Claude Code in Visual Studio Code",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "When to use \u00b7 When to skip",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Headroom for teams",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Updating",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Corporate / SSL-inspection environments",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "macOS / Linux",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Windows",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Intel macOS (x86_64-apple-darwin): no prebuilt ONNX Runtime binary (#941)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "ORT is dlopen'd at runtime too:",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\"Basic Constraints of CA cert not marked critical\" (Python 3.13+ strict mode)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "headroom learn",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Documentation",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Compared to",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Community",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Community projects",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        128,
+        1,
+        0,
+        100,
+        329,
+        90,
+        172,
+        110,
+        115,
+        96,
+        126,
+        425,
+        163,
+        84,
+        50,
+        14,
+        141,
+        55,
+        35,
+        168,
+        41,
+        141
+      ],
+      "architecture": [
+        68
+      ],
+      "installation": [
+        36,
+        23,
+        168,
+        54,
+        277
+      ],
+      "api": [
+        122
+      ],
+      "contributing": [
+        13
+      ],
+      "support": [
+        23,
+        33
+      ],
+      "license": [
+        6
+      ]
+    },
+    "preamble_word_count": 378,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 8,
+    "uses_centering": true,
+    "image_count_total": 11,
+    "badge_count": 7,
+    "screenshot_or_logo_image_count": 4,
+    "gif_count": 2,
+    "has_video_embed": false,
+    "badges_in_header_block": 7,
+    "html_link_count": 18,
+    "inline_link_count": 35,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 35,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.11,
+    "internal_anchor_link_count": 1,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 22,
+    "code_block_languages": [
+      "bash",
+      "toml"
+    ],
+    "avg_code_block_lines": 3.86,
+    "table_row_count": 59,
+    "table_present": true,
+    "paragraph_count": 82,
+    "avg_paragraph_words": 28.78,
+    "median_paragraph_words": 26.5,
+    "sentence_count": 131,
+    "avg_sentence_words": 18.02,
+    "median_sentence_words": 16,
+    "stdev_sentence_words": 15.43,
+    "short_sentence_pct": 29.0,
+    "medium_sentence_pct": 35.9,
+    "long_sentence_pct": 35.1,
+    "total_prose_words": 3218,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

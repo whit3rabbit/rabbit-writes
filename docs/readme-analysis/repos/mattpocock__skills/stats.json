@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "full_name": "mattpocock/skills",
+    "html_url": "https://github.com/mattpocock/skills",
+    "description": "Skills for Real Engineers. Straight from my .agents directory.",
+    "stars_total": 211274,
+    "forks": 18268,
+    "watchers": 1217,
+    "created_at": "2026-02-03T11:15:53Z",
+    "pushed_at": "2026-08-07T15:50:46Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/mattpocock__skills/README.md",
+    "readme_bytes": 15682,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 4905,
+    "est_stars_gained_1y": 19620,
+    "slug": "mattpocock__skills"
+  },
+  "stats": {
+    "total_lines": 231,
+    "non_blank_lines": 147,
+    "total_chars": 15594,
+    "heading_count": 14,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Skills For Real Engineers",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Installation (30-second setup)",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "1. Get the skills",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "2. Run `/setup-matt-pocock-skills`",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "3. Bam - you're ready to go.",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Why These Skills Exist",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "#1: The Agent Didn't Do What I Want",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "#2: The Agent Is Way Too Verbose",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "#3: The Code Doesn't Work",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "#4: We Built A Ball Of Mud",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Summary",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Reference",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Engineering",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Productivity",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        135,
+        135,
+        0,
+        164,
+        284,
+        198,
+        189,
+        31,
+        61,
+        566,
+        215
+      ],
+      "installation": [
+        70,
+        50
+      ],
+      "features": [
+        22
+      ]
+    },
+    "preamble_word_count": 59,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 2,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 2,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 1,
+    "inline_link_count": 44,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 44,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.5,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 4,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 1,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 53,
+    "avg_paragraph_words": 20.6,
+    "median_paragraph_words": 19,
+    "sentence_count": 94,
+    "avg_sentence_words": 11.62,
+    "median_sentence_words": 10.0,
+    "stdev_sentence_words": 8.55,
+    "short_sentence_pct": 46.8,
+    "medium_sentence_pct": 41.5,
+    "long_sentence_pct": 11.7,
+    "total_prose_words": 2171,
+    "has_license_section_or_badge": false,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

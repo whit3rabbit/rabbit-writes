@@ -1,0 +1,480 @@
+{
+  "meta": {
+    "full_name": "nexu-io/open-design",
+    "html_url": "https://github.com/nexu-io/open-design",
+    "description": "\ud83c\udfa8 The open-source Claude Design alternative. \ud83d\udda5\ufe0f Local-first desktop app. \ud83d\uddbc\ufe0f Your coding agent becomes the design engine: prototypes, landing pages, dashboards, slides, images & video \u2014 real files, HTML/PDF/PPTX/MP4 export. \ud83e\udd16 Claude Code / Codex / Cursor / Gemini / OpenCode / Qwen & 20+ CLIs via BYOK.",
+    "stars_total": 84750,
+    "forks": 9905,
+    "watchers": 262,
+    "created_at": "2026-04-28T04:25:20Z",
+    "pushed_at": "2026-08-10T01:34:39Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/nexu-io__open-design/README.md",
+    "readme_bytes": 58160,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 2366,
+    "est_stars_gained_1y": 9464,
+    "slug": "nexu-io__open-design"
+  },
+  "stats": {
+    "total_lines": 772,
+    "non_blank_lines": 582,
+    "total_chars": 56587,
+    "heading_count": 53,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "demo",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "features",
+      "related",
+      "installation",
+      "configuration",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "installation",
+      "other",
+      "architecture",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "architecture",
+      "roadmap",
+      "support",
+      "contributing",
+      "other",
+      "contributing",
+      "other",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "other",
+      "credits",
+      "other",
+      "other",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "What is Open Design",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Product tour",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Core pages",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Studio \u2014 many artifact types in one project",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Platform Compatibility",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Demo",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "1 \u00b7 Prototypes \u2014 web \u00b7 desktop \u00b7 mobile",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "2 \u00b7 Live artifacts & dashboards",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "3 \u00b7 Decks \u2014 magazine decks, weekly updates, pitches",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "4 \u00b7 Images \u2014 `gpt-image-2`, ImageRouter, custom API",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "5 \u00b7 Video & HyperFrames \u2014 agent-native motion graphics",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Why Open Design",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Comparison",
+        "category": "related"
+      },
+      {
+        "level": 2,
+        "text": "Quick start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udda5\ufe0f Download the desktop app (recommended \u2014 zero config)",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udd16 Install into your coding agent (no UI)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "One-line install into the agent you're using:",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "<agent> = claude | codex | reasonix | raven | cursor | copilot | openclaw",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "| antigravity | pi | vibe | hermes | cline | kimi | kiro",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "| trae | opencode",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Hosted equivalent for curl-based setup:",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udc33 Run with Docker",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "open http://localhost:7456",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\ude80 Deploy on Sealos",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\uddd1\u200d\ud83d\udcbb Run from source",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "A full workflow \u2014 from brief to artifact",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Use Open Design from your coding agent",
+        "category": "architecture"
+      },
+      {
+        "level": 1,
+        "text": "One-line install (16+ CLIs supported):",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Then the agent can:",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Skills and design templates",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Design Systems",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Plugins",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "What plugins can do",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Using plugins",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Building a plugin",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Contributing a plugin",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Architecture",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Roadmap",
+        "category": "roadmap"
+      },
+      {
+        "level": 2,
+        "text": "Community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfaf Where to start (max leverage, min change)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udd16 Contributing as an agent",
+        "category": "contributing"
+      },
+      {
+        "level": 1,
+        "text": "1. Boot locally",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. Find a good-first-issue and assign yourself",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "3. Make the change, run the checks",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "4. Open the PR",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfc5 Open Design Fellow program",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Maintainers",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributors",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "Repository activity",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Star us",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "References & lineage",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "features": [
+        201,
+        298
+      ],
+      "other": [
+        50,
+        211,
+        178,
+        471,
+        199,
+        172,
+        120,
+        451,
+        0,
+        0,
+        0,
+        27,
+        30,
+        58,
+        56,
+        163,
+        366,
+        201,
+        89,
+        83,
+        149,
+        181,
+        18,
+        20,
+        9,
+        59,
+        180,
+        40,
+        136,
+        215
+      ],
+      "demo": [
+        22
+      ],
+      "api": [
+        188
+      ],
+      "related": [
+        84
+      ],
+      "installation": [
+        0,
+        88,
+        4,
+        66,
+        4
+      ],
+      "configuration": [
+        105
+      ],
+      "architecture": [
+        52,
+        308,
+        196,
+        124,
+        57
+      ],
+      "contributing": [
+        111,
+        30,
+        12
+      ],
+      "roadmap": [
+        290
+      ],
+      "support": [
+        103
+      ],
+      "credits": [
+        51
+      ],
+      "license": [
+        40
+      ]
+    },
+    "preamble_word_count": 448,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 7,
+    "uses_centering": true,
+    "image_count_total": 46,
+    "badge_count": 4,
+    "screenshot_or_logo_image_count": 42,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 1,
+    "html_link_count": 37,
+    "inline_link_count": 155,
+    "reference_style_link_count": 3,
+    "reference_definitions_count": 3,
+    "bare_url_count": 2,
+    "total_markdown_links": 158,
+    "uses_reference_style_links": true,
+    "avg_link_text_words": 1.79,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 10,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 8.4,
+    "table_row_count": 89,
+    "table_present": true,
+    "paragraph_count": 115,
+    "avg_paragraph_words": 38.39,
+    "median_paragraph_words": 22,
+    "sentence_count": 158,
+    "avg_sentence_words": 27.94,
+    "median_sentence_words": 17.0,
+    "stdev_sentence_words": 38.18,
+    "short_sentence_pct": 24.1,
+    "medium_sentence_pct": 36.1,
+    "long_sentence_pct": 39.9,
+    "total_prose_words": 5636,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "full_name": "NousResearch/hermes-agent",
+  "html_url": "https://github.com/NousResearch/hermes-agent",
+  "description": "The agent that grows with you",
+  "stars_total": 227968,
+  "forks": 44777,
+  "watchers": 872,
+  "created_at": "2025-07-22T22:22:28Z",
+  "pushed_at": "2026-08-10T02:21:00Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/NousResearch__hermes-agent/README.md",
+  "readme_bytes": 17688,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 4042,
+  "est_stars_gained_1y": 16168,
+  "slug": "NousResearch__hermes-agent"
+}

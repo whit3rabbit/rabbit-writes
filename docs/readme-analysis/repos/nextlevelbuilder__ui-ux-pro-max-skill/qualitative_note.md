@@ -1,0 +1,7 @@
+# nextlevelbuilder/ui-ux-pro-max-skill — qualitative note
+
+This README's most distinctive technique is showing its own output as ASCII art: a boxed mock "RECOMMENDED DESIGN SYSTEM" report and a four-step ASCII flow diagram ("USER REQUEST → MULTI-DOMAIN SEARCH → REASONING ENGINE → COMPLETE DESIGN SYSTEM OUTPUT") that demonstrate exactly what the tool produces before the reader has installed anything — a strong show-don't-tell pattern for a tool whose value is hard to describe abstractly. It leans heavily on precise, checkable numbers throughout ("161 Reasoning Rules," "84 UI Styles," "192 Color Palettes") reinforced by badges at the top, which gives the scope of the dataset an air of rigor, though the badge count (84) and body text ("Available Styles (67)") are inconsistent with each other. Large style/stack reference tables are collapsed into `<details>` blocks to keep the main scroll manageable, and a "Basic vs. Premium" comparison section transparently draws the open-source/paid line rather than burying it. The troubleshooting section is a good example of grounding advice in actual error strings users would search for (e.g. "`uipro: unknown command 'uninstall'`") paired with the exact fix, rather than generic guidance.
+
+**Quotes:**
+- "AI agents using this skill should never install software on your machine; they are instructed to ask you instead."
+- "Human-readable output truncates long fields at 300 characters. Use `--json` to get the full, untruncated data"

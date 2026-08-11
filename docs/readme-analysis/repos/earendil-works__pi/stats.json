@@ -1,0 +1,151 @@
+{
+  "meta": {
+    "full_name": "earendil-works/pi",
+    "html_url": "https://github.com/earendil-works/pi",
+    "description": "AI agent toolkit: unified LLM API, agent loop, TUI, coding agent CLI",
+    "stars_total": 86066,
+    "forks": 10695,
+    "watchers": 283,
+    "created_at": "2025-08-09T14:03:50Z",
+    "pushed_at": "2026-08-09T00:11:09Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/earendil-works__pi/README.md",
+    "readme_bytes": 6762,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1265,
+    "est_stars_gained_1y": 5060,
+    "slug": "earendil-works__pi"
+  },
+  "stats": {
+    "total_lines": 114,
+    "non_blank_lines": 79,
+    "total_chars": 6760,
+    "heading_count": 9,
+    "heading_levels_used": [
+      1,
+      2
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "other",
+      "other",
+      "other",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Pi Agent Harness",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "All Packages",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Permissions & Containerization",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Development",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Building standalone binaries from release source",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Supply-chain hardening",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Share your OSS coding agent sessions",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        81,
+        72,
+        99,
+        0,
+        80,
+        169,
+        124
+      ],
+      "contributing": [
+        38
+      ],
+      "license": [
+        41
+      ]
+    },
+    "preamble_word_count": 95,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 3,
+    "uses_centering": true,
+    "image_count_total": 4,
+    "badge_count": 2,
+    "screenshot_or_logo_image_count": 2,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 2,
+    "html_link_count": 5,
+    "inline_link_count": 20,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 20,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.45,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 2,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 5,
+    "table_row_count": 7,
+    "table_present": true,
+    "paragraph_count": 18,
+    "avg_paragraph_words": 24.67,
+    "median_paragraph_words": 20.5,
+    "sentence_count": 27,
+    "avg_sentence_words": 16.44,
+    "median_sentence_words": 14,
+    "stdev_sentence_words": 13.17,
+    "short_sentence_pct": 22.2,
+    "medium_sentence_pct": 63.0,
+    "long_sentence_pct": 14.8,
+    "total_prose_words": 741,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": false,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

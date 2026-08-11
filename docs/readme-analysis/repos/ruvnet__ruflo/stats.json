@@ -1,0 +1,338 @@
+{
+  "meta": {
+    "full_name": "ruvnet/ruflo",
+    "html_url": "https://github.com/ruvnet/ruflo",
+    "description": "\ud83c\udf0a The original agent meta-harness. Deploy intelligent multi-player swarms, coordinate autonomous workflows, and build conversational AI systems. Features adaptive memory, self-learning intelligence, RAG integration, and native Claude Code / Codex / Hermes and many more Integrated",
+    "stars_total": 67509,
+    "forks": 8077,
+    "watchers": 433,
+    "created_at": "2025-06-02T21:24:20Z",
+    "pushed_at": "2026-08-09T06:12:27Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/ruvnet__ruflo/README.md",
+    "readme_bytes": 29891,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1088,
+    "est_stars_gained_1y": 4352,
+    "slug": "ruvnet__ruflo"
+  },
+  "stats": {
+    "total_lines": 417,
+    "non_blank_lines": 314,
+    "total_chars": 29630,
+    "heading_count": 35,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "installation",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "demo",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "support",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Ruflo",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Path A \u2014 Claude Code Plugins (lite, slash commands only)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Add the marketplace",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install core + any plugins you need",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Core & Orchestration",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Memory & Knowledge",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Intelligence & Learning",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Code Quality & Testing",
+        "category": "testing"
+      },
+      {
+        "level": 4,
+        "text": "Security & Compliance",
+        "category": "security"
+      },
+      {
+        "level": 4,
+        "text": "Architecture & Methodology",
+        "category": "architecture"
+      },
+      {
+        "level": 4,
+        "text": "DevOps & Observability",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Extensibility",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Domain-Specific",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "CLI Install",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "One-line install (POSIX shells only \u2014 see Windows note below)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Interactive setup wizard \u2014 runs identically on every platform",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Quick non-interactive init",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "npx ruflo@latest init",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Or install globally",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "MCP Server",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Add Ruflo as an MCP server in Claude Code (canonical form, matches USERGUIDE.md)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What You Get",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Web UI (Beta) \u2014 self-hostable, hosted demo at [flo.ruv.io](https://flo.ruv.io/)",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "Goal Planner UI \u2014 autonomous agents at [goal.ruv.io](https://goal.ruv.io/)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Agent Federation \u2014 Slack for Agents",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Team A: initialize federation and generate keypair",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Team A: join Team B's federation endpoint",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Team A: send a task \u2014 PII is stripped automatically before it leaves",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Team A: check peer trust levels and session health",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Claude Code plugin",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Or via CLI",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Documentation",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Support",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        217,
+        1,
+        5,
+        69,
+        68,
+        66,
+        40,
+        32,
+        49,
+        0,
+        0,
+        1,
+        9,
+        343,
+        328,
+        314,
+        5,
+        10,
+        16,
+        6,
+        4,
+        50
+      ],
+      "installation": [
+        96,
+        57,
+        5,
+        15,
+        5,
+        53
+      ],
+      "testing": [
+        48
+      ],
+      "security": [
+        26
+      ],
+      "architecture": [
+        85
+      ],
+      "demo": [
+        515
+      ],
+      "api": [
+        302
+      ],
+      "support": [
+        40
+      ],
+      "license": [
+        6
+      ]
+    },
+    "preamble_word_count": 279,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 3,
+    "uses_centering": true,
+    "image_count_total": 15,
+    "badge_count": 11,
+    "screenshot_or_logo_image_count": 4,
+    "gif_count": 1,
+    "has_video_embed": false,
+    "badges_in_header_block": 11,
+    "html_link_count": 2,
+    "inline_link_count": 101,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 101,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.78,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 9,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 8.22,
+    "table_row_count": 138,
+    "table_present": true,
+    "paragraph_count": 41,
+    "avg_paragraph_words": 21.49,
+    "median_paragraph_words": 8,
+    "sentence_count": 55,
+    "avg_sentence_words": 16.02,
+    "median_sentence_words": 10,
+    "stdev_sentence_words": 15.59,
+    "short_sentence_pct": 49.1,
+    "medium_sentence_pct": 25.5,
+    "long_sentence_pct": 25.5,
+    "total_prose_words": 1117,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

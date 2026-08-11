@@ -1,0 +1,19 @@
+{
+  "full_name": "floci-io/floci",
+  "html_url": "https://github.com/floci-io/floci",
+  "description": "Light, fluffy, and always free - The AWS Local Emulator alternative",
+  "stars_total": 19289,
+  "forks": 1968,
+  "watchers": 62,
+  "created_at": "2026-02-18T02:28:29Z",
+  "pushed_at": "2026-08-09T23:40:15Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/floci-io__floci/README.md",
+  "readme_bytes": 35148,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 852,
+  "est_stars_gained_1y": 3408,
+  "slug": "floci-io__floci"
+}

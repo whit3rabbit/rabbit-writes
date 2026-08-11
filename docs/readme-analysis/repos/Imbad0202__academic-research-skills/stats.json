@@ -1,0 +1,743 @@
+{
+  "meta": {
+    "full_name": "Imbad0202/academic-research-skills",
+    "html_url": "https://github.com/Imbad0202/academic-research-skills",
+    "description": "Academic Research Skills for Claude Code: research \u2192 write \u2192 review \u2192 revise \u2192 finalize",
+    "stars_total": 41504,
+    "forks": 3300,
+    "watchers": 115,
+    "created_at": "2026-02-26T06:31:01Z",
+    "pushed_at": "2026-08-09T21:58:14Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/Imbad0202__academic-research-skills/README.md",
+    "readme_bytes": 101074,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1816,
+    "est_stars_gained_1y": 7264,
+    "slug": "Imbad0202__academic-research-skills"
+  },
+  "stats": {
+    "total_lines": 727,
+    "non_blank_lines": 502,
+    "total_chars": 100236,
+    "heading_count": 91,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "features",
+      "architecture",
+      "installation",
+      "performance",
+      "other",
+      "features",
+      "demo",
+      "other",
+      "usage",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "support",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "features",
+      "license",
+      "credits",
+      "changelog",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "toc",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "other",
+      "changelog",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Academic Research Skills for Claude Code",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Why human-in-the-loop, not full automation?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Architecture & pipeline",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Quick install",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Performance & cost",
+        "category": "performance"
+      },
+      {
+        "level": 2,
+        "text": "Guides & articles",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Features at a glance",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Showcase: real pipeline output",
+        "category": "demo"
+      },
+      {
+        "level": 2,
+        "text": "Companion: Experiment Agent",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Usage",
+        "category": "usage"
+      },
+      {
+        "level": 3,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Start a full research pipeline",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Start with Socratic guidance",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Write a paper with guided planning",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Review an existing paper",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Check pipeline status",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Individual Skills",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Deep Research (8 modes)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Academic Paper (11 modes)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Academic Paper Reviewer (6 modes)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Academic Pipeline (Orchestrator)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Supported Languages",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Supported Citation Formats",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Supported Paper Structures",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Skill Details",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Deep Research (v2.11.0)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Academic Paper (v3.2.0)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Academic Paper Reviewer (v1.10.0)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Academic Pipeline (v3.19.0)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "v3.0 Optimizations: What We Discovered About AI's Structural Limits",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "What happened",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "What we changed (v3.0)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Why this matters",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "Contributors",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "Changelog",
+        "category": "changelog"
+      },
+      {
+        "level": 3,
+        "text": "v3.19.0 (2026-07-22) \u2014 Revision-round claim-drift guards, PDF read-integrity preflight, read-scope attestation",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.18.0 (2026-07-18) \u2014 Self-improvement survey integration: advisory quality layers, risk-stratified claim gate, cross-model reviewer & judge tracks",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.17.0 (2026-07-16) \u2014 Pipeline boundary semantics, canonical cross-model handoff envelope, executable panel checker",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.16.0 (2026-07-12) \u2014 Model tiering, cross-model gate hardening, WP advisory sharpening",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.15.0 (2026-07-04) \u2014 Release-gate hardening, prompt-debt retirement round 2, defrift locks",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.14.0 (2026-07-02) \u2014 Claude Science importability, eval-comment rendering, prompt-debt retirement",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.13.0 (2026-06-18) \u2014 Hook portability, provider-agnostic verification, guard correctness",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.12.1 (2026-06-15) \u2014 Reviewer-response triage modes (PR #433 integration)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.12.0 (2026-06-08) \u2014 Kong auto-research feature track: experiment provenance, figure fidelity, cross-paper contradiction, partial-evidence decomposition",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.11.1 (2026-06-06) \u2014 Post-ship correctness, hardening & provenance rollup",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.11.0 (2026-06-04) \u2014 Deterministic citation verification gate (#182)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.10.0 (2026-06-01) \u2014 Triangulation policy layer, Kong survey adoptions, eval harness, scoped-write guard",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "v3.9.4.2 (2026-05-19) \u2014 post-ship hotfix for PR #149 CI discipline gates (codex post-ship)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.9.4.1 (2026-05-19) \u2014 post-ship hotfix for v3.9.4 temporal verification (#135 codex post-ship)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.9.4 (2026-05-18) \u2014 #135 temporal verification layer (advisory)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.9.3 (2026-05-18) \u2014 #128 housekeeping (shared client utilities + dedup resolvers)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.9.2 (2026-05-18) \u2014 #133 phase boundary hot-fix",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.9.1 (2026-05-18) \u2014 #129 + #130 client hardening",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.9.0 (2026-05-17) \u2014 #102 cross-index triangulation measurement",
+        "category": "toc"
+      },
+      {
+        "level": 3,
+        "text": "v3.8.2 (2026-05-17) \u2014 #118 uncited audit_tool_failure surface",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.8.0 (2026-05-16) \u2014 L3 Claim-Faithfulness Locator + Audit (paired milestone)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.7.0 (2026-05-05) \u2014 Claude Code Plugin Packaging",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.6.8 (2026-05-03) \u2014 Generator-Evaluator Contract Gate (v3.6.6 spec ship)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.6.7 (2026-04-30) \u2014 Downstream-Agent Pattern Protection (Step 1+2)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.6.5 (2026-04-27) \u2014 Material Passport `literature_corpus[]` Consumer Integration",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.6.4 (2026-04-25) \u2014 Material Passport `literature_corpus[]` Input Port",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.6.3 (2026-04-23) \u2014 Opt-in Passport Reset Boundary",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.6.2 (2026-04-23) \u2014 Reviewer Sprint Contract Hard Gate",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.5.1 (2026-04-22) \u2014 Opt-in Socratic Reading-Check Probe",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.5.0 (2026-04-21) \u2014 Collaboration Depth Observer",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.4.0 (2026-04-20) \u2014 Compliance Agent + Schema 12",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.3.6 (2026-04-15) \u2014 README Streamlining + ARCHITECTURE doc",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "v3.3.5 (2026-04-15)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.3.4 (2026-04-15) \u2014 README Changelog Sync Patch",
+        "category": "changelog"
+      },
+      {
+        "level": 3,
+        "text": "v3.3.3 (2026-04-15) \u2014 Release Prep + Lint Hardening",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.3.2 (2026-04-15) \u2014 Data Access Levels + Task Type Metadata",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.3.1 (2026-04-14) \u2014 Spec Consistency Patch",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.3 (2026-04-09) \u2014 PaperOrchestra-Inspired Enhancements",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.2 (2026-04-09) \u2014 Lu 2026 Nature Integration",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.1.1 (2026-04-09) \u2014 IS Senior Scholars' Basket of 11",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.1 (2026-04-06) \u2014 Anti-Context-Rot + Cognitive Frameworks + Lean Size",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v3.0 (2026-04-03) \u2014 Anti-Sycophancy + Intent Detection + Dialogue Health",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.9.1 (2026-04-03) \u2014 Skill Metadata",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.9 (2026-03-27) \u2014 Style Calibration + Writing Quality Check",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.8 (2026-03-22) \u2014 SCR Loop Phase 1: State-Challenge-Reflect",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.7 (2026-03-09) \u2014 Integrity Verification v2.0: Anti-Hallucination Overhaul",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.6.2 (2026-03-09) \u2014 Intent-Based Mode Activation",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.6.1 (2026-03-09) \u2014 Bilingual Trigger Keywords",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.6 / v2.4 / v1.4 (2026-03-08) \u2014 15+ Improvements",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.4 / v1.3 (2026-03-08)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.3 / v1.3 (2026-03-08)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.2 / v1.3 (2025-03-05)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.0.1 (2026-03)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.0 (2026-02)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v1.0 (2026-02)",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        251,
+        41,
+        265,
+        15,
+        9,
+        10,
+        8,
+        2,
+        0,
+        0,
+        0,
+        0,
+        21,
+        26,
+        21,
+        44,
+        42,
+        112,
+        0,
+        210,
+        144,
+        176,
+        186,
+        249,
+        225,
+        163,
+        195,
+        160,
+        159,
+        257,
+        101,
+        203,
+        123,
+        155,
+        103,
+        106,
+        81,
+        21,
+        254,
+        410,
+        594,
+        406,
+        174,
+        199,
+        182,
+        135,
+        210,
+        94,
+        205,
+        92,
+        26,
+        99,
+        60,
+        79,
+        140,
+        187,
+        89,
+        232,
+        251,
+        24,
+        138,
+        91,
+        102,
+        93,
+        35,
+        159,
+        53,
+        52,
+        96,
+        31,
+        60,
+        33
+      ],
+      "features": [
+        561,
+        474,
+        103
+      ],
+      "architecture": [
+        49,
+        107
+      ],
+      "installation": [
+        493,
+        0
+      ],
+      "performance": [
+        27
+      ],
+      "demo": [
+        147
+      ],
+      "usage": [
+        0
+      ],
+      "support": [
+        109,
+        14,
+        14
+      ],
+      "license": [
+        55
+      ],
+      "credits": [
+        379
+      ],
+      "changelog": [
+        0,
+        37
+      ],
+      "configuration": [
+        157
+      ],
+      "toc": [
+        178
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 4,
+    "badge_count": 4,
+    "screenshot_or_logo_image_count": 0,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 4,
+    "html_link_count": 0,
+    "inline_link_count": 86,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 86,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.51,
+    "internal_anchor_link_count": 1,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 9,
+    "code_block_languages": [
+      "text"
+    ],
+    "avg_code_block_lines": 5.89,
+    "table_row_count": 11,
+    "table_present": true,
+    "paragraph_count": 76,
+    "avg_paragraph_words": 37.76,
+    "median_paragraph_words": 28.0,
+    "sentence_count": 130,
+    "avg_sentence_words": 22.08,
+    "median_sentence_words": 17.0,
+    "stdev_sentence_words": 19.54,
+    "short_sentence_pct": 26.2,
+    "medium_sentence_pct": 33.1,
+    "long_sentence_pct": 40.8,
+    "total_prose_words": 11663,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,897 @@
+{
+  "meta": {
+    "full_name": "affaan-m/ECC",
+    "html_url": "https://github.com/affaan-m/ECC",
+    "description": "The agent harness performance optimization system. Skills, instincts, memory, security, and research-first development for Claude Code, Codex, Opencode, Cursor and beyond.",
+    "stars_total": 239034,
+    "forks": 36307,
+    "watchers": 1227,
+    "created_at": "2026-01-18T00:51:51Z",
+    "pushed_at": "2026-08-09T22:39:00Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/affaan-m__ECC/README.md",
+    "readme_bytes": 113279,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 2992,
+    "est_stars_gained_1y": 11968,
+    "slug": "affaan-m__ECC"
+  },
+  "stats": {
+    "total_lines": 2080,
+    "non_blank_lines": 1571,
+    "total_chars": 113194,
+    "heading_count": 114,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "changelog",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "performance",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "support",
+      "other",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "configuration",
+      "configuration",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "configuration",
+      "installation",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "security",
+      "faq",
+      "other",
+      "other",
+      "testing",
+      "testing",
+      "other",
+      "other",
+      "support",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "ECC",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Install ECC",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Pick one path only (per harness)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Guided setup (recommended)",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Claude Code",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Codex App and CLI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Other agents and editors",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Advanced Install Options",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Low-context / no-hooks path",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "or, without cloning first",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Find the right components first",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Just agents",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Rules directories (common + language-specific)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Core/general skills only (Claude Code loads skills from direct children",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "of ~/.claude/skills; do not nest manual installs under ~/.claude/skills/ecc/)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Optional: maintained slash-command compatibility during migration",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Install hooks",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Configure MCPs",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Self-host Kimi with ECC + It\u00f4 compute",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "It\u00f4 compute CLI bridge",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Reset / Uninstall ECC",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Start Using ECC",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What's New: ECC 2.1",
+        "category": "changelog"
+      },
+      {
+        "level": 3,
+        "text": "Plan Canvas: review plans by pointing, not retyping",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Also in 2.1",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Current development: Unified Memory Vault",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.0.0: The Agent Harness Operating System (Jun 2026)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v2.0.0-rc.1: Surface Refresh, Operator Workflows, and ECC 2.0 Alpha (Apr 2026)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v1.9.0: Selective Install and Language Expansion (Mar 2026)",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "v1.8.0: Harness Performance System (Mar 2026)",
+        "category": "performance"
+      },
+      {
+        "level": 3,
+        "text": "v1.7.0: Cross-Platform Expansion and Presentation Builder (Feb 2026)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v1.6.0: Codex CLI, AgentShield, and Marketplace (Feb 2026)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v1.4.1: Bug Fix (Feb 2026)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v1.4.0: Multi-Language Rules, Installation Wizard, and PM2 (Feb 2026)",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "v1.3.0: OpenCode Plugin Support (Feb 2026)",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "v1.2.0: Unified Commands and Skills (Feb 2026)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Why Choose ECC?",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "TDD: Test-Driven Development",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Skills keep the context focused",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Share context between harnesses",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Initialize the project vault.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Write a handoff body to a regular file, then target the next harness.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Recall it from another harness.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Validate the vault before sharing team memories.",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Guides",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What's Inside",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "or",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Ecosystem Tools",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Option A: Local Analysis (Built-in)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Option B: GitHub App (Advanced)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Comment on any issue:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Quick scan (no install needed)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Auto-fix safe issues",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Deep analysis with three Opus 4.6 agents",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Generate secure config from scratch",
+        "category": "configuration"
+      },
+      {
+        "level": 2,
+        "text": "Key Concepts",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Agents",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Skills",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "TDD Workflow",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Hooks",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Rules",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Cross-Platform Support",
+        "category": "support"
+      },
+      {
+        "level": 1,
+        "text": "Via environment variable",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Via global config",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Via project config",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Detect current setting",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Hook strictness profile (default: standard)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Comma-separated hook IDs to disable",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Cap SessionStart additional context (default: 8000 chars)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Disable SessionStart additional context entirely for low-context/local-model setups",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Session-tmp retention window in days (default: 30).",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Set to 0, off, false, disabled, never, or none to keep all sessions (disable pruning).",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Cap how many learned instincts SessionStart injects into context (default: 6)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Minimum confidence an instinct needs to be injected, 0-1 (default: 0.7)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Keep context/scope/loop warnings but suppress API-rate cost estimates",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": "Cursor-only boundary (Claude Code keeps the default ~/.claude)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Platform Support",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Cross-tool capability map",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "macOS/Linux",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Windows PowerShell",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "What's included for Cursor",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Cursor loading notes",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Memory and data isolation (Cursor + Claude Code)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Hook architecture (DRY adapter pattern)",
+        "category": "architecture"
+      },
+      {
+        "level": 4,
+        "text": "Rules format",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Run Codex CLI in the repo: AGENTS.md and .codex/ are auto-detected",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Automatic setup: sync ECC assets (AGENTS.md, skills, MCP servers) into ~/.codex",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Or manually: copy the reference config to your home directory",
+        "category": "configuration"
+      },
+      {
+        "level": 4,
+        "text": "What's included for Codex",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Key limitation",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Multi-agent support",
+        "category": "support"
+      },
+      {
+        "level": 1,
+        "text": "Install OpenCode",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Run in the repository root",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Hook support via plugins",
+        "category": "support"
+      },
+      {
+        "level": 4,
+        "text": "Plugin installation",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Documentation",
+        "category": "api"
+      },
+      {
+        "level": 4,
+        "text": "What's included for GitHub Copilot",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Feature coverage",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Limitations",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Token Optimization",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Requirements",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Claude Code CLI version",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Important: hooks auto-loading behavior",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Security",
+        "category": "security"
+      },
+      {
+        "level": 2,
+        "text": "Troubleshooting",
+        "category": "faq"
+      },
+      {
+        "level": 1,
+        "text": "Just agents",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Just rules",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Running Tests",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Run all tests",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Run individual test files",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Background",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Community and Project",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Links",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        231,
+        146,
+        389,
+        218,
+        302,
+        24,
+        42,
+        53,
+        5,
+        22,
+        0,
+        101,
+        314,
+        303,
+        308,
+        150,
+        77,
+        299,
+        49,
+        249,
+        73,
+        83,
+        35,
+        53,
+        26,
+        98,
+        176,
+        5,
+        14,
+        11,
+        175,
+        254,
+        49,
+        33,
+        21,
+        21,
+        24,
+        3,
+        4,
+        5,
+        11,
+        8,
+        44,
+        21,
+        10,
+        23,
+        6,
+        3,
+        8,
+        3,
+        0,
+        3,
+        3,
+        4,
+        45,
+        198,
+        14,
+        13,
+        79,
+        70,
+        124,
+        73,
+        1,
+        108,
+        24,
+        10,
+        174,
+        66,
+        135,
+        386,
+        29,
+        104,
+        5,
+        249,
+        18,
+        43,
+        48
+      ],
+      "installation": [
+        32,
+        299,
+        40,
+        16,
+        101,
+        162,
+        168,
+        84,
+        3,
+        3,
+        6,
+        4,
+        79,
+        12
+      ],
+      "configuration": [
+        426,
+        48,
+        3,
+        6,
+        6,
+        159
+      ],
+      "changelog": [
+        34
+      ],
+      "performance": [
+        96
+      ],
+      "support": [
+        34,
+        233,
+        189,
+        179,
+        48,
+        328
+      ],
+      "features": [
+        97
+      ],
+      "api": [
+        15,
+        58
+      ],
+      "architecture": [
+        80
+      ],
+      "security": [
+        261
+      ],
+      "faq": [
+        372
+      ],
+      "testing": [
+        8,
+        4
+      ],
+      "license": [
+        27
+      ]
+    },
+    "preamble_word_count": 1033,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 10,
+    "uses_centering": true,
+    "image_count_total": 33,
+    "badge_count": 17,
+    "screenshot_or_logo_image_count": 16,
+    "gif_count": 1,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 57,
+    "inline_link_count": 109,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 109,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.61,
+    "internal_anchor_link_count": 6,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 73,
+    "code_block_languages": [
+      "bash",
+      "json",
+      "markdown",
+      "powershell",
+      "text",
+      "yaml"
+    ],
+    "avg_code_block_lines": 6.92,
+    "table_row_count": 183,
+    "table_present": true,
+    "paragraph_count": 298,
+    "avg_paragraph_words": 26.33,
+    "median_paragraph_words": 15.0,
+    "sentence_count": 486,
+    "avg_sentence_words": 16.14,
+    "median_sentence_words": 13.0,
+    "stdev_sentence_words": 16.77,
+    "short_sentence_pct": 34.4,
+    "medium_sentence_pct": 44.7,
+    "long_sentence_pct": 21.0,
+    "total_prose_words": 9647,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

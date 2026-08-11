@@ -1,0 +1,445 @@
+{
+  "meta": {
+    "full_name": "antirez/ds4",
+    "html_url": "https://github.com/antirez/ds4",
+    "description": "DeepSeek 4 Flash and PRO local inference engine for Metal, CUDA and ROCm",
+    "stars_total": 21061,
+    "forks": 1891,
+    "watchers": 168,
+    "created_at": "2026-05-06T17:17:05Z",
+    "pushed_at": "2026-08-09T18:31:13Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/antirez__ds4/README.md",
+    "readme_bytes": 74395,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1226,
+    "est_stars_gained_1y": 4904,
+    "slug": "antirez__ds4"
+  },
+  "stats": {
+    "total_lines": 1622,
+    "non_blank_lines": 1328,
+    "total_chars": 74391,
+    "heading_count": 49,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "credits",
+      "other",
+      "usage",
+      "api",
+      "other",
+      "other",
+      "other",
+      "other",
+      "examples",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "related",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "usage",
+      "other",
+      "performance",
+      "other",
+      "other",
+      "other",
+      "other",
+      "usage",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "So, what can I do with this software?",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Motivations",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "AI full disclosure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Acknowledgements to llama.cpp and GGML",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "Status",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "How to use this project?",
+        "category": "usage"
+      },
+      {
+        "level": 2,
+        "text": "More Documentation",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Model Weights",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "DSpark Speculative Decoding",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Speed",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Running models larger than RAM",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Practical SSD streaming examples",
+        "category": "examples"
+      },
+      {
+        "level": 2,
+        "text": "Distributed inference with pipeline parallelism",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "How it works and how to configure it",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Full DeepSeek V4 PRO Q4 on two Mac Studios",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Coordinator machine.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Worker machine.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Machine A: coordinator, owns tokenization, sampling, the prompt, and layers 0..30.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Machine B: worker, connects to A and owns layers 31..output.",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Network Link Comparison",
+        "category": "related"
+      },
+      {
+        "level": 3,
+        "text": "Distributed protocol overview",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Tensor Parallelism over RDMA",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Running GLM 5.2 across two 128 GB MacBooks",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Let the GPU wire ~117 GB (default cap is ~75% of RAM; the resident",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "expert shard needs ~97.5 GiB plus KV/scratch).",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "RDMA over Thunderbolt needs an IPv4 address directly on the cabled",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "member interface (the bridge IP does not count). Use the interface",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "that is 'active' in ifconfig, e.g. en1 on one side and en6 on the",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "other. Skip this if you are fine with the TCP fallback.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Machine B: worker.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Machine A: coordinator.",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Tensor Parallelism across CUDA GPUs",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Reducing heat, power usage and fan noise",
+        "category": "usage"
+      },
+      {
+        "level": 2,
+        "text": "Native agent",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Benchmarking",
+        "category": "performance"
+      },
+      {
+        "level": 2,
+        "text": "Capability Evaluation",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "CLI",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Server",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Tool call handling and canonicalization",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Agent Client Usage",
+        "category": "usage"
+      },
+      {
+        "level": 2,
+        "text": "Thinking Modes",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Disk KV Cache",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Backends",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Steering",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Test Vectors",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Metal, with DS4_TEST_SESSION_COUNT set to 2, 4, 8, and 16.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "CUDA multi-GPU Flash.",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Debugging Notes",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Logo",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        147,
+        43,
+        69,
+        25,
+        528,
+        381,
+        347,
+        318,
+        278,
+        44,
+        3,
+        11,
+        16,
+        81,
+        232,
+        121,
+        8,
+        0,
+        5,
+        0,
+        0,
+        35,
+        14,
+        268,
+        481,
+        308,
+        645,
+        109,
+        737,
+        330,
+        74,
+        963,
+        234,
+        96,
+        104,
+        9,
+        63,
+        89,
+        27
+      ],
+      "credits": [
+        113
+      ],
+      "usage": [
+        242,
+        135,
+        289
+      ],
+      "api": [
+        167
+      ],
+      "examples": [
+        206
+      ],
+      "configuration": [
+        246,
+        0
+      ],
+      "related": [
+        581
+      ],
+      "performance": [
+        198
+      ]
+    },
+    "preamble_word_count": 185,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 1,
+    "uses_centering": true,
+    "image_count_total": 3,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 3,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 16,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 16,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 3.31,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 51,
+    "code_block_languages": [
+      "json",
+      "sh",
+      "text",
+      "toml"
+    ],
+    "avg_code_block_lines": 6.31,
+    "table_row_count": 46,
+    "table_present": true,
+    "paragraph_count": 172,
+    "avg_paragraph_words": 46.98,
+    "median_paragraph_words": 43.0,
+    "sentence_count": 458,
+    "avg_sentence_words": 17.64,
+    "median_sentence_words": 16.0,
+    "stdev_sentence_words": 9.32,
+    "short_sentence_pct": 19.7,
+    "medium_sentence_pct": 45.9,
+    "long_sentence_pct": 34.5,
+    "total_prose_words": 9261,
+    "has_license_section_or_badge": false,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": false,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

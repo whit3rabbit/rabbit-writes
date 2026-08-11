@@ -1,0 +1,548 @@
+{
+  "meta": {
+    "full_name": "DeusData/codebase-memory-mcp",
+    "html_url": "https://github.com/DeusData/codebase-memory-mcp",
+    "description": "High-performance code intelligence MCP server. Indexes codebases into a persistent knowledge graph \u2014 average repo in milliseconds. 158 languages, sub-ms queries, 99% fewer tokens. Single static binary, zero dependencies.",
+    "stars_total": 38308,
+    "forks": 3050,
+    "watchers": 161,
+    "created_at": "2026-02-24T22:01:00Z",
+    "pushed_at": "2026-08-10T00:43:43Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/DeusData__codebase-memory-mcp/README.md",
+    "readme_bytes": 64988,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 670,
+    "est_stars_gained_1y": 2680,
+    "slug": "DeusData__codebase-memory-mcp"
+  },
+  "stats": {
+    "total_lines": 815,
+    "non_blank_lines": 604,
+    "total_chars": 64791,
+    "heading_count": 63,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "features",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "toc",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "toc",
+      "other",
+      "other",
+      "architecture",
+      "performance",
+      "faq",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "configuration",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "toc",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "other",
+      "configuration",
+      "configuration",
+      "toc",
+      "other",
+      "other",
+      "faq",
+      "other",
+      "support",
+      "architecture",
+      "security",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "codebase-memory-mcp",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Why codebase-memory-mcp",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "1. Download the installer",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "2. (Optional but recommended) Inspect the script",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "3. Unblock the downloaded file (removes Mark-of-the-Web restriction added by browsers/Invoke-WebRequest)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "4. Run it",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Session Coordination Daemon",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Graph Visualization UI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Auto-Index",
+        "category": "toc"
+      },
+      {
+        "level": 3,
+        "text": "Keeping Up to Date",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "macOS / Linux",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Windows",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Uninstall",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Graph & analysis",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Search",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Cross-service linking",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Cross-repo intelligence",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Edge types (selected)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Indexing pipeline",
+        "category": "toc"
+      },
+      {
+        "level": 3,
+        "text": "Distribution & operation",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Team-Shared Graph Artifact",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How It Works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Performance",
+        "category": "performance"
+      },
+      {
+        "level": 2,
+        "text": "Troubleshooting & Diagnostics",
+        "category": "faq"
+      },
+      {
+        "level": 3,
+        "text": "Capture a diagnostics log",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "What to share",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Pre-built Binaries",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Setup Scripts",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "AUR (Arch Linux)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Install via Claude Code",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Build from Source",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Binary at: build/c/codebase-memory-mcp   (codebase-memory-mcp.exe on Windows)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Manual MCP Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 2,
+        "text": "Multi-Agent Support",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Sessions, compaction, and subagents",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Manual or UI-managed integrations",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "CLI Mode",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Use the \"name\" returned by list_projects as the project value.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Force human-readable progress without contaminating stdout.",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "MCP Tools",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Indexing",
+        "category": "toc"
+      },
+      {
+        "level": 3,
+        "text": "Querying",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Graph Data Model",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Node Labels",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Edge Types",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Qualified Names",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Supported Cypher (openCypher read subset)",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Ignoring Files",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Environment Variables",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Store indexes in a custom directory",
+        "category": "toc"
+      },
+      {
+        "level": 2,
+        "text": "Custom File Extensions",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Persistence",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Troubleshooting",
+        "category": "faq"
+      },
+      {
+        "level": 2,
+        "text": "Hybrid LSP",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Language Support",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Architecture",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Security",
+        "category": "security"
+      },
+      {
+        "level": 3,
+        "text": "v0.7.0 VirusTotal scans",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        533,
+        3,
+        3,
+        66,
+        521,
+        119,
+        29,
+        5,
+        225,
+        87,
+        83,
+        34,
+        32,
+        79,
+        48,
+        203,
+        242,
+        71,
+        110,
+        12,
+        75,
+        36,
+        629,
+        104,
+        187,
+        32,
+        43,
+        0,
+        167,
+        0,
+        13,
+        19,
+        13,
+        37,
+        204,
+        18,
+        566,
+        77
+      ],
+      "features": [
+        206,
+        0
+      ],
+      "installation": [
+        11,
+        14,
+        79,
+        0,
+        11,
+        0
+      ],
+      "toc": [
+        78,
+        164,
+        40,
+        4
+      ],
+      "architecture": [
+        78,
+        0
+      ],
+      "performance": [
+        121
+      ],
+      "faq": [
+        72,
+        91
+      ],
+      "configuration": [
+        36,
+        0,
+        451
+      ],
+      "support": [
+        919,
+        139,
+        201
+      ],
+      "security": [
+        151
+      ],
+      "license": [
+        1
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 1,
+    "uses_centering": true,
+    "image_count_total": 14,
+    "badge_count": 11,
+    "screenshot_or_logo_image_count": 3,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 11,
+    "html_link_count": 0,
+    "inline_link_count": 31,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 1,
+    "total_markdown_links": 31,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.29,
+    "internal_anchor_link_count": 6,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 26,
+    "code_block_languages": [
+      "bash",
+      "json",
+      "powershell"
+    ],
+    "avg_code_block_lines": 3.58,
+    "table_row_count": 136,
+    "table_present": true,
+    "paragraph_count": 106,
+    "avg_paragraph_words": 36.87,
+    "median_paragraph_words": 23.5,
+    "sentence_count": 224,
+    "avg_sentence_words": 17.45,
+    "median_sentence_words": 15.0,
+    "stdev_sentence_words": 15.13,
+    "short_sentence_pct": 27.7,
+    "medium_sentence_pct": 44.6,
+    "long_sentence_pct": 27.7,
+    "total_prose_words": 5423,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

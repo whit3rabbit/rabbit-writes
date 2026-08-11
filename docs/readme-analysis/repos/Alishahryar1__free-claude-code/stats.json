@@ -1,0 +1,239 @@
+{
+  "meta": {
+    "full_name": "Alishahryar1/free-claude-code",
+    "html_url": "https://github.com/Alishahryar1/free-claude-code",
+    "description": "Use Claude Code, Codex and Pi for free from your terminal, app, IDE, or phone like OpenClaw (voice supported)",
+    "stars_total": 45069,
+    "forks": 7452,
+    "watchers": 305,
+    "created_at": "2026-01-28T19:02:30Z",
+    "pushed_at": "2026-08-10T00:10:03Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/Alishahryar1__free-claude-code/README.md",
+    "readme_bytes": 21105,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 878,
+    "est_stars_gained_1y": 3512,
+    "slug": "Alishahryar1__free-claude-code"
+  },
+  "stats": {
+    "total_lines": 528,
+    "non_blank_lines": 374,
+    "total_chars": 21087,
+    "heading_count": 21,
+    "heading_levels_used": [
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "What You Get",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "1. Install Or Update",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "2. Start FCC",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Windows",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "macOS",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Linux",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "3. Configure NVIDIA NIM",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "4. Run Your Coding Agent",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Choose A Provider",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "LM Studio",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "llama.cpp",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Ollama",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Connect Your Client",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Optional Integrations",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Messaging commands",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Manage Your Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Update",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Uninstall",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Project Links",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": false,
+    "section_word_counts": {
+      "other": [
+        152,
+        0,
+        10,
+        10,
+        96,
+        89,
+        686,
+        30,
+        41,
+        182,
+        343,
+        153,
+        185,
+        9,
+        21
+      ],
+      "installation": [
+        4,
+        68,
+        0,
+        35
+      ],
+      "configuration": [
+        73
+      ],
+      "license": [
+        7
+      ]
+    },
+    "preamble_word_count": 173,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 4,
+    "uses_centering": true,
+    "image_count_total": 11,
+    "badge_count": 7,
+    "screenshot_or_logo_image_count": 4,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 7,
+    "html_link_count": 0,
+    "inline_link_count": 58,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 58,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.1,
+    "internal_anchor_link_count": 6,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 21,
+    "code_block_languages": [
+      "bash",
+      "json",
+      "powershell",
+      "text",
+      "toml"
+    ],
+    "avg_code_block_lines": 2.9,
+    "table_row_count": 52,
+    "table_present": true,
+    "paragraph_count": 93,
+    "avg_paragraph_words": 11.44,
+    "median_paragraph_words": 7,
+    "sentence_count": 119,
+    "avg_sentence_words": 8.94,
+    "median_sentence_words": 8,
+    "stdev_sentence_words": 7.01,
+    "short_sentence_pct": 61.3,
+    "medium_sentence_pct": 32.8,
+    "long_sentence_pct": 5.9,
+    "total_prose_words": 1751,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

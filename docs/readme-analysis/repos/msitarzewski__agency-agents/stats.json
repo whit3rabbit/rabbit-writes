@@ -1,0 +1,620 @@
+{
+  "meta": {
+    "full_name": "msitarzewski/agency-agents",
+    "html_url": "https://github.com/msitarzewski/agency-agents",
+    "description": "A complete AI agency at your fingertips - From frontend wizards to Reddit community ninjas, from whimsy injectors to reality checkers. Each agent is a specialized expert with personality, processes, and proven deliverables.",
+    "stars_total": 140809,
+    "forks": 22994,
+    "watchers": 1045,
+    "created_at": "2025-10-13T12:12:29Z",
+    "pushed_at": "2026-08-06T13:29:47Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/msitarzewski__agency-agents/README.md",
+    "readme_bytes": 81575,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1595,
+    "est_stars_gained_1y": 6380,
+    "slug": "msitarzewski__agency-agents"
+  },
+  "stats": {
+    "total_lines": 1120,
+    "non_blank_lines": 851,
+    "total_chars": 80162,
+    "heading_count": 74,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "features",
+      "installation",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "support",
+      "other",
+      "other",
+      "support",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "testing",
+      "security",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "other",
+      "features",
+      "other",
+      "other",
+      "support",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "roadmap",
+      "support",
+      "related",
+      "license",
+      "credits",
+      "support",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "\ud83c\udfad The Agency: AI Specialists Ready to Transform Your Workflow",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 What Is This?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "\u26a1 Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Option 1: Install the app (Recommended)",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Option 2: Use with Claude Code",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install all agents to your Claude Code directory",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Or manually copy a category if you only want one division",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Then activate any agent in your Claude Code sessions:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\"Hey Claude, activate Frontend Developer mode and help me build a React component\"",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Option 3: Use as Reference",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Option 4: Use with Other Tools (GitHub Copilot, Antigravity, Gemini CLI, OpenCode, OpenClaw, Cursor, Aider, Windsurf, Kimi Code, Codex, Osaurus, Hermes, Mistral Vibe)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Step 1 -- generate integration files for all supported tools",
+        "category": "support"
+      },
+      {
+        "level": 1,
+        "text": "Step 2 -- install interactively (auto-detects what you have installed)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Or target a specific tool directly",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfa8 The Agency Roster",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcbb Engineering Division",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfa8 Design Division",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcb0 Paid Media Division",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcbc Sales Division",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udce2 Marketing Division",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcca Product Division",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfac Project Management Division",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\uddea Testing Division",
+        "category": "testing"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd12 Security Division",
+        "category": "security"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udedf Support Division",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udd7d Spatial Computing Division",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfaf Specialized Division",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcb5 Finance Division",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfae Game Development Division",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Cross-Engine Agents (Engine-Agnostic)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Unity",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Unreal Engine",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Godot",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Blender",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Roblox Studio",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcda Academic Division",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udf0d GIS Division",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfe5 Healthcare Division",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfaf Real-World Use Cases",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Scenario 1: Building a Startup MVP",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Scenario 2: Marketing Campaign Launch",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Scenario 3: Enterprise Feature Development",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Scenario 4: Paid Media Account Takeover",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Scenario 5: Full Agency Product Discovery",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Scenario 6: Smart Campus Digital Twin",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd1d Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 3,
+        "text": "Add a New Agent",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Improve Existing Agents",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Share Your Success Stories",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcd6 Agent Design Philosophy",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf81 What Makes This Special?",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Unlike Generic AI Prompts:",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Unlike Prompt Libraries:",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Unlike AI Tools:",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfa8 Agent Personality Highlights",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcca Stats",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd0c Multi-Tool Integrations",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Supported Tools",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "\u26a1 Quick Install",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Faster (parallel, output order may vary): ./scripts/convert.sh --parallel",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Faster (parallel, output order may vary): ./scripts/install.sh --no-interactive --parallel",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Tool-Specific Instructions",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Convert and install (run from your project root)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Convert and install",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Use an agent",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "In a project",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Regenerating After Changes",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\uddfa\ufe0f Roadmap",
+        "category": "roadmap"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf10 Community Translations & Localizations",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd17 Related Resources",
+        "category": "related"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcdc License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude4f Acknowledgments",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcac Community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 Get Started",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        176,
+        1,
+        5,
+        0,
+        30,
+        1,
+        161,
+        0,
+        1064,
+        143,
+        201,
+        630,
+        92,
+        120,
+        110,
+        988,
+        114,
+        9,
+        127,
+        93,
+        91,
+        67,
+        35,
+        75,
+        116,
+        333,
+        105,
+        0,
+        45,
+        43,
+        47,
+        73,
+        91,
+        128,
+        48,
+        11,
+        18,
+        0,
+        12,
+        10,
+        11,
+        33,
+        25,
+        4,
+        377,
+        8,
+        47,
+        13,
+        102
+      ],
+      "features": [
+        74,
+        84
+      ],
+      "installation": [
+        0,
+        75,
+        5,
+        3,
+        9,
+        178,
+        14,
+        11
+      ],
+      "support": [
+        0,
+        3,
+        101,
+        156,
+        222,
+        36
+      ],
+      "architecture": [
+        177,
+        46
+      ],
+      "testing": [
+        157
+      ],
+      "security": [
+        215
+      ],
+      "contributing": [
+        8
+      ],
+      "roadmap": [
+        55
+      ],
+      "related": [
+        14
+      ],
+      "license": [
+        12
+      ],
+      "credits": [
+        81
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 1,
+    "uses_centering": true,
+    "image_count_total": 5,
+    "badge_count": 5,
+    "screenshot_or_logo_image_count": 0,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 5,
+    "html_link_count": 0,
+    "inline_link_count": 336,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 336,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.55,
+    "internal_anchor_link_count": 1,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 33,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 3.61,
+    "table_row_count": 325,
+    "table_present": true,
+    "paragraph_count": 139,
+    "avg_paragraph_words": 10.4,
+    "median_paragraph_words": 8,
+    "sentence_count": 126,
+    "avg_sentence_words": 11.48,
+    "median_sentence_words": 9.0,
+    "stdev_sentence_words": 9.5,
+    "short_sentence_pct": 54.0,
+    "medium_sentence_pct": 34.9,
+    "long_sentence_pct": 11.1,
+    "total_prose_words": 2338,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": false
+  }
+}

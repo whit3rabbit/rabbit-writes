@@ -1,0 +1,459 @@
+{
+  "meta": {
+    "full_name": "farion1231/cc-switch",
+    "html_url": "https://github.com/farion1231/cc-switch",
+    "description": "A cross-platform desktop All-in-One assistant for Claude Code, Codex, OpenCode, OpenClaw, Grok Build & Hermes Agent. Only official website: ccswitch.io",
+    "stars_total": 125965,
+    "forks": 8571,
+    "watchers": 229,
+    "created_at": "2025-08-04T14:16:16Z",
+    "pushed_at": "2026-08-09T13:28:38Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/farion1231__cc-switch/README.md",
+    "readme_bytes": 46114,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 2608,
+    "est_stars_gained_1y": 10432,
+    "slug": "farion1231__cc-switch"
+  },
+  "stats": {
+    "total_lines": 591,
+    "non_blank_lines": 417,
+    "total_chars": 44622,
+    "heading_count": 50,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "sponsors",
+      "features",
+      "demo",
+      "features",
+      "other",
+      "other",
+      "other",
+      "usage",
+      "other",
+      "other",
+      "faq",
+      "api",
+      "installation",
+      "usage",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "testing",
+      "testing",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "testing",
+      "testing",
+      "testing",
+      "testing",
+      "testing",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "changelog",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "CC Switch",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "The All-in-One Manager for Claude Code, Claude Desktop, Codex, Gemini CLI, Grok Build, OpenCode, OpenClaw & Hermes Agent",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udf10 The Only Official Website: **[ccswitch.io](https://ccswitch.io)**",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u2764\ufe0fSponsor",
+        "category": "sponsors"
+      },
+      {
+        "level": 2,
+        "text": "Why CC Switch?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Screenshots",
+        "category": "demo"
+      },
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Provider Management",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Proxy & Failover",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "MCP, Prompts & Skills",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Usage & Cost Tracking",
+        "category": "usage"
+      },
+      {
+        "level": 3,
+        "text": "Session Manager & Workspace",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "System & Platform",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "FAQ",
+        "category": "faq"
+      },
+      {
+        "level": 2,
+        "text": "Documentation",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Basic Usage",
+        "category": "usage"
+      },
+      {
+        "level": 3,
+        "text": "MCP, Prompts, Skills & Sessions",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Download & Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "System Requirements",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Windows Users",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "macOS Users",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Arch Linux Users",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Linux Users",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Design Principles",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "Environment Requirements",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Development Commands",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install dependencies",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Dev mode (hot reload)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Type check",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Format code",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Check code format",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Run frontend unit tests",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Run tests in watch mode (recommended for development)",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Build application",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Build debug version",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Rust Backend Development",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Format Rust code",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Run clippy checks",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Run backend tests",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Run specific tests",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Run tests with test-hooks feature",
+        "category": "testing"
+      },
+      {
+        "level": 3,
+        "text": "Testing Guide",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Run all tests",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Watch mode (auto re-run)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "With coverage report",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Tech Stack",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        0,
+        149,
+        14,
+        47,
+        29,
+        55,
+        24,
+        39,
+        69,
+        20,
+        42,
+        4,
+        58,
+        1,
+        2,
+        2,
+        2,
+        3,
+        2,
+        4,
+        3,
+        2,
+        2,
+        4,
+        4,
+        44
+      ],
+      "sponsors": [
+        4076
+      ],
+      "features": [
+        245,
+        12
+      ],
+      "demo": [
+        16
+      ],
+      "usage": [
+        17,
+        70
+      ],
+      "faq": [
+        527
+      ],
+      "api": [
+        26
+      ],
+      "installation": [
+        0,
+        0,
+        23,
+        12,
+        2
+      ],
+      "architecture": [
+        119
+      ],
+      "testing": [
+        3,
+        4,
+        2,
+        3,
+        4,
+        26,
+        3
+      ],
+      "contributing": [
+        55
+      ],
+      "changelog": [
+        20
+      ],
+      "license": [
+        3
+      ]
+    },
+    "preamble_word_count": 3,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 1,
+    "uses_centering": true,
+    "image_count_total": 40,
+    "badge_count": 4,
+    "screenshot_or_logo_image_count": 36,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 4,
+    "html_link_count": 69,
+    "inline_link_count": 22,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 3,
+    "total_markdown_links": 22,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.09,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 9,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 11.33,
+    "table_row_count": 3,
+    "table_present": true,
+    "paragraph_count": 96,
+    "avg_paragraph_words": 51.92,
+    "median_paragraph_words": 17.0,
+    "sentence_count": 234,
+    "avg_sentence_words": 21.3,
+    "median_sentence_words": 19.5,
+    "stdev_sentence_words": 14.22,
+    "short_sentence_pct": 18.8,
+    "medium_sentence_pct": 34.6,
+    "long_sentence_pct": 46.6,
+    "total_prose_words": 5752,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

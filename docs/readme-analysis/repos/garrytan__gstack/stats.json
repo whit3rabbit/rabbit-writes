@@ -1,0 +1,352 @@
+{
+  "meta": {
+    "full_name": "garrytan/gstack",
+    "html_url": "https://github.com/garrytan/gstack",
+    "description": "Use Garry Tan's exact Claude Code setup: 23 opinionated tools that serve as CEO, Designer, Eng Manager, Release Manager, Doc Engineer, and QA",
+    "stars_total": 127208,
+    "forks": 19160,
+    "watchers": 783,
+    "created_at": "2026-03-11T21:22:45Z",
+    "pushed_at": "2026-08-08T16:28:45Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/garrytan__gstack/README.md",
+    "readme_bytes": 45456,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1554,
+    "est_stars_gained_1y": 6216,
+    "slug": "garrytan__gstack"
+  },
+  "stats": {
+    "total_lines": 491,
+    "non_blank_lines": 335,
+    "total_chars": 45236,
+    "heading_count": 37,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "faq",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "gstack",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Quick start",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Install \u2014 30 seconds",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Step 1: Install on your machine",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Step 2: Team mode \u2014 auto-update for shared repos (recommended)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "OpenClaw",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Native OpenClaw Skills (via ClawHub)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Other AI Agents",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "See it work",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "The sprint",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Which review should I use?",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Power tools",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "New binaries (v0.19)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Continuous checkpoint mode (opt-in, local by default)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Domain skills + raw CDP escape hatch",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Karpathy's four failure modes? Already covered.",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Parallel sprints",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "10-15 parallel sprints",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Voice input (AquaVoice, Whisper, etc.)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Uninstall",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Option 1: Run the uninstall script",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Option 2: Manual removal (no local repo)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "1. Stop browse daemons",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. Remove per-skill directories whose SKILL.md points into gstack/",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "3. Remove gstack",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "4. Remove global state",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "5. Remove integrations (skip any you never installed)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "6. Remove temp files",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "7. Per-project cleanup (run from each project root)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Clean up CLAUDE.md",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Playwright",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "GBrain \u2014 persistent knowledge for your coding agent",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Docs",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Privacy & Telemetry",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Troubleshooting",
+        "category": "faq"
+      },
+      {
+        "level": 2,
+        "text": "gstack",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        516,
+        64,
+        213,
+        57,
+        106,
+        39,
+        979,
+        45,
+        344,
+        197,
+        72,
+        192,
+        91,
+        1173,
+        138,
+        37,
+        22,
+        8,
+        50,
+        5,
+        3,
+        7,
+        21,
+        22,
+        81,
+        532,
+        171,
+        49
+      ],
+      "installation": [
+        46,
+        27,
+        120,
+        0,
+        33,
+        32
+      ],
+      "api": [
+        120
+      ],
+      "faq": [
+        259
+      ],
+      "license": [
+        6
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 2,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 2,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 41,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 1,
+    "total_markdown_links": 41,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.32,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 9,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 9.56,
+    "table_row_count": 92,
+    "table_present": true,
+    "paragraph_count": 84,
+    "avg_paragraph_words": 37.57,
+    "median_paragraph_words": 24.0,
+    "sentence_count": 225,
+    "avg_sentence_words": 14.03,
+    "median_sentence_words": 12,
+    "stdev_sentence_words": 10.71,
+    "short_sentence_pct": 40.0,
+    "medium_sentence_pct": 40.4,
+    "long_sentence_pct": 19.6,
+    "total_prose_words": 3933,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

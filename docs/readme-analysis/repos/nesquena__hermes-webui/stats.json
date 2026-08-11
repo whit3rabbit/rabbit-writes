@@ -1,0 +1,391 @@
+{
+  "meta": {
+    "full_name": "nesquena/hermes-webui",
+    "html_url": "https://github.com/nesquena/hermes-webui",
+    "description": "Hermes WebUI: The best way to use Hermes Agent from the web or from your phone!",
+    "stars_total": 17158,
+    "forks": 2349,
+    "watchers": 56,
+    "created_at": "2026-03-30T21:50:12Z",
+    "pushed_at": "2026-08-09T21:46:58Z",
+    "default_branch": "master",
+    "readme_branch_used": "master",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/nesquena__hermes-webui/README.md",
+    "readme_bytes": 57597,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 473,
+    "est_stars_gained_1y": 1892,
+    "slug": "nesquena__hermes-webui"
+  },
+  "stats": {
+    "total_lines": 837,
+    "non_blank_lines": 644,
+    "total_chars": 57343,
+    "heading_count": 41,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "toc",
+      "features",
+      "installation",
+      "other",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "security",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "testing",
+      "architecture",
+      "other",
+      "api",
+      "credits",
+      "credits",
+      "other",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Hermes Web UI",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contents",
+        "category": "toc"
+      },
+      {
+        "level": 2,
+        "text": "Why Hermes",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Quick start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Advanced: dynamic recall prefill & Gateway-backed chat",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Chat and agent",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Sessions",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Workspace file browser",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Voice input",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Profiles",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Authentication and security",
+        "category": "security"
+      },
+      {
+        "level": 3,
+        "text": "Themes",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Settings and configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Slash commands",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Panels",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Mobile responsive",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Configuration & access",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "What start.sh discovers automatically",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Overrides (only needed if auto-detection misses)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Nix flake and NixOS module",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Remote access (SSH tunnel, Tailscale, phone)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Manual launch (without start.sh)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Docker",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "5-minute quickstart (single container)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Edit .env if your host UID isn't 1000 (e.g. macOS where UIDs start at 501)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Open http://localhost:8787",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Manual `docker run` (no compose)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Build locally",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Multi-container setups",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Agent + WebUI",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Agent + Dashboard + WebUI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Common failure modes",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Running tests",
+        "category": "testing"
+      },
+      {
+        "level": 2,
+        "text": "Architecture",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Compatibility",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Docs",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Contributors",
+        "category": "credits"
+      },
+      {
+        "level": 3,
+        "text": "Top contributors (by PR count, including absorbed/batch-released work)",
+        "category": "credits"
+      },
+      {
+        "level": 3,
+        "text": "Notable contributions",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Repo",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        363,
+        367,
+        243,
+        173,
+        82,
+        47,
+        100,
+        69,
+        37,
+        71,
+        47,
+        81,
+        482,
+        245,
+        80,
+        38,
+        41,
+        4,
+        10,
+        0,
+        0,
+        8,
+        147,
+        199,
+        254,
+        1679,
+        0
+      ],
+      "toc": [
+        89
+      ],
+      "features": [
+        396,
+        0
+      ],
+      "installation": [
+        283,
+        26,
+        22
+      ],
+      "security": [
+        256
+      ],
+      "configuration": [
+        105,
+        22
+      ],
+      "testing": [
+        146
+      ],
+      "architecture": [
+        61
+      ],
+      "api": [
+        316
+      ],
+      "credits": [
+        90,
+        170
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 6,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 6,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 111,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 111,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.88,
+    "internal_anchor_link_count": 10,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 22,
+    "code_block_languages": [
+      "bash",
+      "nix"
+    ],
+    "avg_code_block_lines": 5.14,
+    "table_row_count": 60,
+    "table_present": true,
+    "paragraph_count": 119,
+    "avg_paragraph_words": 34.18,
+    "median_paragraph_words": 30,
+    "sentence_count": 160,
+    "avg_sentence_words": 25.42,
+    "median_sentence_words": 19.0,
+    "stdev_sentence_words": 21.79,
+    "short_sentence_pct": 19.4,
+    "medium_sentence_pct": 34.4,
+    "long_sentence_pct": 46.2,
+    "total_prose_words": 6040,
+    "has_license_section_or_badge": false,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

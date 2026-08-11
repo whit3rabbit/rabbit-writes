@@ -116,7 +116,7 @@ The number-one tell is fluff: extra words, academic padding, the meaningless fil
 
 If a draft reads padded, trim it. If it reads cold, add back the 20% warmth (a true acknowledgment of the person), not exclamation points.
 
-The full catalog is in the `human-writing` engine and applies on top of this. Two of its rules matter most here:
+The full catalog is in the engine, under `references/`, and applies on top of this. Two of its rules matter most here:
 
 - **The portability test.** If a sentence could move unchanged to another person, company, or product, it's filler. Same idea as my fluff rule, stated so it catches sentences a word list misses.
 - **Never inject a humanizer voice.** Swapping AI phrasing for staccato fragments, performed candor, or fake first person is a new tell, not the absence of one. My register is even-temperature short sentences, not a drumroll.

@@ -1,0 +1,744 @@
+{
+  "meta": {
+    "full_name": "Wei-Shaw/sub2api",
+    "html_url": "https://github.com/Wei-Shaw/sub2api",
+    "description": "Sub2API \u4e00\u7ad9\u5f0f\u5f00\u6e90\u4e2d\u8f6c\u670d\u52a1\uff0c\u8ba9 Claude\u3001Openai \u3001Gemini\u3001Grok\u8ba2\u9605\u7edf\u4e00\u63a5\u5165\uff0c\u652f\u6301\u62fc\u8f66\u5171\u4eab\uff0c\u66f4\u9ad8\u6548\u5206\u644a\u6210\u672c\uff0c\u539f\u751f\u5de5\u5177\u65e0\u7f1d\u4f7f\u7528\u3002",
+    "stars_total": 36404,
+    "forks": 7519,
+    "watchers": 71,
+    "created_at": "2025-12-18T02:26:18Z",
+    "pushed_at": "2026-08-10T02:23:05Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/Wei-Shaw__sub2api/README.md",
+    "readme_bytes": 49730,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 647,
+    "est_stars_gained_1y": 2588,
+    "slug": "Wei-Shaw__sub2api"
+  },
+  "stats": {
+    "total_lines": 881,
+    "non_blank_lines": 642,
+    "total_chars": 49415,
+    "heading_count": 94,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "sponsors",
+      "other",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "support",
+      "configuration",
+      "configuration",
+      "usage",
+      "support",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "changelog",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Sub2API",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u26a0\ufe0f Important Notice",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u2764\ufe0f Sponsors",
+        "category": "sponsors"
+      },
+      {
+        "level": 2,
+        "text": "Overview",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Ecosystem",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Tech Stack",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Nginx Reverse Proxy Note",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Deployment",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Method 1: Script Installation (Recommended)",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Installation Steps",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Post-Installation",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "1. Start the service",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. Enable auto-start on boot",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "3. Open Setup Wizard in browser",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "http://YOUR_SERVER_IP:8080",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Upgrade",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Useful Commands",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Check status",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "View logs",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Restart service",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Uninstall",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Method 2: Docker Compose (Recommended)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Quick Start (One-Click Deployment)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Create deployment directory",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Download and run deployment preparation script",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Start services",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "View logs",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Manual Deployment",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "1. Clone the repository",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. Copy environment configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "3. Edit configuration (generate secure passwords)",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "PostgreSQL password (REQUIRED)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "JWT Secret (RECOMMENDED - keeps users logged in after restart)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "TOTP Encryption Key (RECOMMENDED - preserves 2FA after restart)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Optional: Admin account",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Optional: Custom port",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Generate JWT_SECRET",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Generate TOTP_ENCRYPTION_KEY",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Generate POSTGRES_PASSWORD",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "4. Create data directories (for local version)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "5. Start all services",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Option A: Local directory version (recommended - easy migration)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Option B: Named volumes version (simple setup)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "6. Check status",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "7. View logs",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Deployment Versions",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Access",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Upgrade",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Pull latest image and recreate container",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Easy Migration (Local Directory Version)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "On source server",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Transfer to new server",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "On new server",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Useful Commands",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Stop all services",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Restart",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "View all logs",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Remove all data (caution!)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Method 3: Apple container (macOS)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Method 4: Build from Source",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Build Steps",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "1. Clone the repository",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. Install pnpm (if not already installed)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "3. Build frontend",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Output will be in ../backend/internal/web/dist/",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "4. Build backend with embedded frontend",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "5. Create configuration file",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "6. Edit configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Sora Status (Temporarily Unavailable)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "OpenAI Responses WebSocket ingress limits",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u26a0\ufe0f Important: Creating the Admin Account",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "6. Run the application",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Development Mode",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Backend (with hot reload)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Frontend (with hot reload)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Code Generation",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Simple Mode",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Asynchronous Image Tasks",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Grok / xAI Support",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Supported Scope",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "OAuth Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Grok Build CLI Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Usage And Quota Display",
+        "category": "usage"
+      },
+      {
+        "level": 2,
+        "text": "Antigravity Support",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Dedicated Endpoints",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Claude Code Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Hybrid Scheduling Mode",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Project Structure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        106,
+        176,
+        39,
+        68,
+        23,
+        43,
+        0,
+        4,
+        4,
+        14,
+        39,
+        1,
+        4,
+        5,
+        4,
+        9,
+        5,
+        13,
+        4,
+        48,
+        6,
+        11,
+        2,
+        2,
+        2,
+        6,
+        3,
+        4,
+        4,
+        5,
+        5,
+        0,
+        8,
+        7,
+        9,
+        39,
+        16,
+        1,
+        15,
+        12,
+        14,
+        7,
+        15,
+        1,
+        7,
+        7,
+        8,
+        12,
+        50,
+        10,
+        1,
+        10,
+        7,
+        0,
+        19,
+        428,
+        143,
+        158,
+        1,
+        1,
+        6,
+        5,
+        8,
+        45,
+        45,
+        11,
+        42,
+        0
+      ],
+      "sponsors": [
+        2978
+      ],
+      "features": [
+        119
+      ],
+      "installation": [
+        10,
+        17,
+        29,
+        1,
+        0,
+        17,
+        6,
+        9,
+        4,
+        10,
+        4
+      ],
+      "configuration": [
+        7,
+        3,
+        7,
+        47,
+        293,
+        153,
+        0
+      ],
+      "support": [
+        23,
+        218,
+        18
+      ],
+      "usage": [
+        259
+      ],
+      "changelog": [
+        59
+      ],
+      "license": [
+        36
+      ]
+    },
+    "preamble_word_count": 13,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 2,
+    "uses_centering": true,
+    "image_count_total": 32,
+    "badge_count": 5,
+    "screenshot_or_logo_image_count": 27,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 5,
+    "html_link_count": 58,
+    "inline_link_count": 18,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 3,
+    "total_markdown_links": 18,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.06,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 30,
+    "code_block_languages": [
+      "bash",
+      "nginx",
+      "toml",
+      "yaml"
+    ],
+    "avg_code_block_lines": 7.97,
+    "table_row_count": 33,
+    "table_present": true,
+    "paragraph_count": 111,
+    "avg_paragraph_words": 41.59,
+    "median_paragraph_words": 22,
+    "sentence_count": 202,
+    "avg_sentence_words": 22.86,
+    "median_sentence_words": 19.0,
+    "stdev_sentence_words": 19.13,
+    "short_sentence_pct": 22.8,
+    "medium_sentence_pct": 33.2,
+    "long_sentence_pct": 44.1,
+    "total_prose_words": 5546,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

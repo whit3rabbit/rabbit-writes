@@ -1,0 +1,19 @@
+{
+  "full_name": "supertone-inc/supertonic",
+  "html_url": "https://github.com/supertone-inc/supertonic",
+  "description": "Lightning-Fast, On-Device, Multilingual TTS \u2014 running natively via ONNX.",
+  "stars_total": 13638,
+  "forks": 1477,
+  "watchers": 94,
+  "created_at": "2025-11-18T08:23:58Z",
+  "pushed_at": "2026-07-24T04:00:17Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/supertone-inc__supertonic/README.md",
+  "readme_bytes": 28449,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 805,
+  "est_stars_gained_1y": 3220,
+  "slug": "supertone-inc__supertonic"
+}

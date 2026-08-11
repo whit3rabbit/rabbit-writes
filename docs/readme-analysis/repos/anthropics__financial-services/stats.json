@@ -1,0 +1,224 @@
+{
+  "meta": {
+    "full_name": "anthropics/financial-services",
+    "html_url": "https://github.com/anthropics/financial-services",
+    "description": "",
+    "stars_total": 34147,
+    "forks": 5082,
+    "watchers": 267,
+    "created_at": "2026-02-23T19:24:50Z",
+    "pushed_at": "2026-08-04T14:41:29Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/anthropics__financial-services/README.md",
+    "readme_bytes": 16409,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1415,
+    "est_stars_gained_1y": 5660,
+    "slug": "anthropics__financial-services"
+  },
+  "stats": {
+    "total_lines": 260,
+    "non_blank_lines": 195,
+    "total_chars": 16294,
+    "heading_count": 19,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "contributing",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Claude for Financial Services",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Agents",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Repository Layout",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Getting Started",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Cowork",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Claude Code",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Add the marketplace",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Core skills + connectors (install first)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Named agents \u2014 pick the ones you want",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Vertical skill bundles",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Claude Managed Agents",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How It Fits Together",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Vertical Plugins",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "MCP Integrations",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Claude for Microsoft 365 \u2014 Install Tooling",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Making It Yours",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Skill & Command Reference",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        215,
+        209,
+        0,
+        48,
+        1,
+        6,
+        15,
+        34,
+        74,
+        133,
+        149,
+        156,
+        78,
+        426
+      ],
+      "installation": [
+        0,
+        5,
+        108
+      ],
+      "contributing": [
+        78
+      ],
+      "license": [
+        5
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 0,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 0,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 42,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 42,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.67,
+    "internal_anchor_link_count": 2,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 4,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 6.25,
+    "table_row_count": 101,
+    "table_present": true,
+    "paragraph_count": 28,
+    "avg_paragraph_words": 16.89,
+    "median_paragraph_words": 11.5,
+    "sentence_count": 36,
+    "avg_sentence_words": 13.14,
+    "median_sentence_words": 10.0,
+    "stdev_sentence_words": 10.9,
+    "short_sentence_pct": 47.2,
+    "medium_sentence_pct": 30.6,
+    "long_sentence_pct": 22.2,
+    "total_prose_words": 806,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": false
+  }
+}

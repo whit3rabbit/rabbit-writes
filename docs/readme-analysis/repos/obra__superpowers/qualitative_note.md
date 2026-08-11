@@ -1,0 +1,7 @@
+# obra/superpowers — qualitative note
+
+The README leads with a plain-prose "How it works" narrative rather than a feature bullet list, walking the reader through the actual agent workflow (brainstorm → plan → implement → review) in the order it happens, which makes an abstract "skills methodology" concrete before any installation details appear. Its most distinctive formatting choice is the per-harness Quickstart line that anchor-links out to eleven separate `###` install sections (Claude Code, Codex, Cursor, Gemini CLI, etc.), letting one README serve many audiences without forcing everyone to scroll past instructions that don't apply to them. The voice is casual and self-aware, using concrete, slightly comic imagery to explain design intent rather than abstract claims. A "Visual companion telemetry" section proactively discloses what data an optional feature sends home and how to disable it — an unusually transparent trust-building move for a dev-tool README. Overall it reads like documentation written for someone actively deciding whether to adopt the tool today, not marketing copy.
+
+**Quotes:**
+- "an enthusiastic junior engineer with poor taste, no judgement, no project context, and an aversion to testing" — describing the level of detail an implementation plan must have
+- "It's 100% optional. To disable this, set the environment variable `SUPERPOWERS_DISABLE_TELEMETRY` to any true value." — from the telemetry disclosure section

@@ -1,0 +1,19 @@
+{
+  "full_name": "nexu-io/open-design",
+  "html_url": "https://github.com/nexu-io/open-design",
+  "description": "\ud83c\udfa8 The open-source Claude Design alternative. \ud83d\udda5\ufe0f Local-first desktop app. \ud83d\uddbc\ufe0f Your coding agent becomes the design engine: prototypes, landing pages, dashboards, slides, images & video \u2014 real files, HTML/PDF/PPTX/MP4 export. \ud83e\udd16 Claude Code / Codex / Cursor / Gemini / OpenCode / Qwen & 20+ CLIs via BYOK.",
+  "stars_total": 84750,
+  "forks": 9905,
+  "watchers": 262,
+  "created_at": "2026-04-28T04:25:20Z",
+  "pushed_at": "2026-08-10T01:34:39Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/nexu-io__open-design/README.md",
+  "readme_bytes": 58160,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 2366,
+  "est_stars_gained_1y": 9464,
+  "slug": "nexu-io__open-design"
+}

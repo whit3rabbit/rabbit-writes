@@ -1,0 +1,240 @@
+{
+  "meta": {
+    "full_name": "addyosmani/agent-skills",
+    "html_url": "https://github.com/addyosmani/agent-skills",
+    "description": "Production-grade engineering skills for AI coding agents.",
+    "stars_total": 85187,
+    "forks": 9168,
+    "watchers": 460,
+    "created_at": "2026-02-15T20:20:26Z",
+    "pushed_at": "2026-08-08T21:05:57Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/addyosmani__agent-skills/README.md",
+    "readme_bytes": 24577,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1799,
+    "est_stars_gained_1y": 7196,
+    "slug": "addyosmani__agent-skills"
+  },
+  "stats": {
+    "total_lines": 425,
+    "non_blank_lines": 299,
+    "total_chars": 23589,
+    "heading_count": 21,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "features",
+      "other",
+      "contributing",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Agent Skills",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Commands",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Adoption",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "All 24 Skills",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Meta - Discover which skill applies",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Define - Clarify what to build",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Plan - Break it down",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Build - Write the code",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Verify - Prove it works",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Review - Quality gates before merge",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Ship - Deploy with confidence",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Agent Personas",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Reference Checklists",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How Skills Work",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Project Structure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Why Agent Skills?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "How it compares",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Team",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        80,
+        161,
+        40,
+        39,
+        32,
+        95,
+        31,
+        207,
+        59,
+        111,
+        148,
+        98,
+        119,
+        91,
+        0,
+        60,
+        81
+      ],
+      "installation": [
+        561
+      ],
+      "features": [
+        174
+      ],
+      "contributing": [
+        48
+      ],
+      "license": [
+        10
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 5,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 5,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 1,
+    "inline_link_count": 60,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 1,
+    "total_markdown_links": 60,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.75,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 15,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 5.27,
+    "table_row_count": 68,
+    "table_present": true,
+    "paragraph_count": 76,
+    "avg_paragraph_words": 13.24,
+    "median_paragraph_words": 6.5,
+    "sentence_count": 91,
+    "avg_sentence_words": 11.05,
+    "median_sentence_words": 7,
+    "stdev_sentence_words": 9.27,
+    "short_sentence_pct": 57.1,
+    "medium_sentence_pct": 25.3,
+    "long_sentence_pct": 17.6,
+    "total_prose_words": 1229,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

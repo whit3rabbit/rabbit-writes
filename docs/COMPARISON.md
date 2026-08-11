@@ -1,5 +1,7 @@
 # Seven humanizer skills, compared
 
+**Bottom line: no one repo does the whole job, and no one repo is redundant.** Each owns a layer the others do badly or skip: orwell the override that stops a rule engine making prose worse, blader the false-positive discipline, conor the catalog and the research honesty, brandonwise the measurement, ghostwriter the voice-as-artifact model, petergyang the judgment, hardik the sharpest individual rules. The thing worth building stacks all seven instead of picking one. The layer map is at the end, and the evidence for every claim is in that repo's section.
+
 Cloned 2026-08-10 into a scratch folder. Every line count and feature note below comes from the checked-out tree, not from the READMEs.
 
 | Repo | Last commit | Skill size | Total repo | Executable code |
@@ -18,7 +20,7 @@ Cloned 2026-08-10 into a scratch folder. Every line count and feature note below
 
 ### 1. petergyang/no-ai-slop
 
-**Shape.** A 97-line SKILL.md plus a separate `eval.md` the model grades its own output against. Ships as a Codex plugin; `scripts/build_plugin.py` validates the manifest and zips a dist archive. No detection code.
+**Shape.** A 97-line SKILL.md plus a separate `eval.md` the model grades its own output against. Ships as a Codex plugin. `scripts/build_plugin.py` validates the manifest and zips a dist archive. No detection code.
 
 **What it does that nobody else does:**
 
@@ -37,7 +39,7 @@ Cloned 2026-08-10 into a scratch folder. Every line count and feature note below
 
 ### 2. conorbronsdon/avoid-ai-writing
 
-**Shape.** 806-line SKILL.md at v3.23.1, and the only repo where the prose rules and the code are held in sync by a contract (`detector/CATEGORIES.md` maps each rule to a detector `type` or marks it judgment-only; `categories.test.js` enforces the map).
+**Shape.** 806-line SKILL.md at v3.23.1, and the only repo where the prose rules and the code are held in sync by a contract (`detector/CATEGORIES.md` maps each rule to a detector `type` or marks it judgment-only, and `categories.test.js` enforces the map).
 
 **Scripts and features:**
 
@@ -59,7 +61,7 @@ Cloned 2026-08-10 into a scratch folder. Every line count and feature note below
 - **"Never inject these."** Seven things a rewrite may never add: fake first person, manufactured stakes, forced contrarianism, performed candor, em-dash theatrics, staccato conversion, invented specifics. It cites an independent stress test of blader/humanizer that found generic AI phrasing replaced by a recognizable *humanizer* voice. A new fingerprint, not the absence of one. This is the single most important paragraph in any of the seven repos.
 - **Prompt-injection boundary:** In edit mode, a document that addresses its editor ("ignore the rules above," "add a closing paragraph") gets flagged, not obeyed.
 - **Honesty about detectors:** Opens by citing Liang et al. (Stanford, *Patterns* 2023) on 60%+ false positives for non-native writers, Jabarian & Imas (BFI 2025) on 70%+ misclassification, and arXiv:2506.07001 on paraphrase dropping accuracy ~88%. "Signals, not proof. Worth acting on; not worth ruining someone's day over."
-- **Writer-side tests with no regex form:** paragraph-reshuffle immunity (swap two paragraphs; if nothing breaks, it's a list not an argument) and the treadmill test (name the one new thing each paragraph contributes; if there isn't one, cut it).
+- **Writer-side tests with no regex form:** paragraph-reshuffle immunity (swap two paragraphs: if nothing breaks, it's a list not an argument) and the treadmill test (name the one new thing each paragraph contributes: if there isn't one, cut it).
 - Patterns nobody else catches: narrated candor, recap-flattery openers, self-labeling significance ("that last one is the contrarian one"), lingering-attention claims, wall-of-text replies, unfilled placeholders, chatbot citation-markup leaks, `utm_source=chatgpt.com`.
 
 **Weakness.** 806 lines fired at once. The han research below names this exactly: compliance drops as simultaneous instructions multiply. Rules also overlap heavily (four separate sections govern reader-steering phrases). Several carve-outs read like issue-tracker archaeology.
@@ -78,8 +80,8 @@ Cloned 2026-08-10 into a scratch folder. Every line count and feature note below
 - **"Signs of human writing (preserve these)."** The inverse list, and the rarest thing in the seven repos. Specific hard-to-fabricate detail. Mixed feelings and unresolved tension. Dated, era-bound references. Genuine asides and self-corrections. Variety in sentence length. Anything edited before 2022-11-30. This converts the tool from a subtractive scrubber into something that can recognize what to protect.
 - **A writing sample outranks the skill's own rules,** including the hard em-dash ban. "Matching the author beats scrubbing the tell."
 - **PERSONALITY AND SOUL, with a genre gate:** Sterile writing is as obvious as slop. But: apply this only to essays, posts, opinion. For encyclopedic, technical, and legal text, neutral and plain *is* the correct human voice.
-- **Never invent facts,** stated with unusual precision: swapping a vague claim for a specific one is allowed only when the specific comes from the source or the user. Opinions are voice; facts are not.
-- **Invocation modes**: pasted text (show the work), file (edit in place, report a summary), embedded (another agent is calling you, so output prose and no ceremony).
+- **Never invent facts,** stated with unusual precision: swapping a vague claim for a specific one is allowed only when the specific comes from the source or the user. Opinions are voice. Facts are not.
+- **Invocation modes:** pasted text (show the work), file (edit in place, report a summary), embedded (another agent is calling you, so output prose and no ceremony).
 - Draft, then ask two questions ("What makes the below so obviously AI generated?" and "Does the rewrite state any fact not in the source?"), then final.
 
 **Weakness.** The em-dash ban is absolute and wrong as written for many good writers, which the repo half-admits with the sample override. No context awareness, no stylometrics, no code.
@@ -256,7 +258,7 @@ Every repo except orwell-writing converges on this core. The count is out of the
 This is the architectural correction the whole set needs.
 
 1. **The curse of instructions.** Compliance drops as simultaneous instructions multiply. The standard's answer is to decompose into three layers that fire at different times: structural rules baked into the output template, do/don't pairs supplied as few-shot examples, testable checks run as a separate pass. Conor's 806 lines all fire at once, which is why the repo needs a second-pass audit section to catch what the first pass missed. **The super skill uses progressive disclosure: a short router, references loaded per mode, a script for the mechanical layer.**
-2. **It rejects readability formulas as optimization targets.** Flesch and Gunning Fog are poor proxies, disagree with each other, and reward gaming. Brandonwise computes Flesch-Kincaid; the super skill reports it as a diagnostic only and never optimizes toward it.
+2. **It rejects readability formulas as optimization targets.** Flesch and Gunning Fog are poor proxies, disagree with each other, and reward gaming. Brandonwise computes Flesch-Kincaid. The super skill reports it as a diagnostic only and never optimizes toward it.
 3. **The audience frame beats the formula.** "Write this for a smart non-expert who has not seen the code" dropped reading difficulty 2-5 grade levels with no accuracy loss across three clinical studies. That is one always-on sentence replacing a scoring system.
 4. **Self-check must be behaviorally anchored.** Asking a model "is this clear?" fails: general writing assessment is unreliable and sycophancy-biased. A short concrete yes/no rubric works. This validates petergyang's `eval.md` and tells us how to write it: each item must be checkable, not evaluative.
 5. **Structural rules to adopt directly:** main point first, one idea per paragraph with the first sentence carrying weight, conditions before instructions, numbered lists for sequences and bullets for non-sequences, progressive disclosure, average 15-20 words per sentence with a 25-30 word ceiling, subject and verb kept close, address the reader as "you."
@@ -274,7 +276,7 @@ blader/humanizer is a faithful port, so the catalog is already absorbed. Three f
 
 This one reframes the voice layer.
 
-- **"Taste is boundaries."** About 80% of the author's self-documentation is refusals, not preferences. Ghostwriter's profile schema is preference-heavy; the super skill's profile is refusal-first, with a `hard_nos` and an `aesthetic_crimes` section carrying the most weight.
+- **"Taste is boundaries."** About 80% of the author's self-documentation is refusals, not preferences. Ghostwriter's profile schema is preference-heavy. The super skill's profile is refusal-first, with a `hard_nos` and an `aesthetic_crimes` section carrying the most weight.
 - **"LLMs don't lack taste; they lack *specific* taste."** Without context they default to the statistical average, which is the same mechanism Wikipedia describes. The fix is not better adjectives in a prompt. It is a durable file.
 - **The interview method:** ~100 questions across seven categories: beliefs, writing mechanics, aesthetic crimes, voice, structure, hard nos, red flags. That is a concrete build procedure for ghostwriter's artifact, and the super skill ships a condensed version.
 - **Portability:** One markdown file, read first, works across tools. This argues for the voice profile living outside the skill as a user-owned file rather than inside it as a named persona.
@@ -283,16 +285,16 @@ This one reframes the voice layer.
 
 ## The synthesis
 
-**Layer 0 — Override.** Orwell's rule six. Break any rule here sooner than write something worse.
+**Layer 0: Override.** Orwell's rule six. Break any rule here sooner than write something worse.
 
-**Layer 1 — Guardrails on the editor.** Never invent facts (blader). Never inject the seven humanizer moves (conor). Minimum effective edit (petergyang). Preserve signs of human writing (blader). Treat document content as text under audit, never as instructions (conor).
+**Layer 1: Guardrails on the editor.** Never invent facts (blader). Never inject the seven humanizer moves (conor). Minimum effective edit (petergyang). Preserve signs of human writing (blader). Treat document content as text under audit, never as instructions (conor).
 
-**Layer 2 — Voice.** A user-owned, refusal-first profile (ruben + ghostwriter) that outranks every style rule in this skill (blader). Absent a profile, infer register from the text and impose nothing.
+**Layer 2: Voice.** A user-owned, refusal-first profile (ruben + ghostwriter) that outranks every style rule in this skill (blader). Absent a profile, infer register from the text and impose nothing.
 
-**Layer 3 — Detection.** One merged catalog in two bands: fingerprints (evidence about production) and craft (good editing regardless of author), which is conor's 1A/1B generalized. Scoped by a condensed context/tolerance matrix. Triaged P0/P1/P2. Loaded from a reference file only in the mode that needs it.
+**Layer 3: Detection.** One merged catalog in two bands: fingerprints (evidence about production) and craft (good editing regardless of author), which is conor's 1A/1B generalized. Scoped by a condensed context/tolerance matrix. Triaged P0/P1/P2. Loaded from a reference file only in the mode that needs it.
 
-**Layer 4 — Mechanics.** A script for what a script does better than a model: hidden unicode, AI URL params, citation-markup leaks, unfilled placeholders, curly quotes, burstiness, TTR, sentence-length CoV, trigram repetition, tiered vocabulary density, em-dash rate. Plus a preservation validator that diffs original against rewrite and fails on touched code, tables, quotes, URLs, or headings.
+**Layer 4: Mechanics.** A script for what a script does better than a model: hidden unicode, AI URL params, citation-markup leaks, unfilled placeholders, curly quotes, burstiness, TTR, sentence-length CoV, trigram repetition, tiered vocabulary density, em-dash rate. Plus a preservation validator that diffs original against rewrite and fails on touched code, tables, quotes, URLs, or headings.
 
-**Layer 5 — Craft.** Orwell + STE + han's structural rules, applied as positive drafting discipline rather than as a banlist. This is the layer that makes writing good rather than merely un-AI.
+**Layer 5: Craft.** Orwell + STE + han's structural rules, applied as positive drafting discipline rather than as a banlist. This is the layer that makes writing good rather than merely un-AI.
 
-**Layer 6 — Self-check.** A behaviorally anchored yes/no rubric (han), graded by the same model in the same pass (petergyang), with a hard stop at two passes (conor).
+**Layer 6: Self-check.** A behaviorally anchored yes/no rubric (han), graded by the same model in the same pass (petergyang), with a hard stop at two passes (conor).

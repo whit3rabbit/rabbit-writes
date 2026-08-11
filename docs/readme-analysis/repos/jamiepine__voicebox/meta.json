@@ -1,0 +1,19 @@
+{
+  "full_name": "jamiepine/voicebox",
+  "html_url": "https://github.com/jamiepine/voicebox",
+  "description": "The open-source AI voice studio. Clone, dictate, create.",
+  "stars_total": 49902,
+  "forks": 6168,
+  "watchers": 228,
+  "created_at": "2026-01-25T12:27:03Z",
+  "pushed_at": "2026-08-09T00:03:42Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/jamiepine__voicebox/README.md",
+  "readme_bytes": 25009,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 648,
+  "est_stars_gained_1y": 2592,
+  "slug": "jamiepine__voicebox"
+}

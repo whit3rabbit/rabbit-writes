@@ -1,0 +1,306 @@
+{
+  "meta": {
+    "full_name": "lfnovo/open-notebook",
+    "html_url": "https://github.com/lfnovo/open-notebook",
+    "description": "An Open Source implementation of Notebook LM with more flexibility and features",
+    "stars_total": 36576,
+    "forks": 4192,
+    "watchers": 181,
+    "created_at": "2024-10-21T17:58:46Z",
+    "pushed_at": "2026-08-06T19:28:24Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/lfnovo__open-notebook/README.md",
+    "readme_bytes": 21667,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 492,
+    "est_stars_gained_1y": 1968,
+    "slug": "lfnovo__open-notebook"
+  },
+  "stats": {
+    "total_lines": 396,
+    "non_blank_lines": 317,
+    "total_chars": 21217,
+    "heading_count": 29,
+    "heading_levels_used": [
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "installation",
+      "support",
+      "changelog",
+      "support",
+      "features",
+      "other",
+      "features",
+      "other",
+      "api",
+      "installation",
+      "other",
+      "other",
+      "roadmap",
+      "features",
+      "other",
+      "support",
+      "contributing",
+      "support",
+      "contributing",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "A private, multi-model, 100% local, full-featured alternative to Notebook LM",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udd9a Open Notebook vs Google Notebook LM",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Built With",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 Quick Start (2 Minutes)",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Step 1: Get docker-compose.yml",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Step 2: Set Your Encryption Key",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Step 3: Start Services",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Step 4: Configure AI Provider",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcda More Installation Options",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcd6 Need Help?",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "Provider Support Matrix",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\u2728 Key Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Core Capabilities",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Advanced Features",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Podcast Feature",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcda Documentation",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "Getting Started",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "User Guide",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Advanced Topics",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\uddfa\ufe0f Roadmap",
+        "category": "roadmap"
+      },
+      {
+        "level": 3,
+        "text": "Upcoming Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Recently Completed \u2705",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcd6 Need Help?",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd1d Community & Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 3,
+        "text": "Join the Community",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc4 License",
+        "category": "license"
+      }
+    ],
+    "has_h1": false,
+    "section_word_counts": {
+      "other": [
+        132,
+        163,
+        17,
+        19,
+        14,
+        8,
+        79,
+        20,
+        54,
+        107,
+        107
+      ],
+      "installation": [
+        0,
+        18,
+        35,
+        46
+      ],
+      "configuration": [
+        112
+      ],
+      "support": [
+        39,
+        81,
+        66,
+        76
+      ],
+      "changelog": [
+        25
+      ],
+      "features": [
+        0,
+        71,
+        32
+      ],
+      "api": [
+        0
+      ],
+      "roadmap": [
+        0
+      ],
+      "contributing": [
+        0,
+        108
+      ],
+      "license": [
+        316
+      ]
+    },
+    "preamble_word_count": 281,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 5,
+    "uses_centering": true,
+    "image_count_total": 6,
+    "badge_count": 1,
+    "screenshot_or_logo_image_count": 5,
+    "gif_count": 0,
+    "has_video_embed": true,
+    "badges_in_header_block": 0,
+    "html_link_count": 21,
+    "inline_link_count": 58,
+    "reference_style_link_count": 11,
+    "reference_definitions_count": 23,
+    "bare_url_count": 2,
+    "total_markdown_links": 69,
+    "uses_reference_style_links": true,
+    "avg_link_text_words": 2.41,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 4,
+    "code_block_languages": [
+      "bash",
+      "yaml"
+    ],
+    "avg_code_block_lines": 13,
+    "table_row_count": 35,
+    "table_present": true,
+    "paragraph_count": 37,
+    "avg_paragraph_words": 28.86,
+    "median_paragraph_words": 14,
+    "sentence_count": 39,
+    "avg_sentence_words": 27.38,
+    "median_sentence_words": 14,
+    "stdev_sentence_words": 39.71,
+    "short_sentence_pct": 35.9,
+    "medium_sentence_pct": 30.8,
+    "long_sentence_pct": 33.3,
+    "total_prose_words": 1838,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

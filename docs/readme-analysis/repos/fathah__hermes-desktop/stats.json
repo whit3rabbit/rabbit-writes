@@ -1,0 +1,230 @@
+{
+  "meta": {
+    "full_name": "fathah/hermes-desktop",
+    "html_url": "https://github.com/fathah/hermes-desktop",
+    "description": "Desktop Companion for Hermes Agent",
+    "stars_total": 13810,
+    "forks": 1566,
+    "watchers": 78,
+    "created_at": "2026-04-02T15:26:49Z",
+    "pushed_at": "2026-08-06T14:27:28Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/fathah__hermes-desktop/README.md",
+    "readme_bytes": 19098,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 740,
+    "est_stars_gained_1y": 2960,
+    "slug": "fathah__hermes-desktop"
+  },
+  "stats": {
+    "total_lines": 350,
+    "non_blank_lines": 270,
+    "total_chars": 19014,
+    "heading_count": 18,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "sponsors",
+      "installation",
+      "demo",
+      "features",
+      "architecture",
+      "other",
+      "support",
+      "sponsors",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "contributing",
+      "related"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Sponsors",
+        "category": "sponsors"
+      },
+      {
+        "level": 2,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Preview",
+        "category": "demo"
+      },
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "How It Works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Screens",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Supported Providers",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Sponsors",
+        "category": "sponsors"
+      },
+      {
+        "level": 3,
+        "text": "LLM Providers",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Messaging Platforms",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Tool Integrations",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "First-Time Setup",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Secrets provider",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "~/.hermes/config.yaml",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Vault / secret manager integration (no TPM required)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Notes",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Related Project",
+        "category": "related"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "sponsors": [
+        159,
+        25
+      ],
+      "installation": [
+        131,
+        82
+      ],
+      "demo": [
+        242
+      ],
+      "features": [
+        335
+      ],
+      "architecture": [
+        149
+      ],
+      "other": [
+        105,
+        71,
+        27,
+        16,
+        68,
+        385,
+        63
+      ],
+      "support": [
+        0
+      ],
+      "configuration": [
+        41
+      ],
+      "contributing": [
+        51
+      ],
+      "related": [
+        33
+      ]
+    },
+    "preamble_word_count": 401,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 3,
+    "uses_centering": true,
+    "image_count_total": 25,
+    "badge_count": 7,
+    "screenshot_or_logo_image_count": 18,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 7,
+    "html_link_count": 17,
+    "inline_link_count": 10,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 3,
+    "total_markdown_links": 10,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.3,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 4,
+    "code_block_languages": [
+      "bash",
+      "yaml"
+    ],
+    "avg_code_block_lines": 3,
+    "table_row_count": 30,
+    "table_present": true,
+    "paragraph_count": 41,
+    "avg_paragraph_words": 29.9,
+    "median_paragraph_words": 14,
+    "sentence_count": 57,
+    "avg_sentence_words": 21.51,
+    "median_sentence_words": 14,
+    "stdev_sentence_words": 37.7,
+    "short_sentence_pct": 38.6,
+    "medium_sentence_pct": 38.6,
+    "long_sentence_pct": 22.8,
+    "total_prose_words": 2186,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

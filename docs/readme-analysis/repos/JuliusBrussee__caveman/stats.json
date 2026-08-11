@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "full_name": "JuliusBrussee/caveman",
+    "html_url": "https://github.com/JuliusBrussee/caveman",
+    "description": "\ud83e\udea8 why use many token when few token do trick \u2014 Claude Code skill that cuts 65% of tokens by talking like caveman",
+    "stars_total": 97084,
+    "forks": 5595,
+    "watchers": 237,
+    "created_at": "2026-04-04T10:03:00Z",
+    "pushed_at": "2026-08-08T11:05:00Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/JuliusBrussee__caveman/README.md",
+    "readme_bytes": 18066,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1296,
+    "est_stars_gained_1y": 5184,
+    "slug": "JuliusBrussee__caveman"
+  },
+  "stats": {
+    "total_lines": 351,
+    "non_blank_lines": 250,
+    "total_chars": 17690,
+    "heading_count": 18,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "performance",
+      "other",
+      "other",
+      "api",
+      "other",
+      "architecture",
+      "other",
+      "sponsors",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Before / After",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "macOS \u00b7 Linux \u00b7 WSL \u00b7 Git Bash",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Windows \u00b7 PowerShell 5.1+",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Claude Code plugin",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Gemini CLI extension",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Cursor / Windsurf / Cline / Codex / 30+ more, via the skills registry",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Pick your grunt",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What you get",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Benchmarks",
+        "category": "performance"
+      },
+      {
+        "level": 3,
+        "text": "Independently measured: JetBrains, 86 tasks",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "The whole cave",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "<img src=\"docs/assets/dancing-rock.svg\" width=\"20\" height=\"20\" alt=\"\"> Want the whole agent, not just its mouth? \u2192 caveman-code",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Caveman 2",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How it works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Privacy",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Sponsors",
+        "category": "sponsors"
+      },
+      {
+        "level": 2,
+        "text": "Star this repo",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        229,
+        13,
+        12,
+        11,
+        9,
+        84,
+        117,
+        128,
+        362,
+        3,
+        111,
+        53,
+        110
+      ],
+      "installation": [
+        12
+      ],
+      "performance": [
+        209
+      ],
+      "api": [
+        359
+      ],
+      "architecture": [
+        103
+      ],
+      "sponsors": [
+        82
+      ]
+    },
+    "preamble_word_count": 298,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 9,
+    "uses_centering": true,
+    "image_count_total": 10,
+    "badge_count": 4,
+    "screenshot_or_logo_image_count": 6,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 1,
+    "html_link_count": 23,
+    "inline_link_count": 30,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 30,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.93,
+    "internal_anchor_link_count": 4,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 7,
+    "code_block_languages": [
+      "bash",
+      "powershell"
+    ],
+    "avg_code_block_lines": 3,
+    "table_row_count": 55,
+    "table_present": true,
+    "paragraph_count": 64,
+    "avg_paragraph_words": 21.17,
+    "median_paragraph_words": 13.5,
+    "sentence_count": 116,
+    "avg_sentence_words": 11.68,
+    "median_sentence_words": 7.0,
+    "stdev_sentence_words": 14.11,
+    "short_sentence_pct": 62.9,
+    "medium_sentence_pct": 23.3,
+    "long_sentence_pct": 13.8,
+    "total_prose_words": 1804,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

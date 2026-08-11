@@ -1,0 +1,19 @@
+{
+  "full_name": "virgiliojr94/book-to-skill",
+  "html_url": "https://github.com/virgiliojr94/book-to-skill",
+  "description": "Turn any technical book PDF into a Claude Code skill \u2014 ready to study, reference, and use while you work.",
+  "stars_total": 19478,
+  "forks": 2085,
+  "watchers": 108,
+  "created_at": "2026-05-01T02:09:39Z",
+  "pushed_at": "2026-08-07T15:34:15Z",
+  "default_branch": "master",
+  "readme_branch_used": "master",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/virgiliojr94__book-to-skill/README.md",
+  "readme_bytes": 13608,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 395,
+  "est_stars_gained_1y": 1580,
+  "slug": "virgiliojr94__book-to-skill"
+}

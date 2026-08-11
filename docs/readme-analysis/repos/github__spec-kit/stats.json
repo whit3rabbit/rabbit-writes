@@ -1,0 +1,421 @@
+{
+  "meta": {
+    "full_name": "github/spec-kit",
+    "html_url": "https://github.com/github/spec-kit",
+    "description": "\ud83d\udcab Toolkit to help you get started with Spec-Driven Development",
+    "stars_total": 125998,
+    "forks": 11253,
+    "watchers": 650,
+    "created_at": "2025-08-21T22:54:31Z",
+    "pushed_at": "2026-08-07T17:55:55Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/github__spec-kit/README.md",
+    "readme_bytes": 21681,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1610,
+    "est_stars_gained_1y": 6440,
+    "slug": "github__spec-kit"
+  },
+  "stats": {
+    "total_lines": 382,
+    "non_blank_lines": 263,
+    "total_chars": 21511,
+    "heading_count": 46,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "toc",
+      "features",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "demo",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "support",
+      "credits",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Table of Contents",
+        "category": "toc"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd14 What is Spec-Driven Development?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "\u26a1 Get Started",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "1. Install Specify CLI",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "2. Initialize a project",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Check whether a newer release is available (read-only \u2014 does not modify anything)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Preview what would run, without actually upgrading",
+        "category": "demo"
+      },
+      {
+        "level": 1,
+        "text": "Upgrade in place to the latest stable release (auto-detects uv tool vs pipx install)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Or pin a specific release tag (replace vX.Y.Z[suffix] with your desired release tag)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "3. Establish project principles",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "4. Create the spec",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "5. Create a technical implementation plan",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "6. Break down into tasks",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "7. Execute implementation",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcfd\ufe0f Video Overview",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf0d Community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd16 Supported AI Coding Agent Integrations",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Available Slash Commands",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Core Commands",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Optional Commands",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd27 Specify CLI Reference",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udde9 Making Spec Kit Your Own: Extensions & Presets",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Extensions \u2014 Add New Capabilities",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Search available extensions",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install an extension",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Presets \u2014 Customize Existing Workflows",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Search available presets",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install a preset",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udce6 Bundles: Role-Based Setups",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Discover bundles in the active catalog stack",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Inspect the exact component set a bundle will add (equals what install does)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Install a bundle's full component set in one operation",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "See what's installed, then update or remove non-destructively",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "When to Use Which",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcda Core Philosophy",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf1f Development Phases",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfaf Experimental Goals",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Technology independence",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Enterprise constraints",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "User-centric development",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Creative & iterative processes",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd27 Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcd6 Learn More",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcac Support",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude4f Acknowledgements",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc4 License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "toc": [
+        55
+      ],
+      "features": [
+        46
+      ],
+      "other": [
+        0,
+        27,
+        3,
+        95,
+        60,
+        22,
+        13,
+        13,
+        25,
+        43,
+        37,
+        102,
+        56,
+        19,
+        154,
+        50,
+        3,
+        62,
+        3,
+        4,
+        56,
+        45,
+        117,
+        6,
+        24,
+        20,
+        17,
+        21,
+        25
+      ],
+      "installation": [
+        68,
+        3,
+        53,
+        100,
+        83,
+        4,
+        4,
+        93,
+        57
+      ],
+      "demo": [
+        4
+      ],
+      "support": [
+        136,
+        52,
+        26
+      ],
+      "credits": [
+        20
+      ],
+      "license": [
+        24
+      ]
+    },
+    "preamble_word_count": 187,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 4,
+    "uses_centering": true,
+    "image_count_total": 6,
+    "badge_count": 4,
+    "screenshot_or_logo_image_count": 2,
+    "gif_count": 0,
+    "has_video_embed": true,
+    "badges_in_header_block": 4,
+    "html_link_count": 5,
+    "inline_link_count": 52,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 52,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.19,
+    "internal_anchor_link_count": 17,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 13,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 3.46,
+    "table_row_count": 33,
+    "table_present": true,
+    "paragraph_count": 49,
+    "avg_paragraph_words": 28.22,
+    "median_paragraph_words": 22,
+    "sentence_count": 76,
+    "avg_sentence_words": 18.2,
+    "median_sentence_words": 14.0,
+    "stdev_sentence_words": 13.0,
+    "short_sentence_pct": 19.7,
+    "medium_sentence_pct": 53.9,
+    "long_sentence_pct": 26.3,
+    "total_prose_words": 1814,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

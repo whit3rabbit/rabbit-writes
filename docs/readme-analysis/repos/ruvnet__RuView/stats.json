@@ -1,0 +1,595 @@
+{
+  "meta": {
+    "full_name": "ruvnet/RuView",
+    "html_url": "https://github.com/ruvnet/RuView",
+    "description": "\u03c0 RuView turns commodity WiFi signals into real-time spatial intelligence, vital sign monitoring, and presence detection \u2014 all without a single pixel of video.",
+    "stars_total": 89099,
+    "forks": 11868,
+    "watchers": 794,
+    "created_at": "2025-06-07T04:32:30Z",
+    "pushed_at": "2026-08-10T00:25:46Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/ruvnet__RuView/README.md",
+    "readme_bytes": 68837,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1567,
+    "est_stars_gained_1y": 6268,
+    "slug": "ruvnet__RuView"
+  },
+  "stats": {
+    "total_lines": 760,
+    "non_blank_lines": 588,
+    "total_chars": 68280,
+    "heading_count": 70,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "performance",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "security",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "demo",
+      "other",
+      "other",
+      "other",
+      "other",
+      "security",
+      "testing",
+      "api",
+      "other",
+      "license",
+      "other",
+      "support"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "\u03c0 RuView",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "**See through walls with WiFi** ##",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u03c0 RuView is a WiFi sensing platform that turns radio signals into spatial intelligence.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Check the local setup and get source-cited guidance",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Run a read-only RuView agent through Codex",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Search or verify the reviewed contributor brain",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Check claims, replay the deterministic proof, or expose the MCP server",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Built for low-power edge applications",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Option 1: Docker (simulated data, no hardware needed)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Open http://localhost:3000",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Option 2a: Live sensing with ESP32-S3 hardware ($9)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Flash firmware, provision WiFi, and start sensing:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Option 2b: WiFi 6 + 802.15.4 research sensing with ESP32-C6 ($6-10, ADR-110)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Same csi-node firmware compiled for the C6 target \u2014 picks up the C6",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "overlay (sdkconfig.defaults.esp32c6) automatically.",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "C6 boot extras (vs S3): HE-LTF subcarrier tagging in ADR-018 bytes 18-19,",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "802.15.4 mesh time-sync on channel 15, TWT setup when the AP supports it,",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "opt-in LP-core wake-on-motion for ~5 \u00b5A battery seed nodes.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "v0.6.7 adds: real LP-core RISC-V motion-gate program (debounce + motion",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "counter) and a Wi-Fi 6 soft-AP with TWT Responder so two C6 boards can",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "benchmark real iTWT without buying an 11ax router. Both default off,",
+        "category": "performance"
+      },
+      {
+        "level": 1,
+        "text": "flip CONFIG_C6_{LP_CORE,SOFTAP_HE}_ENABLE to turn them on.",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Option 3: Full system with Cognitum Seed ($140)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "ESP32 streams CSI \u2192 bridge forwards to Seed for persistent storage + kNN + witness chain",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Option 4: Python \u2014 live on PyPI (ADR-117)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Both ship the same compiled PyO3 wheel (~250 KB, abi3-py310, Linux/macOS/Windows).",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Add [client] for the asyncio WebSocket + paho-mqtt clients:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "from ruview import BreathingExtractor, HeartRateExtractor   # equivalent to:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "from wifi_densepose import BreathingExtractor, HeartRateExtractor",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "from ruview.client import SensingClient, RuViewMqttClient",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd17 Pretrained model on Hugging Face",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Download the model bundle",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Results & proof",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Reproduce the deterministic pipeline proof yourself (must print VERDICT: PASS):",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Model weights: what's real, what's not",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udde9 Edge Module Catalog",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udec0 Health &mdash; <sub>14 modules</sub>",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd12 Security &mdash; <sub>14 modules</sub>",
+        "category": "security"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfe2 Building &mdash; <sub>11 modules</sub>",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udecd\ufe0f Retail &mdash; <sub>7 modules</sub>",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfed Industrial &mdash; <sub>7 modules</sub>",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd2c Research &mdash; <sub>12 modules</sub>",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\udd16 Ai &mdash; <sub>15 modules</sub>",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udc1d Swarm &mdash; <sub>11 modules</sub>",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udce1 Signal &mdash; <sub>6 modules</sub>",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udf10 Network &mdash; <sub>1 modules</sub>",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udee0\ufe0f Developer &mdash; <sub>7 modules</sub>",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd2c How It Works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfe2 Use Cases & Applications",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udde0 Self-Learning WiFi AI",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Step 1: Learn from raw WiFi data (no labels needed)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Step 2: Fine-tune with pose labels for full capability",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Step 3: Use the model \u2014 extract fingerprints from live WiFi",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Step 4: Search \u2014 find similar environments or detect anomalies",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udde9 Claude Code & Codex Plugin",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "In Claude Code \u2014 add this repo as a plugin marketplace, then install:",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Or try it for one session without installing (from a local clone of the repo):",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Then, in Claude Code:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "/ruview-start      \u2192 onboarding (Docker demo / repo build / live ESP32)",
+        "category": "demo"
+      },
+      {
+        "level": 1,
+        "text": "/ruview-flash      \u2192 build + flash ESP32 firmware",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "/ruview-provision  \u2192 provision WiFi creds, sink IP, channel/MAC, mesh slots",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "/ruview-app        \u2192 run a sensing application (presence / vitals / pose / sleep / MAT / point cloud)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "/ruview-train      \u2192 train / evaluate / publish a model (incl. GPU on GCloud)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "/ruview-advanced   \u2192 multistatic / tomography / cross-viewpoint / mesh-security",
+        "category": "security"
+      },
+      {
+        "level": 1,
+        "text": "/ruview-verify     \u2192 tests + deterministic proof + witness bundle",
+        "category": "testing"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcd6 Documentation",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udea7 Beta software",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc4 License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd1d Creator Affiliate Program",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcde Support",
+        "category": "support"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        66,
+        262,
+        253,
+        21,
+        19,
+        259,
+        684,
+        13,
+        0,
+        0,
+        38,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        28,
+        7,
+        0,
+        9,
+        0,
+        0,
+        609,
+        84,
+        183,
+        188,
+        32,
+        340,
+        83,
+        192,
+        184,
+        100,
+        105,
+        148,
+        177,
+        137,
+        76,
+        25,
+        124,
+        1445,
+        388,
+        10,
+        13,
+        8,
+        173,
+        80,
+        0,
+        0,
+        0,
+        0,
+        0,
+        97,
+        57
+      ],
+      "installation": [
+        19,
+        0,
+        9,
+        4
+      ],
+      "configuration": [
+        15,
+        0
+      ],
+      "performance": [
+        0
+      ],
+      "security": [
+        175,
+        0
+      ],
+      "architecture": [
+        67
+      ],
+      "demo": [
+        0
+      ],
+      "testing": [
+        104
+      ],
+      "api": [
+        770
+      ],
+      "license": [
+        7
+      ],
+      "support": [
+        30
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 3,
+    "uses_centering": true,
+    "image_count_total": 19,
+    "badge_count": 15,
+    "screenshot_or_logo_image_count": 4,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 9,
+    "inline_link_count": 206,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 206,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.15,
+    "internal_anchor_link_count": 10,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 8,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 13.88,
+    "table_row_count": 241,
+    "table_present": true,
+    "paragraph_count": 86,
+    "avg_paragraph_words": 23.86,
+    "median_paragraph_words": 13.0,
+    "sentence_count": 115,
+    "avg_sentence_words": 17.84,
+    "median_sentence_words": 13,
+    "stdev_sentence_words": 18.58,
+    "short_sentence_pct": 30.4,
+    "medium_sentence_pct": 41.7,
+    "long_sentence_pct": 27.8,
+    "total_prose_words": 3324,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

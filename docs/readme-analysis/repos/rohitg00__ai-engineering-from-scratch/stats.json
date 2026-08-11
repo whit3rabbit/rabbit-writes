@@ -1,0 +1,277 @@
+{
+  "meta": {
+    "full_name": "rohitg00/ai-engineering-from-scratch",
+    "html_url": "https://github.com/rohitg00/ai-engineering-from-scratch",
+    "description": "Learn it. Build it. Ship it for others.",
+    "stars_total": 46385,
+    "forks": 8050,
+    "watchers": 285,
+    "created_at": "2026-03-18T18:38:02Z",
+    "pushed_at": "2026-08-10T02:14:55Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/rohitg00__ai-engineering-from-scratch/README.md",
+    "readme_bytes": 97053,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1959,
+    "est_stars_gained_1y": 7836,
+    "slug": "rohitg00__ai-engineering-from-scratch"
+  },
+  "stats": {
+    "total_lines": 1288,
+    "non_blank_lines": 1094,
+    "total_chars": 94613,
+    "heading_count": 25,
+    "heading_levels_used": [
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "toc",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "features",
+      "contributing",
+      "sponsors",
+      "changelog",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "From the creator of [Agent Memory - #1 Persistent memory \u2b50](https://github.com/rohitg00/agentmemory) <a href=\"https://github.com/rohitg00/agentmemory/stargazers\"><img src=\"https://img.shields.io/github/stars/rohitg00/agentmemory?style=flat-square&labelColor=fafaf5&color=3553ff\" alt=\"GitHub stars\"></a> which naturally works with any agents or chat assistants.",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Start learning in 30 seconds",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How this works",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "The shape of the curriculum",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "The shape of a lesson",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Getting started",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Prepare for Claude certifications",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "The learning skills (any agent: Claude, Cursor, Codex, OpenClaw, Hermes, \u2026)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Read the core curriculum as a book",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Every lesson ships something",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "FIG_002 \u00b7 A worked sample",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contents",
+        "category": "toc"
+      },
+      {
+        "level": 3,
+        "text": "Phase 0: Setup & Tooling `12 lessons`",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "The toolkit",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Install course skills into your agent",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Drop the agent workbench into your own repo",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Browse the entire course as JSON",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Smoke-check every lesson's Python code",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Where to start",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Why this matters now",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Sponsor the work",
+        "category": "sponsors"
+      },
+      {
+        "level": 2,
+        "text": "Star history",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": false,
+    "section_word_counts": {
+      "other": [
+        106,
+        109,
+        147,
+        40,
+        59,
+        136,
+        135,
+        329,
+        252,
+        57,
+        34,
+        71,
+        123,
+        116,
+        65
+      ],
+      "installation": [
+        103,
+        20,
+        5967,
+        194
+      ],
+      "toc": [
+        14
+      ],
+      "features": [
+        157
+      ],
+      "contributing": [
+        96
+      ],
+      "sponsors": [
+        159
+      ],
+      "changelog": [
+        58
+      ],
+      "license": [
+        64
+      ]
+    },
+    "preamble_word_count": 271,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 4,
+    "uses_centering": true,
+    "image_count_total": 13,
+    "badge_count": 6,
+    "screenshot_or_logo_image_count": 7,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 24,
+    "inline_link_count": 551,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 1,
+    "total_markdown_links": 551,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 3.89,
+    "internal_anchor_link_count": 9,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 29,
+    "code_block_languages": [
+      "bash",
+      "markdown",
+      "mermaid",
+      "python",
+      "text"
+    ],
+    "avg_code_block_lines": 3.59,
+    "table_row_count": 588,
+    "table_present": true,
+    "paragraph_count": 109,
+    "avg_paragraph_words": 25.28,
+    "median_paragraph_words": 23,
+    "sentence_count": 179,
+    "avg_sentence_words": 15.39,
+    "median_sentence_words": 11,
+    "stdev_sentence_words": 19.38,
+    "short_sentence_pct": 43.0,
+    "medium_sentence_pct": 31.3,
+    "long_sentence_pct": 25.7,
+    "total_prose_words": 2987,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

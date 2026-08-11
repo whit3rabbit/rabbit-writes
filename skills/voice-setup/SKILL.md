@@ -3,7 +3,7 @@ name: voice-setup
 description: Build, measure, edit, or switch a personal writing voice profile for the rabbit-writes plugin. Use when the user wants to teach the system how they write, create their own writing style, set up or replace a voice, capture their tone, change whose voice is active, blend two voices, or convert their writing samples into a reusable style profile. Also use when a draft "doesn't sound like me" and the saved profile needs correcting.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "0.1.0"
 ---
 
 # Voice setup
@@ -15,6 +15,8 @@ Turn one person's way of writing into two files a machine can apply:
 
 Both live in `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices/`. They are plain text under version control, so a voice is editable, diffable, and shareable.
 
+**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
+
 ## The principle
 
 > Taste is boundaries.
@@ -25,7 +27,7 @@ So weight everything here toward the **Hard nos**. If the interview runs short, 
 
 Two other rules govern the whole process:
 
-**Do not write general writing advice into a profile.** "Avoid passive voice", "cut filler", "be concrete" apply to everyone and already live in the `human-writing` engine. The test: *would this rule be wrong for a different person?* If yes, it is voice. If no, leave it out. A profile that restates the engine will drift out of sync with it.
+**Do not write general writing advice into a profile.** "Avoid passive voice", "cut filler", "be concrete" apply to everyone and already live in the `rabbit-writes` engine, under `references/`. The test: *would this rule be wrong for a different person?* If yes, it is voice. If no, leave it out. A profile that restates the engine will drift out of sync with it.
 
 **Measure before you believe.** People are unreliable narrators of their own prose. Someone who says "I write short" often averages 24 words a sentence. Where samples exist, the numbers win.
 
@@ -66,7 +68,7 @@ Keep the interview to **10 high-signal questions max** covering the 7 core categ
 Point to 3 or 4 pieces written by the author (e.g. Substack posts like [Ruben Substack](https://ruben.substack.com/p/i-am-just-a-text-file), articles, past emails, or chat logs). This is the fastest method because it extracts mechanics automatically without manual typing:
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/human-writing/scripts/scan.py sample1.md --json
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py sample1.md --json
 ```
 
 Read off `avg_sentence_words`, `sentence_sd`, `burstiness`, `mattr`, and `em_dashes_per_1k`, and write them into the profile's **Measured from samples** block. Then read the samples yourself for what the numbers miss: paragraph openings, contraction rate, recurring phrases, how they transition, how they sign off, where they hedge.
@@ -108,7 +110,7 @@ Do not re-run the full interview. A working profile plus one correction beats a 
 **Test the rules before saving.** Write a short paragraph that deliberately breaks four or five of them, run the scan, and confirm each one fires:
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/human-writing/scripts/scan.py /tmp/violations.md \
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py /tmp/violations.md \
     --voice-rules ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices/<name>.rules.json
 ```
 

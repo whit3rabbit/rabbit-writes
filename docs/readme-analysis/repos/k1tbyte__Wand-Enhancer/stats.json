@@ -1,0 +1,204 @@
+{
+  "meta": {
+    "full_name": "k1tbyte/Wand-Enhancer",
+    "html_url": "https://github.com/k1tbyte/Wand-Enhancer",
+    "description": "Advanced UX and interoperability extension for Wand (WeMod) app",
+    "stars_total": 16192,
+    "forks": 42687,
+    "watchers": 78,
+    "created_at": "2024-11-17T20:02:10Z",
+    "pushed_at": "2026-07-21T21:05:51Z",
+    "default_branch": "master",
+    "readme_branch_used": "master",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/k1tbyte__Wand-Enhancer/README.md",
+    "readme_bytes": 9373,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 146,
+    "est_stars_gained_1y": 584,
+    "slug": "k1tbyte__Wand-Enhancer"
+  },
+  "stats": {
+    "total_lines": 167,
+    "non_blank_lines": 113,
+    "total_chars": 9310,
+    "heading_count": 15,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "features",
+      "other",
+      "installation",
+      "faq",
+      "usage",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "demo",
+      "license",
+      "support"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "WandEnhancer",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udc7e What does it access?",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcab What features are improved?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf10 Remote Web Panel",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Quick Start:",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Troubleshooting & Remote Access:",
+        "category": "faq"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udc40 How to use?",
+        "category": "usage"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udde9 Custom scripts",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udee0\ufe0f How to build from source",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Requirements",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Build steps",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u2753 Q&A",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\uddbc\ufe0f Screenshots",
+        "category": "demo"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcdc License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "\u2764\ufe0f Support",
+        "category": "support"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        124,
+        95,
+        17,
+        177,
+        10,
+        52,
+        225
+      ],
+      "features": [
+        32
+      ],
+      "installation": [
+        35,
+        33
+      ],
+      "faq": [
+        169
+      ],
+      "usage": [
+        117
+      ],
+      "demo": [
+        14
+      ],
+      "license": [
+        16
+      ],
+      "support": [
+        141
+      ]
+    },
+    "preamble_word_count": 7,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 2,
+    "uses_centering": true,
+    "image_count_total": 9,
+    "badge_count": 5,
+    "screenshot_or_logo_image_count": 4,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 1,
+    "html_link_count": 0,
+    "inline_link_count": 8,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 1,
+    "total_markdown_links": 8,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.5,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 1,
+    "code_block_languages": [
+      "js"
+    ],
+    "avg_code_block_lines": 14,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 30,
+    "avg_paragraph_words": 15.47,
+    "median_paragraph_words": 5.5,
+    "sentence_count": 33,
+    "avg_sentence_words": 14.06,
+    "median_sentence_words": 16,
+    "stdev_sentence_words": 9.18,
+    "short_sentence_pct": 39.4,
+    "medium_sentence_pct": 36.4,
+    "long_sentence_pct": 24.2,
+    "total_prose_words": 1186,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "full_name": "microsoft/markitdown",
+  "html_url": "https://github.com/microsoft/markitdown",
+  "description": "Python tool for converting files and office documents to Markdown.",
+  "stars_total": 172653,
+  "forks": 12591,
+  "watchers": 564,
+  "created_at": "2024-11-13T19:56:40Z",
+  "pushed_at": "2026-07-29T18:18:09Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/microsoft__markitdown/README.md",
+  "readme_bytes": 15755,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 1413,
+  "est_stars_gained_1y": 5652,
+  "slug": "microsoft__markitdown"
+}

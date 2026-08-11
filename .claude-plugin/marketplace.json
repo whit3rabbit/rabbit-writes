@@ -3,23 +3,31 @@
   "name": "rabbit-writes",
   "owner": {
     "name": "whit3rabbit",
-    "url": "https://github.com/whit3rabbit"
+    "url": "https://github.com/whit3rabbit/rabbit-writes"
   },
   "description": "Rabbit writes: a personal writing voice plus an AI-pattern detection engine, installable as a Claude Code plugin.",
   "plugins": [
     {
       "name": "rabbit-writes",
       "source": "./",
-      "description": "Write and edit in your own voice, not a chatbot's. Ships three skills: rabbit-writes (draft in the active voice), human-writing (the generic detection and craft engine), and voice-setup (build or swap a voice profile).",
+      "description": "Write and edit in your own voice, not a chatbot's. Ships three skills: rabbit-writes (draft, convert, de-slop, or audit prose in the active voice, four modes over a shared detection and craft engine), voice-setup (build or swap a voice profile), and readme-writing (draft or audit a README.md against patterns measured from 100 real GitHub repos).",
       "category": "productivity",
       "license": "MIT",
+      "author": {
+        "name": "whit3rabbit",
+        "url": "https://github.com/whit3rabbit"
+      },
+      "homepage": "https://github.com/whit3rabbit/rabbit-writes",
+      "repository": "https://github.com/whit3rabbit/rabbit-writes",
       "keywords": [
         "writing",
         "editing",
         "voice",
         "style",
         "humanize",
-        "ai-detection"
+        "ai-detection",
+        "readme",
+        "documentation"
       ]
     }
   ]

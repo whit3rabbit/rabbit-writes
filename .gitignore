@@ -68,3 +68,7 @@ venv.bak/
 .vscode/
 .idea/
 node_modules/
+
+# Personal Claude Code notes, machine-specific
+CLAUDE.local.md
+.claude.local.md

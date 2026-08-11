@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "full_name": "crynta/terax-ai",
+    "html_url": "https://github.com/crynta/terax-ai",
+    "description": "Lightweight (7MB) Terminal-first AI-native dev workspace",
+    "stars_total": 8916,
+    "forks": 968,
+    "watchers": 40,
+    "created_at": "2026-04-21T18:33:12Z",
+    "pushed_at": "2026-08-09T23:29:39Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/crynta__terax-ai/README.md",
+    "readme_bytes": 8530,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 671,
+    "est_stars_gained_1y": 2684,
+    "slug": "crynta__terax-ai"
+  },
+  "stats": {
+    "total_lines": 178,
+    "non_blank_lines": 134,
+    "total_chars": 8485,
+    "heading_count": 18,
+    "heading_levels_used": [
+      2,
+      3
+    ],
+    "section_order": [
+      "demo",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "demo",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "contributing",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Screenshots",
+        "category": "demo"
+      },
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Terminal",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Code editor",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Source control",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "File explorer",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Web preview",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "Themes and customization",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "AI",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Windows notes",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Linux notes",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Configure AI",
+        "category": "configuration"
+      },
+      {
+        "level": 2,
+        "text": "Build from source",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Tech stack",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Code signing",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": false,
+    "section_word_counts": {
+      "demo": [
+        137,
+        19
+      ],
+      "features": [
+        0
+      ],
+      "other": [
+        71,
+        75,
+        43,
+        27,
+        37,
+        98,
+        25,
+        84,
+        25,
+        21,
+        52
+      ],
+      "installation": [
+        18
+      ],
+      "configuration": [
+        41
+      ],
+      "contributing": [
+        31
+      ],
+      "license": [
+        20
+      ]
+    },
+    "preamble_word_count": 324,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 2,
+    "uses_centering": true,
+    "image_count_total": 12,
+    "badge_count": 5,
+    "screenshot_or_logo_image_count": 7,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 5,
+    "html_link_count": 17,
+    "inline_link_count": 7,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 7,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 2,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 4,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 17,
+    "avg_paragraph_words": 36.94,
+    "median_paragraph_words": 23,
+    "sentence_count": 24,
+    "avg_sentence_words": 26.17,
+    "median_sentence_words": 14.5,
+    "stdev_sentence_words": 35.03,
+    "short_sentence_pct": 37.5,
+    "medium_sentence_pct": 25.0,
+    "long_sentence_pct": 37.5,
+    "total_prose_words": 1148,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

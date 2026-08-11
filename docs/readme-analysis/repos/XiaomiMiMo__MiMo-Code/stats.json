@@ -1,0 +1,356 @@
+{
+  "meta": {
+    "full_name": "XiaomiMiMo/MiMo-Code",
+    "html_url": "https://github.com/XiaomiMiMo/MiMo-Code",
+    "description": "MiMo Code: Where Models and Agents Co-Evolve",
+    "stars_total": 12699,
+    "forks": 1300,
+    "watchers": 70,
+    "created_at": "2026-06-10T11:52:41Z",
+    "pushed_at": "2026-08-09T12:11:25Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/XiaomiMiMo__MiMo-Code/README.md",
+    "readme_bytes": 26959,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 385,
+    "est_stars_gained_1y": 1540,
+    "slug": "XiaomiMiMo__MiMo-Code"
+  },
+  "stats": {
+    "total_lines": 553,
+    "non_blank_lines": 400,
+    "total_chars": 26789,
+    "heading_count": 37,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "installation",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "support",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "One-line install (macOS / Linux)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "One-line install (Windows PowerShell)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Or install via npm (all platforms)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Run",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Remote host",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Local host: create the SSH port forward",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Local host: connect from another terminal",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "MiMo Ecosystem",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Core Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Multiple Agents",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Persistent Memory",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Intelligent Context Management",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Task Tracking",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Subagent System",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Goal / Stop Condition",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Compose Mode",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Workflows",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Builtin Skills",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Voice Input",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Mac (local)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Add to ~/.ssh/config: RemoteForward 4713 127.0.0.1:4713",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Remote host",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Verify: pactl info",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Dream & Distill",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "File Locations",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "JSON Schemas",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Custom OpenAI-Compatible Endpoints",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Key Options",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "TUI \u2014 prompts once for an explicit confirmation on startup",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Headless",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Or via environment variable (any surface)",
+        "category": "configuration"
+      },
+      {
+        "level": 2,
+        "text": "Development",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Relationship to OpenCode",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "installation": [
+        1,
+        8,
+        12,
+        5
+      ],
+      "other": [
+        12,
+        4,
+        11,
+        172,
+        53,
+        102,
+        67,
+        294,
+        24,
+        26,
+        38,
+        109,
+        272,
+        517,
+        62,
+        14,
+        14,
+        108,
+        33,
+        47,
+        149,
+        215,
+        2,
+        5,
+        0,
+        44
+      ],
+      "features": [
+        0
+      ],
+      "configuration": [
+        0,
+        14,
+        158,
+        172
+      ],
+      "support": [
+        46
+      ],
+      "license": [
+        56
+      ]
+    },
+    "preamble_word_count": 131,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 6,
+    "uses_centering": true,
+    "image_count_total": 3,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 3,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 3,
+    "inline_link_count": 7,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 1,
+    "total_markdown_links": 7,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.86,
+    "internal_anchor_link_count": 1,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 13,
+    "code_block_languages": [
+      "bash",
+      "json",
+      "jsonc"
+    ],
+    "avg_code_block_lines": 9.69,
+    "table_row_count": 56,
+    "table_present": true,
+    "paragraph_count": 96,
+    "avg_paragraph_words": 20.58,
+    "median_paragraph_words": 14.5,
+    "sentence_count": 125,
+    "avg_sentence_words": 15.81,
+    "median_sentence_words": 14,
+    "stdev_sentence_words": 9.97,
+    "short_sentence_pct": 26.4,
+    "medium_sentence_pct": 40.8,
+    "long_sentence_pct": 32.8,
+    "total_prose_words": 2379,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

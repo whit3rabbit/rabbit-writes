@@ -1,0 +1,19 @@
+{
+  "full_name": "colbymchenry/codegraph",
+  "html_url": "https://github.com/colbymchenry/codegraph",
+  "description": "Pre-indexed code knowledge graph, auto syncs on code changes, for Claude Code, Codex, Gemini, Cursor, OpenCode, AntiGravity, Kiro, and Hermes Agent \u2014 fewer tokens, fewer tool calls, 100% local",
+  "stars_total": 65586,
+  "forks": 4129,
+  "watchers": 148,
+  "created_at": "2026-01-18T21:45:37Z",
+  "pushed_at": "2026-08-08T02:56:05Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/colbymchenry__codegraph/README.md",
+  "readme_bytes": 63459,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 3401,
+  "est_stars_gained_1y": 13604,
+  "slug": "colbymchenry__codegraph"
+}

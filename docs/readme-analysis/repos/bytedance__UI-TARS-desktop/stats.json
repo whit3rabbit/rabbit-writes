@@ -1,0 +1,226 @@
+{
+  "meta": {
+    "full_name": "bytedance/UI-TARS-desktop",
+    "html_url": "https://github.com/bytedance/UI-TARS-desktop",
+    "description": "The Open-Source Multimodal AI Agent Stack: Connecting Cutting-Edge AI Models and Agent Infra",
+    "stars_total": 38534,
+    "forks": 3885,
+    "watchers": 278,
+    "created_at": "2025-01-19T09:04:43Z",
+    "pushed_at": "2026-08-05T02:48:59Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/bytedance__UI-TARS-desktop/README.md",
+    "readme_bytes": 16262,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 625,
+    "est_stars_gained_1y": 2500,
+    "slug": "bytedance__UI-TARS-desktop"
+  },
+  "stats": {
+    "total_lines": 299,
+    "non_blank_lines": 246,
+    "total_chars": 16113,
+    "heading_count": 18,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "toc",
+      "other",
+      "other",
+      "demo",
+      "features",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "api",
+      "other",
+      "demo",
+      "features",
+      "installation",
+      "contributing",
+      "license",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Introduction",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Table of Contents",
+        "category": "toc"
+      },
+      {
+        "level": 2,
+        "text": "News",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Agent TARS",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Showcase",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "Core Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Launch with `npx`.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install globally, required Node.js >= 22",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Run with your preferred model provider",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Documentation",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "UI-TARS Desktop",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Showcase",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "Citation",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        288,
+        293,
+        311,
+        4,
+        31,
+        122,
+        20
+      ],
+      "toc": [
+        64
+      ],
+      "demo": [
+        150,
+        95
+      ],
+      "features": [
+        111,
+        33
+      ],
+      "installation": [
+        12,
+        6,
+        6
+      ],
+      "api": [
+        322
+      ],
+      "contributing": [
+        5
+      ],
+      "license": [
+        10
+      ]
+    },
+    "preamble_word_count": 12,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 2,
+    "uses_centering": true,
+    "image_count_total": 17,
+    "badge_count": 13,
+    "screenshot_or_logo_image_count": 4,
+    "gif_count": 0,
+    "has_video_embed": true,
+    "badges_in_header_block": 0,
+    "html_link_count": 29,
+    "inline_link_count": 37,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 1,
+    "total_markdown_links": 37,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.81,
+    "internal_anchor_link_count": 15,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 3,
+    "code_block_languages": [
+      "bash",
+      "bibtex"
+    ],
+    "avg_code_block_lines": 5.33,
+    "table_row_count": 4,
+    "table_present": true,
+    "paragraph_count": 28,
+    "avg_paragraph_words": 46.79,
+    "median_paragraph_words": 12.5,
+    "sentence_count": 31,
+    "avg_sentence_words": 42.26,
+    "median_sentence_words": 15,
+    "stdev_sentence_words": 68.05,
+    "short_sentence_pct": 32.3,
+    "medium_sentence_pct": 29.0,
+    "long_sentence_pct": 38.7,
+    "total_prose_words": 1781,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,483 @@
+{
+  "meta": {
+    "full_name": "Anil-matcha/Open-Generative-AI",
+    "html_url": "https://github.com/Anil-matcha/Open-Generative-AI",
+    "description": "Unrestricted Open-source alternative to AI video platforms \u2014 Free AI image & video generation studio with 500+ models (Flux, Midjourney, Kling, Sora, Veo). No content filters. Self-hosted, MIT licensed.",
+    "stars_total": 25962,
+    "forks": 4575,
+    "watchers": 208,
+    "created_at": "2023-05-09T14:12:37Z",
+    "pushed_at": "2026-08-09T13:28:10Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/Anil-matcha__Open-Generative-AI/README.md",
+    "readme_bytes": 40654,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 677,
+    "est_stars_gained_1y": 2708,
+    "slug": "Anil-matcha__Open-Generative-AI"
+  },
+  "stats": {
+    "total_lines": 638,
+    "non_blank_lines": 464,
+    "total_chars": 39952,
+    "heading_count": 55,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "related",
+      "installation",
+      "other",
+      "installation",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "changelog",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "architecture",
+      "api",
+      "support",
+      "other",
+      "other",
+      "license",
+      "credits"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Open Generative AI \u2014 Unrestricted Open-Source Alternative to AI Video Platforms",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcb0 Turn This Into Your Own Product \u2014 White Label & Resell",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "What similar AI studios charge their users",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Related Projects",
+        "category": "related"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf10 Try it Online \u2014 No Install Required",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "\u2b07\ufe0f Download Desktop App",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "macOS Installation Guide",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Windows Installation \u2014 SmartScreen warning fix",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Ubuntu / Linux Installation",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Build Linux installers (AppImage + .deb)",
+        "category": "installation"
+      },
+      {
+        "level": 4,
+        "text": "Ubuntu 24.04+ / AppArmor sandbox restriction",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u26a1 Local Model Inference (Desktop App Only)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Engine 1 \u2014 sd.cpp (bundled)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Engine 2 \u2014 Wan2GP (remote Gradio server)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "On your GPU machine",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Hardware Notes",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Verifying the SD 1.5 path (the fastest sanity test on Mac)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "1. App data layout (created on first app launch)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. Grab a small SD 1.5 model directly (Dreamshaper 8, ~2 GB)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "3. Run a single 512x512 / 12-step inference",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u2728 Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\uddbc\ufe0f Image Studio \u2014 Dual Mode",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Newly Added Models",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Multi-Image Input",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfac Video Studio \u2014 Dual Mode",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Newly Added Models",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udf99\ufe0f Lip Sync Studio",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Image-based Models (Portrait Image + Audio \u2192 Video)",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Video-based Models (Video + Audio \u2192 Lipsync Video)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd00 Workflow Studio",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfa5 Cinema Studio Controls",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcc1 Upload History & Picker",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Setup",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Clone the repository (with submodules \u2014 required for the workflow + agent packages)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "If you already cloned without --recurse-submodules, run this once:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "git submodule update --init --recursive",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install dependencies + build workspace packages (studio, workflow, agents).",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "This step is REQUIRED \u2014 `npm install` alone is not enough; the workspaces",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "need to be built before either dev script will work.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Then start ONE of:",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Production Build",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Desktop App Build",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "macOS (DMG \u2014 Intel + Apple Silicon)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Windows (NSIS installer \u2014 x64 + ARM64)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Linux (AppImage + DEB \u2014 x64)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Both platforms in one pass",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfd7\ufe0f Architecture",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd0c API Integration",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfa8 Supported Model Categories",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udee0\ufe0f Tech Stack",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd14 How is this different from other AI Video Platforms?",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc4 License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude4f Credits",
+        "category": "credits"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        164,
+        148,
+        97,
+        133,
+        272,
+        138,
+        266,
+        33,
+        197,
+        108,
+        29,
+        20,
+        18,
+        96,
+        50,
+        85,
+        166,
+        50,
+        148,
+        43,
+        40,
+        94,
+        110,
+        96,
+        11,
+        0,
+        0,
+        3,
+        97,
+        0,
+        7,
+        4,
+        5,
+        27,
+        34,
+        101
+      ],
+      "related": [
+        645
+      ],
+      "installation": [
+        82,
+        101,
+        36,
+        10,
+        31,
+        0,
+        37,
+        65,
+        0,
+        0,
+        5
+      ],
+      "features": [
+        437
+      ],
+      "changelog": [
+        90
+      ],
+      "architecture": [
+        57
+      ],
+      "api": [
+        129
+      ],
+      "support": [
+        165
+      ],
+      "license": [
+        1
+      ],
+      "credits": [
+        83
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 3,
+    "uses_centering": true,
+    "image_count_total": 3,
+    "badge_count": 2,
+    "screenshot_or_logo_image_count": 1,
+    "gif_count": 0,
+    "has_video_embed": true,
+    "badges_in_header_block": 2,
+    "html_link_count": 3,
+    "inline_link_count": 55,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 55,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.35,
+    "internal_anchor_link_count": 1,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 13,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 6.54,
+    "table_row_count": 117,
+    "table_present": true,
+    "paragraph_count": 71,
+    "avg_paragraph_words": 25.03,
+    "median_paragraph_words": 19,
+    "sentence_count": 102,
+    "avg_sentence_words": 17.42,
+    "median_sentence_words": 13.0,
+    "stdev_sentence_words": 14.38,
+    "short_sentence_pct": 29.4,
+    "medium_sentence_pct": 44.1,
+    "long_sentence_pct": 26.5,
+    "total_prose_words": 3507,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

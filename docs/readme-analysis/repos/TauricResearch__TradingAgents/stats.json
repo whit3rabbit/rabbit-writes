@@ -1,0 +1,269 @@
+{
+  "meta": {
+    "full_name": "TauricResearch/TradingAgents",
+    "html_url": "https://github.com/TauricResearch/TradingAgents",
+    "description": "TradingAgents: Multi-Agents LLM Financial Trading Framework",
+    "stars_total": 96872,
+    "forks": 18700,
+    "watchers": 716,
+    "created_at": "2024-12-28T03:31:08Z",
+    "pushed_at": "2026-07-18T15:55:05Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/TauricResearch__TradingAgents/README.md",
+    "readme_bytes": 17337,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1156,
+    "est_stars_gained_1y": 4624,
+    "slug": "TauricResearch__TradingAgents"
+  },
+  "stats": {
+    "total_lines": 304,
+    "non_blank_lines": 222,
+    "total_chars": 17279,
+    "heading_count": 25,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "api",
+      "usage",
+      "other",
+      "other",
+      "other",
+      "usage",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "TradingAgents: Multi-Agents LLM Financial Trading Framework",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "News",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "TradingAgents Framework",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Analyst Team",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Researcher Team",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Trader Agent",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Risk Management and Portfolio Manager",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Installation and CLI",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Docker",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Required APIs",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "CLI Usage",
+        "category": "usage"
+      },
+      {
+        "level": 3,
+        "text": "Markets and tickers",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "TradingAgents Package",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Implementation Details",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Python Usage",
+        "category": "usage"
+      },
+      {
+        "level": 1,
+        "text": "forward propagate",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Persistence and Recovery",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Decision log",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Checkpoint resume",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Reproducibility",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Reasoning models ignore temperature. For tighter reproducibility, set a",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "non-reasoning deep/quick model explicitly (e.g. via the Custom model ID option).",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Citation",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        0,
+        318,
+        124,
+        84,
+        43,
+        36,
+        70,
+        9,
+        131,
+        0,
+        43,
+        85,
+        8,
+        70,
+        89,
+        202,
+        0,
+        97,
+        13
+      ],
+      "installation": [
+        0,
+        19
+      ],
+      "api": [
+        184
+      ],
+      "usage": [
+        24,
+        53
+      ],
+      "contributing": [
+        20
+      ]
+    },
+    "preamble_word_count": 261,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 13,
+    "uses_centering": true,
+    "image_count_total": 14,
+    "badge_count": 4,
+    "screenshot_or_logo_image_count": 10,
+    "gif_count": 0,
+    "has_video_embed": true,
+    "badges_in_header_block": 4,
+    "html_link_count": 13,
+    "inline_link_count": 11,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 11,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.27,
+    "internal_anchor_link_count": 5,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 14,
+    "code_block_languages": [
+      "bash",
+      "python"
+    ],
+    "avg_code_block_lines": 4.57,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 48,
+    "avg_paragraph_words": 28.12,
+    "median_paragraph_words": 17.5,
+    "sentence_count": 75,
+    "avg_sentence_words": 18,
+    "median_sentence_words": 14,
+    "stdev_sentence_words": 20.08,
+    "short_sentence_pct": 29.3,
+    "medium_sentence_pct": 50.7,
+    "long_sentence_pct": 20.0,
+    "total_prose_words": 1893,
+    "has_license_section_or_badge": false,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "meta": {
+    "full_name": "ChromeDevTools/chrome-devtools-mcp",
+    "html_url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+    "description": "Chrome DevTools for coding agents",
+    "stars_total": 48822,
+    "forks": 3401,
+    "watchers": 239,
+    "created_at": "2025-09-11T10:39:55Z",
+    "pushed_at": "2026-08-09T11:57:01Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/ChromeDevTools__chrome-devtools-mcp/README.md",
+    "readme_bytes": 39239,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 503,
+    "est_stars_gained_1y": 2012,
+    "slug": "ChromeDevTools__chrome-devtools-mcp"
+  },
+  "stats": {
+    "total_lines": 997,
+    "non_blank_lines": 724,
+    "total_chars": 39235,
+    "heading_count": 24,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "other",
+      "api",
+      "features",
+      "other",
+      "usage",
+      "other",
+      "installation",
+      "installation",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Chrome DevTools for agents",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "[Tool reference](./docs/tool-reference.md) | [Changelog](./CHANGELOG.md) | [Contributing](./CONTRIBUTING.md) | [Troubleshooting](./docs/troubleshooting.md) | [Design Principles](./docs/design-principles.md)",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Key features",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Disclaimers",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "**Usage statistics**",
+        "category": "usage"
+      },
+      {
+        "level": 2,
+        "text": "Update checks",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Requirements",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Getting started",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "MCP Client configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "Either MCP only:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Or as a Gemini extension (MCP+Skills):",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Your first prompt",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Tools",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Configuration",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Connecting via WebSocket with custom headers",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Concepts",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Concurrent sessions",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "User data directory",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Connecting to a running Chrome instance",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Automatically connecting to a running Chrome instance",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Manual connection using port forwarding",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Debugging Chrome on Android",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Known limitations",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Integrating as a browser subagent",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        79,
+        153,
+        33,
+        7,
+        194,
+        64,
+        313,
+        56,
+        0,
+        86,
+        66,
+        150,
+        192,
+        335,
+        7,
+        5,
+        47
+      ],
+      "api": [
+        0
+      ],
+      "features": [
+        56
+      ],
+      "usage": [
+        102
+      ],
+      "installation": [
+        29,
+        50
+      ],
+      "configuration": [
+        841,
+        1122
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 5,
+    "badge_count": 4,
+    "screenshot_or_logo_image_count": 1,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 1,
+    "html_link_count": 15,
+    "inline_link_count": 85,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 8,
+    "total_markdown_links": 85,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.31,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 36,
+    "code_block_languages": [
+      "bash",
+      "json",
+      "none",
+      "powershell",
+      "sh",
+      "toml"
+    ],
+    "avg_code_block_lines": 3.78,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 160,
+    "avg_paragraph_words": 15.06,
+    "median_paragraph_words": 11.0,
+    "sentence_count": 201,
+    "avg_sentence_words": 11.99,
+    "median_sentence_words": 11,
+    "stdev_sentence_words": 9.72,
+    "short_sentence_pct": 46.8,
+    "medium_sentence_pct": 33.8,
+    "long_sentence_pct": 19.4,
+    "total_prose_words": 4292,
+    "has_license_section_or_badge": false,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

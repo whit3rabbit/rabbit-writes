@@ -1,0 +1,402 @@
+{
+  "n_repos": 100,
+  "pct_has_badges_in_header": 67.0,
+  "pct_has_any_badge": 80.0,
+  "pct_uses_centering": 76.0,
+  "pct_has_toc": 32.0,
+  "pct_has_installation_section": 84.0,
+  "pct_has_usage_or_examples": 31.0,
+  "pct_has_contributing_section": 52.0,
+  "pct_has_license_section_or_badge": 83.0,
+  "pct_has_demo_media": 89.0,
+  "pct_has_screenshot_or_logo_image": 87.0,
+  "pct_has_gif": 14.0,
+  "pct_has_video_embed": 19.0,
+  "pct_has_code_blocks": 97.0,
+  "pct_has_table": 82.0,
+  "pct_uses_reference_style_links": 2.0,
+  "pct_has_h1": 89.0,
+  "pct_has_bare_urls": 50.0,
+  "avg_readme_word_count": 2930.36,
+  "median_readme_word_count": 1842.0,
+  "avg_heading_count": 36.49,
+  "median_heading_count": 30.5,
+  "avg_sentence_words": 20.11,
+  "median_sentence_words_repo_level": 13.25,
+  "avg_paragraph_words": 28.43,
+  "avg_short_sentence_pct": 37.84,
+  "avg_medium_sentence_pct": 36.52,
+  "avg_long_sentence_pct": 25.63,
+  "avg_badge_count": 5.68,
+  "median_badge_count": 5.0,
+  "avg_image_count": 17.13,
+  "avg_code_block_count": 14.71,
+  "avg_preamble_word_count": 176.45,
+  "avg_total_markdown_links": 56.75,
+  "avg_bare_url_count": 1.76,
+  "avg_link_text_words": 2.16,
+  "link_style_corpus_totals": {
+    "inline_markdown_links": 5661,
+    "reference_style_links": 14,
+    "bare_urls": 176,
+    "pct_inline": 96.8,
+    "pct_reference_style": 0.2,
+    "pct_bare_url": 3.0
+  },
+  "badge_type_counts_corpus": {
+    "license": 56,
+    "version/release": 47,
+    "stars/social": 39,
+    "chat/community": 29,
+    "build/CI": 27,
+    "docs": 4,
+    "sponsor": 1
+  },
+  "top_section_sequences": [
+    {
+      "sequence": [],
+      "count": 3
+    },
+    {
+      "sequence": [
+        "changelog"
+      ],
+      "count": 2
+    },
+    {
+      "sequence": [
+        "installation",
+        "contributing",
+        "license"
+      ],
+      "count": 2
+    },
+    {
+      "sequence": [
+        "installation",
+        "configuration",
+        "installation",
+        "license"
+      ],
+      "count": 1
+    },
+    {
+      "sequence": [
+        "related",
+        "installation",
+        "features",
+        "changelog",
+        "installation",
+        "architecture"
+      ],
+      "count": 1
+    },
+    {
+      "sequence": [
+        "api",
+        "features",
+        "usage",
+        "installation",
+        "configuration"
+      ],
+      "count": 1
+    },
+    {
+      "sequence": [
+        "installation",
+        "features",
+        "license",
+        "related",
+        "architecture",
+        "configuration"
+      ],
+      "count": 1
+    },
+    {
+      "sequence": [
+        "sponsors",
+        "features",
+        "support",
+        "architecture",
+        "installation",
+        "usage"
+      ],
+      "count": 1
+    },
+    {
+      "sequence": [
+        "features",
+        "installation",
+        "toc",
+        "installation",
+        "features",
+        "toc"
+      ],
+      "count": 1
+    },
+    {
+      "sequence": [
+        "architecture",
+        "installation",
+        "faq",
+        "sponsors",
+        "license",
+        "changelog"
+      ],
+      "count": 1
+    },
+    {
+      "sequence": [
+        "features",
+        "installation",
+        "support",
+        "installation",
+        "support",
+        "contributing"
+      ],
+      "count": 1
+    },
+    {
+      "sequence": [
+        "support",
+        "installation"
+      ],
+      "count": 1
+    },
+    {
+      "sequence": [
+        "features",
+        "installation",
+        "roadmap",
+        "contributing",
+        "license"
+      ],
+      "count": 1
+    },
+    {
+      "sequence": [
+        "demo",
+        "performance",
+        "installation",
+        "related",
+        "toc",
+        "installation"
+      ],
+      "count": 1
+    },
+    {
+      "sequence": [
+        "features",
+        "installation",
+        "features",
+        "installation",
+        "features",
+        "api"
+      ],
+      "count": 1
+    }
+  ],
+  "section_category_presence_pct": {
+    "other": 99.0,
+    "installation": 84.0,
+    "license": 72.0,
+    "features": 59.0,
+    "contributing": 52.0,
+    "support": 46.0,
+    "api": 44.0,
+    "architecture": 41.0,
+    "configuration": 33.0,
+    "changelog": 32.0,
+    "credits": 28.0,
+    "usage": 24.0,
+    "demo": 24.0,
+    "faq": 17.0,
+    "security": 16.0,
+    "performance": 15.0,
+    "testing": 14.0,
+    "related": 13.0,
+    "examples": 13.0,
+    "sponsors": 13.0,
+    "toc": 12.0,
+    "roadmap": 8.0
+  },
+  "section_median_word_count": {
+    "installation": {
+      "median_words": 112.5,
+      "n_repos": 84
+    },
+    "license": {
+      "median_words": 13.5,
+      "n_repos": 72
+    },
+    "features": {
+      "median_words": 137,
+      "n_repos": 59
+    },
+    "contributing": {
+      "median_words": 50.5,
+      "n_repos": 52
+    },
+    "api": {
+      "median_words": 121.0,
+      "n_repos": 46
+    },
+    "support": {
+      "median_words": 158.5,
+      "n_repos": 46
+    },
+    "architecture": {
+      "median_words": 92.5,
+      "n_repos": 44
+    },
+    "configuration": {
+      "median_words": 135,
+      "n_repos": 33
+    },
+    "changelog": {
+      "median_words": 60.5,
+      "n_repos": 32
+    },
+    "credits": {
+      "median_words": 82.0,
+      "n_repos": 28
+    },
+    "usage": {
+      "median_words": 36.0,
+      "n_repos": 24
+    },
+    "demo": {
+      "median_words": 49.0,
+      "n_repos": 24
+    },
+    "faq": {
+      "median_words": 253.5,
+      "n_repos": 18
+    },
+    "security": {
+      "median_words": 151,
+      "n_repos": 17
+    },
+    "performance": {
+      "median_words": 96,
+      "n_repos": 15
+    },
+    "testing": {
+      "median_words": 53,
+      "n_repos": 15
+    },
+    "related": {
+      "median_words": 33,
+      "n_repos": 13
+    },
+    "examples": {
+      "median_words": 8,
+      "n_repos": 13
+    },
+    "sponsors": {
+      "median_words": 143,
+      "n_repos": 13
+    },
+    "toc": {
+      "median_words": 58.5,
+      "n_repos": 12
+    },
+    "roadmap": {
+      "median_words": 56.0,
+      "n_repos": 8
+    }
+  },
+  "readme_word_count_percentiles": {
+    "p10": 766,
+    "p25": 1311,
+    "p50": 1846,
+    "p75": 3612,
+    "p90": 6040
+  },
+  "section_avg_relative_position": {
+    "features": {
+      "avg_relative_position": 0.21,
+      "n_occurrences": 86
+    },
+    "toc": {
+      "avg_relative_position": 0.23,
+      "n_occurrences": 15
+    },
+    "installation": {
+      "avg_relative_position": 0.33,
+      "n_occurrences": 311
+    },
+    "demo": {
+      "avg_relative_position": 0.38,
+      "n_occurrences": 31
+    },
+    "sponsors": {
+      "avg_relative_position": 0.39,
+      "n_occurrences": 15
+    },
+    "related": {
+      "avg_relative_position": 0.45,
+      "n_occurrences": 13
+    },
+    "performance": {
+      "avg_relative_position": 0.45,
+      "n_occurrences": 17
+    },
+    "architecture": {
+      "avg_relative_position": 0.46,
+      "n_occurrences": 70
+    },
+    "usage": {
+      "avg_relative_position": 0.46,
+      "n_occurrences": 30
+    },
+    "api": {
+      "avg_relative_position": 0.53,
+      "n_occurrences": 70
+    },
+    "examples": {
+      "avg_relative_position": 0.53,
+      "n_occurrences": 17
+    },
+    "security": {
+      "avg_relative_position": 0.54,
+      "n_occurrences": 23
+    },
+    "configuration": {
+      "avg_relative_position": 0.56,
+      "n_occurrences": 65
+    },
+    "support": {
+      "avg_relative_position": 0.59,
+      "n_occurrences": 93
+    },
+    "faq": {
+      "avg_relative_position": 0.61,
+      "n_occurrences": 21
+    },
+    "roadmap": {
+      "avg_relative_position": 0.63,
+      "n_occurrences": 8
+    },
+    "testing": {
+      "avg_relative_position": 0.66,
+      "n_occurrences": 35
+    },
+    "changelog": {
+      "avg_relative_position": 0.71,
+      "n_occurrences": 35
+    },
+    "contributing": {
+      "avg_relative_position": 0.77,
+      "n_occurrences": 60
+    },
+    "credits": {
+      "avg_relative_position": 0.8,
+      "n_occurrences": 35
+    },
+    "license": {
+      "avg_relative_position": 0.93,
+      "n_occurrences": 75
+    }
+  }
+}

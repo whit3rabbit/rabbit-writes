@@ -1,0 +1,356 @@
+{
+  "meta": {
+    "full_name": "Egonex-AI/Understand-Anything",
+    "html_url": "https://github.com/Egonex-AI/Understand-Anything",
+    "description": "Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.",
+    "stars_total": 78591,
+    "forks": 6598,
+    "watchers": 245,
+    "created_at": "2026-03-15T02:30:51Z",
+    "pushed_at": "2026-07-30T02:54:18Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/Egonex-AI__Understand-Anything/README.md",
+    "readme_bytes": 18671,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 3324,
+    "est_stars_gained_1y": 13296,
+    "slug": "Egonex-AI__Understand-Anything"
+  },
+  "stats": {
+    "total_lines": 392,
+    "non_blank_lines": 276,
+    "total_chars": 18473,
+    "heading_count": 37,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "features",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "contributing",
+      "changelog"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "\u2728 Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Explore the structural graph",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Understand business logic",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Analyze knowledge bases",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "1. Install the plugin",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "2. Analyze your codebase",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Generate Chinese content (\u77e5\u8bc6\u56fe\u8282\u70b9\u63cf\u8ff0\u548c Dashboard UI)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Supported languages: en (default), zh, zh-TW, ja, ko, ru",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "3. Explore the dashboard",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "4. Keep learning",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Ask anything about the codebase",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Analyze impact of your current changes",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Deep-dive into a specific file or function",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Generate an onboarding guide for new team members",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Extract business domain knowledge (domains, flows, steps)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Analyze a Karpathy-pattern LLM wiki knowledge base",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Re-run anytime \u2014 incremental by default (only re-analyzes changed files)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Auto-update on every commit via a post-commit hook",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Scope to a subdirectory (for huge monorepos)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf10 Multi-Platform Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Claude Code (Native)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "One-line install (Codex / OpenCode / OpenClaw / Antigravity / Gemini CLI / Pi Agent / Vibe CLI / VS Code Copilot / Hermes / Cline / KIMI CLI / Trae / Nanobot / Kiro)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "or skip the prompt by passing the platform:",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Cursor",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "VS Code + GitHub Copilot",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Copilot CLI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Kiro CLI / IDE",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Platform Compatibility",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udce6 Share the Graph with Your Team",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "View the dashboard without Claude Code",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd27 Under the Hood",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Tree-sitter + LLM hybrid",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Multi-Agent Pipeline",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfa5 Community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd1d Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "features": [
+        35
+      ],
+      "other": [
+        33,
+        25,
+        230,
+        114,
+        3,
+        31,
+        1,
+        7,
+        1,
+        5,
+        1,
+        1,
+        4,
+        1,
+        2,
+        3,
+        0,
+        121,
+        51,
+        46,
+        0,
+        55,
+        94,
+        100,
+        114,
+        0,
+        129,
+        106
+      ],
+      "installation": [
+        0,
+        34,
+        7,
+        15
+      ],
+      "support": [
+        77,
+        75
+      ],
+      "contributing": [
+        67
+      ],
+      "changelog": [
+        107
+      ]
+    },
+    "preamble_word_count": 542,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 12,
+    "uses_centering": true,
+    "image_count_total": 17,
+    "badge_count": 13,
+    "screenshot_or_logo_image_count": 4,
+    "gif_count": 0,
+    "has_video_embed": true,
+    "badges_in_header_block": 0,
+    "html_link_count": 28,
+    "inline_link_count": 6,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 6,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 13,
+    "code_block_languages": [
+      "bash",
+      "gitignore",
+      "powershell"
+    ],
+    "avg_code_block_lines": 3.69,
+    "table_row_count": 28,
+    "table_present": true,
+    "paragraph_count": 58,
+    "avg_paragraph_words": 28.45,
+    "median_paragraph_words": 22.0,
+    "sentence_count": 76,
+    "avg_sentence_words": 21.71,
+    "median_sentence_words": 15.0,
+    "stdev_sentence_words": 27.39,
+    "short_sentence_pct": 28.9,
+    "medium_sentence_pct": 32.9,
+    "long_sentence_pct": 38.2,
+    "total_prose_words": 2006,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

@@ -1,0 +1,323 @@
+{
+  "meta": {
+    "full_name": "op7418/guizang-ppt-skill",
+    "html_url": "https://github.com/op7418/guizang-ppt-skill",
+    "description": "AI-agent Skill for generating polished HTML slide decks: editorial magazine and Swiss layouts, image prompts, social covers, and a WebGL/low-power presentation runtime.",
+    "stars_total": 23601,
+    "forks": 1693,
+    "watchers": 53,
+    "created_at": "2026-04-23T13:23:07Z",
+    "pushed_at": "2026-08-07T03:58:08Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/op7418__guizang-ppt-skill/README.md",
+    "readme_bytes": 24832,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 650,
+    "est_stars_gained_1y": 2600,
+    "slug": "op7418__guizang-ppt-skill"
+  },
+  "stats": {
+    "total_lines": 422,
+    "non_blank_lines": 304,
+    "total_chars": 14747,
+    "heading_count": 33,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "roadmap",
+      "faq",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Guizang PPT Skill \u00b7 \u7f51\u9875 PPT / \u914d\u56fe / \u5c01\u9762",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "30 \u79d2\u5f00\u59cb",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u8d5e\u52a9\u4e0e\u652f\u6301",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u5728\u5176\u4ed6\u5730\u65b9\u4f7f\u7528\u5f52\u85cf PPT Skill",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u6548\u679c",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u9002\u5408 / \u4e0d\u9002\u5408",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5e38\u89c1\u4f7f\u7528\u573a\u666f",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u4e3a\u4ec0\u4e48\u662f HTML PPT",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5e73\u53f0\u652f\u6301",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5b89\u88c5",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u65b9\u5f0f\u4e00:\u4e00\u884c\u547d\u4ee4\u5b89\u88c5(\u63a8\u8350)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u65b9\u5f0f\u4e8c:\u628a\u4e0b\u9762\u8fd9\u6bb5\u8bdd\u76f4\u63a5\u53d1\u7ed9 AI",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u65b9\u5f0f\u4e09:\u624b\u52a8\u547d\u4ee4\u884c",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u89e6\u53d1\u65b9\u5f0f",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u4f7f\u7528\u6d41\u7a0b",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u6f14\u8bb2\u8005\u6a21\u5f0f",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u6f14\u8bb2\u65f6\u80fd\u770b\u5230\u4ec0\u4e48",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u65f6\u95f4\u3001\u6392\u7ec3\u4e0e\u81ea\u52a8\u7ffb\u9875",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u73b0\u573a\u5de5\u5177\u4e0e\u6545\u969c\u6062\u590d",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Style B \u745e\u58eb\u98ce",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Codex \u914d\u56fe\u80fd\u529b",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u5c01\u9762\u751f\u6210",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u793a\u4f8b\u8bf7\u6c42",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u76ee\u5f55\u7ed3\u6784",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u4e3b\u9898\u8272\u9884\u8bbe",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Style A \u7535\u5b50\u6742\u5fd7\u4e3b\u9898",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Style B \u745e\u58eb\u4e3b\u9898",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u6838\u5fc3\u8bbe\u8ba1\u539f\u5219",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u89c6\u89c9\u53c2\u8003",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Roadmap",
+        "category": "roadmap"
+      },
+      {
+        "level": 2,
+        "text": "FAQ",
+        "category": "faq"
+      },
+      {
+        "level": 2,
+        "text": "\u8d21\u732e",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        297,
+        11,
+        52,
+        56,
+        99,
+        16,
+        65,
+        42,
+        35,
+        0,
+        0,
+        55,
+        0,
+        36,
+        95,
+        28,
+        28,
+        22,
+        54,
+        62,
+        96,
+        35,
+        5,
+        0,
+        9,
+        110,
+        96,
+        57,
+        20,
+        66
+      ],
+      "roadmap": [
+        13
+      ],
+      "faq": [
+        78
+      ],
+      "license": [
+        8
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 23,
+    "badge_count": 10,
+    "screenshot_or_logo_image_count": 13,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 10,
+    "html_link_count": 1,
+    "inline_link_count": 15,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 15,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.4,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 15,
+    "code_block_languages": [
+      "bash",
+      "text"
+    ],
+    "avg_code_block_lines": 2.67,
+    "table_row_count": 34,
+    "table_present": true,
+    "paragraph_count": 44,
+    "avg_paragraph_words": 8.39,
+    "median_paragraph_words": 7.0,
+    "sentence_count": 44,
+    "avg_sentence_words": 8.39,
+    "median_sentence_words": 7.0,
+    "stdev_sentence_words": 5.97,
+    "short_sentence_pct": 72.7,
+    "medium_sentence_pct": 22.7,
+    "long_sentence_pct": 4.5,
+    "total_prose_words": 1097,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": false,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

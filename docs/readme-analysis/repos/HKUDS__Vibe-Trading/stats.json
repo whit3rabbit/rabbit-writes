@@ -1,0 +1,663 @@
+{
+  "meta": {
+    "full_name": "HKUDS/Vibe-Trading",
+    "html_url": "https://github.com/HKUDS/Vibe-Trading",
+    "description": "\"Vibe-Trading: Your Personal Trading Agent\"",
+    "stars_total": 30467,
+    "forks": 4907,
+    "watchers": 168,
+    "created_at": "2026-04-01T09:52:20Z",
+    "pushed_at": "2026-08-09T14:59:50Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/HKUDS__Vibe-Trading/README.md",
+    "readme_bytes": 195453,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 570,
+    "est_stars_gained_1y": 2280,
+    "slug": "HKUDS__Vibe-Trading"
+  },
+  "stats": {
+    "total_lines": 1786,
+    "non_blank_lines": 1394,
+    "total_chars": 193542,
+    "heading_count": 78,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "features",
+      "features",
+      "other",
+      "usage",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "demo",
+      "installation",
+      "installation",
+      "other",
+      "installation",
+      "installation",
+      "api",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "other",
+      "other",
+      "examples",
+      "testing",
+      "other",
+      "other",
+      "other",
+      "testing",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "sponsors",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "security",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "api",
+      "other",
+      "other",
+      "other",
+      "other",
+      "roadmap",
+      "contributing",
+      "credits",
+      "other",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "\ud83d\udcf0 News",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u2728 Key Features",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udca1 What Is Vibe-Trading?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "\u2728 What You Can Do",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u26a1 Quick Example",
+        "category": "usage"
+      },
+      {
+        "level": 1,
+        "text": "Natural-language research",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Bench a pre-built alpha zoo (one line)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udc65 Shadow Account",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\uddea Research Workflow",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udce1 Data Sources & Smart Fallback",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Using Longbridge explicitly",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udc8e Optional premium data \u2014 QVeris",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd29 Detailed Capabilities",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfac Demo",
+        "category": "demo"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "One-line install (PyPI)",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Or choose a path",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Path A: Docker (zero setup)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Edit agent/.env \u2014 uncomment your LLM provider and set API key",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "Path B: Local install",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Activate",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": ".venv\\Scripts\\activate.bat       # Windows CMD",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": ".venv\\Scripts\\Activate.ps1       # Windows PowerShell",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Terminal 1: API server",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": "Terminal 2: Frontend dev server",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Path C: MCP plugin",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Path D: ClawHub (one command)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udde0 Environment Variables",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfaf Recommended Models",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udda5 CLI Reference",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udca1 Examples",
+        "category": "examples"
+      },
+      {
+        "level": 3,
+        "text": "Strategy & Backtesting",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Moving average crossover on US equities",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "RSI mean-reversion on crypto",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Multi-factor strategy on A-shares",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "After backtesting, export to TradingView / TDX / MetaTrader 5",
+        "category": "testing"
+      },
+      {
+        "level": 3,
+        "text": "Market Research",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Equity deep-dive",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Macro analysis",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Crypto on-chain",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Swarm Workflows",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Bull/bear debate on a stock",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Quant strategy from screening to backtest",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Crypto desk: funding + liquidation + flow \u2192 risk manager",
+        "category": "sponsors"
+      },
+      {
+        "level": 1,
+        "text": "Global macro portfolio allocation",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Cross-Session Memory",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Save your preferences once",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "The agent recalls them in future sessions automatically",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Upload & Analyze Documents",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Analyze a broker export or earnings report",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf10 API Server",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "Security defaults",
+        "category": "security"
+      },
+      {
+        "level": 3,
+        "text": "Web UI Settings",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Scheduled research",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "every 6 hours (cron)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "weekdays at 23:30 Auckland wall time \u2014 DST-proof",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "list / cancel",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd0c MCP Plugin",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "SWARM external MCP tools",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "MetaTrader 5 (Exness and other MT5 brokers)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd0c eToro Public API Connector",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd0c Loading Tools from External MCP Servers (MCP Client Mode)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Quick start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Official IBKR MCP read-only probe",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Trading connectors: fastest path",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udd10 TAP Mode \u2014 full credential isolation & human-approved writes",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Config reference",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Per-session overrides (API)",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "Tool naming",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "v1 limits",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc1 Project Structure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfdb Ecosystem",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\uddfa Roadmap",
+        "category": "roadmap"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Contributors",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "Disclaimer",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        14316,
+        228,
+        20,
+        34,
+        130,
+        108,
+        310,
+        122,
+        99,
+        1006,
+        41,
+        6,
+        0,
+        21,
+        118,
+        6,
+        17,
+        129,
+        503,
+        22,
+        18,
+        17,
+        1,
+        17,
+        18,
+        16,
+        1,
+        11,
+        10,
+        10,
+        1,
+        16,
+        12,
+        1,
+        33,
+        120,
+        26,
+        25,
+        111,
+        309,
+        183,
+        243,
+        33,
+        98,
+        106,
+        536,
+        58,
+        53,
+        9,
+        137,
+        75
+      ],
+      "features": [
+        207,
+        73
+      ],
+      "usage": [
+        4
+      ],
+      "demo": [
+        46
+      ],
+      "installation": [
+        0,
+        90,
+        158,
+        17,
+        15,
+        23
+      ],
+      "api": [
+        172,
+        4,
+        307,
+        239,
+        25
+      ],
+      "configuration": [
+        238,
+        143,
+        161
+      ],
+      "examples": [
+        0
+      ],
+      "testing": [
+        1,
+        52
+      ],
+      "sponsors": [
+        7
+      ],
+      "security": [
+        254
+      ],
+      "roadmap": [
+        221
+      ],
+      "contributing": [
+        59
+      ],
+      "credits": [
+        1097
+      ],
+      "license": [
+        51
+      ]
+    },
+    "preamble_word_count": 396,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 13,
+    "uses_centering": true,
+    "image_count_total": 18,
+    "badge_count": 9,
+    "screenshot_or_logo_image_count": 9,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 1,
+    "html_link_count": 28,
+    "inline_link_count": 483,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 483,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.07,
+    "internal_anchor_link_count": 3,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 53,
+    "code_block_languages": [
+      "bash",
+      "dotenv",
+      "json",
+      "python",
+      "yaml"
+    ],
+    "avg_code_block_lines": 6.72,
+    "table_row_count": 244,
+    "table_present": true,
+    "paragraph_count": 193,
+    "avg_paragraph_words": 23.37,
+    "median_paragraph_words": 13,
+    "sentence_count": 269,
+    "avg_sentence_words": 16.77,
+    "median_sentence_words": 13,
+    "stdev_sentence_words": 20.26,
+    "short_sentence_pct": 35.7,
+    "medium_sentence_pct": 37.5,
+    "long_sentence_pct": 26.8,
+    "total_prose_words": 20996,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

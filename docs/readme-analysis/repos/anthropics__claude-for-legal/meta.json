@@ -1,0 +1,19 @@
+{
+  "full_name": "anthropics/claude-for-legal",
+  "html_url": "https://github.com/anthropics/claude-for-legal",
+  "description": "A suite of plugins for legal workflows",
+  "stars_total": 9066,
+  "forks": 1757,
+  "watchers": 109,
+  "created_at": "2026-04-21T15:43:42Z",
+  "pushed_at": "2026-08-02T04:03:49Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/anthropics__claude-for-legal/README.md",
+  "readme_bytes": 53485,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 698,
+  "est_stars_gained_1y": 2792,
+  "slug": "anthropics__claude-for-legal"
+}

@@ -1,0 +1,19 @@
+{
+  "full_name": "anthropics/financial-services",
+  "html_url": "https://github.com/anthropics/financial-services",
+  "description": "",
+  "stars_total": 34147,
+  "forks": 5082,
+  "watchers": 267,
+  "created_at": "2026-02-23T19:24:50Z",
+  "pushed_at": "2026-08-04T14:41:29Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/anthropics__financial-services/README.md",
+  "readme_bytes": 16409,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 1415,
+  "est_stars_gained_1y": 5660,
+  "slug": "anthropics__financial-services"
+}

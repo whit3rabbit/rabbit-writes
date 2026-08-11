@@ -1,0 +1,361 @@
+{
+  "meta": {
+    "full_name": "coreyhaines31/marketingskills",
+    "html_url": "https://github.com/coreyhaines31/marketingskills",
+    "description": "Marketing skills for Claude Code and AI agents. CRO, copywriting, SEO, analytics, and growth engineering.",
+    "stars_total": 43695,
+    "forks": 6877,
+    "watchers": 380,
+    "created_at": "2026-01-15T19:45:23Z",
+    "pushed_at": "2026-07-29T05:41:15Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/coreyhaines31__marketingskills/README.md",
+    "readme_bytes": 20729,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 507,
+    "est_stars_gained_1y": 2028,
+    "slug": "coreyhaines31__marketingskills"
+  },
+  "stats": {
+    "total_lines": 334,
+    "non_blank_lines": 261,
+    "total_chars": 19307,
+    "heading_count": 38,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "usage",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "testing",
+      "other",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "Marketing Skills for AI Agents",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What are Skills?",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How Skills Work Together",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Available Skills",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Option 1: CLI Install (Recommended)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Install all skills",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Install specific skills",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "List available skills",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Option 2: Claude Code Plugin",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Add the marketplace",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install all marketing skills",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Option 3: Clone and Copy",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Option 4: Git Submodule",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Option 5: Fork and Customize",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Option 6: SkillKit (Multi-Agent)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install all skills",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Install specific skills",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "List available skills",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Upgrading from v1.x to v2.0",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "From the directory where you installed the skills (e.g., .agents/skills/ or .claude/skills/)",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Migrate the product marketing context file",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "v2.0 file (or pre-v2.0 file with new name)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "pre-v2.0 file with legacy name",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Full rename map",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Usage",
+        "category": "usage"
+      },
+      {
+        "level": 2,
+        "text": "Skill Categories",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Conversion Optimization",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Content & Copy",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "SEO & Discovery",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Paid & Distribution",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Measurement & Testing",
+        "category": "testing"
+      },
+      {
+        "level": 3,
+        "text": "Retention",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Growth Engineering",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Strategy & Monetization",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Sales & RevOps",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        201,
+        41,
+        42,
+        1080,
+        14,
+        8,
+        5,
+        9,
+        14,
+        18,
+        20,
+        6,
+        54,
+        29,
+        10,
+        30,
+        42,
+        0,
+        18,
+        33,
+        30,
+        19,
+        8,
+        16,
+        20,
+        15
+      ],
+      "installation": [
+        0,
+        13,
+        5,
+        8,
+        3,
+        5,
+        8,
+        38
+      ],
+      "usage": [
+        17
+      ],
+      "testing": [
+        7
+      ],
+      "contributing": [
+        29
+      ],
+      "license": [
+        28
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 1,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 1,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 1,
+    "inline_link_count": 62,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 62,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.24,
+    "internal_anchor_link_count": 1,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 11,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 7.27,
+    "table_row_count": 72,
+    "table_present": true,
+    "paragraph_count": 27,
+    "avg_paragraph_words": 20.89,
+    "median_paragraph_words": 17,
+    "sentence_count": 45,
+    "avg_sentence_words": 12.53,
+    "median_sentence_words": 11,
+    "stdev_sentence_words": 7.29,
+    "short_sentence_pct": 42.2,
+    "medium_sentence_pct": 44.4,
+    "long_sentence_pct": 13.3,
+    "total_prose_words": 794,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

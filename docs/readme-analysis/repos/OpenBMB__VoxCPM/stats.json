@@ -1,0 +1,445 @@
+{
+  "meta": {
+    "full_name": "OpenBMB/VoxCPM",
+    "html_url": "https://github.com/OpenBMB/VoxCPM",
+    "description": "VoxCPM2: Tokenizer-Free TTS for Multilingual Speech Generation, Creative Voice Design, and True-to-Life Cloning",
+    "stars_total": 35139,
+    "forks": 4039,
+    "watchers": 155,
+    "created_at": "2025-09-16T03:41:49Z",
+    "pushed_at": "2026-07-08T09:46:11Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/OpenBMB__VoxCPM/README.md",
+    "readme_bytes": 41991,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 575,
+    "est_stars_gained_1y": 2300,
+    "slug": "OpenBMB__VoxCPM"
+  },
+  "stats": {
+    "total_lines": 692,
+    "non_blank_lines": 519,
+    "total_chars": 41524,
+    "heading_count": 48,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "features",
+      "other",
+      "toc",
+      "installation",
+      "installation",
+      "api",
+      "usage",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "demo",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "performance",
+      "other",
+      "other",
+      "other",
+      "performance",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "support",
+      "other",
+      "other",
+      "license",
+      "credits",
+      "other",
+      "changelog"
+    ],
+    "section_order_detail": [
+      {
+        "level": 3,
+        "text": "\u2728 Highlights",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "News",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contents",
+        "category": "toc"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Python API",
+        "category": "api"
+      },
+      {
+        "level": 4,
+        "text": "\ud83d\udde3\ufe0f Text-to-Speech",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83c\udfa8 Voice Design",
+        "category": "architecture"
+      },
+      {
+        "level": 4,
+        "text": "\ud83c\udf9b\ufe0f Controllable Voice Cloning",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\ud83c\udf99\ufe0f Ultimate Cloning",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "CLI Usage",
+        "category": "usage"
+      },
+      {
+        "level": 1,
+        "text": "Voice design (no reference audio needed)",
+        "category": "architecture"
+      },
+      {
+        "level": 1,
+        "text": "Controllable voice cloning with style control",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Voice cloning (reference audio)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Ultimate cloning (prompt audio + transcript)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Batch processing",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Optional post-generation timestamps with stable-ts",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Character timestamps are best-effort and are derived from word alignment",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Help",
+        "category": "support"
+      },
+      {
+        "level": 3,
+        "text": "Web Demo",
+        "category": "demo"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udea2 Production Deployment (Nano-vLLM)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfed Production Serving (vLLM-Omni)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install from source (latest main \u2014 vllm-omni is rapidly evolving)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Launch an OpenAI-compatible TTS server (--omni enables omni-modal serving)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Call it from any OpenAI client",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcf1 On-Device Inference (llama.cpp-omni)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Basic TTS",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Voice cloning (reference audio)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Ultimate cloning (reference audio + transcript)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udce6 Models & Versions",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcca Performance",
+        "category": "performance"
+      },
+      {
+        "level": 3,
+        "text": "Seed-TTS-eval",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "CV3-eval",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "MiniMax-Multilingual-Test",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Internal 30-Language ASR Benchmark",
+        "category": "performance"
+      },
+      {
+        "level": 3,
+        "text": "InstructTTSEval",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u2699\ufe0f Fine-tuning",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "LoRA fine-tuning (parameter-efficient, recommended)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Full fine-tuning",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "WebUI for training & inference",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcda Documentation",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udf1f Ecosystem & Community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "\u26a0\ufe0f Risks and Limitations",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcd6 Citation",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc4 License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude4f Acknowledgments",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "Institutions",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u2b50 Star History",
+        "category": "changelog"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "features": [
+        239
+      ],
+      "other": [
+        90,
+        10,
+        22,
+        36,
+        23,
+        17,
+        29,
+        8,
+        21,
+        13,
+        66,
+        35,
+        7,
+        64,
+        85,
+        19,
+        16,
+        103,
+        242,
+        355,
+        105,
+        498,
+        111,
+        29,
+        9,
+        9,
+        28,
+        130,
+        14,
+        9
+      ],
+      "toc": [
+        44
+      ],
+      "installation": [
+        0,
+        27,
+        24
+      ],
+      "api": [
+        0,
+        76
+      ],
+      "architecture": [
+        31,
+        12
+      ],
+      "usage": [
+        1
+      ],
+      "support": [
+        2,
+        196
+      ],
+      "demo": [
+        26
+      ],
+      "performance": [
+        13,
+        251
+      ],
+      "license": [
+        13
+      ],
+      "credits": [
+        66
+      ],
+      "changelog": [
+        9
+      ]
+    },
+    "preamble_word_count": 365,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 6,
+    "uses_centering": true,
+    "image_count_total": 12,
+    "badge_count": 7,
+    "screenshot_or_logo_image_count": 5,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 7,
+    "html_link_count": 11,
+    "inline_link_count": 80,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 80,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.62,
+    "internal_anchor_link_count": 14,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 19,
+    "code_block_languages": [
+      "bash",
+      "bib",
+      "python",
+      "sh"
+    ],
+    "avg_code_block_lines": 9.42,
+    "table_row_count": 171,
+    "table_present": true,
+    "paragraph_count": 49,
+    "avg_paragraph_words": 18.43,
+    "median_paragraph_words": 11,
+    "sentence_count": 53,
+    "avg_sentence_words": 17.04,
+    "median_sentence_words": 11,
+    "stdev_sentence_words": 21.9,
+    "short_sentence_pct": 39.6,
+    "medium_sentence_pct": 37.7,
+    "long_sentence_pct": 22.6,
+    "total_prose_words": 1708,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

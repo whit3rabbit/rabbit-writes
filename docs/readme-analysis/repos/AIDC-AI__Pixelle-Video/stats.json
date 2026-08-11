@@ -1,0 +1,386 @@
+{
+  "meta": {
+    "full_name": "AIDC-AI/Pixelle-Video",
+    "html_url": "https://github.com/AIDC-AI/Pixelle-Video",
+    "description": "\ud83d\ude80 AI \u5168\u81ea\u52a8\u77ed\u89c6\u9891\u5f15\u64ce | AI Fully Automated Short Video Engine",
+    "stars_total": 26602,
+    "forks": 3840,
+    "watchers": 104,
+    "created_at": "2025-11-07T06:34:27Z",
+    "pushed_at": "2026-06-14T12:40:58Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/AIDC-AI__Pixelle-Video/README.md",
+    "readme_bytes": 20845,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 765,
+    "est_stars_gained_1y": 3060,
+    "slug": "AIDC-AI__Pixelle-Video"
+  },
+  "stats": {
+    "total_lines": 476,
+    "non_blank_lines": 343,
+    "total_chars": 13962,
+    "heading_count": 45,
+    "heading_levels_used": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "changelog"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "\ud83d\udda5\ufe0f Web \u754c\u9762\u9884\u89c8",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udccb \u6700\u8fd1\u66f4\u65b0",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u2728 \u529f\u80fd\u4eae\u70b9",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcca \u89c6\u9891\u751f\u6210\u6d41\u7a0b",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83c\udfac \u89c6\u9891\u793a\u4f8b",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcf1 \u6269\u5c55\u6a21\u5757\u89c6\u9891\u5c55\u793a",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcf1 \u7ad6\u5c4f\u89c6\u9891\u5c55\u793a",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udda5\ufe0f \u6a2a\u5c4f\u89c6\u9891\u5c55\u793a",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\ude80 \u5feb\u901f\u5f00\u59cb",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83e\ude9f Windows \u4e00\u952e\u6574\u5408\u5305\uff08\u63a8\u8350 Windows \u7528\u6237\u4f7f\u7528\uff09",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u4ece\u6e90\u7801\u5b89\u88c5\uff08\u9002\u5408 macOS / Linux \u7528\u6237\u6216\u9700\u8981\u81ea\u5b9a\u4e49\u7684\u7528\u6237\uff09",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u524d\u7f6e\u73af\u5883\u4f9d\u8d56",
+        "category": "other"
+      },
+      {
+        "level": 5,
+        "text": "\u5b89\u88c5 uv",
+        "category": "other"
+      },
+      {
+        "level": 5,
+        "text": "\u5b89\u88c5 ffmpeg",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u7b2c\u4e00\u6b65\uff1a\u4e0b\u8f7d\u9879\u76ee",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u7b2c\u4e8c\u6b65\uff1a\u542f\u52a8 Web \u754c\u9762",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\u4f7f\u7528 uv \u8fd0\u884c\uff08\u63a8\u8350\uff0c\u4f1a\u81ea\u52a8\u5b89\u88c5\u4f9d\u8d56\uff09",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u7b2c\u4e09\u6b65\uff1a\u5728 Web \u754c\u9762\u914d\u7f6e",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcbb \u4f7f\u7528\u65b9\u6cd5",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u2699\ufe0f \u7cfb\u7edf\u914d\u7f6e\uff08\u9996\u6b21\u5fc5\u586b\uff09",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "1. LLM \u914d\u7f6e\uff08\u5927\u8bed\u8a00\u6a21\u578b\uff09",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "2. ComfyUI / RunningHub \u914d\u7f6e",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "3. API \u5a92\u4f53\u6a21\u578b\u914d\u7f6e",
+        "category": "api"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcdd \u5185\u5bb9\u8f93\u5165\uff08\u5de6\u4fa7\u680f\uff09",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u751f\u6210\u6a21\u5f0f",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u80cc\u666f\u97f3\u4e50\uff08BGM\uff09",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfa4 \u8bed\u97f3\u8bbe\u7f6e\uff08\u4e2d\u95f4\u680f\uff09",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "TTS \u5de5\u4f5c\u6d41",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u53c2\u8003\u97f3\u9891\uff08\u53ef\u9009\uff09",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u9884\u89c8\u529f\u80fd",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfa8 \u89c6\u89c9\u8bbe\u7f6e\uff08\u4e2d\u95f4\u680f\uff09",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u56fe\u50cf\u751f\u6210",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u89c6\u9891\u6a21\u677f",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "API \u89c6\u9891\u751f\u6210",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfac \u751f\u6210\u89c6\u9891\uff08\u53f3\u4fa7\u680f\uff09",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u751f\u6210\u6309\u94ae",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u8fdb\u5ea6\u663e\u793a",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "\u89c6\u9891\u9884\u89c8",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\u2753 \u5e38\u89c1\u95ee\u9898",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd1d \u53c2\u8003\u9879\u76ee",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcac \u793e\u533a\u4ea4\u6d41",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udce2 \u53cd\u9988\u4e0e\u652f\u6301",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcdd \u8bb8\u53ef\u8bc1",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcda \u7cfb\u5217\u5de5\u4f5c",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\u2b50 Star History",
+        "category": "changelog"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        5,
+        88,
+        72,
+        20,
+        4,
+        82,
+        252,
+        67,
+        0,
+        47,
+        0,
+        7,
+        17,
+        21,
+        0,
+        1,
+        11,
+        48,
+        5,
+        4,
+        27,
+        26,
+        0,
+        20,
+        20,
+        0,
+        17,
+        12,
+        5,
+        0,
+        52,
+        39,
+        23,
+        0,
+        9,
+        6,
+        7,
+        58,
+        45,
+        24,
+        25,
+        9,
+        260
+      ],
+      "api": [
+        71
+      ],
+      "changelog": [
+        19
+      ]
+    },
+    "preamble_word_count": 202,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 17,
+    "uses_centering": true,
+    "image_count_total": 16,
+    "badge_count": 7,
+    "screenshot_or_logo_image_count": 9,
+    "gif_count": 0,
+    "has_video_embed": true,
+    "badges_in_header_block": 7,
+    "html_link_count": 8,
+    "inline_link_count": 20,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 5,
+    "total_markdown_links": 20,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.3,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 4,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 1.75,
+    "table_row_count": 9,
+    "table_present": true,
+    "paragraph_count": 57,
+    "avg_paragraph_words": 17.58,
+    "median_paragraph_words": 6,
+    "sentence_count": 57,
+    "avg_sentence_words": 17.58,
+    "median_sentence_words": 6,
+    "stdev_sentence_words": 39.48,
+    "short_sentence_pct": 64.9,
+    "medium_sentence_pct": 21.1,
+    "long_sentence_pct": 14.0,
+    "total_prose_words": 1415,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": false,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

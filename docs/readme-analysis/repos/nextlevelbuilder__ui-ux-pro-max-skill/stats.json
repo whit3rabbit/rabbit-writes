@@ -1,0 +1,534 @@
+{
+  "meta": {
+    "full_name": "nextlevelbuilder/ui-ux-pro-max-skill",
+    "html_url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+    "description": "An AI SKILL that provide design intelligence for building professional UI/UX multiple platforms",
+    "stars_total": 115036,
+    "forks": 12325,
+    "watchers": 493,
+    "created_at": "2025-11-30T11:36:31Z",
+    "pushed_at": "2026-08-06T01:29:27Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/nextlevelbuilder__ui-ux-pro-max-skill/README.md",
+    "readme_bytes": 31253,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 1242,
+    "est_stars_gained_1y": 4968,
+    "slug": "nextlevelbuilder__ui-ux-pro-max-skill"
+  },
+  "stats": {
+    "total_lines": 634,
+    "non_blank_lines": 494,
+    "total_chars": 30017,
+    "heading_count": 61,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "changelog",
+      "architecture",
+      "architecture",
+      "other",
+      "features",
+      "other",
+      "related",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "installation",
+      "usage",
+      "other",
+      "other",
+      "examples",
+      "architecture",
+      "support",
+      "architecture",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "architecture",
+      "other",
+      "architecture",
+      "other",
+      "credits",
+      "other",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "faq",
+      "installation",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "installation",
+      "installation",
+      "installation",
+      "architecture",
+      "architecture",
+      "changelog",
+      "license",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "[UI UX Pro Max](https://uupm.cc)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What's New in v2.0",
+        "category": "changelog"
+      },
+      {
+        "level": 3,
+        "text": "Intelligent Design System Generation",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "How Design System Generation Works",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "161 Industry-Specific Reasoning Rules",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 3,
+        "text": "Available Styles (67)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udc8e Basic vs. Premium Version Comparison",
+        "category": "related"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udfe2 Basic Version (This Repository)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udfe1 Premium Version",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Installation",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Using Claude Marketplace (Claude Code)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Using CLI (Recommended)",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install CLI globally",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Go to your project",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Install for your AI assistant",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Global Install (Available for All Projects)",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Other CLI Commands",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Usage",
+        "category": "usage"
+      },
+      {
+        "level": 3,
+        "text": "Skill Mode (Auto-activate)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Workflow Mode (Slash Command)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Example Prompts",
+        "category": "examples"
+      },
+      {
+        "level": 3,
+        "text": "How It Works",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "Supported Stacks",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Design System Command (Advanced)",
+        "category": "architecture"
+      },
+      {
+        "level": 1,
+        "text": "Generate design system with ASCII output",
+        "category": "architecture"
+      },
+      {
+        "level": 1,
+        "text": "Generate with Markdown output",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Domain-specific search",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Stack-specific guidelines",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Persist Design System (Master + Overrides Pattern)",
+        "category": "architecture"
+      },
+      {
+        "level": 1,
+        "text": "Generate and persist to design-system/MASTER.md",
+        "category": "architecture"
+      },
+      {
+        "level": 1,
+        "text": "Also create a page-specific override file",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Architecture & Contributing",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "For Users",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "For Contributors",
+        "category": "credits"
+      },
+      {
+        "level": 1,
+        "text": "1. Clone the repository",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. Understand the structure",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "3. Make changes in src/ui-ux-pro-max/",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "- data/*.csv              \u2192 Database files",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "- scripts/*.py            \u2192 Search engine & design system",
+        "category": "architecture"
+      },
+      {
+        "level": 1,
+        "text": "- templates/              \u2192 Platform-specific templates",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "4. Sync to CLI and test locally",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "5. Build and test CLI",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "`npm run build` uses Bun when available and falls back to TypeScript compiler output after `npm ci`.",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "6. Create PR (never push directly to main)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Automated Releases",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Troubleshooting",
+        "category": "faq"
+      },
+      {
+        "level": 3,
+        "text": "`uipro: unknown command 'uninstall'` or `unknown command 'update'`",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "`uipro uninstall` says \"No installed AI skill directories detected\"",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Option A \u2014 run from the project root where you originally installed it",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Option B \u2014 remove the global install",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "Option C \u2014 remove manually",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Claude Marketplace install fails with \"Zip file contains a symbolic link\"",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "`npm install -g ui-ux-pro-max-cli` fails with permission error",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "npx without installing globally",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Python not found when running design system commands",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "Design system output is cut off / fields truncated",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "Compatible Agents",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        362,
+        136,
+        516,
+        68,
+        88,
+        8,
+        1,
+        5,
+        0,
+        47,
+        15,
+        12,
+        31,
+        59,
+        74,
+        65,
+        10,
+        31,
+        0,
+        0,
+        0,
+        25,
+        0,
+        16,
+        28,
+        110,
+        26,
+        30
+      ],
+      "changelog": [
+        0,
+        19
+      ],
+      "architecture": [
+        29,
+        0,
+        73,
+        31,
+        14,
+        12,
+        13,
+        0,
+        0,
+        42,
+        16
+      ],
+      "features": [
+        102
+      ],
+      "related": [
+        27
+      ],
+      "installation": [
+        0,
+        4,
+        140,
+        0,
+        78,
+        11,
+        16,
+        7,
+        3,
+        39,
+        13,
+        5
+      ],
+      "usage": [
+        0
+      ],
+      "examples": [
+        0
+      ],
+      "support": [
+        74
+      ],
+      "credits": [
+        9
+      ],
+      "faq": [
+        0
+      ],
+      "license": [
+        9
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 6,
+    "uses_centering": true,
+    "image_count_total": 12,
+    "badge_count": 10,
+    "screenshot_or_logo_image_count": 2,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 9,
+    "html_link_count": 14,
+    "inline_link_count": 11,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 11,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 21,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 10.29,
+    "table_row_count": 95,
+    "table_present": true,
+    "paragraph_count": 54,
+    "avg_paragraph_words": 20.24,
+    "median_paragraph_words": 12.5,
+    "sentence_count": 70,
+    "avg_sentence_words": 15.61,
+    "median_sentence_words": 11.0,
+    "stdev_sentence_words": 17.83,
+    "short_sentence_pct": 42.9,
+    "medium_sentence_pct": 37.1,
+    "long_sentence_pct": 20.0,
+    "total_prose_words": 1481,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

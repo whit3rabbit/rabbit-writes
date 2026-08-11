@@ -1,0 +1,19 @@
+{
+  "full_name": "ChromeDevTools/chrome-devtools-mcp",
+  "html_url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+  "description": "Chrome DevTools for coding agents",
+  "stars_total": 48822,
+  "forks": 3401,
+  "watchers": 239,
+  "created_at": "2025-09-11T10:39:55Z",
+  "pushed_at": "2026-08-09T11:57:01Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/ChromeDevTools__chrome-devtools-mcp/README.md",
+  "readme_bytes": 39239,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 503,
+  "est_stars_gained_1y": 2012,
+  "slug": "ChromeDevTools__chrome-devtools-mcp"
+}

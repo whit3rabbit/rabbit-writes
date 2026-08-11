@@ -1,0 +1,437 @@
+{
+  "meta": {
+    "full_name": "calesthio/OpenMontage",
+    "html_url": "https://github.com/calesthio/OpenMontage",
+    "description": "World's first open-source, agentic video production system. 12 production pipelines, 100+ tools, 700+ agent skill and production-knowledge files. Turn your AI coding assistant into a full video production studio.",
+    "stars_total": 46345,
+    "forks": 5755,
+    "watchers": 266,
+    "created_at": "2026-03-29T15:23:22Z",
+    "pushed_at": "2026-08-03T09:19:09Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/calesthio__OpenMontage/README.md",
+    "readme_bytes": 42084,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 718,
+    "est_stars_gained_1y": 2872,
+    "slug": "calesthio__OpenMontage"
+  },
+  "stats": {
+    "total_lines": 763,
+    "non_blank_lines": 541,
+    "total_chars": 41751,
+    "heading_count": 47,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "sponsors",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "api",
+      "other",
+      "other",
+      "api",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "api",
+      "other",
+      "other",
+      "other",
+      "other",
+      "configuration",
+      "installation",
+      "other",
+      "features",
+      "architecture",
+      "architecture",
+      "architecture",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "other",
+      "other",
+      "support",
+      "support",
+      "testing",
+      "api",
+      "testing",
+      "changelog",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Sponsors",
+        "category": "sponsors"
+      },
+      {
+        "level": 2,
+        "text": "Start From A Video You Already Love",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Watch It Happen \u2014 The Backlot Living Storyboard",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Install & Run",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "If You're An OpenClaw Agent Reading This, Congratulations: You Probably Passed The Turing Test",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Add API Keys (optional \u2014 more keys = more tools)",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": ".env \u2014 every key is optional, add what you have",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Image + video gateway:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Kling official direct API:",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": "Free stock media:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Music:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Voice & images:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "More video providers:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Then add to .env:",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What You Get With Zero API Keys",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Try These Prompts",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Start from a reference video",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Zero keys needed",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Free real-footage documentary path",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "With an image/video provider configured (~$0.15\u2013$1.50)",
+        "category": "configuration"
+      },
+      {
+        "level": 3,
+        "text": "Full setup (~$1\u2013$3)",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Pipelines",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Why OpenMontage?",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "How It Works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Architecture",
+        "category": "architecture"
+      },
+      {
+        "level": 3,
+        "text": "Three-Layer Knowledge Architecture",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Supported Providers",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Style System",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Platform Output Profiles",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Production Governance",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Quality Gates",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Scored Provider Selection",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Decision Audit Trail",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Budget Controls",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Agent Compatibility",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 3,
+        "text": "Adding a New Tool",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Adding a New Pipeline",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Join the Community",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Contact",
+        "category": "support"
+      },
+      {
+        "level": 2,
+        "text": "Testing",
+        "category": "testing"
+      },
+      {
+        "level": 1,
+        "text": "Run contract tests (no API keys needed)",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": "Run all tests",
+        "category": "testing"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "sponsors": [
+        727
+      ],
+      "other": [
+        142,
+        248,
+        98,
+        0,
+        24,
+        19,
+        7,
+        35,
+        18,
+        14,
+        18,
+        57,
+        35,
+        57,
+        271,
+        54,
+        48,
+        17,
+        194,
+        109,
+        51,
+        63,
+        82,
+        39,
+        54
+      ],
+      "installation": [
+        0,
+        44,
+        177,
+        67
+      ],
+      "api": [
+        1,
+        16,
+        275,
+        2
+      ],
+      "configuration": [
+        58
+      ],
+      "features": [
+        388
+      ],
+      "architecture": [
+        62,
+        0,
+        37
+      ],
+      "support": [
+        640,
+        89,
+        44
+      ],
+      "contributing": [
+        11
+      ],
+      "testing": [
+        1,
+        2
+      ],
+      "changelog": [
+        70
+      ],
+      "license": [
+        60
+      ]
+    },
+    "preamble_word_count": 314,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 21,
+    "uses_centering": true,
+    "image_count_total": 14,
+    "badge_count": 5,
+    "screenshot_or_logo_image_count": 9,
+    "gif_count": 0,
+    "has_video_embed": true,
+    "badges_in_header_block": 1,
+    "html_link_count": 21,
+    "inline_link_count": 19,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 19,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.16,
+    "internal_anchor_link_count": 1,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 13,
+    "code_block_languages": [
+      "bash",
+      "text"
+    ],
+    "avg_code_block_lines": 8.15,
+    "table_row_count": 118,
+    "table_present": true,
+    "paragraph_count": 116,
+    "avg_paragraph_words": 19.33,
+    "median_paragraph_words": 15.5,
+    "sentence_count": 137,
+    "avg_sentence_words": 16.36,
+    "median_sentence_words": 13,
+    "stdev_sentence_words": 15.24,
+    "short_sentence_pct": 35.8,
+    "medium_sentence_pct": 39.4,
+    "long_sentence_pct": 24.8,
+    "total_prose_words": 3823,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

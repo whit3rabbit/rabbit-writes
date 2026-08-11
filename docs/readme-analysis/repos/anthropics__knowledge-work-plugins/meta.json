@@ -1,0 +1,19 @@
+{
+  "full_name": "anthropics/knowledge-work-plugins",
+  "html_url": "https://github.com/anthropics/knowledge-work-plugins",
+  "description": "Open source repository of plugins primarily intended for knowledge workers to use in Claude Cowork",
+  "stars_total": 23398,
+  "forks": 2825,
+  "watchers": 168,
+  "created_at": "2026-01-23T20:11:54Z",
+  "pushed_at": "2026-08-09T18:08:14Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/anthropics__knowledge-work-plugins/README.md",
+  "readme_bytes": 6109,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 599,
+  "est_stars_gained_1y": 2396,
+  "slug": "anthropics__knowledge-work-plugins"
+}

@@ -1,0 +1,346 @@
+{
+  "meta": {
+    "full_name": "datawhalechina/easy-vibe",
+    "html_url": "https://github.com/datawhalechina/easy-vibe",
+    "description": "\ud83d\udcbb  vibe coding 101\uff5cThe first course for AI-native product builders.",
+    "stars_total": 18832,
+    "forks": 1793,
+    "watchers": 61,
+    "created_at": "2025-12-28T16:45:28Z",
+    "pushed_at": "2026-08-09T17:10:16Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/datawhalechina__easy-vibe/README.md",
+    "readme_bytes": 30708,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 846,
+    "est_stars_gained_1y": 3384,
+    "slug": "datawhalechina__easy-vibe"
+  },
+  "stats": {
+    "total_lines": 447,
+    "non_blank_lines": 351,
+    "total_chars": 30340,
+    "heading_count": 37,
+    "heading_levels_used": [
+      2,
+      3,
+      4
+    ],
+    "section_order": [
+      "toc",
+      "features",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "credits",
+      "credits",
+      "license",
+      "changelog"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "Table of Contents",
+        "category": "toc"
+      },
+      {
+        "level": 2,
+        "text": "Why Easy-Vibe",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udd25 News",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Who This Is For",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Your Learning Paths",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udfae I want a fast first win",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udca1 I want to turn an idea into a product prototype",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\ude80 I want to build full-stack products end to end",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "AI-Native: I want advanced Claude Code and agent workflows",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcda I want reference material and fundamentals",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Study Suggestions",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcd6 Content Navigation",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "I. Beginner Entry",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Appendix: Product and Business Thinking",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Appendix: User Research and Requirement Validation",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Appendix: Technical Solutions",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "II. Junior and Mid-Level Developers",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Frontend",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Backend",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Major Projects",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "AI Capabilities Appendix",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "III. Advanced Developers",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Claude Code Core Skills",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "Cross-Platform Development",
+        "category": "other"
+      },
+      {
+        "level": 4,
+        "text": "AI Capabilities Appendix",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\udcda Appendix Knowledge Base",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "\ud83c\udf93 Other Courses",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udee0\ufe0f How To Learn",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcbb Run Locally",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Modern approach",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Traditional approach",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Other Courses",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "\ud83e\udd1d Contributing & Contributors",
+        "category": "contributing"
+      },
+      {
+        "level": 3,
+        "text": "\ud83d\ude4f Contributors",
+        "category": "credits"
+      },
+      {
+        "level": 3,
+        "text": "Special Thanks",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "\ud83d\udcc4 LICENSE",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "Star History",
+        "category": "changelog"
+      }
+    ],
+    "has_h1": false,
+    "section_word_counts": {
+      "toc": [
+        50
+      ],
+      "features": [
+        44
+      ],
+      "other": [
+        399,
+        54,
+        0,
+        48,
+        52,
+        45,
+        49,
+        43,
+        85,
+        30,
+        156,
+        49,
+        123,
+        70,
+        0,
+        224,
+        157,
+        66,
+        31,
+        0,
+        259,
+        298,
+        54,
+        41,
+        8,
+        20,
+        0,
+        17,
+        15,
+        75
+      ],
+      "contributing": [
+        94
+      ],
+      "credits": [
+        77,
+        110
+      ],
+      "license": [
+        60
+      ],
+      "changelog": [
+        25
+      ]
+    },
+    "preamble_word_count": 875,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 12,
+    "uses_centering": true,
+    "image_count_total": 29,
+    "badge_count": 16,
+    "screenshot_or_logo_image_count": 13,
+    "gif_count": 4,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 32,
+    "inline_link_count": 101,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 2,
+    "total_markdown_links": 101,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 4.86,
+    "internal_anchor_link_count": 16,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 1,
+    "code_block_languages": [
+      "text"
+    ],
+    "avg_code_block_lines": 1,
+    "table_row_count": 78,
+    "table_present": true,
+    "paragraph_count": 38,
+    "avg_paragraph_words": 37.03,
+    "median_paragraph_words": 19.5,
+    "sentence_count": 43,
+    "avg_sentence_words": 32.72,
+    "median_sentence_words": 11,
+    "stdev_sentence_words": 46.09,
+    "short_sentence_pct": 30.2,
+    "medium_sentence_pct": 25.6,
+    "long_sentence_pct": 44.2,
+    "total_prose_words": 2279,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": false,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

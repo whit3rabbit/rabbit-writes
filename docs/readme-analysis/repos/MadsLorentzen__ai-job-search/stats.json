@@ -1,0 +1,306 @@
+{
+  "meta": {
+    "full_name": "MadsLorentzen/ai-job-search",
+    "html_url": "https://github.com/MadsLorentzen/ai-job-search",
+    "description": "The job search that runs on your machine. AI job application framework built on Claude Code: evaluate postings, tailor CVs, write cover letters, prep interviews. Fork it and own it.",
+    "stars_total": 30982,
+    "forks": 10610,
+    "watchers": 118,
+    "created_at": "2026-03-18T14:33:04Z",
+    "pushed_at": "2026-08-09T18:28:38Z",
+    "default_branch": "master",
+    "readme_branch_used": "master",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/MadsLorentzen__ai-job-search/README.md",
+    "readme_bytes": 32435,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 340,
+    "est_stars_gained_1y": 1360,
+    "slug": "MadsLorentzen__ai-job-search"
+  },
+  "stats": {
+    "total_lines": 375,
+    "non_blank_lines": 272,
+    "total_chars": 31866,
+    "heading_count": 30,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "performance",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "contributing",
+      "credits",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "AI Job Search",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Does it actually work?",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What this is",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Prerequisites",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Quick start",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "1. Fork and clone",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "2. Install job search tools",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "3. Set up your profile",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Then inside Claude Code:",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "4. Search for jobs",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "5. Apply to a job",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Other commands",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "File structure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How `/apply` works",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "What makes this workflow different",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Customization",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Which files to edit manually",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Updating your search queries",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Custom templates",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Job search tools",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Extending the framework: portals, templates, criteria - and borrowing from other forks",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Salary benchmarking",
+        "category": "performance"
+      },
+      {
+        "level": 3,
+        "text": "Starting over",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Staying up to date",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Tips for better results",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Profile depth matters",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Career path discovery",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "Acknowledgements",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "License",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        182,
+        173,
+        76,
+        0,
+        2,
+        62,
+        55,
+        92,
+        699,
+        0,
+        199,
+        331,
+        0,
+        75,
+        51,
+        192,
+        293,
+        501,
+        29,
+        54,
+        0,
+        140,
+        126
+      ],
+      "installation": [
+        177,
+        43,
+        30
+      ],
+      "performance": [
+        39
+      ],
+      "contributing": [
+        21
+      ],
+      "credits": [
+        32
+      ],
+      "license": [
+        1
+      ]
+    },
+    "preamble_word_count": 17,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 4,
+    "uses_centering": true,
+    "image_count_total": 4,
+    "badge_count": 1,
+    "screenshot_or_logo_image_count": 3,
+    "gif_count": 1,
+    "has_video_embed": true,
+    "badges_in_header_block": 1,
+    "html_link_count": 2,
+    "inline_link_count": 34,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 34,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 1.94,
+    "internal_anchor_link_count": 3,
+    "has_toc_like_anchor_list": true,
+    "code_block_count": 13,
+    "code_block_languages": [
+      "bash",
+      "powershell"
+    ],
+    "avg_code_block_lines": 7.62,
+    "table_row_count": 9,
+    "table_present": true,
+    "paragraph_count": 48,
+    "avg_paragraph_words": 30,
+    "median_paragraph_words": 26.0,
+    "sentence_count": 87,
+    "avg_sentence_words": 16.55,
+    "median_sentence_words": 14,
+    "stdev_sentence_words": 10.62,
+    "short_sentence_pct": 28.7,
+    "medium_sentence_pct": 46.0,
+    "long_sentence_pct": 25.3,
+    "total_prose_words": 3612,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": true,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": true
+  }
+}

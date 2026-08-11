@@ -1,0 +1,470 @@
+{
+  "meta": {
+    "full_name": "santifer/career-ops",
+    "html_url": "https://github.com/santifer/career-ops",
+    "description": "Open-source AI job search: scan job portals, evaluate listings with a structured A-F rubric into a 1.0-5.0 score, tailor your CV, track applications \u2014 runs locally in your AI coding CLI (Claude Code, Codex, OpenCode, Antigravity\u2026)",
+    "stars_total": 63319,
+    "forks": 12491,
+    "watchers": 255,
+    "created_at": "2026-04-04T18:21:18Z",
+    "pushed_at": "2026-08-10T01:41:02Z",
+    "default_branch": "main",
+    "readme_branch_used": "main",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/santifer__career-ops/README.md",
+    "readme_bytes": 32506,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 716,
+    "est_stars_gained_1y": 2864,
+    "slug": "santifer__career-ops"
+  },
+  "stats": {
+    "total_lines": 510,
+    "non_blank_lines": 383,
+    "total_chars": 31919,
+    "heading_count": 52,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "features",
+      "other",
+      "features",
+      "installation",
+      "installation",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "support",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "installation",
+      "api",
+      "other",
+      "installation",
+      "other",
+      "usage",
+      "architecture",
+      "configuration",
+      "other",
+      "other",
+      "other",
+      "other",
+      "faq",
+      "other",
+      "other",
+      "credits",
+      "license",
+      "other"
+    ],
+    "section_order_detail": [
+      {
+        "level": 2,
+        "text": "What Is This",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "The CareerOps Manifesto",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Features",
+        "category": "features"
+      },
+      {
+        "level": 2,
+        "text": "Quick Start",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "2. Check setup",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "3. Configure",
+        "category": "configuration"
+      },
+      {
+        "level": 1,
+        "text": "4. Add your CV",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Create cv.md in the project root with your CV in markdown",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "5. Open your AI CLI in this directory",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Then ask your CLI to adapt the system to you:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\"Change the archetypes to backend engineering roles\"",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\"Translate the modes to English\"",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\"Add these 5 companies to portals.yml\"",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\"Update my profile with this CV I'm pasting\"",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "6. Start using",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "Paste a job URL or JD text to trigger auto-pipeline",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "If your CLI supports slash commands, use /career-ops (or its CLI-specific alias)",
+        "category": "support"
+      },
+      {
+        "level": 1,
+        "text": "In Codex, ask for the same mode in plain language, e.g.:",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\"Run the career-ops scan mode\"",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\"Run the career-ops pipeline mode for data/pipeline.md\"",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\"Run the career-ops pdf mode for the latest evaluated role\"",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "\"Run the career-ops tracker mode and summarize the current statuses\"",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Global install",
+        "category": "installation"
+      },
+      {
+        "level": 2,
+        "text": "Antigravity CLI Integration",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Native Antigravity CLI",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "1. Run in the career-ops directory",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. Use the unified /career-ops command with subcommands:",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Codex Integration",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Interactive Codex",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "One-shot Codex (`codex exec`)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Grok Build CLI Integration",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Native Grok Build CLI",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "1. Run in the career-ops directory",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. Use the unified /career-ops command with subcommands:",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Standalone Gemini API Script (No CLI install needed)",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "1. Get a free API key at https://aistudio.google.com/apikey",
+        "category": "api"
+      },
+      {
+        "level": 1,
+        "text": "Edit .env, set GEMINI_API_KEY=your_key_here",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "2. Install dependencies",
+        "category": "installation"
+      },
+      {
+        "level": 1,
+        "text": "3. Evaluate a job description",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Usage",
+        "category": "usage"
+      },
+      {
+        "level": 2,
+        "text": "How It Works",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Pre-configured Portals",
+        "category": "configuration"
+      },
+      {
+        "level": 2,
+        "text": "Dashboard TUI",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Project Structure",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Tech Stack",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Also Open Source",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "FAQ",
+        "category": "faq"
+      },
+      {
+        "level": 2,
+        "text": "About the Author",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Disclaimer",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Contributors",
+        "category": "credits"
+      },
+      {
+        "level": 2,
+        "text": "License & Trademark",
+        "category": "license"
+      },
+      {
+        "level": 2,
+        "text": "Let's Connect",
+        "category": "other"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "features": [
+        302,
+        468
+      ],
+      "other": [
+        31,
+        0,
+        0,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        67,
+        1,
+        3,
+        42,
+        31,
+        21,
+        0,
+        33,
+        1,
+        3,
+        28,
+        0,
+        67,
+        47,
+        0,
+        119,
+        36,
+        108,
+        200,
+        86
+      ],
+      "installation": [
+        108,
+        6,
+        221,
+        1,
+        2
+      ],
+      "configuration": [
+        21,
+        195
+      ],
+      "support": [
+        0
+      ],
+      "api": [
+        4
+      ],
+      "usage": [
+        55
+      ],
+      "architecture": [
+        0
+      ],
+      "faq": [
+        386
+      ],
+      "credits": [
+        62
+      ],
+      "license": [
+        31
+      ]
+    },
+    "preamble_word_count": 757,
+    "preamble_has_centered_block": true,
+    "centered_block_count": 15,
+    "uses_centering": true,
+    "image_count_total": 36,
+    "badge_count": 27,
+    "screenshot_or_logo_image_count": 9,
+    "gif_count": 1,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 12,
+    "inline_link_count": 63,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 1,
+    "total_markdown_links": 63,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 2.13,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 15,
+    "code_block_languages": [
+      "bash",
+      "text"
+    ],
+    "avg_code_block_lines": 9.8,
+    "table_row_count": 21,
+    "table_present": true,
+    "paragraph_count": 66,
+    "avg_paragraph_words": 34.26,
+    "median_paragraph_words": 28.5,
+    "sentence_count": 105,
+    "avg_sentence_words": 21.53,
+    "median_sentence_words": 16,
+    "stdev_sentence_words": 25.61,
+    "short_sentence_pct": 19.0,
+    "medium_sentence_pct": 48.6,
+    "long_sentence_pct": 32.4,
+    "total_prose_words": 2812,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": false,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": true,
+    "has_demo_section_or_media": true
+  }
+}

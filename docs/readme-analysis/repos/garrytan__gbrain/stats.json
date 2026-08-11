@@ -1,0 +1,267 @@
+{
+  "meta": {
+    "full_name": "garrytan/gbrain",
+    "html_url": "https://github.com/garrytan/gbrain",
+    "description": "Garry's Opinionated OpenClaw/Hermes Agent Brain",
+    "stars_total": 28080,
+    "forks": 4114,
+    "watchers": 132,
+    "created_at": "2026-04-05T14:40:56Z",
+    "pushed_at": "2026-08-10T00:43:40Z",
+    "default_branch": "master",
+    "readme_branch_used": "master",
+    "readme_filename": "README.md",
+    "readme_local_path": "/home/claude/readme-research/data/repos/garrytan__gbrain/README.md",
+    "readme_bytes": 41540,
+    "source": "ossinsight_past_3_months",
+    "stars_3mo_gained": 720,
+    "est_stars_gained_1y": 2880,
+    "slug": "garrytan__gbrain"
+  },
+  "stats": {
+    "total_lines": 474,
+    "non_blank_lines": 340,
+    "total_chars": 41358,
+    "heading_count": 24,
+    "heading_levels_used": [
+      1,
+      2,
+      3
+    ],
+    "section_order": [
+      "other",
+      "other",
+      "installation",
+      "installation",
+      "installation",
+      "installation",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "other",
+      "architecture",
+      "faq",
+      "related",
+      "other",
+      "api",
+      "contributing",
+      "license"
+    ],
+    "section_order_detail": [
+      {
+        "level": 1,
+        "text": "GBrain",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What this looks like",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Install",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Have your agent install it (recommended)",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Quick start: Claude Code or Codex",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "Install the full autonomous setup into your existing agent",
+        "category": "installation"
+      },
+      {
+        "level": 3,
+        "text": "CLI standalone (no agent)",
+        "category": "other"
+      },
+      {
+        "level": 3,
+        "text": "Connect GBrain to your AI client (MCP)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Two ways to query your brain",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "raw retrieval: top pages by hybrid score, fast, no LLM cost",
+        "category": "other"
+      },
+      {
+        "level": 1,
+        "text": "brain layer: synthesized answer with citations and gap analysis",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "How to get data in",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Your brain's shape (schema packs)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Tutorials",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "What it does (the loop)",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Capabilities",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Integrations",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Architecture",
+        "category": "architecture"
+      },
+      {
+        "level": 2,
+        "text": "Troubleshooting",
+        "category": "faq"
+      },
+      {
+        "level": 1,
+        "text": "Defaults: 3 retries, base 1s, max 10s, decorrelated jitter.",
+        "category": "related"
+      },
+      {
+        "level": 1,
+        "text": "Override per operator without a release:",
+        "category": "other"
+      },
+      {
+        "level": 2,
+        "text": "Docs",
+        "category": "api"
+      },
+      {
+        "level": 2,
+        "text": "Contributing",
+        "category": "contributing"
+      },
+      {
+        "level": 2,
+        "text": "License + credit",
+        "category": "license"
+      }
+    ],
+    "has_h1": true,
+    "section_word_counts": {
+      "other": [
+        616,
+        162,
+        14,
+        280,
+        22,
+        10,
+        199,
+        100,
+        335,
+        228,
+        92,
+        858,
+        178,
+        198
+      ],
+      "installation": [
+        142,
+        154,
+        198,
+        53
+      ],
+      "architecture": [
+        219
+      ],
+      "faq": [
+        414
+      ],
+      "related": [
+        0
+      ],
+      "api": [
+        181
+      ],
+      "contributing": [
+        119
+      ],
+      "license": [
+        68
+      ]
+    },
+    "preamble_word_count": 0,
+    "preamble_has_centered_block": false,
+    "centered_block_count": 0,
+    "uses_centering": false,
+    "image_count_total": 0,
+    "badge_count": 0,
+    "screenshot_or_logo_image_count": 0,
+    "gif_count": 0,
+    "has_video_embed": false,
+    "badges_in_header_block": 0,
+    "html_link_count": 0,
+    "inline_link_count": 77,
+    "reference_style_link_count": 0,
+    "reference_definitions_count": 0,
+    "bare_url_count": 0,
+    "total_markdown_links": 77,
+    "uses_reference_style_links": false,
+    "avg_link_text_words": 3.09,
+    "internal_anchor_link_count": 0,
+    "has_toc_like_anchor_list": false,
+    "code_block_count": 19,
+    "code_block_languages": [
+      "bash"
+    ],
+    "avg_code_block_lines": 3.95,
+    "table_row_count": 0,
+    "table_present": false,
+    "paragraph_count": 80,
+    "avg_paragraph_words": 48.36,
+    "median_paragraph_words": 40.0,
+    "sentence_count": 229,
+    "avg_sentence_words": 16.9,
+    "median_sentence_words": 15,
+    "stdev_sentence_words": 10.15,
+    "short_sentence_pct": 25.3,
+    "medium_sentence_pct": 46.7,
+    "long_sentence_pct": 27.9,
+    "total_prose_words": 5220,
+    "has_license_section_or_badge": true,
+    "has_contributing_section": true,
+    "has_toc_section": false,
+    "has_installation_section": true,
+    "has_usage_or_examples_section": false,
+    "has_demo_section_or_media": false
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "full_name": "github/spec-kit",
+  "html_url": "https://github.com/github/spec-kit",
+  "description": "\ud83d\udcab Toolkit to help you get started with Spec-Driven Development",
+  "stars_total": 125998,
+  "forks": 11253,
+  "watchers": 650,
+  "created_at": "2025-08-21T22:54:31Z",
+  "pushed_at": "2026-08-07T17:55:55Z",
+  "default_branch": "main",
+  "readme_branch_used": "main",
+  "readme_filename": "README.md",
+  "readme_local_path": "/home/claude/readme-research/data/repos/github__spec-kit/README.md",
+  "readme_bytes": 21681,
+  "source": "ossinsight_past_3_months",
+  "stars_3mo_gained": 1610,
+  "est_stars_gained_1y": 6440,
+  "slug": "github__spec-kit"
+}
