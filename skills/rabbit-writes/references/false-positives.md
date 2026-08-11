@@ -46,11 +46,11 @@ Commercial detector audits report false-positive rates above 60% on non-native E
 
 ---
 
-## Signs of human writing — protect these
+## Signs of human writing, which you protect
 
 When you see these, lean toward leaving the prose alone. Over-editing destroys exactly what makes the piece sound like somebody.
 
-**Specific, unusual, hard-to-fabricate detail.** A real address. A weird quote. "The lawyer who used to work upstairs from my dentist." Models round off specifics; people hoard them.
+**Specific, unusual, hard-to-fabricate detail.** A real address. A weird quote. "The lawyer who used to work upstairs from my dentist." Models round off specifics. People hoard them.
 
 **Mixed feelings and unresolved tension.** "I think this is mostly good, but it bothers me and I can't fully explain why." Models default to clean takes. Leave the mess.
 

@@ -133,7 +133,6 @@ def main():
         else:
             # prefer the exact (List B) estimate over the extrapolated one, keep both signals
             existing = merged[fn]
-            existing_est = existing.get("est_stars_gained_1y", 0)
             new_est = r.get("est_stars_gained_1y", 0)
             if r["source"] == "github_search_created_past_year":
                 existing["est_stars_gained_1y"] = new_est

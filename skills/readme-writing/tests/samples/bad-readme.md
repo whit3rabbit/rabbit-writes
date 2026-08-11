@@ -57,6 +57,10 @@ Copyright (c) 2026 Widgetizer Contributors. Permission is hereby granted, free o
 
 We love contributions. Open a PR and someone will look at it eventually. Read the guide at https://example.com/contributing before you start, and please be nice to each other in the issue tracker because we are all volunteers here doing this in our spare time around jobs and families and everything else that fills a week.
 
+The code of conduct is [here](https://example.com/coc).
+
+The style guide is [here](https://example.com/style).
+
 ## Widgetizer
 
 Widgetizer is a delightful, blazing-fast platform that revolutionizes how modern teams orchestrate their widget pipelines end to end, unlocking unprecedented productivity gains across the entire organization while seamlessly integrating with the tools you already love and empowering everyone from junior engineers to the C-suite to move faster than ever before, and it is 40% faster than the competition.

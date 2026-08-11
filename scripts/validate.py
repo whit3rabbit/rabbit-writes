@@ -7,6 +7,7 @@ Repo validator. Checks the things that break an install silently.
 Exit 0 clean, 1 on any failure. Stdlib only.
 """
 
+import importlib.util
 import json
 import os
 import re
@@ -15,6 +16,16 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS = os.path.join(ROOT, "skills")
 VOICES = os.path.join(SKILLS, "rabbit-writes", "voices")
+SCAN = os.path.join(SKILLS, "rabbit-writes", "scripts", "scan.py")
+
+# Findings scan.py raises itself rather than from a lexicon pattern. A register
+# may name any of these in PROFILE_SKIP or PROFILE_RELAX, so the id check below
+# has to know them.
+SYNTHETIC_FINDING_IDS = {
+    "hidden-unicode", "tier1", "clarity", "tier2-cluster", "tier3-density",
+    "uniformity", "low-diversity", "trigram-repetition", "uniform-paragraphs",
+    "em-dash-rate",
+}
 
 problems = []
 notes = []
@@ -79,7 +90,8 @@ def check_skills():
         if not os.path.exists(path):
             fail("skills/%s has no SKILL.md" % name)
             continue
-        text = open(path, encoding="utf-8").read()
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
         m = re.match(r"\A---\n(.*?)\n---\n", text, re.S)
         if not m:
             fail("skills/%s/SKILL.md has no YAML frontmatter" % name)
@@ -112,7 +124,8 @@ def check_voices():
     if not os.path.exists(active_path):
         fail("voices/ACTIVE is missing; nothing tells the skill whose voice to use")
     else:
-        active = open(active_path, encoding="utf-8").read().strip()
+        with open(active_path, encoding="utf-8") as fh:
+            active = fh.read().strip()
         if not active:
             fail("voices/ACTIVE is empty")
         elif not os.path.exists(os.path.join(VOICES, active + ".md")):
@@ -137,7 +150,8 @@ def check_voices():
 
         vname = fn[:-11]
         try:
-            data = json.loads(open(os.path.join(VOICES, fn), encoding="utf-8").read())
+            with open(os.path.join(VOICES, fn), encoding="utf-8") as fh:
+                data = json.load(fh)
         except ValueError as exc:
             fail("voices/%s does not parse: %s" % (fn, exc))
             continue
@@ -182,7 +196,8 @@ def check_engine():
         fail("rabbit-writes/scripts/lexicon.json is missing")
         return
     try:
-        data = json.loads(open(lex, encoding="utf-8").read())
+        with open(lex, encoding="utf-8") as fh:
+            data = json.load(fh)
     except ValueError as exc:
         fail("lexicon.json does not parse: %s" % exc)
         return
@@ -211,12 +226,50 @@ def check_engine():
     else:
         # readme_check imports scan.py by path. A rename on either side breaks it
         # at runtime, inside a subagent, where nobody sees the traceback.
-        text = open(check_path, encoding="utf-8").read()
+        with open(check_path, encoding="utf-8") as fh:
+            text = fh.read()
         if 'os.path.join(PLUGIN_ROOT, "skills", "rabbit-writes", "scripts", "scan.py")' not in text:
             notes.append("note: readme_check.py no longer resolves scan.py the documented "
                          "way; check the engine hand-off still works")
         elif not os.path.exists(os.path.join(SKILLS, "rabbit-writes", "scripts", "scan.py")):
             fail("readme_check.py expects rabbit-writes/scripts/scan.py, which is missing")
+
+
+def check_profile_ids():
+    """A typo'd id in a register's skip or relax set silently un-skips the rule.
+
+    Nothing fails, nothing warns: the register just quietly stops honouring a
+    tolerance it claims in references/context.md, and the only symptom is a
+    finding somebody eventually learns to ignore."""
+    lex_path = os.path.join(SKILLS, "rabbit-writes", "scripts", "lexicon.json")
+    if not (os.path.exists(SCAN) and os.path.exists(lex_path)):
+        return
+    try:
+        spec = importlib.util.spec_from_file_location("rw_scan_validate", SCAN)
+        scan = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(scan)
+        with open(lex_path, encoding="utf-8") as fh:
+            lex = json.load(fh)
+    except (OSError, ValueError, SyntaxError) as exc:
+        fail("could not load scan.py to check the register profiles: %s" % exc)
+        return
+
+    known = {p.get("id") for p in lex.get("patterns", [])} | SYNTHETIC_FINDING_IDS
+    for name, table in (("PROFILE_SKIP", scan.PROFILE_SKIP),
+                        ("PROFILE_RELAX", scan.PROFILE_RELAX)):
+        for profile, entries in table.items():
+            for pid in sorted(entries):
+                if pid not in known:
+                    fail("scan.py %s[%r] names %r, which is not a lexicon "
+                         "pattern id or a built-in finding id" % (name, profile, pid))
+    overlap = {p: sorted(set(scan.PROFILE_SKIP.get(p, ())) & set(relaxed))
+               for p, relaxed in scan.PROFILE_RELAX.items()}
+    for profile, ids in overlap.items():
+        if ids:
+            fail("scan.py profile %r both skips and relaxes %s; skip wins, so the "
+                 "allowance never applies" % (profile, ", ".join(ids)))
+    notes.append("register profiles: %d skip sets, %d relax sets, all ids known"
+                 % (len(scan.PROFILE_SKIP), len(scan.PROFILE_RELAX)))
 
 
 def check_no_stale_skill_name():
@@ -235,7 +288,9 @@ def check_no_stale_skill_name():
             if os.path.abspath(path) == os.path.abspath(__file__):
                 continue  # this file has to name the string in order to search for it
             try:
-                if "human-writing" in open(path, encoding="utf-8").read():
+                with open(path, encoding="utf-8") as fh:
+                    stale = "human-writing" in fh.read()
+                if stale:
                     hits.append(os.path.relpath(path, ROOT))
             except (OSError, UnicodeDecodeError):
                 continue
@@ -253,7 +308,8 @@ def check_mode_contract():
     if not os.path.exists(path):
         fail("rabbit-writes/SKILL.md is missing")
         return
-    text = open(path, encoding="utf-8").read()
+    with open(path, encoding="utf-8") as fh:
+        text = fh.read()
 
     for mode in ("detect", "deslop", "voice", "draft"):
         if not re.search(r"(?m)^\|\s*\*\*%s\*\*" % mode, text):
@@ -282,7 +338,8 @@ def check_scripts_compile():
         if not os.path.exists(path):
             continue
         try:
-            ast.parse(open(path, encoding="utf-8").read(), filename=path)
+            with open(path, encoding="utf-8") as fh:
+                ast.parse(fh.read(), filename=path)
         except SyntaxError as exc:
             fail("%s does not parse: %s" % (rel, exc))
     notes.append("bundled scripts compile")
@@ -306,7 +363,8 @@ def check_cross_references():
         for path in targets:
             if not os.path.exists(path):
                 continue
-            text = open(path, encoding="utf-8").read()
+            with open(path, encoding="utf-8") as fh:
+                text = fh.read()
             for rel in set(rx.findall(text)):
                 if "<" in rel or rel.endswith("/"):
                     continue
@@ -319,6 +377,7 @@ check_manifests()
 check_skills()
 check_voices()
 check_engine()
+check_profile_ids()
 check_no_stale_skill_name()
 check_mode_contract()
 check_scripts_compile()

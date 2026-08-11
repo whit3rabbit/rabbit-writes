@@ -66,16 +66,20 @@
     "transformative", "transformation", "cornerstone", "paramount",
     "poised", "burgeoning", "nascent", "quintessential", "overarching",
     "leverage", "leverages", "leveraged", "leveraging",
-    "landscape", "landscapes"
+    "landscape", "landscapes",
+    "unpack", "unpacks", "unpacking", "complexities",
+    "embrace", "embraces", "embracing",
+    "symphony", "kaleidoscope"
   ],
 
+  "_tier3_note": "Ordinary words, scored only at density. Nothing here may also appear in tier1: a word in both yields a P1 finding and inflates the density that produces a second one. Nothing here may be a top-200 English word either, which is why 'key' was removed: it dominated the count, and the phrase worth catching ('key turning point') is already a pattern regex.",
   "tier3": [
     "significant", "significantly", "innovative", "innovation",
     "effective", "effectively", "dynamic", "dynamics",
     "scalable", "scalability", "compelling", "unprecedented",
     "exceptional", "exceptionally", "remarkable", "remarkably",
     "sophisticated", "instrumental", "world-class", "best-in-class",
-    "verbatim", "vital", "essential", "key", "seamlessly"
+    "verbatim", "vital", "essential"
   ],
 
   "technical_exempt": [
@@ -392,7 +396,9 @@
       "label": "Curly quotation mark (weak)",
       "band": "fingerprint",
       "priority": "P2",
-      "rx": "[\\u201C\\u201D]"
+      "rx": "[\\u201C\\u201D]",
+      "_scan_raw_note": "Checked against the raw text, like hidden unicode. The quoted-example exemption blanks a curly-quoted span including its quote marks, so scoring this one on the exempted copy leaves it able to fire only on an unpaired quote. Typography is a production artifact, not content, and the exemption is about content.",
+      "scan_raw": true
     },
     {
       "id": "double-hyphen-dash",

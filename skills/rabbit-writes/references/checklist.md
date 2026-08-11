@@ -8,7 +8,7 @@ Asking yourself "is this clear?" does not work: general writing assessment is un
 
 ---
 
-## A. Guardrails — a no here is a failure, not a note
+## A. Guardrails, where a no is a failure rather than a note
 
 1. Does the output contain any fact, name, number, date, quote, tool, or citation that is **not** in the source or supplied by the user?  *(A yes is the failure.)*
 2. Did you **add** first person, an anecdote, a stated opinion, or a stated preference that the source did not have?  *(A yes is the failure.)*
@@ -23,7 +23,7 @@ Asking yourself "is this clear?" does not work: general writing assessment is un
 
 9. Zero chatbot artifacts, sycophancy, cutoff disclaimers, reasoning-chain leaks?
 10. Zero hidden unicode, chat citation markup, AI tracking parameters, unfilled placeholders? *(Confirm with `scripts/scan.py`.)*
-11. Every vague attribution either named or cut — and no source invented to fix one?
+11. Every vague attribution either named or cut, with no source invented to fix one?
 12. Zero negation runways, including the split form across two sentences and the tailing fragment?
 13. Em-dash count within the register's tolerance, or matching the user's sample?
 

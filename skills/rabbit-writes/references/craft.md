@@ -100,7 +100,7 @@ When strict STE is not possible, keep the text clear and mark the terms or passa
 
 For fiction, poetry, memoir, scripts, and lyrical prose, treat all of the above as a clarity aid and never as a constraint that overrides the form.
 
-Keep intentional ambiguity, cadence, dialogue style, imagery, and character voice when they create a real effect. Invented detail is the job in fiction; the never-invent-facts rule governs everything else.
+Keep intentional ambiguity, cadence, dialogue style, imagery, and character voice when they create a real effect. Invented detail is the job in fiction. The never-invent-facts rule governs everything else.
 
 Remove only language that is inherited, inflated, evasive, or lazy. Apply strict simplification only when the user asks for it, and say when that request conflicts with an effect they seem to want.
 

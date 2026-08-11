@@ -12,7 +12,7 @@ is a description rather than a migration note.
   `voice` (convert an existing document into the active voice), `draft` (new
   prose in that voice). Underneath: a 63-pattern catalog in P0/P1/P2 tiers, a
   false-positive discipline, six register profiles with a tolerance matrix, an
-  Orwell and ASD-STE100 craft layer, and a 32-item behaviourally anchored
+  Orwell and ASD-STE100 craft layer, and a 33-item behaviourally anchored
   self-check.
 - **`voice-setup`**: interview, sample measurement, editing, and blending for
   voice profiles. Owns everything about building a profile.
@@ -84,3 +84,87 @@ These were arrived at the hard way and are easy to undo by accident.
 - **Scanner bugs found by pointing it at this repo** rather than at fixtures are
   listed in `skills/rabbit-writes/PROOF.md`, along with the self-scan numbers
   including the unflattering rows.
+
+### Corrections made during pre-release review
+
+A read-through by someone who had not written any of it. The full list with the
+reasoning is in `skills/rabbit-writes/PROOF.md` under "Bugs found by review".
+The parts that change behaviour:
+
+- **Two shipped features did nothing.** `curly-quote` was listed in every
+  register's skip set, so the pattern could not fire anywhere, and the
+  `oxford_comma` mechanic was documented in both rules files and read by no line
+  of code. Both work now. `PROFILE_RELAX` gives the tolerance matrix's "relaxed"
+  cells an executable form as hit allowances, since skipping had been standing
+  in for relaxing throughout, and `validate.py` fails on a register that names a
+  rule id that does not exist.
+- **`verify.py` had its own silent failure modes**, which matters more than
+  usual for the script whose job is catching silent breakage. It read headings
+  and table rows out of code fences, so moving a fenced block that contained
+  shell comments failed a rewrite that touched no headings. It matched file
+  paths inside URLs, double-reporting every edited link. It counted tells from a
+  frozen fifteen-word copy of the lexicon. It dropped a trailing bare `#` from a
+  URL and then reported the mismatch it had just created.
+- **Lexicon and catalog disagreed on Tier 1**, and `seamlessly` sat in both
+  Tier 1 and Tier 3, so one word produced a P1 and inflated the density behind a
+  P2. `key` was a Tier-3 word, which put one of the commonest words in English
+  in charge of the density count. A test now fails if a word in the section 12
+  table does not resolve in the lexicon.
+- **False positives that cost trust:** a non-breaking space was a P0 (it is
+  correct French typography, now P2 past three), `Dr.` read as a one-word
+  sentence, one stray quote exempted the following 200 characters from scoring,
+  three `here` links all reported the same line, and one caveat anywhere in a
+  README excused every headline number in it.
+- **The tolerance matrix is now checked, not just written.** `test_scan.py`
+  parses the table in `references/context.md` and fails on any cell with no
+  implementation, in either direction. It caught five gaps on its first run,
+  including three the `PROFILE_RELAX` work had left behind. A missing entry is
+  invisible to `validate.py`, which can only see an id that does not exist, so
+  this is the guard for the class of bug `curly-quote` belonged to.
+- **One fix introduced a bug of its own.** Rebuilding `verify.py`'s tell counter
+  from the lexicon swept in `curly-quote`, so a rewrite that passed through an
+  auto-curling editor gained tells from typography and failed verification. P2
+  fingerprints are excluded from that counter now.
+- **CI.** `.github/workflows/ci.yml` runs the validator and both suites across
+  Python 3.8 through 3.13, and scans this repo's own prose with `--check`.
+- **`.claude/settings.local.json` is ignored.** It was never committed here,
+  only because a contributor's global excludes happened to cover it. The repo
+  now ignores it itself.
+- **Reproduction.** `README.rst` and `README.txt` no longer vanish from the
+  research pipeline, which looked only for `README.md` and then fell back to an
+  absolute path on the machine that fetched the corpus.
+
+### Corrections made during a second pre-release review
+
+A read of both scanners, the verifier, the research pipeline, the validators, and
+the tests together. The full list is in `skills/rabbit-writes/PROOF.md` under
+"Bugs found by a second review". The parts that change behaviour:
+
+- **The invisible-character tables were stored as invisible characters.** A save
+  that normalized whitespace would have turned the U+00A0 key into a plain space,
+  at which point `scan.py` reports every space in every document as a paste
+  artifact. They are `\uXXXX` escapes now, in the test fixtures too, and a test
+  asserts the codepoints rather than the keys.
+- **`verify.py` compared headings by membership, not as a multiset,** unlike
+  every other preservation check. Two identical headings, one dropped and one
+  different one added, passed both the membership test and the count test.
+- **Two hard gates in `verify.py` ran on the raw text,** so a correctly written
+  date range failed "em dashes added" and a quoted example of a flagged phrase
+  failed "more tells after rewrite". Both now run on the same exempted copy
+  `scan.py` uses, an en dash between digits is not a splice, and both name the
+  span that moved the counter.
+- **`oxford_comma: "forbid"` had no guard and no test,** so it reported the comma
+  in every compound sentence as a serial comma. Both sides of the mechanic carry
+  the same guards now, and every previously untested branch of `apply_voice_rules`
+  has a case: `em_dash: "limit"`, `date_format: "mdy"` and `"iso"`,
+  `curly_quotes: "forbid"`, and `required_when` firing as well as staying quiet.
+- **`readme_check.py` counted badges out of the raw file,** so a fenced example
+  showing badge markdown could trip `badge-wall` on a README with no badges. It
+  also saw markdown links only, missing `<a href>click here</a>` in the HTML
+  header blocks that 76% of the corpus uses.
+- **Two findings were answered by documenting rather than by changing code,**
+  because measuring showed the change would cost more than it bought: the one
+  deliberate divergence between the checker's badge host list and the corpus
+  scripts', and the fact that `verify.py` tracks a file path only when it has an
+  extension. Both are written down at both ends now, and `SKILL.md` says which
+  half of its own path promise is mechanically enforced.

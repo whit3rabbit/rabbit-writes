@@ -29,9 +29,13 @@ def get_meta(full_name):
     return None
 
 def get_readme(full_name, branch):
-    for branch_try in [branch, "main", "master"]:
-        if not branch_try:
-            continue
+    # Deduped for the same reason as step 02: a default branch of "main" made
+    # the old list fetch the same 8 URLs twice.
+    branches = []
+    for branch_try in (branch, "main", "master"):
+        if branch_try and branch_try not in branches:
+            branches.append(branch_try)
+    for branch_try in branches:
         for fname in README_CANDIDATES:
             url = f"https://raw.githubusercontent.com/{full_name}/{branch_try}/{fname}"
             status, body = fetch(url)

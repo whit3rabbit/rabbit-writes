@@ -89,7 +89,7 @@ SECTION_KEYWORDS = [
     ("demo", ["demo", "screenshot", "preview", "gallery", "in action", "showcase"]),
     ("installation", ["install", "setup", "getting started", "quick start", "quickstart",
                       "requirements", "prerequisites"]),
-    ("usage", ["usage", "how to use", "quick example", "basic usage"]),
+    ("usage", ["usage", "how to use", "quick example", "getting started", "basic usage"]),
     ("examples", ["example"]),
     ("configuration", ["config", "options", "settings", "environment variable"]),
     ("api", ["api reference", " api", "documentation", "docs"]),
@@ -120,15 +120,29 @@ REF_DEF_RX = re.compile(r"(?m)^\s*\[[^\]]+\]:\s*\S+")
 INLINE_CODE_RX = re.compile(r"`[^`\n]+`")
 HTML_TAG_RX = re.compile(r"</?[a-zA-Z][^>]*>")
 HTML_IMG_RX = re.compile(r"<img[^>]+src\s*=\s*[\"']([^\"']+)[\"']", re.I)
+# Anchor text, for the vague-link-text check. Non-greedy and DOTALL because a
+# centered header routinely puts the badge image and the anchor text on separate
+# lines. Nested <a> is not valid HTML, so there is nothing to balance.
+HTML_ANCHOR_RX = re.compile(r"<a\b[^>]*>(.*?)</a>", re.I | re.S)
 # Any line opening with a tag is markup, not the project description. Kept broad
 # on purpose: <details>, <picture>, and <p align=center> all show up in header
 # blocks, and listing tags by hand guarantees missing one.
 HTML_TAG_LINE_RX = re.compile(r"^\s*</?[a-zA-Z][a-zA-Z0-9]*(?:\s|>|/>)")
-BADGE_HOSTS = ("shields.io", "badge.fury.io", "badgen.net", "travis-ci", "circleci.com/gh",
-               "codecov.io", "coveralls.io", "actions/workflows", "sonarcloud.io", "snyk.io",
-               "discord.com/api/guilds", "opencollective.com", "npmjs.com/package",
-               "pypi.org/project", "crates.io/v", "gitpod.io/button", "deepwiki.com/badge",
-               "img.badgesize.io", "visitor-badge", "/badge")
+# The named hosts come from scripts/readme-research/03_analyze_readme.py, so the
+# count here means the same thing as the corpus median it is compared against.
+#
+# The last entry is the one deliberate divergence. "/badge" catches the long tail
+# the named hosts miss (trendshift, star-history, repology, awesome.re,
+# scorecard): 625 badges against 568 over the committed snapshot, and no
+# non-badge image is caught by it in that sample. It makes this check broader
+# than the study, never narrower, so a badge-wall finding stays conservative
+# against a corpus median of 5 and a p90 of 14. Widening the corpus list to match
+# means regenerating the corpus and the CORPUS constants above together.
+BADGE_HOSTS = ("shields.io", "badge.fury.io", "img.shields", "badgen.net", "travis-ci",
+               "circleci.com/gh", "codecov.io", "coveralls.io", "actions/workflows",
+               "sonarcloud.io", "snyk.io", "discord.com/api/guilds", "opencollective.com",
+               "npmjs.com/package", "pypi.org/project", "crates.io/v", "gitpod.io/button",
+               "deepwiki.com/badge", "img.badgesize.io", "visitor-badge", "/badge")
 VAGUE_LINK_TEXT = {"here", "click here", "this", "this link", "link", "read more", "more",
                    "learn more", "see here", "this page", "documentation here"}
 CLAIM_RX = re.compile(
@@ -197,15 +211,18 @@ def find_pitch(raw):
     in a centered header the tagline lives inside <p align="center"> or <h3>.
     Treating markup as decoration would report a buried pitch on most of the
     good READMEs in the study.
+
+    Returns the line number alone. It used to return a non-blank line count with
+    it that no caller used, counted to a different boundary than the one
+    check_structure computes for itself (this one included the pitch line), and
+    two live definitions of "lines above the pitch" is a drift waiting to happen.
     """
-    nonblank = 0
     in_comment = False
     details_depth = 0
     for i, line in enumerate(raw.splitlines(), start=1):
         s = line.strip()
         if not s:
             continue
-        nonblank += 1
         if in_comment:
             in_comment = "-->" not in s
             continue
@@ -215,8 +232,12 @@ def find_pitch(raw):
         # <details> hides a language bar or an FAQ, and an HTML <table> at the
         # top of a README is a sponsor grid in almost every case. Neither is
         # where the project describes itself.
+        # Clamped, because README fragments and hand-written HTML close tags
+        # they never opened. Left negative, the counter never climbs back above
+        # zero and the next real <details> block reads as prose.
         details_depth += len(re.findall(r"(?i)<(?:details|table)\b", s))
         details_depth -= len(re.findall(r"(?i)</(?:details|table)>", s))
+        details_depth = max(0, details_depth)
         if details_depth > 0 or re.search(r"(?i)<summary\b", s):
             continue
         if (s.startswith("#") or s.startswith(">") or s.startswith("|")
@@ -229,8 +250,8 @@ def find_pitch(raw):
         stripped = re.sub(r"[*_`#>|]", "", stripped).strip()
         stripped = re.sub(r"^[-*+]\s+", "", stripped)
         if word_count(stripped) >= 5:
-            return i, nonblank
-    return None, nonblank
+            return i
+    return None
 
 
 def check_structure(raw, scored, findings, stats):
@@ -248,7 +269,7 @@ def check_structure(raw, scored, findings, stats):
     stats["heading_count"] = len(headings)
 
     # --- the pitch, and what sits above it
-    pitch_line, _ = find_pitch(raw)
+    pitch_line = find_pitch(raw)
     stats["pitch_line"] = pitch_line
     if pitch_line is None:
         findings.append(finding(
@@ -371,7 +392,8 @@ def check_links(scored, findings, stats):
     # Link syntax inside backticks is being talked about, not used. A doc that
     # explains `[text][ref]` should not be reported as using it.
     scored = INLINE_CODE_RX.sub(blank, scored)
-    inline = LINK_RX.findall(scored)
+    inline_matches = list(LINK_RX.finditer(scored))
+    inline = [(m.group(1), m.group(2)) for m in inline_matches]
     refs = REF_LINK_RX.findall(scored)
     bare = list(BARE_URL_RX.finditer(strip_wrapped_urls(scored)))
     stats["inline_links"] = len(inline)
@@ -394,13 +416,24 @@ def check_links(scored, findings, stats):
             "Reference style is 0.2%% of corpus links, 14 out of 5,851. Use inline "
             "[text](url) unless the same few destinations repeat dozens of times."))
 
-    for text, _url in inline:
-        clean = re.sub(r"[*_`]", "", text).strip().lower().rstrip(".!")
+    # Iterated as matches, not as findall pairs: three "here" links searched by
+    # text all resolve to the first occurrence, and the writer gets sent to the
+    # same line three times.
+    #
+    # HTML anchors are checked alongside markdown ones. The study counts HTML as
+    # the third link style and 76% of the corpus centers its header, so a
+    # <a href="...">click here</a> in a header block is exactly where this
+    # failure lives, and checking only markdown lets the worst case through.
+    vague_candidates = [(m.group(1), m.start()) for m in inline_matches]
+    vague_candidates += [(m.group(1), m.start())
+                         for m in HTML_ANCHOR_RX.finditer(scored)]
+    for text, start in vague_candidates:
+        clean = re.sub(r"[*_`]", "", HTML_TAG_RX.sub("", text))
+        clean = re.sub(r"\s+", " ", clean).strip().lower().rstrip(".!")
         if clean in VAGUE_LINK_TEXT:
-            m = re.search(re.escape("[" + text + "]"), scored)
             findings.append(finding(
-                "vague-link-text", "Link text %r" % text, "P1",
-                line_of(scored, m.start()) if m else 1,
+                "vague-link-text", "Link text %r" % text.strip(), "P1",
+                line_of(scored, start),
                 "Name the destination in a word or two, corpus average is 2.2 words. "
                 "Link text is read out of context by screen readers and skimmers alike."))
 
@@ -408,10 +441,41 @@ def check_links(scored, findings, stats):
     stats["avg_link_text_words"] = round(statistics.mean(texts), 2) if texts else 0
 
 
+CAVEAT_WINDOW_LINES = 3
+
+
+def caveat_near(scored, index):
+    """True when a caveat sits with the claim at `index` rather than anywhere.
+
+    Scoped, because one "results vary" buried in an FAQ used to excuse every
+    headline number in the header, and a caveat the reader never reaches beside
+    the number is not a caveat. The primary scope is the section: the span from
+    the enclosing heading to the next one. The line window is the escape hatch
+    for a caveat that lands just over a heading boundary, and it is deliberately
+    small, because widening it far enough to cross a section reinstates the bug.
+    """
+    starts = [m.start() for m in HEADING_RX.finditer(scored)]
+    lo = max((s for s in starts if s <= index), default=0)
+    hi = min((s for s in starts if s > index), default=len(scored))
+    if CAVEAT_RX.search(scored[lo:hi]):
+        return True
+    lines = scored.split("\n")
+    n = scored.count("\n", 0, index)
+    window = "\n".join(lines[max(0, n - CAVEAT_WINDOW_LINES):
+                             n + CAVEAT_WINDOW_LINES + 1])
+    return bool(CAVEAT_RX.search(window))
+
+
 def check_media_and_claims(raw, scored, findings, stats):
     # Header blocks are usually raw HTML, so counting only markdown images would
     # report zero badges on the majority of centered READMEs.
-    image_urls = [u for _, u in IMAGE_RX.findall(raw)] + HTML_IMG_RX.findall(raw)
+    #
+    # Read from the fence-blanked copy, not from raw: a README that shows badge
+    # markdown inside a fenced example is documenting badges, not wearing them,
+    # and counting those inflates badge_count until badge-wall fires on a file
+    # with no badge in it. HTML headers are not fenced, so blanking loses
+    # nothing. Only the fence count itself has to come from raw.
+    image_urls = [u for _, u in IMAGE_RX.findall(scored)] + HTML_IMG_RX.findall(scored)
     badges = [u for u in image_urls if is_badge(u)]
     stats["badge_count"] = len(badges)
     stats["image_count"] = len(image_urls)
@@ -432,15 +496,18 @@ def check_media_and_claims(raw, scored, findings, stats):
 
     claims = list(CLAIM_RX.finditer(scored))
     stats["headline_claims"] = len(claims)
-    if claims and not CAVEAT_RX.search(scored):
-        m = claims[0]
+    uncaveated = [m for m in claims if not caveat_near(scored, m.start())]
+    stats["uncaveated_claims"] = len(uncaveated)
+    if uncaveated:
+        m = uncaveated[0]
         findings.append(finding(
-            "uncaveated-claim", "Headline number with no caveat anywhere", "P1",
+            "uncaveated-claim", "Headline number with no caveat near it", "P1",
             line_of(scored, m.start()),
-            "%r is asserted with nothing saying what it does not cover. The most credible "
-            "READMEs in the study all argue against their own best stat somewhere: a number "
-            "with a caveat reads as engineering, one without reads as marketing."
-            % m.group(0).strip()))
+            "%r is asserted with nothing nearby saying what it does not cover. The most "
+            "credible READMEs in the study all argue against their own best stat where "
+            "the stat is: a number with a caveat reads as engineering, one without reads "
+            "as marketing. %d of %d headline numbers here have no caveat in their section."
+            % (m.group(0).strip(), len(uncaveated), len(claims))))
 
     # Same noun, two different numbers. The failure mode of a README edited
     # piecemeal over months: a badge says "84 UI Styles" while a heading further
@@ -453,8 +520,8 @@ def check_media_and_claims(raw, scored, findings, stats):
     prominent = []
     for m in HEADING_RX.finditer(scored):
         prominent.append((m.group(2), line_of(scored, m.start())))
-    for m in IMAGE_RX.finditer(raw):
-        prominent.append((m.group(1), line_of(raw, m.start())))
+    for m in IMAGE_RX.finditer(scored):
+        prominent.append((m.group(1), line_of(scored, m.start())))
 
     pairs = {}
     for text, line in prominent:
@@ -473,6 +540,23 @@ def check_media_and_claims(raw, scored, findings, stats):
                 "if it is not, say which is which." % shown))
 
 
+def is_paragraph(body):
+    """True when a block is prose rather than a list.
+
+    Matching only the first line lets a mixed block through: one sentence of
+    lead-in followed by eight bullets has a first line that is prose, and the
+    whole thing then scores as a single 90-word paragraph. That is the same
+    shape rabbit-writes' is_prose_block already handles, and this is the same
+    rule, so the two skills agree on what a paragraph is. A lead-in sentence
+    plus one or two bullets is still a paragraph with a list under it, which is
+    why the test is a majority rather than any bullet at all."""
+    lines = [ln for ln in body.split("\n") if ln.strip()]
+    if not lines:
+        return False
+    listish = sum(1 for ln in lines if LIST_ITEM_RX.match(ln))
+    return listish * 2 < len(lines)
+
+
 def check_prose_shape(raw, scored, findings, stats):
     # Blank rather than delete, so a reported line number still points at the
     # line in the file. Blanked fences and tables also read as paragraph breaks,
@@ -487,8 +571,8 @@ def check_prose_shape(raw, scored, findings, stats):
         # A markup block is not a paragraph. A centered header or a <details>
         # language bar counts as several hundred "words" and would otherwise
         # dominate the findings while telling the writer nothing.
-        if (body and not LIST_ITEM_RX.match(body) and not body.startswith(">")
-                and not body.startswith("<")):
+        if (body and not body.startswith(">") and not body.startswith("<")
+                and is_paragraph(body)):
             paragraphs.append((body, offset))
         offset += len(block)
     stats["prose_words"] = word_count(prose)

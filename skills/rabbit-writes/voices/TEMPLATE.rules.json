@@ -16,7 +16,7 @@
       "semicolon": "forbid | allow",
       "emoji": "forbid | allow",
       "curly_quotes": "forbid | allow",
-      "oxford_comma": "require | forbid | allow  (advisory, reported not enforced)",
+      "oxford_comma": "require | forbid | allow  (advisory: always reported at P2, never at default_priority, because no regex tells a list from a compound sentence)",
       "one_word_sentence": "forbid | allow",
       "max_paragraph_sentences": "integer, or omit",
       "max_avg_sentence_words": "integer, or omit",

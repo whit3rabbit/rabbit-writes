@@ -77,7 +77,7 @@
       "rx": "(?i)\\b(efficienc(y|ies)|improve(s|d|ment|ments)?)\\b",
       "priority": "P2",
       "max_allowed": 2,
-      "note": "Not banned, overused. Flags only past the third use. Name what got faster or better instead."
+      "note": "Not banned, overused. Two uses pass; the third and every one after it is flagged. Name what got faster or better instead."
     },
     {
       "id": "motivational-cadence",

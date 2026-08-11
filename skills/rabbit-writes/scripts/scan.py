@@ -44,20 +44,54 @@ from collections import Counter
 HERE = os.path.dirname(os.path.abspath(__file__))
 LEXICON_PATH = os.path.join(HERE, "lexicon.json")
 
-# Registers and the categories they suppress. Mirrors the tolerance matrix in
-# references/context.md. P0 fingerprints are never suppressed anywhere.
+# Registers and the categories they suppress. Mirrors the `skip` cells of the
+# tolerance matrix in references/context.md. P0 fingerprints are never
+# suppressed anywhere.
 PROFILE_SKIP = {
     "linkedin": {"transition-stack", "generic-conclusion", "tier3-density",
-                 "uniform-paragraphs", "em-dash-rate", "curly-quote"},
+                 "uniform-paragraphs", "curly-quote"},
     "blog": {"curly-quote"},
-    "technical-blog": {"curly-quote", "hedge-stack", "diff-anchored"},
+    "technical-blog": {"diff-anchored"},
     "investor-email": {"curly-quote"},
-    "docs": {"transition-stack", "curly-quote", "uniform-paragraphs",
-             "rhetorical-question", "diff-anchored", "list-label-period"},
-    "casual": {"transition-stack", "generic-conclusion", "curly-quote",
+    "docs": {"uniform-paragraphs", "rhetorical-question", "emoji-heading",
+             "generic-conclusion", "future-narrative", "social-cta",
+             "diff-anchored", "list-label-period"},
+    "casual": {"transition-stack", "generic-conclusion",
                "em-dash-rate", "uniform-paragraphs", "tier3-density",
-               "tier2-cluster", "confidence-calibration", "signposting"},
+               "tier2-cluster", "confidence-calibration", "signposting",
+               "tier1", "rhetorical-question", "promotional", "hedge-stack",
+               "emoji-heading", "boilerplate-phrase", "future-narrative",
+               "significance-inflation"},
 }
+
+# The `relaxed` cells of the same matrix, as hit allowances: the rule still
+# runs, it just does not report until the register's tolerance is used up.
+# Relaxing and skipping are different promises, and folding one into the other
+# is how `curly-quote` ended up listed in every skip set and unable to fire in
+# any register.
+#
+# `significance-inflation` is a P0 and is relaxed here anyway, because the
+# promise this engine makes is about P0 *fingerprints*, which are evidence about
+# how a document was produced. A craft P0 is a judgment about writing, and one
+# "plays a key role" in a reference page is the register, not a tell. The
+# fingerprint band is never skipped or relaxed in any register.
+PROFILE_RELAX = {
+    "linkedin": {"em-dash-rate": 2, "emoji-heading": 2,
+                 "rhetorical-question": 1, "promotional": 1},
+    "technical-blog": {"curly-quote": 4, "hedge-stack": 2},
+    "docs": {"curly-quote": 4, "transition-stack": 3, "em-dash-rate": 6,
+             "hedge-stack": 2, "boilerplate-phrase": 2,
+             "significance-inflation": 1},
+    "casual": {"curly-quote": 4, "social-cta": 1},
+}
+
+# Registers where the vocabulary tiers drop the words that carry real technical
+# meaning. This is what the matrix's "partial" cell means, and it is how the
+# `docs` register relaxes Tier 1: not an allowance that would let two `delve`s
+# through, but the named exemption list, which lets `robust` and `comprehensive`
+# through and keeps `delve` at full strength. A README is documentation, so the
+# same reasoning applies to it as to a technical blog post.
+VOCAB_EXEMPT_PROFILES = {"technical-blog", "docs"}
 
 # Human reference ranges. Sources: Copyleaks stylometric work (arXiv 2503.01659),
 # classical type-token-ratio literature, and the ranges published by
@@ -82,18 +116,40 @@ FRONTMATTER_RX = re.compile(r"\A---\n.*?\n---\n", re.S)
 TABLE_RX = re.compile(r"(?m)^\s*\|.*\|\s*$")
 BLOCKQUOTE_RX = re.compile(r"(?m)^\s*>.*$")
 URL_RX = re.compile(r"https?://\S+")
-QUOTED_RX = re.compile(r"[\"“][^\"”\n]{4,200}[\"”]")
+# Each pair has to close with its own kind. A single alternation over both the
+# opening and the closing marks lets one stray straight quote pair with a curly
+# one up to 200 characters later, and every word between them stops being
+# scored.
+QUOTED_RX = re.compile("\"[^\"“”\n]{4,200}\"|“[^\"“”\n]{4,200}”")
 
+# Characters that survive a copy out of a chat window and carry no meaning in
+# the prose.
+#
+# Written as escapes, never as the characters themselves. As literals these keys
+# are invisible: two that look identical in an editor merge into one and a check
+# disappears without a word, and any tool that normalizes whitespace can turn the
+# U+00A0 key into a plain space, at which point the counter below reads every
+# space in every document as a paste artifact. test_scan.py pins the exact
+# codepoints, so a normalizing save fails the build instead of the scan.
 HIDDEN_UNICODE = {
-    "​": "zero-width space",
-    "‌": "zero-width non-joiner",
-    "‍": "zero-width joiner",
-    "⁠": "word joiner",
-    "﻿": "byte-order mark",
-    "­": "soft hyphen",
-    " ": "non-breaking space",
-    " ": "narrow no-break space",
+    "\u200b": "zero-width space",
+    "\u200c": "zero-width non-joiner",
+    "\u200d": "zero-width joiner",
+    "\u2060": "word joiner",
+    "\ufeff": "byte-order mark",
+    "\u00ad": "soft hyphen",
+    "\u00a0": "non-breaking space",
+    "\u202f": "narrow no-break space",
 }
+
+# The invisible characters above have no honest use in prose, so one occurrence
+# is a paste artifact and a P0. The two space-like ones are different: a
+# non-breaking space is correct French typography, correct in front of a unit,
+# and correct in a name that must not wrap. Calling those a credibility killer
+# fails documents that were typeset properly, so they report at P2 and only
+# once there are enough of them to look mechanical.
+SPACE_LIKE_UNICODE = {"\u00a0", "\u202f"}
+SPACE_LIKE_TOLERANCE = 3
 
 ABBREV_RX = re.compile(
     r"\b(Mr|Mrs|Ms|Dr|Prof|Sr|Jr|St|etc|vs|approx|dept|est|vol|Inc|Ltd|Fig|No)\.",
@@ -168,13 +224,25 @@ def syllables(word):
 # --------------------------------------------------------------------------
 
 def moving_ttr(words, window=100):
+    """Mean distinct-word ratio over every window-sized span of the text.
+
+    The window slides rather than being rebuilt. Building a fresh set at each
+    position is O(n x window), which nobody notices on a blog post and which
+    crawls on a book-length document for a number that comes out identical."""
     if len(words) < window:
         return None
-    ratios = []
-    for i in range(len(words) - window + 1):
-        chunk = words[i:i + window]
-        ratios.append(len(set(chunk)) / window)
-    return sum(ratios) / len(ratios)
+    counts = Counter(words[:window])
+    positions = len(words) - window + 1
+    distinct_total = len(counts)
+    for i in range(1, positions):
+        leaving = words[i - 1]
+        counts[leaving] -= 1
+        if not counts[leaving]:
+            del counts[leaving]
+        entering = words[i + window - 1]
+        counts[entering] = counts.get(entering, 0) + 1
+        distinct_total += len(counts)
+    return distinct_total / positions / window
 
 
 def compute_stats(raw_text):
@@ -272,10 +340,11 @@ def phrase_regex(entries):
     return re.compile(r"(?i)\b(" + "|".join(escaped) + r")\b")
 
 
-def find(text, rx, pattern_id, label, band, priority, findings):
-    for m in rx.finditer(text):
-        if not m.group(0).strip():
-            continue
+def find(text, rx, pattern_id, label, band, priority, findings, allowed=0):
+    """`allowed` is the register's tolerance: the first N hits pass unreported
+    and everything past them is a finding. 0 means report every hit."""
+    hits = [m for m in rx.finditer(text) if m.group(0).strip()]
+    for m in hits[allowed:]:
         findings.append({
             "id": pattern_id,
             "label": label,
@@ -287,10 +356,20 @@ def find(text, rx, pattern_id, label, band, priority, findings):
         })
 
 
+# Escaped, not literal. The last range is a bare variation selector (U+FE0F):
+# as a literal it is invisible, and an editor that drops it silently stops
+# this pattern matching the emoji presentation form.
 EMOJI_RX = re.compile(
-    "[" "\U0001F300-\U0001FAFF" "☀-➿" "\U0001F900-\U0001F9FF"
-    "⬀-⯿" "️" "]")
+    "[" "\U0001F300-\U0001FAFF" "\u2600-\u27BF" "\U0001F900-\U0001F9FF"
+    "\u2B00-\u2BFF" "\uFE0F" "]")
 ONE_WORD_SENTENCE_RX = re.compile(r"(?m)(?:^|(?<=[.!?]\s))([A-Z][a-z']{1,14})\.(?=\s|$)")
+# Titles and abbreviations that this pattern would otherwise read as a one-word
+# sentence: "...ran late. Dr. Smith arrived" is a name, not emphasis. Narrower
+# than ABBREV_RX on purpose. `No.` is left out because a bare "No." in prose is
+# almost always the emphatic sentence this rule exists to catch, and almost
+# never the abbreviation for number.
+ONE_WORD_ABBREV_RX = re.compile(
+    r"(Mr|Mrs|Ms|Dr|Prof|Sr|Jr|St|Inc|Ltd|Fig|Vol|Dept|Approx|Est)\.")
 US_DATE_RX = re.compile(
     r"\b(January|February|March|April|May|June|July|August|September|"
     r"October|November|December)\s+\d{1,2},?\s+\d{4}\b")
@@ -299,6 +378,38 @@ DMY_DATE_RX = re.compile(
     r"September|October|November|December)\s+\d{4}\b")
 ISO_DATE_RX = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 
+
+# Serial-comma candidates. OXFORD_MISSING_RX wants a comma, then a run with no
+# comma in it, then the conjunction: "eggs, bacon and toast". OXFORD_PRESENT_RX
+# wants that same run with the comma sitting after it: "eggs, bacon, and toast".
+#
+# Both sides carry the same two guards. The stop-word lookahead drops clauses
+# that open with a conjunction or a relative pronoun, and the three-word ceiling
+# drops the rest: a serial list item is short, a subordinate clause is not.
+#
+# Without them the missing side reports on the far-away "or" in "more examples,
+# and the checklist at the end of any draft or edit", and every
+# correctly-punctuated two-item list becomes a finding. Without them the present
+# side is worse still: a bare `,\s+(?:and|or)` matches every compound sentence in
+# the language, and "She left the room, and he stayed" is required punctuation,
+# not a serial comma. Requiring a comma-delimited short run in front of the
+# conjunction is what distinguishes the third item of a list from a second
+# clause.
+#
+# The cost is real and deliberate on both sides. "eggs, a thick slice of bacon
+# and toast" is a genuine miss, and so is its mirror. An advisory that fires on a
+# third of a page gets ignored along with the hits, and TEMPLATE.rules.json
+# promises advice here, not enforcement.
+OXFORD_CLAUSE_OPENER = ("and|or|which|who|whom|whose|that|because|since|so|but|"
+                        "before|after|while|when|where|if|though|although|"
+                        "unless|until|whether")
+OXFORD_MISSING_RX = re.compile(
+    r",\s+(?!(?:%s)\b)(?:[^\s,;:.!?]+\s+){0,2}[^\s,;:.!?]+\s+(?:and|or)\s+\w"
+    % OXFORD_CLAUSE_OPENER)
+OXFORD_PRESENT_RX = re.compile(
+    r",\s+(?!(?:%s)\b)(?:[^\s,;:.!?]+\s+){0,2}[^\s,;:.!?]+,\s+(?:and|or)\s+\w"
+    % OXFORD_CLAUSE_OPENER)
+OXFORD_MAX_REPORTED = 5
 
 LIST_ITEM_RX = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s")
 LIST_DASH_RX = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+(?:\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\)|`[^`]+`)\s*[—–]\s")
@@ -386,14 +497,42 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
                 excerpt(scored, m.start(), m.end())))
 
     if mech.get("curly_quotes") == "forbid":
-        for m in re.finditer(r"[“”‘’]", scored):
+        # Raw text, for the reason in lexicon.json's curly-quote entry: the
+        # exemption blanks a quoted span along with the quote marks that are
+        # the thing being checked. The excerpt has to come from raw_text for the
+        # same reason, or a quote inside an exempted span reports a line of
+        # blanks. Blanking preserves length, so the offsets line up either way.
+        for m in re.finditer(r"[“”‘’]", raw_text):
             findings.append(voice_finding(
                 "voice-curly-quote", "Curly quote (voice forbids)", "P2",
-                line_of(scored, m.start()), m.group(0),
-                excerpt(scored, m.start(), m.end())))
+                line_of(raw_text, m.start()), m.group(0),
+                excerpt(raw_text, m.start(), m.end())))
+
+    # Serial comma. Advisory: reported, never enforced at the voice default,
+    # because no regex tells a three-item list from a compound sentence.
+    style = mech.get("oxford_comma", "allow")
+    if style in ("require", "forbid"):
+        rx = OXFORD_MISSING_RX if style == "require" else OXFORD_PRESENT_RX
+        label = ("Serial comma missing (voice requires it)" if style == "require"
+                 else "Serial comma present (voice omits it)")
+        hits = list(rx.finditer(scored))
+        for m in hits[:OXFORD_MAX_REPORTED]:
+            findings.append(voice_finding(
+                "voice-oxford-comma", label, "P2",
+                line_of(scored, m.start()), m.group(0).strip()[:60],
+                "Advisory. Check it is a list and not a compound sentence "
+                "before touching it: " + excerpt(scored, m.start(), m.end())))
+        if len(hits) > OXFORD_MAX_REPORTED:
+            findings.append(voice_finding(
+                "voice-oxford-comma",
+                "%s, %d more sites" % (label, len(hits) - OXFORD_MAX_REPORTED),
+                "P2", 1, "%d candidates" % len(hits),
+                "Advisory. Read them rather than running a replace."))
 
     if mech.get("one_word_sentence") == "forbid":
         for m in ONE_WORD_SENTENCE_RX.finditer(scored):
+            if ONE_WORD_ABBREV_RX.fullmatch(m.group(0)):
+                continue
             findings.append(voice_finding(
                 "voice-one-word-sentence",
                 "One-word sentence for emphasis (voice forbids)", default,
@@ -498,9 +637,11 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
 
 
 def scan(raw_text, profile="blog", exempt=True, voice_rules=None):
-    lex = json.load(open(LEXICON_PATH, encoding="utf-8"))
+    with open(LEXICON_PATH, encoding="utf-8") as fh:
+        lex = json.load(fh)
     scored = apply_exemptions(raw_text) if exempt else raw_text
     skip = PROFILE_SKIP.get(profile, set())
+    relax = PROFILE_RELAX.get(profile, {})
     findings = []
     stats = compute_stats(raw_text)
     stats["_profile"] = profile
@@ -509,15 +650,21 @@ def scan(raw_text, profile="blog", exempt=True, voice_rules=None):
     #    because a zero-width space inside a code fence is still a paste artifact.
     for ch, name in HIDDEN_UNICODE.items():
         n = raw_text.count(ch)
+        space_like = ch in SPACE_LIKE_UNICODE
+        if space_like and n <= SPACE_LIKE_TOLERANCE:
+            continue
         if n:
             findings.append({
                 "id": "hidden-unicode",
                 "label": "Hidden unicode: %s" % name,
                 "band": "fingerprint",
-                "priority": "P0",
+                "priority": "P2" if space_like else "P0",
                 "line": line_of(raw_text, raw_text.index(ch)),
                 "match": "U+%04X x%d" % (ord(ch), n),
-                "excerpt": "%d occurrence(s) of %s" % (n, name),
+                "excerpt": ("%d of them, past the %d a typesetter would use. "
+                            "Check they are deliberate before replacing them."
+                            % (n, SPACE_LIKE_TOLERANCE) if space_like
+                            else "%d occurrence(s) of %s" % (n, name)),
             })
 
     # 2. Catalog regexes.
@@ -529,19 +676,29 @@ def scan(raw_text, profile="blog", exempt=True, voice_rules=None):
         except re.error as exc:
             print("lexicon: bad regex %s (%s)" % (p["id"], exc), file=sys.stderr)
             continue
-        find(scored, rx, p["id"], p["label"], p["band"], p["priority"], findings)
+        allowed = relax.get(p["id"], 0)
+        label = p["label"]
+        if allowed:
+            label = "%s (past the %s allowance of %d)" % (label, profile, allowed)
+        # A pattern marked scan_raw is about how the file was produced rather
+        # than what it says, so the quoted-example exemption does not apply.
+        # Blanking preserves length, so the line numbers agree either way.
+        target = raw_text if p.get("scan_raw") else scored
+        find(target, rx, p["id"], label, p["band"], p["priority"], findings,
+             allowed=allowed)
 
     # 3. Vocabulary, tiered. Tier 1 always flags. Clarity edits are reported in
     #    their own band and never counted toward the AI-vocabulary signal, so a
     #    wordiness fix can never look like authorship evidence.
-    technical = profile == "technical-blog"
+    technical = profile in VOCAB_EXEMPT_PROFILES
     exempt_words = set(w.lower() for w in lex["technical_exempt"]) if technical else set()
 
-    t1 = [w for w in lex["tier1"] if w.lower() not in exempt_words]
-    find(scored, word_regex(t1), "tier1", "Tier-1 vocabulary",
-         "fingerprint", "P1", findings)
-    find(scored, phrase_regex(lex["tier1_phrases"]), "tier1", "Tier-1 phrase",
-         "fingerprint", "P1", findings)
+    if "tier1" not in skip:
+        t1 = [w for w in lex["tier1"] if w.lower() not in exempt_words]
+        find(scored, word_regex(t1), "tier1", "Tier-1 vocabulary",
+             "fingerprint", "P1", findings)
+        find(scored, phrase_regex(lex["tier1_phrases"]), "tier1", "Tier-1 phrase",
+             "fingerprint", "P1", findings)
 
     find(scored, word_regex(lex["clarity"]), "clarity", "Wordiness",
          "craft", "P1", findings)
@@ -638,7 +795,11 @@ def scan(raw_text, profile="blog", exempt=True, voice_rules=None):
 
     if "em-dash-rate" not in skip:
         rate = stats.get("em_dashes_per_1k", 0)
-        if rate > BANDS["em_dashes_per_1k"][1] and stats.get("em_dashes", 0) > 1:
+        # The register's allowance is an absolute dash count, not a rate: a
+        # LinkedIn post tolerating "2 per post" says nothing about per-1,000-word
+        # rates on a document that never reaches 1,000 words.
+        allowed = max(1, relax.get("em-dash-rate", 0))
+        if rate > BANDS["em_dashes_per_1k"][1] and stats.get("em_dashes", 0) > allowed:
             findings.append({
                 "id": "em-dash-rate",
                 "label": "Em-dash rate %.1f per 1,000 words" % rate,

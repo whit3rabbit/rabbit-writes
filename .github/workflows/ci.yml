@@ -1,0 +1,56 @@
+name: checks
+
+# The four commands CLAUDE.md lists, minus `claude plugin validate .`, which
+# needs an authenticated CLI that CI has no way to provide. Run that one before
+# tagging a release.
+#
+# No install step and no cache, because the whole plugin is stdlib. If a
+# dependency ever appears here, this file is the place it becomes obvious.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        os: [ubuntu-latest]
+        include:
+          # 3.8 is the floor the scripts claim, and it is not offered on the
+          # 24.04 runner image. Pinning 22.04 keeps the claim tested rather
+          # than dropping it quietly.
+          - python: "3.8"
+            os: ubuntu-22.04
+    name: python ${{ matrix.python }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: repo validator
+        run: python3 scripts/validate.py
+
+      - name: engine calibration and preservation validator
+        run: python3 skills/rabbit-writes/tests/test_scan.py
+
+      - name: readme structure, voice, and corpus regression
+        run: python3 skills/readme-writing/tests/test_readme_check.py
+
+      - name: dogfood the scanner on the repo's own prose
+        run: |
+          python3 skills/readme-writing/scripts/readme_check.py README.md --check
+          python3 skills/rabbit-writes/scripts/scan.py skills/rabbit-writes/SKILL.md \
+            --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
+          python3 skills/rabbit-writes/scripts/scan.py skills/readme-writing/SKILL.md \
+            --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json

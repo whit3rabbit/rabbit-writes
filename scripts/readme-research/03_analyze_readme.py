@@ -10,6 +10,7 @@ Usage:
   python3 03_analyze_readme.py <path-to-readme> [--json]
   python3 03_analyze_readme.py --batch   # process every repo under docs/readme-analysis/repos/
 """
+import glob
 import json
 import os
 import re
@@ -73,8 +74,18 @@ AUTOLINK_RE = re.compile(r"<https?://[^>]+>")
 HTML_CENTER_RE = re.compile(r"<(p|div|h[1-6])\s+align=[\"']center[\"']", re.IGNORECASE)
 TABLE_ROW_RE = re.compile(r"^\|.+\|\s*$", re.MULTILINE)
 TABLE_SEP_RE = re.compile(r"^\|?[\s:|-]+\|[\s:|-]+\|?\s*$", re.MULTILINE)
+# Substrings, not patterns: is_badge_url does `h in url`, so a regex written here
+# is a literal that never matches. GitHub Actions badges are covered by
+# "actions/workflows".
+#
+# readme_check.py in the readme-writing skill carries this list plus one extra
+# entry, "/badge", which catches the long tail (trendshift, star-history,
+# repology, awesome.re) that named hosts miss: 625 badges against 568 over the
+# committed snapshot, with no non-badge image caught either way. The checker is
+# deliberately the broader of the two. Do not narrow it to match this list;
+# widen this list and regenerate the corpus if the two should ever converge.
 BADGE_HOST_HINTS = ["shields.io", "badge.fury.io", "img.shields", "badgen.net", "travis-ci",
-                     "circleci.com/gh", "codecov.io", "coveralls.io", "github.com/.*/workflows/.*badge",
+                     "circleci.com/gh", "codecov.io", "coveralls.io",
                      "actions/workflows", "sonarcloud.io", "snyk.io", "discord.com/api/guilds",
                      "opencollective.com", "npmjs.com/package", "pypi.org/project", "crates.io/v",
                      "gitpod.io/button", "deepwiki.com/badge", "img.badgesize.io", "visitor-badge"]
@@ -254,6 +265,19 @@ def analyze_readme(text, full_name=""):
 
     return stats
 
+def local_readme(repo_dir):
+    """The fetched README that ships beside meta.json, whatever its extension.
+
+    Step 02 saves README.rst and README.txt under their real names. Looking only
+    for README.md sent those repos to meta.json's readme_local_path, which is an
+    absolute path on the machine that did the fetching, so they vanished from
+    any reproduction run without a word.
+    """
+    hits = sorted(glob.glob(os.path.join(repo_dir, "README.*")))
+    preferred = [h for h in hits if h.lower().endswith(".md")]
+    return (preferred or hits or [None])[0]
+
+
 def main():
     if "--batch" in sys.argv:
         results = {}
@@ -265,12 +289,7 @@ def main():
                 continue
             with open(meta_path) as f:
                 meta = json.load(f)
-            # meta.json records the absolute path from the machine that fetched
-            # the corpus. The copy that ships in this repo sits beside meta.json,
-            # so prefer that and fall back to the recorded path.
-            readme_path = os.path.join(repo_dir, "README.md")
-            if not os.path.isfile(readme_path):
-                readme_path = meta["readme_local_path"]
+            readme_path = local_readme(repo_dir) or meta["readme_local_path"]
             try:
                 with open(readme_path, encoding="utf-8", errors="replace") as f:
                     text = f.read()

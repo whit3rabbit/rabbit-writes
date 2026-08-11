@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Step 4: aggregate corpus-wide findings across all analyzed READMEs."""
+import glob
 import json
 import os
+import re
 import statistics
 from collections import Counter, defaultdict
 
@@ -95,16 +97,22 @@ badge_keywords = {
     "sponsor": ["opencollective", "github/sponsors"],
 }
 badge_type_counts = Counter()
-import os, re
-IMAGE_RE = re.compile(r"!\[([^\]]*)\]\(([^)\s]+)\)")
+# Must stay identical to 03_analyze_readme.py's IMAGE_RE. Without the optional
+# title clause, `![alt](url "title")` does not match at all and the image drops
+# out of this count while step 03 still sees it, so the two steps disagree about
+# the same corpus.
+IMAGE_RE = re.compile(r"!\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 HTML_IMG_RE = re.compile(r"<img[^>]+src\s*=\s*[\"']([^\"']+)[\"']", re.IGNORECASE)
 for full_name, r in all_data.items():
     meta = r["meta"]
-    # Prefer the copy that ships in this repo; readme_local_path is absolute and
+    # Prefer the copy that ships in this repo. readme_local_path is absolute and
     # points at the machine that fetched the corpus. Silently failing here is how
-    # this counter shipped empty.
-    local = os.path.join(BASE, "repos", full_name.replace("/", "__"), "README.md")
-    path = local if os.path.isfile(local) else meta.get("readme_local_path", "")
+    # this counter shipped empty. Globbed rather than hardcoded to README.md,
+    # because step 02 saves README.rst and README.txt under their real names.
+    repo_dir = os.path.join(BASE, "repos", full_name.replace("/", "__"))
+    hits = sorted(glob.glob(os.path.join(repo_dir, "README.*")))
+    local = ([h for h in hits if h.lower().endswith(".md")] or hits or [""])[0]
+    path = local if local and os.path.isfile(local) else meta.get("readme_local_path", "")
     try:
         with open(path, encoding="utf-8", errors="replace") as f:
             text = f.read()
@@ -122,7 +130,8 @@ for full_name, r in all_data.items():
                 break
 summary["badge_type_counts_corpus"] = dict(badge_type_counts.most_common())
 
-# --- most common canonical section-order sequence (first 5 top-level categories, dedup consecutive "other")
+# --- most common canonical section-order sequence: drop every "other" heading,
+#     then collapse runs of the same category, then keep the first n
 def canon_seq(r, n=6):
     seq = r["stats"]["section_order"]
     seq = [s for s in seq if s != "other"]

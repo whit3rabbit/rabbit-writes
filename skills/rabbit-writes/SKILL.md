@@ -182,6 +182,8 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/verify.py original.md
 
 Non-zero exit means the rewrite altered something on the do-not-touch list, or added more tells than it removed. It is a brake, not a target: it cannot tell you an edit was too shallow, which is what guardrail 3 is for.
 
+It also does not see every path. A file path is tracked only when it has an extension, because an extensionless one is indistinguishable from "and/or" or "TCP/IP" by regex. `voices/ACTIVE` is still on the do-not-touch list in guardrail 6. Nothing mechanical is watching it, so you are.
+
 ## The five moves that do most of the work
 
 Everything in the catalog is a special case of these.

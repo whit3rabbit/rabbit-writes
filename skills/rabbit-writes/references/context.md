@@ -30,13 +30,13 @@ Rules not listed apply at full strength everywhere.
 | Emoji in headers | relaxed (1-2, end of line) | strict | strict | strict | skip | skip |
 | Excessive bullets | skip | strict | relaxed | strict | skip | skip |
 | Hedging | strict | strict | relaxed ("may" is accurate) | strict | relaxed | skip |
-| Tier-1 vocabulary | strict | strict | **partial**, see below | strict | relaxed | P0 only |
+| Tier-1 vocabulary | strict | strict | **partial**, see below | strict | **partial**, see below | P0 only |
 | Promotional language | relaxed (some sell expected) | strict | strict | **extra strict** | strict | skip |
 | Significance inflation | strict | strict | strict | **extra strict** | relaxed | skip |
 | Copula avoidance | skip | strict | relaxed | strict | skip | skip |
-| Uniform paragraph length | skip | strict | strict | strict | relaxed | skip |
+| Uniform paragraph length | skip | strict | strict | strict | skip | skip |
 | Numbered-list inflation | relaxed | strict | relaxed | strict | skip | skip |
-| Rhetorical questions | relaxed (1 hook) | strict | strict | strict | strict | skip |
+| Rhetorical questions | relaxed (1 hook) | strict | strict | strict | skip | skip |
 | Transition phrases | skip | strict | strict | strict | relaxed | skip |
 | Generic conclusions | skip | strict | strict | **extra strict** | skip | skip |
 | Hashtag stuffing | strict | strict | strict | **extra strict** | skip | skip |
@@ -47,12 +47,22 @@ Rules not listed apply at full strength everywhere.
 | Social endorsement closers | strict | strict | strict | strict | skip | relaxed (1 in a DM) |
 | Wall-of-text replies | strict | skip | skip | skip | skip | strict |
 | Curly quotes | skip | skip | relaxed (plain-text contexts) | skip | relaxed | relaxed |
+| Tier-2 clusters | strict | strict | **partial**, see below | strict | **partial**, see below | skip |
+| Tier-3 density | skip | strict | **partial**, see below | strict | **partial**, see below | skip |
+| Confidence calibration | strict | strict | strict | strict | strict | skip |
+| Signposting | strict | strict | strict | strict | strict | skip |
+| Diff-anchored writing | strict | strict | skip | strict | skip | strict |
+| List-label periods | strict | strict | strict | strict | skip | strict |
 
 **Extra strict** means flag borderline instances. In an investor email, one "thriving ecosystem" undermines the message.
 
 **Skip** means do not audit this category here. The rule does not apply.
 
-**Technical-blog vocabulary exceptions.** These carry real technical meaning and are not flagged in technical context: `robust`, `comprehensive`, `seamless`, `ecosystem`, `leverage` (actual platform leverage), `facilitate`, `underpin`, `streamline`. Still flagged: `delve`, `tapestry`, `beacon`, `embark`, `testament to`, `game-changer`, `harness`.
+**Relaxed** means the rule still runs and reports past a tolerance, not that it stops running. `scan.py` holds those tolerances in `PROFILE_RELAX` as hit allowances: `linkedin` reports the third em dash, `docs` the fifth curly quote, either of `technical-blog` and `docs` the third stacked hedge.
+
+One kind of cell has no mechanical form: a rule with no pattern in `lexicon.json`. Bold overuse, excessive bullets, copula avoidance, numbered-list inflation, bullet-NP lists, subjectless fragments, hashtag stuffing, and wall-of-text replies are yours to apply by reading. Every other cell in the table is implemented, and `tests/test_scan.py` parses this matrix and fails on any cell that is not, in either direction. Add a row here and the test asks for the entry.
+
+**Vocabulary exceptions, `technical-blog` and `docs`.** This is what **partial** means in the three vocabulary rows, and it is why those two registers do not take a hit allowance: an allowance would let a second `delve` through, and this does not. These words carry real technical meaning and are not flagged in either register: `robust`, `comprehensive`, `seamless`, `ecosystem`, `leverage` (actual platform leverage), `facilitate`, `underpin`, `streamline`, `scalable`, `dynamic`. Still flagged at full strength: `delve`, `tapestry`, `beacon`, `embark`, `testament to`, `game-changer`, `harness`. The list itself is `technical_exempt` in `lexicon.json`.
 
 P0 fingerprints (chatbot artifacts, cutoff disclaimers, citation leaks, tracking parameters, hidden unicode, placeholders) apply at full strength in **every** register, including `casual`.
 
@@ -62,7 +72,7 @@ P0 fingerprints (chatbot artifacts, cutoff disclaimers, citation leaks, tracking
 
 Optional. If the writer does not name one, infer from the input's existing register and impose nothing. Each is a set of concrete targets, not a vibe.
 
-**`casual`**: Contractions throughout; their absence reads stiff. Average sentence under 14 words; fragments fine. At least one first-person or concrete-anecdote touch. Near-zero jargon. Keep warm hedges ("I think", "honestly"), cut corporate ones ("it's worth noting"). *Blog, social, community.*
+**`casual`**: Contractions throughout, because their absence reads stiff. Average sentence under 14 words, fragments fine. At least one first-person or concrete-anecdote touch. Near-zero jargon. Keep warm hedges ("I think", "honestly"), cut corporate ones ("it's worth noting"). *Blog, social, community.*
 
 **`professional`**: Active voice for most sentences. Vary sentence length. One concrete claim per paragraph: a number, a name, a date. Never "experts say." Make the ask explicit. Low tolerance for hedging. *LinkedIn, investor email, pitches.*
 

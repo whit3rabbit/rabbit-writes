@@ -49,16 +49,18 @@ def get_meta(full_name):
         return None
 
 def get_readme(full_name, branch):
-    for branch_try in [branch, "main", "master"]:
-        if not branch_try:
-            continue
+    # Deduped: when the default branch is already "main" the old list fetched it
+    # twice, which is 8 wasted requests per repo against a rate-limited CDN.
+    branches = []
+    for branch_try in (branch, "main", "master"):
+        if branch_try and branch_try not in branches:
+            branches.append(branch_try)
+    for branch_try in branches:
         for fname in README_CANDIDATES:
             url = f"https://raw.githubusercontent.com/{full_name}/{branch_try}/{fname}"
             status, body = fetch(url)
             if status == 200 and body and len(body) > 20:
                 return fname, branch_try, body
-        if branch_try == branch:
-            continue
     return None, None, None
 
 def main():

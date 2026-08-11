@@ -69,6 +69,11 @@ venv.bak/
 .idea/
 node_modules/
 
-# Personal Claude Code notes, machine-specific
+# Personal Claude Code notes and settings, machine-specific.
+# settings.local.json holds per-machine permissions and skill overrides. It is
+# ignored here rather than only in a contributor's global excludes, because the
+# global rule is invisible to everyone else and the first clone without it
+# commits somebody's local state.
 CLAUDE.local.md
 .claude.local.md
+.claude/settings.local.json

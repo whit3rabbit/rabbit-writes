@@ -100,17 +100,17 @@ State what happened. Let the reader judge whether it matters. **Test:** if the s
 
 Replace on sight. These run 5-20x more common in machine text (a well-supported convention, not a measurement this skill made). Inflected forms count: `delve` covers `delving`, `meticulous` covers `meticulously`.
 
+Every word in this table is in `scripts/lexicon.json` under `tier1` or `tier1_phrases`, and `tests/test_scan.py` fails if one of them is not. Words whose tell depends on the sense (`leverage` the verb, `landscape` the metaphor) live in section 14 instead, because a regex cannot read the sense and a word that fires on its literal use is a word people learn to ignore.
+
 | Replace | With |
 |---|---|
 | delve / delve into | explore, dig into, look at |
 | tapestry, realm, beacon | (describe the actual thing) |
-| landscape *(metaphor)* | field, space, industry |
 | paradigm | model, approach, framework |
 | testament to | shows, proves |
 | embark | start, begin |
 | robust | strong, reliable, solid |
 | comprehensive | thorough, complete, full |
-| leverage *(verb)* | use |
 | pivotal | important, key |
 | underscores | highlights, shows |
 | meticulous | careful, detailed, precise |
@@ -121,8 +121,7 @@ Replace on sight. These run 5-20x more common in machine text (a well-supported 
 | vibrant, bustling, thriving | describe what makes it active, or cite a number |
 | showcasing | showing, demonstrating (or cut the clause) |
 | deep dive, dive into | look at, examine |
-| unpack, unpacking | explain, break down |
-| intricate, intricacies, complexities | name the actual complexity |
+| intricate, intricacies | name the actual complexity |
 | ever-evolving | changing (or describe how) |
 | enduring | lasting (or cite how long) |
 | daunting | hard, difficult |
@@ -135,8 +134,6 @@ Replace on sight. These run 5-20x more common in machine text (a well-supported 
 | at its core | (cut) |
 | synergy | describe the combined effect |
 | interplay | relationship, interaction |
-| symphony, kaleidoscope *(metaphor)* | describe the actual coordination |
-| embrace *(metaphor)* | adopt, accept, switch to |
 | multifaceted | describe the facets, or cut |
 | the future looks bright / only time will tell | (cut) |
 
@@ -168,11 +165,13 @@ Fine alone. Two or more in the same paragraph, and the paragraph needs a rewrite
 
 harness, navigate, foster, elevate, unleash, streamline, empower, bolster, spearhead, resonate, revolutionize, facilitate, underpin, nuanced, crucial, ecosystem *(metaphor)*, myriad, plethora, encompass, catalyze, reimagine, galvanize, augment, cultivate, illuminate, elucidate, juxtapose, transformative, cornerstone, paramount, poised to, burgeoning, nascent, quintessential, overarching, quietly, deeply *(in "deeply rooted", "deeply committed")*, underpinnings.
 
+The sense-dependent ones sit here rather than in section 12 for a mechanical reason: a regex sees the string, not the meaning. `leverage` *(verb)*, `landscape` *(metaphor)*, `embrace` *(metaphor)*, `symphony` and `kaleidoscope` *(metaphor)*, `unpack` / `unpacking`, `complexities`. Each is a Tier-1 tell in the sense that matters and an ordinary word otherwise: real leverage, a literal landscape, unpacking an archive. Read them as replace-on-sight when the metaphorical sense is the one in front of you.
+
 ## 15. Tier-3 — flag only at density [C]
 
-Normal words that machine text saturates with. Flag when they run roughly 3%+ of the text.
+Normal words that machine text saturates with. Flag when they run roughly 2%+ of the text, which is the threshold `scan.py` uses.
 
-significant, innovative, effective, dynamic, scalable, compelling, unprecedented, exceptional, remarkable, sophisticated, instrumental, world-class, best-in-class, verbatim.
+significant, innovative, effective, dynamic, scalable, compelling, unprecedented, exceptional, remarkable, sophisticated, instrumental, world-class, best-in-class, verbatim, vital, essential.
 
 Fix by replacing some with specifics: numbers, comparisons, examples.
 

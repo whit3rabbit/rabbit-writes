@@ -12,7 +12,7 @@ Models do not lack taste. They lack *specific* taste. Given no constraints, they
 
 A user-supplied writing sample or voice profile **outranks every style rule in this skill**, including the em-dash guidance in `patterns.md` §49.
 
-If the sample uses em dashes, keep them at roughly the sample's frequency. If the writer says "stuff" and "things", keep that register; do not upgrade their vocabulary. If they open three paragraphs with "So," and it is characteristic, leave it.
+If the sample uses em dashes, keep them at roughly the sample's frequency. If the writer says "stuff" and "things", keep that register rather than upgrading their vocabulary. If they open three paragraphs with "So," and it is characteristic, leave it.
 
 Matching the author beats scrubbing the tell. Always.
 
@@ -125,7 +125,7 @@ contraction_rate: high
 
 ## Blending
 
-"70% technical, 30% casual" interpolates the numeric dimensions: `0.7 × technical.formality + 0.3 × casual.formality`. Vocabulary merges as the union of `Always` and the union of `Never` — the stricter refusal wins, because refusals are the load-bearing part. Structural defaults come from the highest-weighted profile. Record the lineage in the blended file.
+"70% technical, 30% casual" interpolates the numeric dimensions: `0.7 × technical.formality + 0.3 × casual.formality`. Vocabulary merges as the union of `Always` and the union of `Never`, so the stricter refusal wins, because refusals are the load-bearing part. Structural defaults come from the highest-weighted profile. Record the lineage in the blended file.
 
 ---
 
