@@ -10,7 +10,7 @@ diverge: "getting started" was listed under both installation and usage, and
 " api" could not match a heading that is just "API", so the commonest API
 heading there is counted as "other" and the study undercounted api sections.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 import re

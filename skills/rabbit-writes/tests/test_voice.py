@@ -12,10 +12,13 @@ is for.
 import json
 import os
 import shutil
+import subprocess
+import sys
 import tempfile
 
-from helpers import (SAMPLES, VOICES, WHIT3RABBIT_RULES, scan_json, scan_text,
-                     scan_with_rules, voice_ids, written)
+from helpers import (SAMPLES, SCAN, VOICES, WHIT3RABBIT_RULES, scan_json,
+                     scan_module as load_scan, scan_text, scan_with_rules,
+                     voice_ids, written)
 
 from rwlib import voices
 
@@ -393,5 +396,266 @@ def test_the_lineage_is_reported():
         child = written(scratch, "child.rules.json",
                         '{"voice": "child", "extends": "whit3rabbit"}')
         assert voices.lineage(child, voices_dir=VOICES) == ["child", "whit3rabbit"]
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+# --------------------------------------------------------------------------
+# resolution: which profile applies when nobody spelled out a path
+# --------------------------------------------------------------------------
+#
+# The order used to live in readme_check.py alone, so the two checkers in this
+# one plugin could disagree about whose rules were in force. It is in
+# rwlib.voices now and scan.py reaches it through `--voice auto`. The
+# readme-writing suite tests the same function through its own caller; these
+# test the engine's half, and the flag handling around it.
+
+
+def scratch_voices(*names):
+    """A temporary voices/ directory holding one rules file per name."""
+    scratch = tempfile.mkdtemp()
+    for who in names:
+        written(scratch, who + ".rules.json",
+                json.dumps({"voice": who, "mechanics": {"semicolon": "forbid"}}))
+    return scratch
+
+
+def test_a_repo_pin_outranks_active():
+    scratch = scratch_voices("ada", "grace")
+    try:
+        written(scratch, "ACTIVE", "ada\n")
+        doc = os.path.join(scratch, "draft.md")
+        written(scratch, "draft.md", "text\n")
+        written(scratch, ".rabbit-voice", "grace\n")
+        rules, name, note = voices.resolve(doc, voices_dir=scratch)
+        assert name == "grace", name
+        assert "pinned" in (note or ""), note
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+def test_resolve_with_no_document_still_answers():
+    """scan.py reads stdin as happily as a path, so there is not always a file
+    to look beside. ACTIVE still decides."""
+    scratch = scratch_voices("ada")
+    try:
+        written(scratch, "ACTIVE", "ada\n")
+        rules, name, note = voices.resolve(None, voices_dir=scratch)
+        assert name == "ada" and note is None, "%s %s" % (name, note)
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+def test_installed_leaves_the_template_out():
+    """TEMPLATE.rules.json is a form to fill in, not somebody's voice. Counted,
+    it turns the single-profile fallback into an ambiguity on a fresh install."""
+    assert "TEMPLATE" not in voices.installed(VOICES)
+    assert "whit3rabbit" in voices.installed(VOICES)
+
+
+def test_voice_auto_applies_the_active_profile():
+    """The flag exists so a writer does not have to spell out a path that moves
+    when the plugin is installed somewhere else."""
+    result, _ = scan_text(BAD_LETTER, "--voice", "auto")
+    assert "voice-em-dash" in voice_ids(result), result["findings"]
+
+
+def test_no_voice_flag_means_no_voice_band():
+    """The default stays silent about style. This is what the `rabbit-scan`
+    hook runs in somebody else's repository, and a stranger's em dash is not a
+    defect in a stranger's README."""
+    result, _ = scan_text(BAD_LETTER)
+    assert not voice_ids(result), result["findings"]
+
+
+def test_a_profile_named_by_hand_that_does_not_exist_is_an_error():
+    """Exit 2, the same as --voice-rules with a typo in it. A clean voice band
+    on a profile nobody read is a false pass."""
+    result = subprocess.run(
+        [sys.executable, SCAN, os.path.join(SAMPLES, "human-sample.md"),
+         "--json", "--voice", "nobody-by-that-name"],
+        capture_output=True, text=True)
+    assert result.returncode == 2, result.stdout
+    assert "nobody-by-that-name" in result.stderr, result.stderr
+
+
+def test_voice_and_voice_rules_cannot_both_be_given():
+    """Silently preferring one produces a report about a profile nobody asked
+    for, which is the failure the whole band exists to avoid."""
+    result = subprocess.run(
+        [sys.executable, SCAN, os.path.join(SAMPLES, "human-sample.md"),
+         "--voice", "auto", "--voice-rules", WHIT3RABBIT_RULES],
+        capture_output=True, text=True)
+    assert result.returncode == 2, result.stdout
+
+
+# --------------------------------------------------------------------------
+# per-register voice rules
+# --------------------------------------------------------------------------
+#
+# The profile markdown has always distinguished on the clock from off it, and
+# until now the rules file could say so only for `required_when`. A writer can
+# now scope a mechanic or a banned_regex the same way.
+#
+# This is not the register relaxing a voice rule, which stays forbidden and is
+# pinned above. It is the writer saying which of their own rules applied where.
+# The direction matters: `--profile casual` still cannot soften anything on its
+# own, it can only select among rules the author already wrote.
+
+SHOUTY = "This is fine. No. It really is fine, and the build stays green.\n"
+
+
+def test_a_mechanic_can_be_scoped_to_a_register():
+    rules = {"voice": "t", "default_priority": "P0",
+             "mechanics": {"one_word_sentence": "forbid"},
+             "mechanics_by_register": {"casual": {"one_word_sentence": "allow"}}}
+    strict, _ = scan_with_rules(SHOUTY, rules)
+    relaxed, _ = scan_with_rules(SHOUTY, rules, "--profile", "casual")
+    assert "voice-one-word-sentence" in voice_ids(strict), strict["findings"]
+    assert "voice-one-word-sentence" not in voice_ids(relaxed), relaxed["findings"]
+
+
+def test_an_unscoped_mechanic_still_applies_everywhere():
+    """The default has not moved. Every profile written before this key existed
+    behaves exactly as it did, in every register."""
+    rules = {"voice": "t", "default_priority": "P0",
+             "mechanics": {"one_word_sentence": "forbid"}}
+    for profile in ("blog", "casual", "docs", "linkedin"):
+        result, _ = scan_with_rules(SHOUTY, rules, "--profile", profile)
+        assert "voice-one-word-sentence" in voice_ids(result), profile
+
+
+def test_a_banned_regex_can_be_scoped_to_a_register():
+    rules = {"voice": "t", "default_priority": "P0",
+             "banned_regex": [{"id": "no-lowercase-opener",
+                               "label": "Lowercase opener",
+                               "rx": "(?m)^[a-z]",
+                               "applies_to_registers": ["blog", "docs"]}]}
+    text = "hey, the build is green and the report is attached.\n"
+    strict, _ = scan_with_rules(text, rules, "--profile", "blog")
+    off, _ = scan_with_rules(text, rules, "--profile", "casual")
+    assert "no-lowercase-opener" in voice_ids(strict), strict["findings"]
+    assert "no-lowercase-opener" not in voice_ids(off), off["findings"]
+
+
+def test_scoped_mechanics_merge_two_levels_deep_under_extends():
+    """A child overriding one mechanic in `casual` must not drop the others the
+    parent scoped there. A shallow update silently unbans them, which is the
+    failure the whole merge section of voices.py is written against."""
+    parent = {"mechanics_by_register": {"casual": {"emoji": "allow",
+                                                   "one_word_sentence": "allow"}}}
+    child = {"mechanics_by_register": {"casual": {"emoji": "forbid"}}}
+    merged = voices.merge(parent, child)["mechanics_by_register"]["casual"]
+    assert merged == {"emoji": "forbid", "one_word_sentence": "allow"}, merged
+
+
+def test_voice_mechanics_resolves_the_active_register():
+    scan = load_scan()
+    rules = {"mechanics": {"emoji": "forbid", "semicolon": "forbid"},
+             "mechanics_by_register": {"casual": {"emoji": "allow"}}}
+    assert scan.voice_mechanics(rules, "blog") == {"emoji": "forbid",
+                                                   "semicolon": "forbid"}
+    assert scan.voice_mechanics(rules, "casual") == {"emoji": "allow",
+                                                     "semicolon": "forbid"}
+
+
+# --------------------------------------------------------------------------
+# blending
+# --------------------------------------------------------------------------
+#
+# voice.md specified a blend precisely enough to be code and only `extends`
+# existed, so half the doc was a promise the machinery could not keep. The
+# rules-file half is code now. The dimensions half is not and cannot be: those
+# numbers live in the profile markdown and no threshold in this engine reads
+# them, which the doc now says instead of implying.
+
+LEFT = {"voice": "ada", "default_priority": "P0",
+        "mechanics": {"em_dash": "forbid", "oxford_comma": "require",
+                      "max_paragraph_sentences": 5, "date_format": "dmy"},
+        "banned_words": ["synergy"],
+        "banned_regex": [{"id": "shared", "rx": "a", "priority": "P0"},
+                         {"id": "ada-only", "rx": "b"}]}
+GRACE = {"voice": "grace", "default_priority": "P2",
+         "mechanics": {"em_dash": "allow", "oxford_comma": "allow",
+                       "max_paragraph_sentences": 9, "date_format": "mdy"},
+         "banned_words": ["piggyback"],
+         "banned_regex": [{"id": "shared", "rx": "z", "priority": "P2"},
+                          {"id": "grace-only", "rx": "y"}]}
+
+
+def test_bans_union_and_neither_side_can_drop_one():
+    rules, _ = voices.blend(LEFT, GRACE, 0.9)
+    assert set(rules["banned_words"]) == {"synergy", "piggyback"}
+    assert {e["id"] for e in rules["banned_regex"]} == {"shared", "ada-only",
+                                                        "grace-only"}
+
+
+def test_the_stricter_mechanic_wins_whatever_the_weight_says():
+    """The weight is a statement about emphasis, not permission. A blend that
+    can drop a refusal is a blend nobody can rely on."""
+    for weight in (0.0, 0.1, 0.5, 0.9, 1.0):
+        rules, _ = voices.blend(LEFT, GRACE, weight)
+        assert rules["mechanics"]["em_dash"] == "forbid", weight
+        assert rules["mechanics"]["max_paragraph_sentences"] == 5, weight
+        assert rules["default_priority"] == "P0", weight
+
+
+def test_a_side_with_no_opinion_yields_to_the_side_with_one():
+    """`allow` on the serial comma is the absence of a rule, not a competing
+    one, so it does not get to cancel the profile that has a habit."""
+    rules, _ = voices.blend(LEFT, GRACE, 0.1)
+    assert rules["mechanics"]["oxford_comma"] == "require", rules["mechanics"]
+
+
+def test_a_real_conflict_is_broken_by_weight_and_reported():
+    """`dmy` and `mdy` are two conventions rather than degrees of one. Picking
+    silently is the choice the person whose name goes on this has to see."""
+    heavy_left, notes = voices.blend(LEFT, GRACE, 0.9)
+    heavy_right, _ = voices.blend(LEFT, GRACE, 0.1)
+    assert heavy_left["mechanics"]["date_format"] == "dmy"
+    assert heavy_right["mechanics"]["date_format"] == "mdy"
+    assert any("date_format" in n for n in notes), notes
+
+
+def test_the_lineage_is_written_into_the_file():
+    rules, _ = voices.blend(LEFT, GRACE, 0.7, name="ada-grace")
+    assert rules["voice"] == "ada-grace"
+    assert rules["blend"] == {"of": ["ada", "grace"], "weight": 0.7}
+
+
+def test_a_blend_is_not_a_child_of_either_parent():
+    """`extends` surviving would send load() off to re-merge a parent whose
+    rules are already folded in, at a path relative to a file that is gone."""
+    rules, _ = voices.blend(dict(LEFT, extends="somebody"), GRACE, 0.7)
+    assert "extends" not in rules, rules
+
+
+def test_the_notes_say_the_dimensions_were_not_blended():
+    """The half a script cannot do has to be handed back explicitly, or the
+    person reads a generated file as the whole answer."""
+    _, notes = voices.blend(LEFT, GRACE, 0.7)
+    assert any("dimensions" in n for n in notes), notes
+
+
+def test_a_weight_outside_the_range_is_an_error():
+    try:
+        voices.blend(LEFT, GRACE, 1.5)
+    except voices.VoiceError as exc:
+        assert "between 0 and 1" in str(exc), str(exc)
+    else:
+        raise AssertionError("a weight of 1.5 was accepted")
+
+
+def test_a_blended_profile_loads_and_scans():
+    """The output is a rules file, not a report about one. If scan.py cannot
+    enforce it, the whole exercise produced a document."""
+    scratch = tempfile.mkdtemp()
+    try:
+        rules, _ = voices.blend(LEFT, GRACE, 0.7, name="ada-grace")
+        path = written(scratch, "ada-grace.rules.json", json.dumps(rules))
+        result, _ = scan_text("We need more synergy, and piggyback on it.\n" * 6,
+                              "--voice-rules", path)
+        found = voice_ids(result)
+        assert found.count("voice-banned-word") >= 2, result["findings"]
     finally:
         shutil.rmtree(scratch, ignore_errors=True)

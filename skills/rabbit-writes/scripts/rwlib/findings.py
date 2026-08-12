@@ -17,6 +17,14 @@ A finding is a dict with exactly these keys:
                 second line of a report, and it is where a structural finding
                 puts its entire explanation.
 
+Two optional keys, both set by rwlib.suppress and absent otherwise:
+
+    suppressed     the reason an inline `rabbit-allow` comment gave for it.
+    suppressed_at  the line that comment is on.
+
+A finding carrying them is reported and does not count. See suppress.py for why
+it stays in the list rather than being dropped.
+
 readme_check.py used to spell the last one `detail` and drop `match` entirely,
 so its reporter had to branch on the band to decide which key held the text and
 no downstream consumer could read both checkers with one parser. That is why
@@ -26,7 +34,7 @@ finds out at parse time when the shape moves, rather than by rendering blanks.
 SCHEMA_VERSION goes up when a key is removed, renamed, or changes meaning.
 Adding an optional key does not move it.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 SCHEMA_VERSION = 1
@@ -63,10 +71,23 @@ def sort_key(f):
 
 
 def counts(findings):
-    """The per-priority and per-band tallies both CLIs report."""
+    """The per-priority and per-band tallies both CLIs report.
+
+    A suppressed finding is counted under `suppressed` and nowhere else. It has
+    to come out of the priority tallies, because those are what `--check` and
+    every summary line read, and leaving it in would make an allowed finding
+    fail the build it was allowed for. It gets its own number rather than
+    vanishing, because a report that says "0 P0" over a document with three
+    allowed P0s in it is the silent suppression rwlib/suppress.py refuses to
+    ship.
+    """
     out = {p: 0 for p in PRIORITIES}
     out.update({b: 0 for b in BANDS})
+    out["suppressed"] = 0
     for f in findings:
+        if "suppressed" in f:
+            out["suppressed"] += 1
+            continue
         if f["priority"] in out:
             out[f["priority"]] += 1
         if f["band"] in out:

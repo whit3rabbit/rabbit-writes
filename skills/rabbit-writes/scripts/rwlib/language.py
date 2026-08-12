@@ -22,7 +22,7 @@ non-Latin script, which is the case where the output is worthless rather than
 merely imprecise, and being wrong about French costs a note nobody has to act
 on.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 import re

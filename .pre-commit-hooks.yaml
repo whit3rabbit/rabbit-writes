@@ -26,15 +26,57 @@
 # reads the run from the left: it knows `--voice-rules` takes a value, so the
 # profile path stays a value instead of becoming a sixth file to scan.
 #
-# All three gate on P0 only. A P1 is a convention worth arguing about and a P2
-# is polish, and a hook that blocks a commit over polish is a hook people learn
-# to pass --no-verify to, at which point it stops catching the P0s as well.
+# The voice hooks say `--voice auto` rather than naming a file. A path inside
+# *this* repository does not resolve from the consuming repository's working
+# directory, which is where a hook runs, and the shipped default used to be
+# exactly that: precommit.py still falls back to resolving a plugin-relative
+# `--voice-rules` against its own root, but nothing shipped depends on it now.
+# `auto` asks the same question readme_check.py asks, in the same order: a
+# `.rabbit-voice` file in your repository, then the plugin's voices/ACTIVE, then
+# a lone installed profile. Your pin wins, which is the behaviour a path could
+# not give you. Point `args` at `--voice-rules <your path>` to be explicit.
+#
+# They gate on P0 only. A P1 is a convention worth arguing about and a P2 is
+# polish, and a hook that blocks a commit over polish is a hook people learn to
+# pass --no-verify to, at which point it stops catching the P0s as well.
+#
+# No voice profile by default. pre-commit clones this repository, so
+# voices/ACTIVE arrives set to this repository's author, and under a hook the
+# note explaining the fallback goes nowhere anybody reads. A stranger's em dash
+# is not a defect in a stranger's README. Opt in with readme-check-voice or
+# rabbit-scan-voice once you have run voice-setup or dropped a .rabbit-voice in
+# your repository.
+#
+# `rabbit-scan` is P0-gated and unscoped by default. One of those P0s is a chat
+# citation marker, which is checked against the raw text, so a document that
+# quotes `citeturn0search0` in backticks to warn about it will block the
+# commit. Two ways out, and the second is usually the better one:
+#
+#   files: ^docs/         turns the check off for everything else
+#   <!-- rabbit-allow: citation-leak (this page catalogues them) -->
+#
+# The comment goes in the document and applies to that file only. The reason is
+# mandatory, and the finding is still printed with the reason beside it: what
+# changes is the exit code, not what the report says. `files:` is the blunter
+# tool and stays available for a directory of generated markdown nobody wrote.
 
 - id: readme-check
-  name: README structure and voice
+  name: README structure
   description: >-
     Check a README against the conventions measured across 100 trending
-    repositories, and against the active voice profile. Fails on P0 only.
+    repositories, and for the fingerprints of machine-written prose. Fails on
+    P0 only. No voice profile: see readme-check-voice.
+  entry: scripts/precommit.py readme --check --no-voice
+  language: script
+  files: (^|/)README(\.md)?$
+  pass_filenames: true
+
+- id: readme-check-voice
+  name: README structure and voice
+  description: >-
+    The same check with the active voice profile applied, so this writer's own
+    mechanics are defects rather than notes. Only useful once voices/ACTIVE
+    names you, or a .rabbit-voice file in your repository pins your profile.
   entry: scripts/precommit.py readme --check
   language: script
   files: (^|/)README(\.md)?$
@@ -56,9 +98,12 @@
   name: prose scan against a voice
   description: >-
     The same scan with a voice profile applied, so a banned word is a defect
-    rather than a note. Override `args` to point at your own profile.
+    rather than a note. Resolves your `.rabbit-voice` first. Without one it
+    falls back to the cloned plugin's voices/ACTIVE, which is this repository's
+    author and almost certainly not you: drop a .rabbit-voice in your repository,
+    or override `args` with `--voice-rules <path relative to your root>`.
   entry: scripts/precommit.py scan --check
   language: script
   types: [markdown]
   pass_filenames: true
-  args: [--voice-rules, skills/rabbit-writes/voices/whit3rabbit.rules.json]
+  args: [--voice, auto]

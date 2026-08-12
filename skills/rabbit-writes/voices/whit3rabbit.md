@@ -131,3 +131,28 @@ The full catalog is in the engine, under `references/`, and applies on top of th
 ## The final check
 
 Before sending: **is it easy to read and clear?** And does it stand on its own, tell its own story, and show the homework was done, not made up?
+
+---
+
+## Quick reference card
+
+Nothing new here. This is the sheet to keep open while drafting, and everything on it is argued for above.
+
+- **Always:** BLUF, then the evidence under it. A true greeting. A specific acknowledgment of the person's effort. Exact numbers on anything serious. Calibrated certainty, "I believe" when it is conviction and "I know" when it is fact.
+- **Never:** em dashes, semicolons, emojis, a one-word sentence with a hard period, an absolute claim, a buzzword off the Hard nos list, an attack on a person rather than the problem, or any claim not actually believed.
+- **Signature phrases and structures:** "Attached is…" leading a document. The feedback sandwich, with the middle left blunt. "Thanks," + "-whit3rabbit" informally, "v/r" officially. "Forgive me, here it is again" for a mistake, once, with no excuse after it.
+- **Litmus test:** does this sound like something I would actually write, or like something trying very hard to imitate me?
+
+---
+
+## Anti-overfitting guide
+
+- **Spirit over letter.** Internalize the sensibility. A draft that uses a few of these naturally beats one that crams in all of them, which is the same thing the opening paragraph says and the thing most likely to be forgotten by the bottom of the page.
+- **Frequency.** Not every rule above carries the same weight:
+  - **Hard rule, never violated:** everything under Hard nos, and the four punctuation bans under Mechanics. These are the ones the rules file enforces mechanically, and a hit is a defect rather than a preference.
+  - **Strong tendency, 70 to 80% of the time:** BLUF, short paragraphs, the feedback sandwich, signposted transitions. Breaking one because the piece is better for it is fine. Breaking all of them is a different writer.
+  - **Light preference, when it fits:** the exclamation point used as a warmth tool, subgrouping past 5 or 6 bullets, dry humor with people who will catch it.
+- **What matters most.** If only three survive:
+  1. Write to a real person, and respect their time.
+  2. Lead with the conclusion and put the evidence under it.
+  3. Never attack the person, and never write anything untrue.

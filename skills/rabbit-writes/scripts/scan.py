@@ -14,7 +14,8 @@ check.
 
 Findings come back in three bands:
 
-    voice        this writer's own rules, from --voice-rules. A hit is a defect.
+    voice        this writer's own rules, from --voice-rules or --voice.
+                 A hit is a defect.
     fingerprint  evidence the text came out of a chat tool.
     craft        general writing problems, never evidence about authorship.
 
@@ -30,18 +31,28 @@ Usage:
     python3 scan.py draft.md --sarif > scan.sarif
     python3 scan.py draft.md --profile technical-blog
     python3 scan.py draft.md --voice-rules ../../rabbit-writes/voices/whit3rabbit.rules.json
+    python3 scan.py draft.md --voice auto     # whichever profile this repo pins
+    python3 scan.py draft.md --voice dana     # voices/dana.rules.json
     python3 scan.py --profile casual < input.txt
     python3 scan.py draft.md --no-exempt      # score quoted examples too
     python3 scan.py draft.md --apply-safe     # show the mechanical fixes
     python3 scan.py draft.md --apply-safe --write
 
+No profile is applied unless one is asked for. That is deliberate rather than an
+oversight: this script is what the `rabbit-scan` pre-commit hook runs, the hook
+runs in somebody else's repository, and a stranger's em dash is not a defect in a
+stranger's README. `--voice auto` is the opt-in.
+
 A register profile relaxes the general rules. It never relaxes a voice rule:
 lowercase and loose punctuation are fine off the clock, a banned phrase is not.
 
 Exit codes: 0 clean; 1 when --check is passed and a P0 finding is present; 2 when
---voice-rules names a file that cannot be read or does not parse, because
-silently scanning without the voice rules that were asked for would report a
-clean voice band on a document nobody checked. Stdlib only; runs on Python 3.8+.
+a profile *named by hand*, with --voice-rules or `--voice <name>`, cannot be read
+or does not parse, because silently scanning without the voice rules that were
+asked for would report a clean voice band on a document nobody checked. A
+`--voice auto` that finds no profile is a note and still exits 0: plenty of repos
+have none, and failing there only teaches people to drop the flag.
+Stdlib only; runs on Python 3.9+.
 """
 
 import argparse
@@ -60,12 +71,12 @@ if HERE not in sys.path:
     sys.path.insert(0, HERE)
 
 from rwlib import fixes as fixes_mod             # noqa: E402
-from rwlib import language, registers, sarif     # noqa: E402
+from rwlib import inflect, language, registers, sarif, suppress  # noqa: E402
 from rwlib import findings as findings_mod       # noqa: E402
 from rwlib import lexicon as lexicon_mod         # noqa: E402
 from rwlib import voices as voices_mod           # noqa: E402
 from rwlib.artifacts import (HIDDEN_UNICODE, SPACE_LIKE_TOLERANCE,  # noqa: E402
-                             SPACE_LIKE_UNICODE)
+                             SPACE_LIKE_UNICODE, occurrences)
 # QUOTED_RX and SENTENCE_SENTINEL are re-exports rather than callers. Two
 # tests assert `scan.QUOTED_RX is verify.QUOTED_RX` and pin the sentinel
 # codepoint through this module, which is what makes "one home per fact"
@@ -74,12 +85,18 @@ from rwlib.artifacts import (HIDDEN_UNICODE, SPACE_LIKE_TOLERANCE,  # noqa: E402
 from rwlib.markdown import (BLOCKQUOTE_RX, CURLY_QUOTE_RX, FENCE_RX,  # noqa: E402,F401
                             FRONTMATTER_RX, HEADING_LINE_RX, INLINE_CODE_RX,
                             PROSE_DASH_RX, QUOTED_RX, TABLE_ROW_RX,
-                            URL_GREEDY_RX, apply_exemptions, excerpt,
-                            is_prose_block, line_of)
+                            URL_GREEDY_RX, apply_exemptions, blank_entities,
+                            excerpt, is_prose_block, line_of)
 from rwlib.sentences import (SENTENCE_SENTINEL, split_sentences,  # noqa: E402,F401
                              syllables, tokenize)
 
 LEXICON_PATH = lexicon_mod.LEXICON_PATH
+
+# The priority of a finding this engine raises itself, read out of the table in
+# rwlib/lexicon.py at each call site. A catalogue pattern carries its own in its
+# entry; these used to carry theirs as a string literal here, with the table
+# beside them and a comment asking the next person to keep the two in step.
+SYNTH = lexicon_mod.synthetic_priority
 
 # The tolerance matrix, read from registers.json rather than restated here.
 # These three names are what validate.py and the test suite check, and they used
@@ -338,11 +355,48 @@ def voice_finding(rules_id, label, priority, line, match, excerpt_text):
                              match=match, excerpt=excerpt_text)
 
 
+def voice_mechanics(rules, register):
+    """The mechanics in force for this register.
+
+    `mechanics` is the writer's baseline and `mechanics_by_register` is where
+    they say what changes off the clock:
+
+        "mechanics": {"one_word_sentence": "forbid", "emoji": "forbid"},
+        "mechanics_by_register": {"casual": {"one_word_sentence": "allow"}}
+
+    This does not break the rule that a register never relaxes a voice rule. It
+    is the opposite direction. `--profile casual` still cannot soften anything;
+    what it can do now is select which of the writer's own rules the writer said
+    applied there. The profile markdown has always drawn this line ("on the
+    clock: full polish, off the clock: relaxed, lowercase"), and until now the
+    rules file had no way to say it, so the enforceable half was making a promise
+    against the readable half.
+
+    Merged key by key over the baseline, so an override names only what moves.
+    """
+    mech = dict(rules.get("mechanics", {}))
+    mech.update(rules.get("mechanics_by_register", {}).get(register, {}))
+    return mech
+
+
+def in_register(entry, register):
+    """Whether a rules entry applies to the register being scanned.
+
+    An entry that says nothing applies everywhere, which is what keeps every
+    profile written before this key existed behaving exactly as it did.
+    """
+    applies_to = entry.get("applies_to_registers")
+    return not applies_to or register in applies_to
+
+
 def apply_voice_rules(scored, raw_text, rules, stats, findings):
     """Enforce one writer's own rules. These sit above the register profile:
-    a register can relax a general rule, never a voice rule."""
+    a register can relax a general rule, never a voice rule. A writer can scope
+    their own rule to a register, which is a different thing: see
+    voice_mechanics."""
     default = rules.get("default_priority", "P0")
-    mech = rules.get("mechanics", {})
+    register = stats.get("_profile")
+    mech = voice_mechanics(rules, register)
     subs = rules.get("preferred_substitutions", {})
 
     def fix_hint(term):
@@ -368,7 +422,12 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
                 "This writer uses em dashes, but not this many."))
 
     if mech.get("semicolon") == "forbid":
-        for m in re.finditer(r";", scored):
+        # Positions taken from a copy with the character references blanked, and
+        # everything reported out of `scored`. `&amp;` and `&nbsp;` each end in a
+        # semicolon that is markup rather than punctuation, and a header block
+        # full of them used to report a finding apiece. Blanking preserves
+        # length, so the offsets still point at the same characters.
+        for m in re.finditer(r";", blank_entities(scored)):
             findings.append(voice_finding(
                 "voice-semicolon", "Semicolon (voice forbids)", default,
                 line_of(scored, m.start()), ";",
@@ -465,16 +524,21 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
             % (stats["avg_sentence_words"], cap), default, 1,
             "avg sentence length", "This writer writes shorter than this."))
 
-    # Word and phrase bans.
+    # Word and phrase bans. Flattened through rwlib.inflect, which turns an
+    # entry that asked for it into the term plus its regular s/es/ed/ing forms
+    # and leaves a plain string exactly as written. A profile using neither
+    # feature reaches word_regex with the same list it always did.
     if rules.get("banned_words"):
-        for m in lexicon_mod.word_regex(rules["banned_words"]).finditer(scored):
+        words = inflect.expand(rules["banned_words"])
+        for m in lexicon_mod.word_regex(words).finditer(scored):
             findings.append(voice_finding(
                 "voice-banned-word", "Banned word", default,
                 line_of(scored, m.start()), m.group(0),
                 fix_hint(m.group(0))))
 
     if rules.get("banned_phrases"):
-        for m in lexicon_mod.phrase_regex(rules["banned_phrases"]).finditer(scored):
+        phrases = inflect.expand(rules["banned_phrases"])
+        for m in lexicon_mod.phrase_regex(phrases).finditer(scored):
             findings.append(voice_finding(
                 "voice-banned-phrase", "Banned phrase", default,
                 line_of(scored, m.start()), m.group(0),
@@ -482,6 +546,11 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
 
     # Custom regexes, including overuse rules that allow N hits before flagging.
     for entry in rules.get("banned_regex", []):
+        # Scoped the same way required_when is, and for the same reason: a rule
+        # about how a writer signs off, or about lowercase openers, is a rule
+        # about a context rather than about the whole person.
+        if not in_register(entry, register):
+            continue
         try:
             rx = re.compile(entry["rx"])
         except (re.error, KeyError) as exc:
@@ -507,8 +576,7 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
     # Without a gate, "missing closer" fires on every document that is not a
     # letter, which is most of them.
     for entry in rules.get("required_when", []):
-        applies_to = entry.get("applies_to_registers")
-        if applies_to and stats.get("_profile") not in applies_to:
+        if not in_register(entry, register):
             continue
         gate = entry.get("when_rx")
         if gate and not re.search(gate, scored):
@@ -521,7 +589,16 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
                 entry.get("note", "")))
 
 
-def scan(raw_text, profile=None, exempt=True, voice_rules=None):
+def scan(raw_text, profile=None, exempt=True, voice_rules=None,
+         suppressions=True):
+    """`suppressions=False` leaves the inline `rabbit-allow` comments alone.
+
+    readme_check.py passes it, because it merges these findings with its own
+    structure findings and then runs one suppression pass over the whole list.
+    Run here as well, it would audit the same comments twice, and report a
+    suppression naming a structure id as covering nothing: this function cannot
+    see the half of the report that id belongs to.
+    """
     profile = profile or DEFAULT_REGISTER
     lex = lexicon_mod.load()
     scored = apply_exemptions(raw_text) if exempt else raw_text
@@ -533,16 +610,29 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None):
 
     # 1. Hidden unicode. Checked on the raw text; exemptions do not apply,
     #    because a zero-width space inside a code fence is still a paste artifact.
-    for ch, name in HIDDEN_UNICODE.items():
-        n = raw_text.count(ch)
+    #    Offsets rather than a bare count, so the reported line is the first
+    #    occurrence that actually counted rather than the first one in the file,
+    #    and so the emoji-joiner carve-out has something to filter. fixes.py
+    #    counts the same way, or the two disagree about whether a rule fired.
+    #    Gated on `skip` like every other finding the engine raises itself. No
+    #    register asks for it today, and until this line existed none could: the
+    #    loop ran before anything read the skip set, so a cell naming
+    #    hidden-unicode in registers.json would have been a silent no-op that
+    #    read in the rendered matrix as a tolerance somebody was honouring.
+    for ch, name in (HIDDEN_UNICODE.items() if "hidden-unicode" not in skip else []):
+        at = occurrences(raw_text, ch)
+        n = len(at)
         space_like = ch in SPACE_LIKE_UNICODE
         if space_like and n <= SPACE_LIKE_TOLERANCE:
             continue
         if n:
             findings.append(findings_mod.make(
                 "hidden-unicode", "Hidden unicode: %s" % name, "fingerprint",
-                "P2" if space_like else "P0",
-                line_of(raw_text, raw_text.index(ch)),
+                # The table names the worst this id reaches. The space-like half
+                # is softer, and says so here rather than in the table, because
+                # a register reading the table needs the ceiling.
+                "P2" if space_like else SYNTH("hidden-unicode"),
+                line_of(raw_text, at[0]),
                 match="U+%04X x%d" % (ord(ch), n),
                 excerpt=("%d of them, past the %d a typesetter would use. "
                          "Check they are deliberate before replacing them."
@@ -571,14 +661,15 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None):
     if "tier1" not in skip:
         t1 = [w for w in lex["tier1"] if w.lower() not in exempt_words]
         find(scored, lexicon_mod.word_regex(t1), "tier1", "Tier-1 vocabulary",
-             "fingerprint", "P1", findings)
+             "fingerprint", SYNTH("tier1"), findings)
         find(scored, lexicon_mod.phrase_regex(lex["tier1_phrases"]), "tier1", "Tier-1 phrase",
-             "fingerprint", "P1", findings)
+             "fingerprint", SYNTH("tier1"), findings)
 
-    find(scored, lexicon_mod.word_regex(lex["clarity"]), "clarity", "Wordiness",
-         "craft", "P1", findings)
-    find(scored, lexicon_mod.phrase_regex(lex["clarity_phrases"]), "clarity", "Wordiness",
-         "craft", "P1", findings)
+    if "clarity" not in skip:
+        find(scored, lexicon_mod.word_regex(lex["clarity"]), "clarity", "Wordiness",
+             "craft", SYNTH("clarity"), findings)
+        find(scored, lexicon_mod.phrase_regex(lex["clarity_phrases"]), "clarity",
+             "Wordiness", "craft", SYNTH("clarity"), findings)
 
     # Tier 2 fires only when two or more land in the same paragraph.
     if "tier2-cluster" not in skip:
@@ -591,7 +682,7 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None):
                 findings.append(findings_mod.make(
                     "tier2-cluster",
                     "Tier-2 cluster (%d in one paragraph)" % len(hits),
-                    "craft", "P1", line_of(scored, offset),
+                    "craft", SYNTH("tier2-cluster"), line_of(scored, offset),
                     match=", ".join(sorted({h.group(0).lower() for h in hits})),
                     excerpt=excerpt(para, hits[0].start(), hits[-1].end())))
             offset += len(para)
@@ -606,7 +697,8 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None):
             findings.append(findings_mod.make(
                 "tier3-density",
                 "Tier-3 saturation (%.1f%% of words)" % (density * 100),
-                "craft", "P2", line_of(scored, hits[0].start()) if hits else 1,
+                "craft", SYNTH("tier3-density"),
+                line_of(scored, hits[0].start()) if hits else 1,
                 match=", ".join(sorted({h.group(0).lower() for h in hits})[:12]),
                 excerpt="Replace some with specifics: numbers, comparisons, examples."))
 
@@ -616,24 +708,25 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None):
         if "uniformity" not in skip and b < BANDS["burstiness"][0]:
             findings.append(findings_mod.make(
                 "uniformity", "Low burstiness (%.2f, human range %.2f-%.2f)"
-                % (b, *BANDS["burstiness"]), "craft", "P1", 1,
+                % (b, *BANDS["burstiness"]), "craft", SYNTH("uniformity"), 1,
                 match="sd/mean of sentence length",
                 excerpt="Sentence lengths are too even. Mix 3-8 word sentences "
                         "with 20+ word ones. Vary the sentences, not the punctuation."))
         m = stats.get("mattr")
-        if m is not None and m < BANDS["mattr"][0]:
+        if "low-diversity" not in skip and m is not None and m < BANDS["mattr"][0]:
             findings.append(findings_mod.make(
                 "low-diversity",
                 "Low vocabulary diversity (MATTR %.2f, human range %.2f-%.2f)"
-                % (m, *BANDS["mattr"]), "craft", "P2", 1,
+                % (m, *BANDS["mattr"]), "craft", SYNTH("low-diversity"), 1,
                 match="moving-average type-token ratio",
                 excerpt="Broaden the what, not the thesaurus: name specific things, "
                         "cite specific cases, replace a reused abstract noun with the instance."))
         tr = stats.get("trigram_repetition", 0)
-        if tr > BANDS["trigram_repetition"][1]:
+        if "trigram-repetition" not in skip and tr > BANDS["trigram_repetition"][1]:
             findings.append(findings_mod.make(
                 "trigram-repetition",
-                "Repeated 3-word phrases (%.1f%%)" % (tr * 100), "craft", "P2", 1,
+                "Repeated 3-word phrases (%.1f%%)" % (tr * 100), "craft",
+                SYNTH("trigram-repetition"), 1,
                 match="trigram repetition",
                 excerpt="The draft reuses the same phrasings. Rewrite the repeats or cut them."))
         psd = stats.get("paragraph_sd")
@@ -642,7 +735,7 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None):
             findings.append(findings_mod.make(
                 "uniform-paragraphs",
                 "Uniform paragraph length (sd %.2f sentences)" % psd,
-                "craft", "P2", 1, match="paragraph length",
+                "craft", SYNTH("uniform-paragraphs"), 1, match="paragraph length",
                 excerpt="Every paragraph is about the same size. Some should be one sentence."))
 
     if "em-dash-rate" not in skip:
@@ -654,7 +747,7 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None):
         if rate > BANDS["em_dashes_per_1k"][1] and stats.get("em_dashes", 0) > allowed:
             findings.append(findings_mod.make(
                 "em-dash-rate", "Em-dash rate %.1f per 1,000 words" % rate,
-                "craft", "P1", 1,
+                "craft", SYNTH("em-dash-rate"), 1,
                 match="%d em/en dashes" % stats.get("em_dashes", 0),
                 excerpt="Guidance, not a ban. A user's writing sample overrides this. "
                         "Never add one during a rewrite."))
@@ -662,6 +755,15 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None):
     # Voice rules run last and are never suppressed by the register profile.
     if voice_rules:
         apply_voice_rules(scored, raw_text, voice_rules, stats, findings)
+
+    # Inline `rabbit-allow` comments, after every finding exists and before the
+    # sort. Marked, never dropped: a suppressed finding is still reported, it
+    # just stops counting. See rwlib/suppress.py.
+    if suppressions:
+        allowances, problems = suppress.parse(raw_text)
+        used = suppress.apply(findings, allowances)
+        findings.extend(suppress.audit(allowances, problems, used,
+                                       findings_mod.make))
 
     stats.pop("_profile", None)
     findings.sort(key=findings_mod.sort_key)
@@ -705,6 +807,13 @@ def report(findings, stats, profile, exempt, voice_name=None, notes=()):
         out.append("note: %s" % note)
     out.append("")
 
+    # Suppressed findings are held out of the priority sections and printed
+    # under their own heading below. They do not count and they are not hidden:
+    # see rwlib/suppress.py on why a mechanism that made a P0 disappear quietly
+    # would be worse than the `files:` scoping it replaces.
+    allowed = suppress.suppressed(findings)
+    findings = suppress.live(findings)
+
     if not findings:
         out.append("No mechanical findings. The judgment layer still applies: "
                    "run references/patterns.md and references/checklist.md.")
@@ -733,6 +842,15 @@ def report(findings, stats, profile, exempt, voice_name=None, notes=()):
                     if n > 4:
                         out.append("    ... and %d more %s" % (n - 4, pid))
             out.append("")
+
+    if allowed:
+        out.append("suppressed by rabbit-allow (%d, not counted above)"
+                   % len(allowed))
+        for f in allowed:
+            out.append("    L%-4d %-32s %s" % (f["line"], f["label"], f["match"]))
+            out.append("          allowed at L%d: %s"
+                       % (f["suppressed_at"], f["suppressed"]))
+        out.append("")
 
     out.append("stylometrics")
     rows = [
@@ -891,9 +1009,20 @@ def main():
                          "repository root. Defaults to the file argument")
     ap.add_argument("--no-exempt", action="store_true",
                     help="also score quoted examples, code, tables, and block quotes")
-    ap.add_argument("--voice-rules", metavar="PATH",
-                    help="a voice's <name>.rules.json; its findings land in the "
-                         "'voice' band and are never relaxed by --profile")
+    # One profile, named one of two ways. Both in a mutually exclusive group
+    # because silently preferring one over the other produces a report about a
+    # profile nobody asked for, which is the failure this band exists to avoid.
+    voice_group = ap.add_mutually_exclusive_group()
+    voice_group.add_argument("--voice-rules", metavar="PATH",
+                             help="a voice's <name>.rules.json; its findings land in the "
+                                  "'voice' band and are never relaxed by --profile")
+    voice_group.add_argument("--voice", metavar="NAME",
+                             help="resolve the profile instead of spelling out a path. "
+                                  "'auto' uses the same order readme_check.py does "
+                                  "(.rabbit-voice beside the file or in the working "
+                                  "directory, then voices/ACTIVE, then a lone installed "
+                                  "profile), and anything else loads "
+                                  "voices/<NAME>.rules.json")
     ap.add_argument("--check", action="store_true",
                     help="exit 1 if any P0 finding is present")
     ap.add_argument("--apply-safe", action="store_true",
@@ -924,14 +1053,39 @@ def main():
         text = sys.stdin.read()
 
     voice_rules, voice_name, lineage = None, None, []
-    if args.voice_rules:
+    # `named` is the difference between "you asked for this profile" and "this
+    # is the one that turned up". A profile asked for by name and not readable
+    # exits 2, because a clean voice band on a profile nobody read is a false
+    # pass. A profile that only fails to *resolve* under --voice auto is a note
+    # and the run continues, because plenty of repos have none and failing there
+    # teaches people to drop the flag. readme_check.py draws the line in the
+    # same place.
+    rules_path, voice_note, named = args.voice_rules, None, bool(args.voice_rules)
+    if args.voice:
+        if args.voice == "auto":
+            rules_path, _, voice_note = voices_mod.resolve(args.file)
+        else:
+            named = True
+            rules_path = os.path.join(voices_mod.VOICES_DIR,
+                                      args.voice + voices_mod.RULES_SUFFIX)
+            if not os.path.exists(rules_path):
+                print("scan: no profile named %r in %s. Installed: %s"
+                      % (args.voice, voices_mod.VOICES_DIR,
+                         ", ".join(voices_mod.installed()) or "none"),
+                      file=sys.stderr)
+                return 2
+    if rules_path:
         try:
-            voice_rules = voices_mod.load(args.voice_rules)
-            lineage = voices_mod.lineage(args.voice_rules)
+            voice_rules = voices_mod.load(rules_path)
+            lineage = voices_mod.lineage(rules_path)
         except voices_mod.VoiceError as exc:
-            print("scan: %s" % exc, file=sys.stderr)
-            return 2
-        voice_name = voice_rules.get("voice", os.path.basename(args.voice_rules))
+            if named:
+                print("scan: %s" % exc, file=sys.stderr)
+                return 2
+            voice_note = ("%s. No voice band in this report, everything else "
+                          "still ran" % exc)
+        else:
+            voice_name = voice_rules.get("voice", os.path.basename(rules_path))
 
     if args.apply_safe:
         return run_apply_safe(text, args.file, voice_rules, args.write,
@@ -939,7 +1093,7 @@ def main():
 
     exempt = not args.no_exempt
     findings, stats = scan(text, args.profile, exempt, voice_rules)
-    notes = [n for n in (language.note(text),) if n]
+    notes = [n for n in (language.note(text), voice_note) if n]
 
     if args.sarif:
         uri = args.sarif_uri or args.file or "stdin"
@@ -955,7 +1109,11 @@ def main():
     else:
         print(report(findings, stats, args.profile, exempt, voice_name, notes))
 
-    if args.check and any(f["priority"] == "P0" for f in findings):
+    # A suppressed P0 does not fail the run. That is the whole point of the
+    # mechanism, and it is why the reason is mandatory and the finding is still
+    # printed above.
+    if args.check and any(f["priority"] == "P0" and "suppressed" not in f
+                          for f in findings):
         return 1
     return 0
 

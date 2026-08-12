@@ -8,12 +8,13 @@ the same file, and "measured against lexicon 3" is only checkable if the file
 says which version it is. `version` is that field, echoed into scan's --json
 output and into PROOF.md's header.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 import json
 import os
 import re
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LEXICON_PATH = os.path.join(os.path.dirname(HERE), "lexicon.json")
@@ -25,7 +26,60 @@ SYNTHETIC_FINDING_IDS = frozenset({
     "hidden-unicode", "tier1", "clarity", "tier2-cluster", "tier3-density",
     "uniformity", "low-diversity", "trigram-repetition", "uniform-paragraphs",
     "em-dash-rate",
+    # Findings about the suppression comments themselves. See rwlib/suppress.py.
+    "suppression-invalid", "suppression-unused",
 })
+
+# The worst priority each of those can be raised at, which a catalogue pattern
+# carries in its own entry and a synthetic finding has nowhere else to put. Only
+# hidden-unicode reaches P0, and only for the zero-width half of its table.
+#
+# scan.py reads this table at each call site rather than repeating the string,
+# so there is nothing left to keep in step. It used to be a hand-sync, with a
+# test that pinned the two id sets equal and said nothing about whether the
+# engine agreed on the priority: `registers.problems` could be told a finding was
+# P1 while scan.py raised it at P2, and the p0-only check silently covered the
+# wrong set. Add an id here and to SYNTHETIC_FINDING_IDS, and synthetic_priority
+# raises on any id that is only in one.
+SYNTHETIC_PRIORITIES = {
+    "hidden-unicode": "P0",
+    "tier1": "P1",
+    "clarity": "P1",
+    "tier2-cluster": "P1",
+    "uniformity": "P1",
+    "em-dash-rate": "P1",
+    "suppression-invalid": "P1",
+    "tier3-density": "P2",
+    "low-diversity": "P2",
+    "trigram-repetition": "P2",
+    "uniform-paragraphs": "P2",
+    "suppression-unused": "P2",
+}
+
+
+def synthetic_priority(finding_id):
+    """The priority scan.py raises this synthetic finding at.
+
+    Raises rather than defaulting. A default is how the table and the engine
+    drifted apart in the first place: the miss has to be loud at the call site,
+    at import-time-adjacent cost, rather than showing up months later as a
+    register tolerance nobody is honouring.
+    """
+    try:
+        return SYNTHETIC_PRIORITIES[finding_id]
+    except KeyError:
+        raise KeyError(
+            "no declared priority for synthetic finding %r. Add it to "
+            "SYNTHETIC_PRIORITIES and SYNTHETIC_FINDING_IDS in rwlib/lexicon.py."
+            % finding_id)
+
+
+# A regex that cannot match anything, for an empty word or phrase list. The
+# alternation these functions build is `(a|b|c)`, and with nothing to join that
+# collapses to `()`, which matches the empty string at every position in the
+# document. Two of the callers do not filter zero-length matches, so an edited
+# lexicon with an empty tier would have reported a cluster in every paragraph.
+NEVER_RX = re.compile(r"(?!)")
 
 _CACHE = {}
 
@@ -55,17 +109,32 @@ def word_regex(entries):
     The boundary is `(?<![\\w-])` rather than `\\b`, because a hyphen is a word
     character to a reader and not to `re`: without it, "cutting-edge" matches
     the bare word "edge" as well.
+
+    An empty list gives back NEVER_RX rather than an empty alternation.
     """
     escaped = sorted((re.escape(e) for e in entries), key=len, reverse=True)
+    if not escaped:
+        return NEVER_RX
     return re.compile(r"(?i)(?<![\w-])(" + "|".join(escaped) + r")(?![\w-])")
 
 
 def phrase_regex(entries):
     """Same, for multi-word entries, with runs of whitespace made flexible so a
-    phrase still matches across a line break."""
+    phrase still matches across a line break. Empty in, NEVER_RX out."""
     escaped = sorted((re.escape(e).replace(r"\ ", r"\s+") for e in entries),
                      key=len, reverse=True)
+    if not escaped:
+        return NEVER_RX
     return re.compile(r"(?i)\b(" + "|".join(escaped) + r")\b")
+
+
+# Everything scan.py reads off a catalogue entry. Checked here rather than at
+# the point of use, because "drop the one bad rule" is only true if the entry is
+# dropped before anybody indexes into it: an entry carrying `rx` but no `id`
+# compiled fine and then raised KeyError out of scan.py's `relax.get(p["id"])`,
+# which is the same whole-scan outage this function exists to prevent, moved one
+# file along.
+REQUIRED_PATTERN_KEYS = ("id", "label", "band", "priority", "rx")
 
 
 def compiled_patterns(path=LEXICON_PATH, skip=()):
@@ -73,15 +142,23 @@ def compiled_patterns(path=LEXICON_PATH, skip=()):
 
     A pattern that does not compile is reported to stderr and dropped rather
     than raising: one bad regex in a user-edited lexicon should cost that one
-    rule, not the whole scan.
+    rule, not the whole scan. An entry missing any of REQUIRED_PATTERN_KEYS is
+    the same failure and gets the same treatment. It used to raise KeyError and
+    take down every scan in the repository, which is how a hand-edit that
+    dropped one line from lexicon.json was discovered.
     """
-    import sys
     out = []
     for p in load(path).get("patterns", []):
-        if p["id"] in skip:
+        if p.get("id") in skip:
+            continue
+        missing = [k for k in REQUIRED_PATTERN_KEYS if not p.get(k)]
+        if missing:
+            print("lexicon: unusable pattern %s (missing %s)"
+                  % (p.get("id", "<no id>"), ", ".join(missing)), file=sys.stderr)
             continue
         try:
             out.append((p, re.compile(p["rx"])))
         except re.error as exc:
-            print("lexicon: bad regex %s (%s)" % (p["id"], exc), file=sys.stderr)
+            print("lexicon: unusable pattern %s (%s)" % (p["id"], exc),
+                  file=sys.stderr)
     return out

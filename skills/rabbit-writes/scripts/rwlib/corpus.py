@@ -20,7 +20,7 @@ Regenerate with:
     python3 03_analyze_readme.py --batch && python3 04_aggregate.py
     python3 05_export_corpus_summary.py
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 import json
@@ -38,7 +38,9 @@ AGGREGATE_PATH = os.path.join(PLUGIN_ROOT, "docs", "readme-analysis",
 # Bumped when `derive` changes which keys it emits or how it rounds them, so a
 # committed extract from an older shape fails the drift check loudly instead of
 # comparing unequal for a reason nobody can see.
-SCHEMA_VERSION = 1
+#
+# 2 adds measured_at.
+SCHEMA_VERSION = 2
 
 _CACHE = {}
 
@@ -55,6 +57,13 @@ def derive(aggregate):
     return {
         "schema_version": SCHEMA_VERSION,
         "n_repos": aggregate["n_repos"],
+        # Carried through so the checker's report can date its own comparison.
+        # These are a frozen snapshot skewed toward what was trending the week it
+        # was taken, which the writeup says and the report did not: it just said
+        # "100 trending repos", and a reader two years out had no way to tell.
+        # None on an aggregate produced before the key existed, and the reporter
+        # drops the clause rather than inventing a date.
+        "measured_at": aggregate.get("measured_at"),
         "word_count_percentiles": dict(aggregate["readme_word_count_percentiles"]),
         "avg_paragraph_words": round(aggregate["avg_paragraph_words"], 1),
         "sentence_mix_pct": {

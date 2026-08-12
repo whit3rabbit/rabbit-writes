@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "_version_note": "Bumped whenever a word, a phrase, or a pattern changes, so a published measurement can name the catalogue that produced it. scan.py --json echoes it, PROOF.md's header quotes it, and scripts/validate.py fails when the two disagree. Numbers measured against one version mean nothing against another.",
   "_comment": "Tiered vocabulary and pattern regexes for scan.py. Edit freely; scan.py reads this at runtime. Word entries are matched case-insensitively on word boundaries and cover the listed inflections.",
 
@@ -125,7 +125,9 @@
       "label": "Chat citation markup leak",
       "band": "fingerprint",
       "priority": "P0",
-      "rx": "(cite\\w*turn\\d+\\w*|contentReference\\[oaicite:|oai_citation|\\[attached_file:\\d+\\]|grok_card)"
+      "rx": "(cite\\w*turn\\d+\\w*|contentReference\\[oaicite:|oai_citation|\\[attached_file:\\d+\\]|grok_card)",
+      "_scan_raw_note": "Checked against the raw text, like curly-quote and hidden unicode. None of these markers has an honest use in any span: they are residue from a copy out of a chat window, which is a fact about how the file was produced rather than about what it says, and the quoted-example exemption is about content. A pasted transcript lands in a block quote or a fence more often than in running prose, which is exactly where the exemption used to hide it. The cost is that a document cataloguing these markers scores a P0 on each one, which references/patterns.md does on purpose and PROOF.md publishes.",
+      "scan_raw": true
     },
     {
       "id": "ai-utm",
@@ -139,7 +141,9 @@
       "label": "Unfilled placeholder",
       "band": "fingerprint",
       "priority": "P0",
-      "rx": "(\\[(?:Your|YOUR|Insert|INSERT|Add|ADD|Enter|Describe|Specify|Choose|TODO|TBD)[^\\]\\n]{0,60}\\]|\\b\\d{4}-XX-XX\\b|<!--\\s*(add|fill in|todo|insert)[^>]*-->)"
+      "rx": "(\\[(?:Your|YOUR|Insert|INSERT|Add|ADD|Enter|Describe|Specify|Choose|TODO|TBD)\\b[^\\]\\n]{0,60}\\](?![(\\[])|\\b\\d{4}-XX-XX\\b|<!--\\s*(add|fill in|todo|insert)[^>]*-->)",
+      "_rx_note": "Two narrowings, both from false positives measured on the trending-README corpus. The keyword needs a word boundary, or `Add` matches `[Address book]`. And a bracket followed by `(` or `[` is a markdown link label, not an unfilled placeholder: `[Your name here](https://...)` is a sponsor slot somebody filled in, and three corpus READMEs were failed by it.",
+      "_scan_raw_note": "Unlike citation-leak, this one is scored against the exempted copy. `[Your API key]` inside a fence is a template doing its job, and a P0 on it would fail every README that shows a config file. The tradeoff is that a genuinely unfilled placeholder inside a fence goes unreported."
     },
     {
       "id": "vague-attribution",
@@ -349,8 +353,8 @@
       "label": "Formulaic challenges section",
       "band": "craft",
       "priority": "P1",
-      "_rx_note": "Matches the formula patterns.md section 45 names, not the words in it. A bare `faces challenges` is an ordinary English sentence: \"the team faces challenges next quarter\" is a fact, and a P1 that fires on it is the false positive references/false-positives.md warns about. The tell is the pairing, \"faces challenges typical of ... Despite these challenges, X continues to thrive\". The two heading forms are anchored to a real heading, because \"the future outlook is uncertain\" in running prose is a financial report, not slop.",
-      "rx": "(?im)(faces (?:several |a number of )?challenges typical of|despite (?:these|those) challenges|continues to thrive|^#{1,6}\\s*challenges and (?:future prospects|legacy)\\b|^#{1,6}\\s*future outlook\\b)"
+      "_rx_note": "Matches the formula patterns.md section 45 names, not the words in it. A bare `faces challenges` is an ordinary English sentence: \"the team faces challenges next quarter\" is a fact, and a P1 that fires on it is the false positive references/false-positives.md warns about. `despite these challenges` and `continues to thrive` were branches here and had the same problem: \"despite these challenges, we shipped late\" is a sentence anybody writes, and each fired on its own because this is an alternation and never was the pairing this note used to claim. The pairing has its own rule, false-concession, which requires both halves within one sentence. What is left here is the one phrase that is formulaic alone, plus two forms anchored to a real heading, because \"the future outlook is uncertain\" in running prose is a financial report, not slop.",
+      "rx": "(?im)(faces (?:several |a number of )?challenges typical of|^#{1,6}\\s*challenges and (?:future prospects|legacy)\\b|^#{1,6}\\s*future outlook\\b)"
     },
     {
       "id": "novelty-inflation",

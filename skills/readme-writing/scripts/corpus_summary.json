@@ -1,6 +1,7 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "n_repos": 100,
+  "measured_at": "2026-08-10",
   "word_count_percentiles": {
     "p10": 766,
     "p25": 1311,

@@ -6,6 +6,15 @@ name: checks
 #
 # No install step and no cache, because the whole plugin is stdlib. If a
 # dependency ever appears here, this file is the place it becomes obvious.
+#
+# `python`, not `python3`. setup-python guarantees `python` on all three
+# platforms and does not guarantee `python3` on Windows, where the official
+# installer has not shipped a `python3.exe` for years. The scripts and the docs
+# still say `python3`, because that is right everywhere a human runs them.
+#
+# `shell: bash` for every step, so one `run:` block works on all three runners.
+# Windows defaults to pwsh, where a trailing `\` is not a line continuation and
+# the dogfood block below silently becomes four broken commands.
 
 on:
   push:
@@ -16,21 +25,39 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        # 3.9 is the floor. 3.8 has been end of life since October 2024 and
+        # cost a pinned ubuntu-22.04 runner to keep testing, because the 24.04
+        # image does not offer it. Nothing in the tree needs it: the scripts use
+        # no syntax past 3.8 either, so the floor is a support claim rather than
+        # a technical one, and supporting an interpreter that stopped getting
+        # security fixes is not a claim worth paying a runner for.
         python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         os: [ubuntu-latest]
         include:
-          # 3.8 is the floor the scripts claim, and it is not offered on the
-          # 24.04 runner image. Pinning 22.04 keeps the claim tested rather
-          # than dropping it quietly.
-          - python: "3.8"
-            os: ubuntu-22.04
-    name: python ${{ matrix.python }}
+          # One Windows entry, for the CRLF write-back path in
+          # `scan.py --apply-safe --write`. That code exists specifically for
+          # files with Windows line endings and was tested only by constructing
+          # CRLF bytes on Linux, which exercises the branch and not the
+          # platform. This also covers every path-handling assumption in the
+          # tree, which is the half nobody thinks to test.
+          - python: "3.12"
+            os: windows-latest
+          # And one macOS entry, for the same reason at lower cost: the plugin
+          # is developed there, so a break that only shows on macOS would
+          # otherwise be found by its author rather than by CI.
+          - python: "3.12"
+            os: macos-latest
+    name: python ${{ matrix.python }} on ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -39,18 +66,38 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: repo validator
-        run: python3 scripts/validate.py
+        run: python scripts/validate.py
 
       - name: engine calibration and preservation validator
-        run: python3 skills/rabbit-writes/tests/run.py
+        run: python skills/rabbit-writes/tests/run.py
 
       - name: readme structure, voice, and corpus regression
-        run: python3 skills/readme-writing/tests/run.py
+        run: python skills/readme-writing/tests/run.py
+
+      - name: detector-corpus harness
+        # The network is stubbed. This is the harness that will publish a
+        # false-positive rate the day somebody populates the corpus, and it had
+        # never run over a populated one.
+        run: python scripts/detector-corpus/test_corpus_harness.py
 
       - name: dogfood the scanner on the repo's own prose
         run: |
-          python3 skills/readme-writing/scripts/readme_check.py README.md --check
-          python3 skills/rabbit-writes/scripts/scan.py skills/rabbit-writes/SKILL.md \
+          python skills/readme-writing/scripts/readme_check.py README.md --check
+          python skills/rabbit-writes/scripts/scan.py skills/rabbit-writes/SKILL.md \
             --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
-          python3 skills/rabbit-writes/scripts/scan.py skills/readme-writing/SKILL.md \
+          python skills/rabbit-writes/scripts/scan.py skills/readme-writing/SKILL.md \
             --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
+          python skills/rabbit-writes/scripts/scan.py skills/voice-setup/SKILL.md \
+            --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
+
+      - name: labeled-corpus score (informational)
+        # Never gates. It prints the state of the evidence on every run, which
+        # is the point: the corpus is empty, PROOF.md says so, and a number
+        # nobody sees is a number nobody notices has stayed at zero. When it is
+        # populated this step starts printing the rate and its interval.
+        #
+        # continue-on-error rather than `|| true`, so a manifest that stops
+        # validating shows up as a visible annotation instead of scrolling past
+        # in a green log.
+        continue-on-error: true
+        run: python scripts/detector-corpus/score.py

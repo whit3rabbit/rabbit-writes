@@ -30,7 +30,7 @@ codex plugin add rabbit-writes@rabbit-writes
 
 Restart, then confirm the three skills loaded: `claude plugin list | grep rabbit-writes`, or `/skills` in Codex.
 
-Python 3.8+ with the standard library, and only if you want the scripts. Nothing to build.
+Python 3.9+ with the standard library, and only if you want the scripts. Nothing to build.
 
 
 <details>
@@ -117,16 +117,21 @@ The explicit forms are there for when you want to force one. The `rabbit-writes:
 /rabbit-writes:readme-writing   # draft or audit a README against the 100-repo study
 ```
 
-The scripts run from a shell, not from a skill. Stdlib only, Python 3.8+:
+The scripts run from a shell, not from a skill. Stdlib only, Python 3.9+:
 
 ```bash
 python3 scripts/validate.py                      # check manifests, skills, voices, cross-refs
 python3 skills/rabbit-writes/scripts/scan.py draft.md \
     --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json   # findings in three bands
+python3 skills/rabbit-writes/scripts/scan.py draft.md --voice auto         # resolve the profile instead
 python3 skills/rabbit-writes/scripts/verify.py original.md rewritten.md   # did the rewrite break a promise
 python3 skills/rabbit-writes/scripts/scan.py draft.md --apply-safe        # the fixes with one right answer
 python3 skills/rabbit-writes/scripts/scan.py draft.md --sarif             # for a pull request annotation
+python3 skills/voice-setup/scripts/measure_voice.py a.md b.md c.md        # samples in, profile numbers out
+python3 skills/rabbit-writes/scripts/rwlib/voices.py --blend ada grace --weight 0.7
 ```
+
+`--voice auto` looks for a `.rabbit-voice` file beside the document or in the working directory, then `voices/ACTIVE`, then a lone installed profile. No profile applies unless you ask for one, because this is what the pre-commit hook runs in somebody else's repository.
 
 ### `--apply-safe`
 
@@ -163,7 +168,7 @@ Findings map onto SARIF 2.1.0 without inventing anything: the finding id is the 
 
 ### pre-commit
 
-`.pre-commit-hooks.yaml` ships three hooks, all gating on P0 only. A P1 is a convention worth arguing about and a P2 is polish, and a hook that blocks a commit over polish is a hook people learn to pass `--no-verify` to.
+`.pre-commit-hooks.yaml` ships four hooks, all gating on P0 only. A P1 is a convention worth arguing about and a P2 is polish, and a hook that blocks a commit over polish is a hook people learn to pass `--no-verify` to.
 
 ```yaml
 repos:
@@ -176,6 +181,27 @@ repos:
 ```
 
 Scope `rabbit-scan` with `files`. Unscoped it runs on every markdown file in the repository, including the generated ones nobody wrote by hand.
+
+`readme-check` and `rabbit-scan` apply no voice profile. pre-commit clones this repository to run the hook, so `voices/ACTIVE` arrives naming this repository's author, and a semicolon that is a P0 in one person's profile is not a defect in anybody else's prose. Structure, fingerprints and craft are all still checked, which is the part that is evidence rather than taste.
+
+The voice halves are separate hooks, `readme-check-voice` and `rabbit-scan-voice`, and they are worth enabling once `voice-setup` has written your profile or a `.rabbit-voice` file in your repository pins one. Both resolve the profile themselves, in the order `.rabbit-voice`, then the plugin's `voices/ACTIVE`, then a lone installed profile, so a pin in your repository wins:
+
+```yaml
+      - id: rabbit-scan-voice
+        files: ^docs/.*\.md$
+```
+
+Override `args` with `[--voice-rules, .writing/dana.rules.json]` to name one by hand instead, relative to your repository root.
+
+One P0 to know about before enabling `rabbit-scan` unscoped: a chat citation marker is checked against the raw text rather than the exempted copy, so a document that quotes one in backticks to warn about it blocks the commit. The markers themselves are listed in `skills/rabbit-writes/references/patterns.md`, which scores 5 P0s of its own for exactly this reason.
+
+Two ways out, and the second is usually better than scoping the hook:
+
+```markdown
+<!-- rabbit-allow: citation-leak (this page catalogues the markers) -->
+```
+
+That goes in the document and applies to that file. The reason is not optional: without one the suppression does not apply and raises a P1 of its own. The finding is still printed, with the reason and the line that allowed it, and one that covers nothing is reported so stale suppressions do not accumulate. Only the exit code changes. `files:` is the blunter tool and stays right for a directory of generated markdown nobody wrote.
 
 ## Point it at a document
 
@@ -262,7 +288,7 @@ Three skills.
 
 Underneath sit 63 patterns in a priority-tiered catalog, a false-positive discipline, register profiles, Orwell and Simplified Technical English as a positive craft layer, a 33-item self-check, and two scripts. The engine half knows nothing about any particular person.
 
-**`voice-setup`**: builds, measures, edits, blends, and switches voice profiles.
+**`voice-setup`**: builds, measures, edits, blends, and switches voice profiles. Ships `measure_voice.py`, which takes three or four things you wrote and prints the aggregate, the spread between samples, the profile block ready to paste, and a starter `mechanics` object with the count behind every line. It stops if a sample carries a P0, because a tell that reaches a profile is then reproduced on purpose.
 
 **`readme-writing`**: drafts or audits a `README.md` against patterns measured from 100 real GitHub repos (section order, sentence length, badge and link conventions) instead of generic advice, in your voice rather than a generated open-source register. Ships `readme_check.py`, which checks structure, links, badges, claims, and the active voice in one pass. The full study is in `docs/README_WRITEUP.md`.
 
@@ -271,16 +297,20 @@ rabbit-writes/
   .claude-plugin/           plugin + marketplace manifests
   scripts/
     validate.py              repo validator
+    precommit.py             the entry point every pre-commit hook goes through
     readme-research/         the pipeline behind readme-writing's evidence base
+    detector-corpus/         the false-positive measurement harness, and its own tests
   docs/
     COMPARISON.md            the craft engine's source writeup
     README_WRITEUP.md        the readme-writing skill's source writeup
     readme-analysis/         raw + aggregated data behind that writeup, one folder per repo studied
+    detector-corpus/         the labeled corpus protocol and manifest, empty for now
   skills/
     rabbit-writes/
       SKILL.md
       references/           patterns, false-positives, context, voice, craft, checklist
-      scripts/              scan.py, verify.py, lexicon.json
+      scripts/              scan.py, verify.py, lexicon.json, registers.json
+        rwlib/              the shared engine: markdown spans, lexicon, voices, suppressions
       tests/                calibration fixtures and regression tests
       PROOF.md              the engine scanned with its own scanner
       voices/
@@ -291,6 +321,7 @@ rabbit-writes/
         TEMPLATE.rules.json
     voice-setup/
       SKILL.md
+      scripts/              measure_voice.py, samples in and a profile starting point out
     readme-writing/
       SKILL.md
       references/           patterns (the full catalog), checklist

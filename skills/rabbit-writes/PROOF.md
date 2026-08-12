@@ -5,38 +5,51 @@ A tool that flags "delve" in your draft should survive its own pass. This is the
 Reproduce in one command, no dependencies:
 
 ```bash
-for f in SKILL.md PROOF.md references/*.md; do echo "== $f"; python3 scripts/scan.py "$f"; done
+for f in SKILL.md PROOF.md references/*.md voices/whit3rabbit.md \
+         ../voice-setup/SKILL.md ../readme-writing/SKILL.md; do
+  echo "== $f"; python3 scripts/scan.py "$f"
+done
 ```
+
+Run it from `skills/rabbit-writes/`. It covers every row in the table below, including the three in other skills, which an earlier version of this command left out.
 
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 1, registers 1, measured 10 August 2026)
+## Result (v0.1.0, lexicon 2, registers 1, measured 11 August 2026, fifth pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 2,315 | 0 | 0 | 0 | 0.70 | 0.74 | 0.0 |
-| `PROOF.md` | 4,157 | 0 | 0 | 0 | 0.60 | 0.73 | 0.0 |
-| `references/patterns.md` | 3,942 | 0 | **15** | **4** | 0.86 | 0.77 | 1.8 |
+| `SKILL.md` | 2,692 | 0 | 0 | 0 | 0.70 | 0.73 | 0.0 |
+| `PROOF.md` | 4,764 | 0 | 0 | 0 | 0.58 | 0.73 | 0.0 |
+| `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.86 | 0.77 | 1.8 |
 | `references/false-positives.md` | 786 | 0 | 0 | 0 | 0.70 | 0.82 | 0.0 |
 | `references/context.md` | 567 | 0 | 0 | 0 | 0.75 | 0.81 | 0.0 |
-| `references/voice.md` | 873 | 0 | 0 | 0 | 0.75 | 0.73 | 0.0 |
+| `references/voice.md` | 1,047 | 0 | 0 | 0 | 0.77 | 0.73 | 0.0 |
 | `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
 | `references/checklist.md` | 640 | 0 | 0 | 0 | 0.46 | 0.74 | 0.0 |
-| `voices/whit3rabbit.md` | 1,183 | 0 | 0 | **7** | 0.63 | 0.79 | 0.0 |
-| `../voice-setup/SKILL.md` | 1,286 | 0 | 0 | 0 | 0.57 | 0.75 | 1.6 |
+| `voices/whit3rabbit.md` | 1,518 | 0 | 0 | **10** | 0.69 | 0.79 | 0.0 |
+| `../voice-setup/SKILL.md` | 1,582 | 0 | 0 | 0 | 0.61 | 0.75 | 1.3 |
 | `../readme-writing/SKILL.md` | 2,378 | 0 | 0 | **7** | 0.63 | 0.73 | 0.0 |
 
 Scores are with the self-reference exemption applied, the rule this skill states in prose: quoted examples, code, tables, and block quotes are exempt from flagging. `apply_exemptions()` in `scan.py` is that rule's executable form. Run with `--no-exempt` to see the raw numbers.
+
+Two patterns opt out of it, `curly-quote` and `citation-leak`, and each says why in a `_scan_raw_note` in `lexicon.json`. Both are facts about how a file was produced rather than about what it says, and the exemption is about content. A chat citation marker pasted into a block quote is the likeliest place one appears and was the one place nothing looked.
 
 Every word count in this table dropped between the second review and the third, and no prose was cut. Item 32 below is why: heading text and block quotes used to be measured as this document's own sentences. The findings columns did not move with them, because flagging already exempted both.
 
 The counts moved again in the fourth pass, this time because the documents changed: the engine was extracted into `scripts/rwlib/`, the tolerance matrix became a data file, and three skill files gained sections. `voices/whit3rabbit.md` fell from 9 P2 hits to 7 by dropping two paraphrases of rules that are defined elsewhere, which is the same drift the one-definition tripwire in `scripts/validate.py` now fails the build over.
 
+The fifth pass moved them for the same reason and not because the engine changed its mind about anything above. `voices/whit3rabbit.md` gained the Quick reference card and Anti-overfitting sections that `TEMPLATE.md` has always had and the worked example did not, which is 335 more words and three more list-label advisories. `references/voice.md`, `SKILL.md`, and `../voice-setup/SKILL.md` grew where blending, per-register mechanics, and `measure_voice.py` are now documented. Every P0 and P1 column is where it was.
+
 ## What it found in our own writing
 
 **`patterns.md` scores worst, and that is structural.** A catalog listing the words it catalogs will hit its own lexicon. Three Tier-1 words, nine `-ing` analyses, and three Tier-2 clusters all come from the vocabulary tables: the comma-separated lists of the words each rule exists to catch. Those are unquoted by design, because quoting a 36-item list would make it unreadable.
 
-Two options were available. Quote every list entry so the exemption swallows it, or leave the number visible and explain it. The number is left visible. A tool that suppresses its own findings to look clean is doing the thing this plugin exists to criticize.
+**The 5 P0s on `patterns.md` are the same story, one rule further on.** Line 46 lists the five chat citation markers in backticks, and `citation-leak` stopped honouring the exemption in lexicon 2, so each one now scores. That is the cost of catching a marker pasted into a block quote, which is where a real one usually lands. This file pays it in full and publishes the number.
+
+Two options were available in both cases. Quote every list entry so the exemption swallows it, or leave the number visible and explain it. The number is left visible. A tool that suppresses its own findings to look clean is doing the thing this plugin exists to criticize.
+
+Anyone enabling the `rabbit-scan` pre-commit hook on a repository that writes about slop detection inherits this, so the hooks file says so and points at `files`.
 
 **`craft.md` has 7 P2 hits.** The boilerplate detector firing on "the intersection of" and the transition detector firing on paragraph-initial "Additionally" inside rule text. Real hits on prose that is quoting rules rather than following them.
 
@@ -60,7 +73,7 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `PROOF.md` | 1 | serial-comma advisory |
 | `references/false-positives.md` | 1 | serial-comma advisory |
 | `references/voice.md` | 2 | one one-word sentence, one serial-comma advisory |
-| `voices/whit3rabbit.md` | 3 | serial-comma advisories |
+| `voices/whit3rabbit.md` | 4 | serial-comma advisories |
 | `../voice-setup/SKILL.md` | 3 | serial-comma advisories |
 | `SKILL.md` | 6 | serial-comma advisories |
 | `references/context.md` | 6 | 4 over-cap paragraphs, 1 one-word sentence, 1 advisory |
@@ -140,6 +153,24 @@ extension requirement makes it match "and/or", "TCP/IP", "human/AI", and every
 under-matching is the safe direction, so `SKILL.md` now says which half of its
 own promise is mechanically enforced.
 
+The image half of that carve-out was measured later and split. Over the same
+100-README corpus there are 341 markdown images: 300 with an absolute src, which
+`URL_RX` already covered, 41 relative with an extension, which `PATH_RX` already
+covered, and **0** in the gap. The HTML `<img>` half held **3**. A check that
+costs nothing and closes a real hole is worth making whatever its yield, so
+image sources are in the extract set now, scoped to exactly the leftovers so a
+retargeted absolute src is still one violation rather than two.
+
+Alt text stayed out, and this is the measurement it stayed out on: **337** of
+those images carry alt text, **7,282** characters of it, containing **0**
+lexicon tells and **18** prose dashes. The 18 cost nothing, because both
+counters compare a before to an after and an editor that leaves alt text alone
+moves neither. What protecting it verbatim would cost is the legitimate edit.
+Alt text in this corpus is overwhelmingly badge labels, `PyPI` becoming
+`PyPI version` is a fix rather than a violation, and `SKILL.md`'s guardrails
+never promised alt text was untouchable. Requiring it here would have been the
+verifier inventing a promise the skill does not make.
+
 ## Bugs found by a third review
 
 A read of the same six surfaces again, this time looking at the places the first
@@ -184,15 +215,23 @@ The harness for it now exists, in `docs/detector-corpus/` and `scripts/detector-
 
 **The corpus is empty.** The machinery works and nobody has gathered the texts, which needs network access, a few hours, and a copyright judgment about redistributing other people's writing that the hash-only design answers but does not make for anybody. `docs/detector-corpus/README.md` is the procedure.
 
-Two numbers are worth stating in the meantime, because they are what the current fixtures are actually worth. Zero false positives over two human samples is a rate somewhere between 0% and 66%. Zero over fifty would be somewhere under 7%. That gap is the whole argument for building this, and it is why the sentence below has not changed.
+Two numbers are worth stating in the meantime, because they are what the current fixtures are actually worth. Zero false positives over two human samples is a rate somewhere between 0% and 66%. Zero over fifty would be somewhere under 7.2%, and 52 samples is where the upper bound crosses 7%. That gap is the whole argument for building this, and it is why the sentence below has not changed. The round numbers an earlier draft of this paragraph used were checked against `corpus_io.wilson` and two of them were wrong, which is the same lesson one paragraph up: a figure nobody recomputes is a figure that drifts.
 
 Until the corpus is populated, treat these numbers as a regression guard, not an accuracy claim.
 
-## Known false positive, parked on purpose
+## Known false positives
 
-`is_prose_block()` decides a block is a list when at least half its lines start with a bullet. A list whose items wrap over several lines each fails that ratio and gets scored as one long paragraph, so the voice paragraph-length cap fires on it. `CHANGELOG.md` reports five of these and every one is a bullet list.
+### The wrapped list, fixed
 
-It is left alone for now because the fix moves the numbers published above, and a calibration table that changed in the same pass that published it is worth less than one that did not. The fix is to treat a block whose first non-blank line is a list item as a list regardless of the ratio. Whoever takes it should expect the self-scan table and `tests/samples/needs-conversion.md` counts to move with it, and should regenerate this file rather than editing the numbers by hand.
+`is_prose_block()` decided a block was a list when at least half its lines started with a bullet. A list whose items wrap over several lines each failed that ratio and got scored as one long paragraph, so the voice paragraph-length cap fired on it. `CHANGELOG.md` reported five of these and every one was a bullet list.
+
+It sat parked for one release because the fix would have moved the numbers published above, and a calibration table that changed in the same pass that published it is worth less than one that did not. That objection expires once the table has been published and stood, which it has. The fix is the one the parked note specified: a block whose first non-blank line is a list item is a list, whatever the ratio says. Nothing that opens with a bullet is a paragraph, so the ratio never needed a vote there, and the majority rule still governs everything past the first line.
+
+`CHANGELOG.md` goes from 5 `voice-paragraph-length` findings to 0, all five of them false. The self-scan table above did not move with it, which is worth saying plainly rather than leaving as a surprise: the reproduce command runs `scan.py` with no voice profile, and `max_paragraph_sentences` is a voice mechanic. Nothing in the published table was ever affected. The stylometric columns were never at risk either, because paragraph statistics are deliberately not filtered through `is_prose_block()`, for the reason in the next section.
+
+`readme_check.py` shares the rule, so the same fix reaches `long-paragraph` there. Across the 100-README corpus it drops 406 findings to 390: **16 fewer**, every one of them a wrapped bullet list read as a paragraph. The corpus P0 band in `tests/test_corpus.py` does not move, because `long-paragraph` is a P2.
+
+### Still parked, and measured
 
 A second one was parked in the third review, with the measurement written down this time. List items are counted as sentences by `strip_for_stats()`, and they distort rhythm the way heading text did: a one-word bullet is a one-word sentence. Dropping them was measured and rejected. It takes `checklist.md` from 640 measured words to 91, under the 120-word floor where the stylometric flags switch off, so the change would silence the uniformity detector on exactly the list-heavy documents most worth measuring.
 

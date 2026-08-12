@@ -24,7 +24,7 @@ Run through before delivering a draft, restructure, or audit. Every item is yes 
 ## Accuracy
 
 14. Does every install command, dependency, and version number actually match the project as it exists right now — nothing invented or assumed?
-15. Does the license section name the license the project actually uses (check for a `LICENSE` file rather than guessing)?
+15. Does the license section name the license the project actually uses (check for a `LICENSE` file rather than guessing)? `readme_check.py` now does half of this for you: run on a real path, it walks up to the repository root for a `LICENSE`, `LICENCE`, or `COPYING` file and reports the mismatch either way. It cannot tell you whether the section names the *right* license, only whether there is a file to name.
 16. Are code examples runnable as written, not simplified to the point of being wrong?
 
 ## Voice

@@ -16,7 +16,7 @@ numbers out of a copy they blanked, and preserving length is what makes that
 legal. tests/test_invariants.py checks the property rather than trusting the
 comment.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 import re
@@ -57,16 +57,39 @@ LIST_ITEM_RX = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s")
 QUOTED_RX = re.compile("\"[^\"“”\n]{4,200}\"|“[^\"“”\n]{4,200}”")
 CURLY_QUOTE_RX = re.compile("[“”‘’]")
 
+# --------------------------------------------------------------------------
+# HTML character references
+# --------------------------------------------------------------------------
+
+# Named, decimal, and hex character references. The lengths are bounded so a
+# stray `&` in prose followed half a paragraph later by a semicolon is not read
+# as one entity swallowing the sentence between them. 31 is HTML5's longest
+# named reference (`CounterClockwiseContourIntegral`) plus room.
+HTML_ENTITY_RX = re.compile(
+    r"&(?:#\d{1,7}|#[xX][0-9a-fA-F]{1,6}|[A-Za-z][A-Za-z0-9]{1,31});")
+
+# The dashes again, spelled as character references. A document written with
+# `&mdash;` renders an em dash, reads as an em dash, and is an em dash to every
+# reader, so it has to be one to the counter as well. Left out, a voice that
+# forbids em dashes was a find-and-replace away from passing, and verify.py's
+# "no em dashes added" gate let a rewrite add as many as it liked.
+EM_DASH_ENTITY = r"&(?:mdash|#8212|#[xX]2014);"
+EN_DASH_ENTITY = r"&(?:ndash|#8211|#[xX]2013);"
+
 # Em dashes, and en dashes that are not a numeric range. "2010-2023" written
 # with an en dash and "pp. 14-18" are correct typography and the one en dash a
 # rewrite legitimately produces; counting them fails a rewrite for getting the
 # punctuation right. Only a spaceless en dash flanked by digits is a range,
-# because a spaced one is standing in for an em dash.
+# because a spaced one is standing in for an em dash. The entity spellings carry
+# the same two guards, so `2010&ndash;2023` is a range on both sides of the
+# alternation and neither form is stricter than the other.
 #
 # scan.py scores against this and verify.py gates against it. They were two
 # byte-identical copies with a test pinning them together, which is the drift
 # this module exists to make impossible: one object, imported twice.
-PROSE_DASH_RX = re.compile(r"—|–(?!\d)|(?<!\d)–")
+PROSE_DASH_RX = re.compile(
+    r"—|%s|–(?!\d)|(?<!\d)–|%s(?!\d)|(?<!\d)%s"
+    % (EM_DASH_ENTITY, EN_DASH_ENTITY, EN_DASH_ENTITY))
 
 # --------------------------------------------------------------------------
 # links, images, URLs
@@ -183,6 +206,22 @@ def strip_images(text):
     return IMAGE_RX.sub(blank, text)
 
 
+def blank_entities(text):
+    """Blank every HTML character reference, so the `;` that closes one is not
+    read as prose punctuation.
+
+    `&amp;`, `&nbsp;`, and `&#39;` are ordinary in a README, and each one ends in
+    a semicolon that belongs to the markup rather than to the sentence. A voice
+    that forbids semicolons reported one finding per entity, which on a header
+    block full of `&nbsp;` is a wall of findings about punctuation the writer
+    never typed.
+
+    Deliberately not folded into apply_exemptions. The dash counters want to see
+    `&mdash;`, and a blanket blank here would hide it from them.
+    """
+    return HTML_ENTITY_RX.sub(blank, text)
+
+
 def strip_wrapped_urls(text):
     """Blank every URL that already lives inside a link, an HTML attribute, an
     autolink, a reference definition, or inline code. What survives is bare.
@@ -238,17 +277,28 @@ def word_count(text):
 def is_prose_block(block):
     """True when a block is prose rather than a list, a table, or a heading.
 
-    Matching only the first line lets a mixed block through: one sentence of
-    lead-in followed by eight bullets has a first line that is prose, and the
-    whole thing then scores as a single 90-word paragraph. A lead-in sentence
-    plus one or two bullets is still a paragraph with a list under it, which is
-    why the test is a majority rather than any bullet at all.
+    Two rules, because the same block was read wrong from both directions.
+
+    A block that *opens* with a bullet is a list, whatever the ratio says. Items
+    that wrap over several lines each drive the bullet share below half, so a
+    six-item list with three-line items scored as one long paragraph and the
+    voice paragraph-length cap fired on it. `CHANGELOG.md` reported five of
+    those and every one was a bullet list. Nothing that starts with a bullet is a
+    paragraph, so the ratio never needed a vote here.
+
+    Past the first line, the majority rule stands. One sentence of lead-in
+    followed by eight bullets has a first line that is prose, and matching only
+    the first line let the whole thing score as a single 90-word paragraph. A
+    lead-in plus one or two bullets is still a paragraph with a list under it,
+    which is why that half is a majority rather than any bullet at all.
     """
     lines = [ln for ln in block.strip().split("\n") if ln.strip()]
     if not lines:
         return False
     first = lines[0].lstrip()
     if first.startswith(("#", ">", "|", "```", "    ")):
+        return False
+    if LIST_ITEM_RX.match(lines[0]):
         return False
     listish = sum(1 for ln in lines if LIST_ITEM_RX.match(ln))
     return listish * 2 < len(lines)

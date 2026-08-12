@@ -32,13 +32,21 @@
     "date_format": "any"
   },
 
-  "_banned_words_note": "Single words, matched case-insensitively on word boundaries. Inflections are not automatic, list them.",
+  "_mechanics_by_register_note": "Optional. What changes off the clock. Merged over `mechanics` key by key for the register being scanned, so an entry names only what moves. This is not the register relaxing your rule: --profile cannot soften anything on its own, it selects among rules you wrote. Register names must exist in scripts/registers.json (linkedin, blog, technical-blog, investor-email, docs, casual) or validate.py fails, because a typo here is a rule that silently stops applying.",
+  "_mechanics_by_register_example": {
+    "casual": {"one_word_sentence": "allow", "curly_quotes": "allow"}
+  },
+  "mechanics_by_register": {},
+
+  "_banned_words_note": "Single words, matched case-insensitively on word boundaries. An entry is a string, or an object naming one: {\"word\": \"synergy\", \"inflect\": true} also bans the regular s/es/ed/ing forms. Opt-in per entry, so a deliberately narrow ban stays narrow. Irregulars (run/ran), consonant doubling (ship/shipping), and derivations (leader/leadership) are not covered: list those by hand.",
+  "_banned_words_example": ["piggyback", {"word": "synergy", "inflect": true}],
   "banned_words": [],
 
-  "_banned_phrases_note": "Multi-word strings. Whitespace between words matches any run of whitespace, so a phrase still matches across a line break.",
+  "_banned_phrases_note": "Multi-word strings. Whitespace between words matches any run of whitespace, so a phrase still matches across a line break. Takes the same object form, under \"word\" or \"phrase\", and inflects one word at a time at every position: {\"phrase\": \"thought leader\", \"inflect\": true} reaches 'thought leaders', and 'circle back' reaches 'circling back'.",
+  "_banned_phrases_example": [{"phrase": "thought leader", "inflect": true}],
   "banned_phrases": [],
 
-  "_banned_regex_note": "Full control. Each entry needs id, label, rx. Optional: priority (P0/P1/P2), max_allowed (flag only past N hits, for overuse rather than a ban), note.",
+  "_banned_regex_note": "Full control. Each entry needs id, label, rx. Optional: priority (P0/P1/P2), max_allowed (flag only past N hits, for overuse rather than a ban), note, applies_to_registers (a list of register names; the entry is skipped everywhere else, and omitting it means everywhere).",
   "banned_regex": [
     {
       "id": "example-rule",

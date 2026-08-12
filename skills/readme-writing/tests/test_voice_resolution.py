@@ -18,6 +18,8 @@ import tempfile
 
 from helpers import CORPUS_DIR, check_module, ids, run, sample
 
+ORIGINAL_CWD = os.getcwd()
+
 VOICED = "voiced-readme.md"
 TEST_RULES = "test-voice.rules.json"
 
@@ -62,7 +64,13 @@ def test_voice_findings_do_not_change_structure_findings():
 
 
 def scratch_voices():
-    """A temporary voices/ holding two profiles and a README to resolve from."""
+    """A temporary voices/ holding two profiles and a README to resolve from.
+
+    Also makes it the working directory. `resolve_voice` probes cwd for a
+    `.rabbit-voice` right after the README's own directory, so without this a
+    stray pin at the developer's repository root decides these tests and the
+    failure reads as a bug in the resolution order.
+    """
     tmp = tempfile.mkdtemp()
     readme = os.path.join(tmp, "README.md")
     open(readme, "w").close()
@@ -70,7 +78,15 @@ def scratch_voices():
         with open(os.path.join(tmp, who + ".rules.json"), "w") as fh:
             json.dump({"voice": who}, fh)
         open(os.path.join(tmp, who + ".md"), "w").close()
+    os.chdir(tmp)
     return tmp, readme
+
+
+def restore(rc, real_voices_dir, tmp):
+    """Undo everything scratch_voices touched, cwd included."""
+    rc.VOICES_DIR = real_voices_dir
+    os.chdir(ORIGINAL_CWD)
+    shutil.rmtree(tmp, ignore_errors=True)
 
 
 def test_active_decides_which_voice_whoever_it_is():
@@ -86,8 +102,7 @@ def test_active_decides_which_voice_whoever_it_is():
         assert rules.endswith("grace.rules.json"), rules
         assert note is None, note
     finally:
-        rc.VOICES_DIR = real
-        shutil.rmtree(tmp, ignore_errors=True)
+        restore(rc, real, tmp)
 
 
 def test_no_active_with_several_profiles_asks_instead_of_guessing():
@@ -100,8 +115,7 @@ def test_no_active_with_several_profiles_asks_instead_of_guessing():
         rules, name, note = rc.resolve_voice(readme)
         assert rules is None and "Name one" in (note or ""), note
     finally:
-        rc.VOICES_DIR = real
-        shutil.rmtree(tmp, ignore_errors=True)
+        restore(rc, real, tmp)
 
 
 def test_no_active_with_one_profile_falls_back_and_says_so():
@@ -115,8 +129,7 @@ def test_no_active_with_one_profile_falls_back_and_says_so():
         assert name == "grace" and rules is not None, "%s %s" % (name, rules)
         assert "falling back" in (note or ""), note
     finally:
-        rc.VOICES_DIR = real
-        shutil.rmtree(tmp, ignore_errors=True)
+        restore(rc, real, tmp)
 
 
 def test_a_repo_pin_outranks_active():
@@ -132,5 +145,37 @@ def test_a_repo_pin_outranks_active():
         rules, name, note = rc.resolve_voice(readme)
         assert name == "grace" and "pinned" in (note or ""), note
     finally:
-        rc.VOICES_DIR = real
+        restore(rc, real, tmp)
+
+
+def test_a_named_profile_that_cannot_be_read_is_an_error_not_a_silent_pass():
+    """`--voice-rules <typo>` used to cancel the whole prose scan and exit 0:
+    the fingerprint band, which has nothing to do with whose voice it is in,
+    disappeared with the profile, so a README carrying a chat citation marker
+    reported "No mechanical findings". scan.py exits 2 here and so does this."""
+    import subprocess
+    import sys
+
+    from helpers import CHECK, NEUTRAL_CWD
+
+    tmp = tempfile.mkdtemp()
+    try:
+        readme = os.path.join(tmp, "README.md")
+        with open(readme, "w", encoding="utf-8") as fh:
+            fh.write("# widget\n\nwidget resizes images. See "
+                     "cite" + "turn0search0 for details.\n")
+        out = subprocess.run(
+            [sys.executable, CHECK, readme, "--json", "--check",
+             "--voice-rules", os.path.join(tmp, "nobody.rules.json")],
+            capture_output=True, text=True, cwd=NEUTRAL_CWD)
+        assert out.returncode == 2, "%d: %s" % (out.returncode, out.stderr)
+
+        # And with no profile asked for, the same document still fails on the
+        # marker rather than passing quietly.
+        out = subprocess.run(
+            [sys.executable, CHECK, readme, "--json", "--check", "--no-voice"],
+            capture_output=True, text=True, cwd=NEUTRAL_CWD)
+        assert out.returncode == 1, "%d: %s" % (out.returncode, out.stderr)
+        assert "citation-leak" in ids(json.loads(out.stdout), "P0")
+    finally:
         shutil.rmtree(tmp, ignore_errors=True)

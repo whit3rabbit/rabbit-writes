@@ -224,3 +224,216 @@ def test_every_finding_matches_the_schema():
     from rwlib import findings as findings_mod
     problems = findings_mod.validate(ai_result()["findings"])
     assert not problems, str(problems)
+
+
+# --------------------------------------------------------------------------
+# regressions from the review pass
+# --------------------------------------------------------------------------
+
+def test_a_citation_marker_inside_a_code_span_is_still_a_p0():
+    """The exemption is about content. A chat citation marker is evidence about
+    how the file was produced, and a pasted transcript lands in a block quote or
+    a fence more often than in running prose, which is where the exemption used
+    to hide it."""
+    for wrapper in ("> quoting: %s here",
+                    "`%s`",
+                    "```\n%s\n```",
+                    "| a | %s |"):
+        text = "# T\n\n" + (wrapper % "citeturn0search0") + "\n"
+        found = ids(scan_text(text)[0], "P0")
+        assert "citation-leak" in found, "%r produced %s" % (wrapper, found)
+
+
+def test_a_markdown_link_label_is_not_an_unfilled_placeholder():
+    """`[Your name here](https://...)` is a sponsor slot somebody filled in, and
+    `[Address book]` is not a placeholder at all. Three trending READMEs in the
+    corpus were failed by the version of this pattern that thought otherwise."""
+    clean = "# T\n\nSee [Your name here](https://x.example) and [Address book](#ab).\n"
+    assert "placeholder" not in ids(scan_text(clean)[0])
+    dirty = "# T\n\nContact [Your Name] before shipping this.\n"
+    assert "placeholder" in ids(scan_text(dirty)[0], "P0")
+
+
+def test_a_joiner_inside_an_emoji_is_not_a_paste_artifact():
+    """U+1F468 U+200D U+1F4BB is one glyph. Reporting the joiner calls an
+    ordinary README a paste artifact, and deleting it turns one emoji into two."""
+    emoji = "# T\n\nWritten by humans \U0001F468\u200d\U0001F4BB. Nothing pasted.\n"
+    assert "hidden-unicode" not in ids(scan_text(emoji)[0])
+    between_letters = "# T\n\nThis wo\u200drd came out of a chat window.\n"
+    assert "hidden-unicode" in ids(scan_text(between_letters)[0], "P0")
+
+
+def test_ordinary_prose_does_not_trip_the_formulaic_challenges_rule():
+    """The formula is the pairing, which false-concession owns. Each half on its
+    own is a sentence anybody writes."""
+    text = ("# T\n\nDespite these challenges, we shipped late.\n\n"
+            "The team continues to thrive under pressure.\n")
+    assert "formulaic-challenges" not in ids(scan_text(text)[0])
+
+
+def test_the_full_false_concession_formula_is_still_caught():
+    text = ("# T\n\nDespite these challenges, the sector continues to thrive "
+            "in every market it enters.\n")
+    assert "false-concession" in ids(scan_text(text)[0])
+
+
+def test_an_empty_vocabulary_list_compiles_to_a_regex_that_matches_nothing():
+    """An empty alternation is `()`, which matches at every position. Two
+    callers do not filter zero-length matches, so an edited lexicon with an
+    empty tier would have reported a cluster in every paragraph."""
+    from rwlib import lexicon as lexicon_mod
+    for build in (lexicon_mod.word_regex, lexicon_mod.phrase_regex):
+        rx = build([])
+        assert not rx.findall("hello world. Anything at all here!"), build.__name__
+        assert not rx.search(""), build.__name__
+
+
+def test_every_synthetic_finding_declares_a_priority():
+    """A new synthetic id added without one makes the p0-only check in
+    registers.problems silently stop covering it."""
+    from rwlib import lexicon as lexicon_mod
+    missing = set(lexicon_mod.SYNTHETIC_FINDING_IDS) - set(lexicon_mod.SYNTHETIC_PRIORITIES)
+    assert not missing, sorted(missing)
+    extra = set(lexicon_mod.SYNTHETIC_PRIORITIES) - set(lexicon_mod.SYNTHETIC_FINDING_IDS)
+    assert not extra, sorted(extra)
+
+
+def test_an_undeclared_synthetic_priority_raises_rather_than_defaulting():
+    """The lookup is loud. A default is how the table and the engine drifted
+    apart before: the miss showed up months later as a register tolerance
+    nobody was honouring, rather than at the call site."""
+    from rwlib import lexicon as lexicon_mod
+    try:
+        lexicon_mod.synthetic_priority("no-such-finding")
+    except KeyError as exc:
+        assert "SYNTHETIC_PRIORITIES" in str(exc), str(exc)
+    else:
+        raise AssertionError("an undeclared id came back with a priority")
+
+
+def test_scan_raises_each_synthetic_finding_at_its_declared_priority():
+    """The half the set-equality test above cannot reach.
+
+    Every priority in the table is now read by scan.py at the call site, so this
+    holds by construction, and that is exactly why it is worth pinning: the next
+    person to write `"P1"` inline instead of SYNTH(...) reintroduces the drift
+    silently. The document below is built to trip as many of them at once as one
+    document can. Anything it does not reach is asserted against the table by
+    the ceiling rule instead: nothing may be raised at a priority the table does
+    not declare.
+    """
+    from rwlib import lexicon as lexicon_mod
+    declared = lexicon_mod.SYNTHETIC_PRIORITIES
+    # Metronomic on purpose: even sentences, a reused trigram, one flat
+    # paragraph shape, and a zero-width space. That is uniformity,
+    # trigram-repetition, uniform-paragraphs, hidden-unicode and the vocabulary
+    # tiers in one file.
+    beat = ("We must leverage the platform to deliver the outcome — quickly. "
+            "We utilize the innovative platform to deliver the value — daily. ")
+    doc = "\n\n".join([beat * 3] * 6) + "\n\nA delve into the​tapestry.\n"
+    result, _ = scan_text(doc)
+    seen = {}
+    for finding in result["findings"]:
+        if finding["id"] in declared:
+            seen.setdefault(finding["id"], set()).add(finding["priority"])
+    # Pinned, not just non-empty. Without this the ceiling rule below passes
+    # vacuously the day the fixture stops tripping anything.
+    assert set(seen) >= {"hidden-unicode", "tier1", "clarity", "tier2-cluster",
+                         "tier3-density", "uniformity", "low-diversity",
+                         "trigram-repetition", "em-dash-rate"}, sorted(seen)
+    # "P0" sorts before "P2" and is the *more* severe of the two, so the ceiling
+    # test reads backwards: a raised priority may be no smaller than the
+    # declared worst case.
+    for finding_id, priorities in sorted(seen.items()):
+        for priority in priorities:
+            assert priority >= declared[finding_id], (
+                "%s raised at %s, worse than the %s the table declares"
+                % (finding_id, priority, declared[finding_id]))
+
+
+def test_a_catalogue_entry_missing_a_key_is_dropped_rather_than_crashing():
+    """`rx` but no `id` used to compile fine here and then raise KeyError out of
+    scan.py's `relax.get(p["id"])`, which is the whole-scan outage the guard was
+    written to prevent, moved one file along. Every key scan.py reads has to be
+    present before the entry is handed over."""
+    import json
+    import shutil
+    import tempfile
+
+    from rwlib import lexicon as lexicon_mod
+
+    good = lexicon_mod.load()
+    data = json.loads(json.dumps(good))
+    before = len(lexicon_mod.compiled_patterns())
+    data["patterns"].append({"label": "no id", "band": "craft",
+                             "priority": "P2", "rx": "zzzz"})
+    data["patterns"].append({"id": "no-label", "band": "craft",
+                             "priority": "P2", "rx": "qqqq"})
+    data["patterns"].append({"id": "no-rx", "label": "x", "band": "craft",
+                             "priority": "P2"})
+    scratch = tempfile.mkdtemp()
+    try:
+        path = os.path.join(scratch, "lexicon.json")
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(data, fh)
+        lexicon_mod._CACHE.pop(path, None)
+        entries = lexicon_mod.compiled_patterns(path=path)
+        assert len(entries) == before, "%d vs %d" % (len(entries), before)
+        for entry, _ in entries:
+            for key in lexicon_mod.REQUIRED_PATTERN_KEYS:
+                assert entry.get(key), (entry.get("id"), key)
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+def test_a_register_that_skips_hidden_unicode_is_honoured():
+    """Every other finding the engine raises itself is gated on the skip set.
+    This one ran before anything read it, so a cell naming it in registers.json
+    would have been a silent no-op that read in the rendered matrix as a
+    tolerance somebody was honouring."""
+    import scan as scan_mod
+
+    # Escape, never a literal: a normalizing save turns a literal joiner
+    # into nothing at all and deletes the check without changing a
+    # visible character. See rwlib/artifacts.py.
+    text = "# T\n\nA wo\u200drd out of a chat window.\n"
+    assert "hidden-unicode" in {f["id"] for f in scan_mod.scan(text)[0]}
+    real = scan_mod.PROFILE_SKIP.get("blog", set())
+    scan_mod.PROFILE_SKIP["blog"] = set(real) | {"hidden-unicode"}
+    try:
+        quiet = {f["id"] for f in scan_mod.scan(text)[0]}
+    finally:
+        scan_mod.PROFILE_SKIP["blog"] = real
+    assert "hidden-unicode" not in quiet, quiet
+
+
+def test_a_wrapped_bullet_list_is_a_list_and_not_one_long_paragraph():
+    """The parked false positive, actioned. A list whose items wrap over several
+    lines each drives the bullet share below half, so the ratio rule alone read
+    it as a paragraph and the voice cap fired on it. `CHANGELOG.md` reported
+    five of these and every one was a bullet list."""
+    from rwlib.markdown import is_prose_block
+    wrapped = ("- The first item runs on for long enough that it wraps\n"
+               "  across two more lines before it finishes saying what it\n"
+               "  came to say about the change.\n"
+               "- The second item does exactly the same thing, at exactly\n"
+               "  the same length, because that is what a changelog entry\n"
+               "  looks like when somebody writes a real one.\n")
+    assert not is_prose_block(wrapped)
+
+
+def test_a_paragraph_with_a_short_list_under_it_is_still_a_paragraph():
+    """The other half of the rule, unchanged. A lead-in sentence plus one or two
+    bullets is a paragraph with a list under it, and reading it as a list is the
+    mirror-image false negative."""
+    from rwlib.markdown import is_prose_block
+    mixed = ("There are two ways to do this, and the second is usually right.\n"
+             "The first costs less and the second is easier to undo later.\n"
+             "- do it the first way\n")
+    assert is_prose_block(mixed)
+
+
+def test_a_lead_in_followed_by_many_bullets_is_a_list():
+    from rwlib.markdown import is_prose_block
+    mixed = "A lead-in sentence.\n" + "".join("- item %d\n" % i for i in range(8))
+    assert not is_prose_block(mixed)

@@ -14,7 +14,7 @@ runs on a checkout with nothing installed, which is the same promise the scripts
 themselves make. Memoized module functions are the one shape that behaves
 identically in both.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 import importlib.util

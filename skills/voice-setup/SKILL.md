@@ -31,7 +31,7 @@ Two other rules govern the whole process:
 
 **Measure before you believe.** People are unreliable narrators of their own prose. Someone who says "I write short" often averages 24 words a sentence. Where samples exist, the numbers win.
 
-## Four ways in
+## Five ways in
 
 Pick based on what the person has.
 
@@ -68,12 +68,18 @@ Keep the interview to **10 high-signal questions max** covering the 7 core categ
 Point to 3 or 4 pieces written by the author (e.g. Substack posts like [Ruben Substack](https://ruben.substack.com/p/i-am-just-a-text-file), articles, past emails, or chat logs). This is the fastest method because it extracts mechanics automatically without manual typing:
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py sample1.md --json
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/measure_voice.py sample1.md sample2.md sample3.md
 ```
 
-Read off `avg_sentence_words`, `sentence_sd`, `burstiness`, `mattr`, and `em_dashes_per_1k`, and write them into the profile's **Measured from samples** block. Then read the samples yourself for what the numbers miss: paragraph openings, contraction rate, recurring phrases, how they transition, how they sign off, where they hedge.
+One command. It prints a per-sample table so an outlier is visible rather than averaged away, the aggregate with the spread between samples, the **Measured from samples** block ready to paste, and a starter `mechanics` object with the count behind every line. It exits 1 if any sample carries a P0.
 
-**Check the samples for contamination first.** If a sample carries P0 fingerprints (chatbot artifacts, cutoff disclaimers, hidden unicode), the person may have handed you AI-assisted writing. Say so plainly and ask. Never let a tell into a profile: it would then be replicated on purpose, forever. If they confirm a sample is assisted, exclude it and record what you excluded under **Known contamination**.
+Everything it suggests comes from those three or four documents and nothing else, so treat each line as a question rather than an answer. Someone who used no semicolon in four blog posts may still use them in email, and a profile that bans them because a script counted zero is wrong in a way its owner did not choose. The script's job is to make the question specific.
+
+Then read the samples yourself for what no counter sees: paragraph openings, recurring phrases, how they transition, how they sign off, where they hedge, and what they refuse to write.
+
+**Check the samples for contamination first.** `measure_voice.py` does this and stops on it, which is why it exits 1. If a sample carries P0 fingerprints (chatbot artifacts, cutoff disclaimers, hidden unicode), the person may have handed you AI-assisted writing. Say so plainly and ask. Never let a tell into a profile: it would then be replicated on purpose, forever. If they confirm a sample is assisted, exclude it, rerun, and record what you excluded under **Known contamination**.
+
+For one sample at a time, or to see the full finding list behind a P0, `scan.py sample1.md --json` is still there and is what `measure_voice.py` runs underneath.
 
 Combine sample extraction with 3 quick questions about **Hard refusals** (what they refuse to write), since samples show what was written, not what was rejected.
 
@@ -85,7 +91,18 @@ Do not re-run the full interview. A working profile plus one correction beats a 
 
 ### 4. Blend
 
-"70% whit3rabbit, 30% dana." Interpolate the numeric dimensions. Take the **union** of both Never lists, because the stricter refusal wins and refusals are load-bearing. Take structural defaults from the higher-weighted profile. Write the lineage into the new file so it can be traced later.
+"70% whit3rabbit, 30% dana." Half of this is a command:
+
+```bash
+VOICES=${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/rwlib/voices.py \
+  --blend whit3rabbit dana --weight 0.7 --name whit3rabbit-dana \
+  > "$VOICES/whit3rabbit-dana.rules.json"
+```
+
+Bans union, the stricter refusal wins whatever the weight says, and the lineage goes into the file as a `blend` key. Read the notes it prints on stderr: they name every place the two profiles wanted incompatible things, and those are the lines to confirm with whoever the blend is for.
+
+The other half is yours. Interpolate the numeric dimensions (`0.7 × whit3rabbit.formality + 0.3 × dana.formality`) and take structural defaults from the higher-weighted profile, both by hand into a new `.md`. Nothing enforces those numbers, so no script can produce them. A blended rules file without the markdown enforces punctuation and describes nobody.
 
 ### 5. Extend
 
@@ -113,6 +130,15 @@ Reach for `extends` when a person's voice is unchanged and the context is not. R
 **Start from the templates.** `voices/TEMPLATE.md` and `voices/TEMPLATE.rules.json` carry the expected shape and inline guidance. Copy, fill, delete the guidance.
 
 **Use their words.** A profile written in your prose describes a person who does not exist. Quote their answers where they were specific. If they said "no motivational-poster cadence," write that, not "vary paragraph length."
+
+**Let a ban catch its own inflections.** The commonest authoring mistake is listing the singular and stopping, which leaves a rule that reads as enforced and is not. An entry can be a plain string or an object:
+
+```json
+"banned_words": ["piggyback", {"word": "synergy", "inflect": true}],
+"banned_phrases": [{"phrase": "thought leader", "inflect": true}]
+```
+
+`inflect` adds the regular s/es/ed/ing forms, and on a phrase it varies one word at a time, so `thought leader` reaches `thought leaders` and `circle back` reaches `circling back`. It is opt-in per entry so a deliberately narrow ban stays narrow: banning `lowly` should not quietly ban `lowlying`. Irregulars (`run`/`ran`), consonant doubling (`ship`/`shipping`), and derivations (`leader`/`leadership`) are not covered. List those by hand.
 
 **Move what a regex can decide into the JSON.** A banned word list belongs in `banned_words`. "Never attack the person" cannot be a regex and stays in the markdown. Rules of thumb:
 

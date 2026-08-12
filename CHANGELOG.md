@@ -2,9 +2,96 @@
 
 ## Unreleased
 
-Architecture and evidence. Nothing here changes what the engine flags, and the
-100-repo corpus regression, the calibration fixtures, and every published
-self-scan number were re-run to prove it.
+Two passes. The first was architecture and evidence and changed nothing about
+what the engine flags. The second, below, changes it in six places and says so.
+The 100-repo corpus regression, the calibration fixtures, and every published
+self-scan number were re-run after both.
+
+### What the engine flags, changed on purpose
+
+- **An HTML character reference is the character it renders as.** `&mdash;` and
+  `&#8212;` count as em dashes now, so a find-and-replace no longer walks a
+  document past `verify.py`'s "no em dashes added" gate or a voice that forbids
+  them. The mirror case is fixed with it: the `;` closing `&amp;` or `&nbsp;` is
+  markup, and a profile that forbids semicolons was reporting one finding per
+  entity in a README header.
+- **A wrapped bullet list is a list.** `is_prose_block` decided by ratio alone,
+  so a list whose items wrap over several lines each scored as one long
+  paragraph. `CHANGELOG.md` reported five of these under a voice profile and
+  every one was false. `long-paragraph` in the README checker drops from 406 to
+  390 across the corpus for the same reason. This was parked in `PROOF.md` for a
+  release with its fix already written down, and this is that release.
+- **Image sources are preserved by `verify.py`.** A relative extensionless
+  `src` fell through both the URL and path checks. Measured before the change:
+  0 of 341 markdown images in the corpus were in the gap, and 3 HTML ones. Alt
+  text stays editable, with the measurement behind that decision in `PROOF.md`.
+- **The README checker reads the LICENSE file.** Given a real path it walks up
+  to the repository root for `LICENSE`, `LICENCE`, or `COPYING`. A file with no
+  License section sharpens the existing `no-license` finding to P1. A License
+  section over a tree with no file is a new P1. A walk that never finds a root
+  says nothing rather than guessing.
+- **Suppressions, with the reason mandatory.**
+  `<!-- rabbit-allow: citation-leak (why) -->` stops a known finding failing the
+  run. Without a reason it does not apply and raises a P1 of its own. The
+  finding is still printed, with the reason and the line that allowed it, and
+  one covering nothing is reported at P2 so stale ones do not accumulate. This
+  repo does not use it on `references/patterns.md`, whose five P0s `PROOF.md`
+  publishes on purpose.
+- **Voice profiles can say more.** `"inflect": true` on a ban expands the
+  regular s/es/ed/ing forms, opt-in per entry so a narrow ban stays narrow.
+  `mechanics_by_register` and `applies_to_registers` on a `banned_regex` let a
+  profile scope its own rule to a register, which is the on-the-clock and
+  off-the-clock distinction the profile markdown has always drawn and the rules
+  file could not express. A register still cannot relax a voice rule.
+
+### New tools
+
+- **`scan.py --voice auto`**, which resolves `.rabbit-voice`, then
+  `voices/ACTIVE`, then a lone installed profile. The order lived only in
+  `readme_check.py`, so the two checkers in one plugin could disagree about
+  whose rules were in force. It is in `rwlib.voices.resolve` now. No profile is
+  applied unless asked for, because that is what the `rabbit-scan` hook runs in
+  somebody else's repository.
+- **`voice-setup/scripts/measure_voice.py`**, which turns the sample workflow
+  into one command: a per-sample table, the aggregate with the spread, the
+  `Measured from samples` block ready to paste, and a starter `mechanics` object
+  with the count behind every line. Exits 1 if any sample carries a P0.
+- **`rwlib/voices.py --blend a b --weight 0.7`**, for the half of blending a
+  script can do. Bans union, the stricter side wins whatever the weight says,
+  genuine conflicts are reported by name, and the lineage goes into the file.
+  `references/voice.md` now says plainly that the numeric dimensions are not
+  blended by anything, because nothing reads them.
+
+### The detector corpus, still empty, no longer unreachable
+
+- **`scripts/detector-corpus/fetch_samples.py`.** `score.py` has always ended
+  its report with "refetch from the archive URLs" and nothing did it, so
+  reproducing a published rate on a fresh clone was a manual afternoon. It is
+  the one script here that makes network requests: only http and https are
+  followed, a mismatch never overwrites a good local copy, and a text that was
+  extracted by hand is reported as manual rather than as a failure, because it
+  never claimed to round-trip.
+- **A second kind of provenance.** A `human` sample can now prove its date with
+  a published research corpus instead of a web archive capture, recording the
+  dataset, the pinned revision, the split, the row, the collection date, and the
+  licence. Rows are refetched through the Hugging Face datasets viewer, which is
+  JSON over HTTPS and so does not put `datasets` and `pyarrow` into a stdlib-only
+  repository.
+- **`test_corpus_harness.py`**, with the network stubbed, now runs in CI. The
+  code that will publish a false-positive rate the day somebody populates this
+  had never run over a populated corpus.
+- **An informational `score.py` step in CI**, which never gates. The corpus is
+  empty, `PROOF.md` says so, and a number nobody sees is a number nobody notices
+  has stayed at zero.
+- **Candidate datasets checked and written up**, in `docs/detector-corpus/README.md`.
+  Nothing was added. RAID is the trap worth naming: MIT-licensed, the obvious
+  choice, and widely summarised as pre-2022 Wayback-sourced human text, while the
+  paper says its abstracts are filtered to 2023 or later. Three other corpora
+  clear the date bar and are written in registers this engine does not measure.
+  The gap is a sourcing problem, not a tooling one.
+- Two Wilson figures quoted in `corpus_io.py` and `PROOF.md` were rounded the
+  wrong way. Zero flags over fifty samples is an upper bound of 7.1%, not "under
+  7%", and 52 is where it crosses. Recomputed and pinned by a test.
 
 ### One home per fact
 
@@ -44,7 +131,11 @@ last two review passes spent themselves.
 - **`extends` in a voice rules file.** Bans union with the parent, mechanics
   merge key by key with the child winning. Cycles and missing parents are errors,
   because a profile that inherits from nothing enforces nothing.
-- **`.pre-commit-hooks.yaml`**, three hooks, all gating on P0 only.
+- **`.pre-commit-hooks.yaml`**, four hooks, all gating on P0 only. Two defaults
+  that apply no voice profile, and `readme-check-voice` and `rabbit-scan-voice`
+  as the opt-ins: pre-commit clones this repository, so a shipped default that
+  enforced a voice would enforce this author's, and a stranger's em dash is not
+  a defect in a stranger's README.
 - **An English-only scope, stated.** Every band and tier list here is calibrated
   on English. A document whose letters are mostly non-ASCII now gets a note at
   the top of the report. A note, never a failure: a bilingual README with an

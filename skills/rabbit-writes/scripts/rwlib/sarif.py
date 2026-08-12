@@ -21,7 +21,7 @@ Nothing here decides anything. It reformats a list of findings that some other
 module already produced, which is why it is safe for it to know nothing about
 prose.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 from . import findings as findings_mod
@@ -61,19 +61,36 @@ def build(findings, uri, tool_name, tool_version=None, information_uri=None,
     whose artifact location it cannot resolve to a file in the checkout, and
     "silently" is the operative word: the upload succeeds and nothing appears.
     """
+    # A rule's default level is the worst priority anything under that id
+    # reached in this document, not whichever one happened to come first.
+    # `hidden-unicode` is P0 for a zero-width character and P2 for a run of
+    # non-breaking spaces, and a document with both used to declare the rule
+    # whichever the iteration order handed over. Per-result levels below are
+    # computed per finding and were always right.
+    # The label travels with it. Taking the level from the worst finding and the
+    # description from whichever came first is how a rule ends up declaring
+    # `error` under the heading "Hidden unicode: non-breaking space".
+    worst = {}
+    for f in findings:
+        rank = findings_mod.PRIORITY_RANK.get(f["priority"],
+                                              len(findings_mod.PRIORITY_RANK))
+        if f["id"] not in worst or rank < worst[f["id"]][0]:
+            worst[f["id"]] = (rank, f["priority"], f["label"])
+
     rules, rule_index = [], {}
     for f in findings:
         if f["id"] in rule_index:
             continue
         rule_index[f["id"]] = len(rules)
+        _, priority, label = worst[f["id"]]
         rules.append({
             "id": f["id"],
             "name": f["id"],
-            "shortDescription": {"text": f["label"]},
+            "shortDescription": {"text": label},
             "fullDescription": {"text": BAND_DESCRIPTIONS.get(f["band"], "")},
             "defaultConfiguration": {
-                "level": LEVEL_BY_PRIORITY.get(f["priority"], "note")},
-            "properties": {"band": f["band"], "priority": f["priority"],
+                "level": LEVEL_BY_PRIORITY.get(priority, "note")},
+            "properties": {"band": f["band"], "priority": priority,
                            "tags": [f["band"]]},
         })
 

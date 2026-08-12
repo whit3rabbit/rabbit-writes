@@ -4,10 +4,11 @@ Sentence and word segmentation.
 
 English only, and deliberately so. The abbreviation list, the capital-letter
 initial rule, the syllable heuristic, and the word pattern are all calibrated on
-English orthography. rwlib.language.looks_like_english exists so a caller can
-say that out loud instead of silently reporting nonsense.
+English orthography. rwlib.language.note exists so a caller can say that out
+loud instead of silently reporting nonsense, and rwlib.language.measure is the
+number it says it with.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 import re

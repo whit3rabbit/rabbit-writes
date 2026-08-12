@@ -105,3 +105,18 @@ def test_a_relaxed_rule_still_fires_past_its_allowance():
 def test_a_register_that_skips_a_rule_stays_silent():
     strict, _ = scan_text(QUOTES, "--profile", "blog")
     assert not [f for f in strict["findings"] if f["id"] == "curly-quote"]
+
+
+def test_a_p0_only_cell_on_a_p0_finding_is_rejected():
+    """skip_table folds p0-only in with skip on the stated grounds that every id
+    it names is P1 or P2. Nothing checked that, so a p0-only cell on a P0 id
+    would have read in the docs as "the credibility killers still fire here" and
+    behaved as a full suppression of one."""
+    real = registers.priorities()
+    assert real["hidden-unicode"] == "P0", real["hidden-unicode"]
+    assert real["tier1"] == "P1", real["tier1"]
+    assert not registers.problems(known_ids(), id_priorities=real)
+
+    lying = dict(real, tier1="P0")
+    complaints = registers.problems(known_ids(), id_priorities=lying)
+    assert any("p0-only" in c for c in complaints), complaints

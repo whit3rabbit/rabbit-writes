@@ -88,6 +88,15 @@ def sentence_split(text):
     # Very light sentence splitter: split on . ! ? followed by whitespace+capital
     # or newline, while trying not to split on common abbreviations, decimal
     # numbers, or version strings.
+    # Strip any literal <DOT> first, before the whitespace collapse, so removing
+    # it cannot leave the double space it was sitting between. The sentinel below
+    # is a plain string, so a document that already contains one gets it turned
+    # into a period on the way out. The engine's splitter had the same bug with
+    # U+2024 and it is recorded in PROOF.md. Stripping is chosen over a rarer
+    # sentinel because it cannot move a published number: no README in the corpus
+    # contains the token, so every committed stats.json is unchanged, and the
+    # splitter stays frozen.
+    text = text.replace("<DOT>", "")
     text = re.sub(r"\s+", " ", text).strip()
     if not text:
         return []

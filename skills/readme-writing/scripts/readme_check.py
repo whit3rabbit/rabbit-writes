@@ -12,11 +12,17 @@ is publishing the thing.
 Everything here is something a regex or a counter can decide. Whether the
 pitch is *good* is a judgment call and stays in SKILL.md.
 
+One check reads outside the file. Given a README that exists on disk, the
+licence cross-check walks up to the repository root looking for a LICENSE,
+LICENCE, or COPYING file, and reports either direction of the mismatch: a file
+the README never names, or a License section over a tree with no file in it.
+A walk that never finds a root stays silent rather than guessing.
+
 Usage:
     python3 readme_check.py README.md
     python3 readme_check.py README.md --json
     python3 readme_check.py README.md --check          # exit 1 on any P0
-    python3 readme_check.py README.md --no-voice       # structure only
+    python3 readme_check.py README.md --no-voice       # no style profile
     python3 readme_check.py README.md --voice-rules path/to/dana.rules.json
 
 Voice resolution, in order: --voice-rules, then a .rabbit-voice file beside
@@ -24,10 +30,16 @@ the README or in the working directory, then skills/rabbit-writes/voices/ACTIVE.
 A missing voice is reported as a note, never an error: plenty of projects have
 no profile, and failing the run would just teach people to pass --no-voice.
 
+--no-voice turns off the style profile, not the reading. Structure, fingerprints
+and craft are all still checked, because a pasted citation marker is evidence
+about how a file was made and has nothing to do with whose voice it is in.
+
 Exit codes: 0, or 1 with --check when a P0 is present, or 2 when the README
-itself cannot be read. A voice that cannot be resolved is a note and still exits
-0, for the reason above; a README that cannot be opened has nothing to check.
-Stdlib only, 3.8+.
+itself cannot be read, or when --voice-rules names a profile that cannot be
+read. A voice that cannot be *resolved* is a note and still exits 0, for the
+reason above. A profile asked for by name is different, and matches scan.py: a
+clean voice band on a profile nobody read is a false pass.
+Stdlib only, 3.9+.
 """
 
 import argparse
@@ -51,7 +63,7 @@ if RWLIB_PARENT not in sys.path:
 
 from rwlib import corpus as corpus_mod            # noqa: E402
 from rwlib import findings as findings_mod        # noqa: E402
-from rwlib import language, sarif                 # noqa: E402
+from rwlib import language, sarif, suppress       # noqa: E402
 from rwlib import voices as voices_mod            # noqa: E402
 from rwlib.markdown import (BARE_URL_RX, FENCE_RX, HEADING_RX,  # noqa: E402
                             HTML_ANCHOR_RX, HTML_IMG_RX, HTML_TAG_LINE_RX,
@@ -171,6 +183,9 @@ def find_pitch(raw):
 
 HTML_BLOCK_OPEN_RX = re.compile(r"(?i)<(?:details|table)\b")
 HTML_BLOCK_CLOSE_RX = re.compile(r"(?i)</(?:details|table)>")
+# A line that opens a fence, whether or not anything ever closes it. Only used
+# as a backstop against FENCE_RX, which requires the pair.
+OPEN_FENCE_RX = re.compile(r"^```", re.M)
 
 
 def scan_for_pitch(raw, skip_html_blocks=True, heading_closes_blocks=False):
@@ -323,6 +338,92 @@ def check_structure(raw, scored, findings, stats):
     return sections
 
 
+# Every spelling of the file, across the licences and the two Englishes. Matched
+# case-insensitively against the whole name, because `LICENSE`, `LICENSE.md`,
+# `LICENSE.txt`, `license`, and `COPYING` are all in the wild and none of them is
+# wrong. `COPYING.LESSER` and `LICENSE-MIT` come along with the prefix test.
+LICENSE_FILE_PREFIXES = ("license", "licence", "copying", "copyright")
+
+
+def find_license_file(readme_path, max_up=8):
+    """(path to the licence file or None, whether the repository root was seen).
+
+    Walks up from the README's own directory, because a `docs/README.md` is
+    governed by the `LICENSE` at the repository root, and calling that project
+    unlicensed is exactly the false assertion this skill's checklist is about.
+    The walk stops at the directory holding `.git`: past the repository root the
+    answer would be somebody else's licence, or the home directory's.
+
+    The second value is why this returns a pair. A walk that runs out of depth
+    without ever finding a root does not know where the project ends, so it
+    cannot say a file is *absent* -- only that it did not find one. The caller
+    reports a missing licence only when the root was reached. `max_up` is a
+    runaway guard on an unbounded walk, not the real limit.
+    """
+    directory = os.path.dirname(os.path.abspath(readme_path))
+    for _ in range(max_up + 1):
+        try:
+            names = os.listdir(directory)
+        except OSError:
+            return None, False
+        for name in sorted(names):
+            if (name.lower().startswith(LICENSE_FILE_PREFIXES)
+                    and os.path.isfile(os.path.join(directory, name))):
+                return os.path.join(directory, name), True
+        if ".git" in names:
+            return None, True
+        parent = os.path.dirname(directory)
+        if parent == directory:
+            return None, True          # filesystem root: the walk is over
+        directory = parent
+    return None, False
+
+
+def check_license_file(readme_path, findings, stats):
+    """Cross-check the README's licence claim against the tree it sits in.
+
+    The checklist has said "check for a LICENSE file rather than guessing" since
+    the skill shipped, and nothing did: this script read the README and only the
+    README, so both halves of the mismatch were invisible to it. A README's most
+    common failure mode is asserting something false, and "MIT" over an empty
+    directory is that failure in its purest form.
+
+    Only runs on a README that exists on disk. Scanning a string through a
+    temporary file has no tree around it, and every such run would otherwise
+    report a missing licence file for a repository nobody named.
+    """
+    if not readme_path or not os.path.isfile(readme_path):
+        return
+    has_section = "license" in stats.get("sections", [])
+    path, saw_root = find_license_file(readme_path)
+    stats["license_file"] = os.path.basename(path) if path else None
+
+    if path and not has_section:
+        # The hedge in `no-license` is there because this script could not see
+        # the tree. Now that it can, and the file is sitting right there, the
+        # finding is a fact rather than a prompt to go and look.
+        for entry in findings:
+            if entry["id"] == "no-license":
+                entry["priority"] = "P1"
+                entry["excerpt"] = (
+                    "%s is sitting beside this README and the README does not "
+                    "name it. 72%% of the corpus does. One line at the end: the "
+                    "licence name and a link to the file."
+                    % os.path.basename(path))
+                break
+    elif has_section and not path and saw_root:
+        findings.append(finding(
+            "license-file-missing",
+            "License section with no license file in the tree", "P1", 1,
+            "The README has a License section and there is no LICENSE, LICENCE, "
+            "or COPYING file here or in any parent up to the repository root. "
+            "Either the file is missing from the repository, in which case a "
+            "reader cannot act on the section, or it is somewhere this check "
+            "does not look. Confirm before publishing: a licence a project does "
+            "not actually carry is the most expensive thing a README can get "
+            "wrong."))
+
+
 def check_toc(scored, findings, stats):
     words = stats["prose_words"]
     anchor_links = [u for _, u in LINK_RX.findall(strip_images(scored))
@@ -441,6 +542,19 @@ def check_media_and_claims(raw, scored, findings, stats):
     stats["badge_count"] = len(badges)
     stats["image_count"] = len(image_urls)
     stats["code_blocks"] = len(FENCE_RX.findall(raw))
+    if not stats["code_blocks"] and OPEN_FENCE_RX.search(raw):
+        # Backstop for a final fence nobody closed, in the shape of the one
+        # find_pitch keeps for an unclosed <table>. FENCE_RX needs a closing
+        # delimiter, so a README whose last block runs to end of file counts
+        # zero and reports no-code-block, which is visibly false: GitHub renders
+        # the block anyway. The strict count runs first and this only fires when
+        # it found nothing at all, so a well-formed README never reaches it.
+        #
+        # Only the count is repaired. The unclosed block's body still survives
+        # the blanking below and in check_prose_shape, so its contents are
+        # measured as prose. Fixing that means teaching FENCE_RX about a fence
+        # with no end, which moves every number this file reports.
+        stats["code_blocks"] = 1
 
     if len(badges) > BADGE_WALL:
         findings.append(finding(
@@ -543,57 +657,22 @@ def check_prose_shape(raw, findings, stats):
 # voice
 # ---------------------------------------------------------------------------
 
-def installed_voices():
-    """Profile names in voices/, excluding the template."""
-    if not os.path.isdir(VOICES_DIR):
-        return []
-    return sorted(f[:-len(".rules.json")] for f in os.listdir(VOICES_DIR)
-                  if f.endswith(".rules.json") and not f.startswith("TEMPLATE"))
+# Both from rwlib.voices, which is where a rules path becomes a profile name for
+# every other caller too. Restating the suffix here was two homes for one fact.
+RULES_SUFFIX = voices_mod.RULES_SUFFIX
+strip_rules_suffix = voices_mod.strip_rules_suffix
 
 
 def resolve_voice(readme_path):
-    """(path_to_rules, voice_name, note).
+    """Which profile applies to this README, and why.
 
-    Whoever is active governs. Nothing here knows or prefers a particular
-    person: a `.rabbit-voice` file pins a repo's house voice, otherwise
-    `voices/ACTIVE` decides, and only when neither exists does the one profile
-    sitting in `voices/` get used as a fallback. That last case is announced in
-    a note rather than assumed, because writing in the wrong person's register
-    is worse than writing in none.
+    A thin alias. The resolution order (`.rabbit-voice`, then `voices/ACTIVE`,
+    then a lone installed profile) used to be written out here and nowhere else,
+    so `scan.py` next door had none of it and the two checkers in one plugin
+    could disagree about whose rules were in force. It lives in rwlib.voices
+    now. The name stays because the report and the tests speak it.
     """
-    for base in (os.path.dirname(os.path.abspath(readme_path)), os.getcwd()):
-        pin = os.path.join(base, ".rabbit-voice")
-        if os.path.exists(pin):
-            name = open(pin, encoding="utf-8").read().strip()
-            rules = os.path.join(VOICES_DIR, name + ".rules.json")
-            if os.path.exists(rules):
-                return rules, name, "voice pinned by %s" % pin
-            return None, name, ("%s names %r but voices/%s.rules.json does not exist"
-                                % (pin, name, name))
-
-    active = os.path.join(VOICES_DIR, "ACTIVE")
-    name = ""
-    if os.path.exists(active):
-        name = open(active, encoding="utf-8").read().strip()
-    if name:
-        rules = os.path.join(VOICES_DIR, name + ".rules.json")
-        if os.path.exists(rules):
-            return rules, name, None
-        return None, name, ("active voice %r has no .rules.json, so none of its rules are "
-                            "mechanically enforced" % name)
-
-    why = "voices/ACTIVE is missing" if not os.path.exists(active) else "voices/ACTIVE is empty"
-    others = installed_voices()
-    if len(others) == 1:
-        return (os.path.join(VOICES_DIR, others[0] + ".rules.json"), others[0],
-                "%s, falling back to the only profile installed (%s). Say so in the "
-                "report, and offer voice-setup: this is probably not the user's voice"
-                % (why, others[0]))
-    if others:
-        return None, None, ("%s and %d profiles are installed (%s). Name one with "
-                            "--voice-rules rather than guessing"
-                            % (why, len(others), ", ".join(others)))
-    return None, None, "%s and no profile is installed, prose checked against craft rules only" % why
+    return voices_mod.resolve(readme_path, voices_dir=VOICES_DIR)
 
 
 def load_scan():
@@ -605,20 +684,38 @@ def load_scan():
     return module
 
 
-def run_prose_scan(raw, rules_path):
+def run_prose_scan(raw, rules_path, required=False):
+    """(findings, stats, note) for the prose half of the report.
+
+    A voice that cannot be loaded never cancels the scan. It used to return an
+    empty finding list, so `--voice-rules <typo>` printed "No mechanical
+    findings" and exited 0 on a README with `citeturn0search0` in it: the
+    fingerprint band, which has nothing to do with whose voice it is in,
+    disappeared along with the profile.
+
+    `required` is set when --voice-rules named the file by hand. Then the error
+    is raised instead, and main() exits 2 the way scan.py does, because
+    reporting a clean voice band on a profile nobody read is worse than
+    stopping. A profile that was merely *resolved* stays a note: plenty of
+    projects have none, and failing there teaches people to pass --no-voice.
+    """
     scan = load_scan()
     if scan is None:
         return [], {}, "rabbit-writes/scripts/scan.py not found, prose not scanned"
-    rules = None
+    rules, note = None, None
     if rules_path:
         try:
             rules = voices_mod.load(rules_path, voices_dir=VOICES_DIR)
         except voices_mod.VoiceError as exc:
-            return [], {}, str(exc)
+            if required:
+                raise
+            note = ("%s. No voice band in this report, everything else still "
+                    "ran" % exc)
     # register 'docs': a README is documentation, not a blog post. The register
     # relaxes general craft rules only, never a voice rule.
-    findings, stats = scan.scan(raw, "docs", True, rules)
-    return findings, stats, None
+    findings, stats = scan.scan(raw, "docs", True, rules,
+                                suppressions=False)
+    return findings, stats, note
 
 
 # ---------------------------------------------------------------------------
@@ -643,6 +740,11 @@ def report(path, findings, stats, voice_name, notes):
     for note in notes:
         out.append("note: %s" % note)
     out.append("")
+
+    # Held out of the priority sections and printed under their own heading
+    # below. Reported, never hidden: see rwlib/suppress.py.
+    allowed = suppress.suppressed(findings)
+    findings = suppress.live(findings)
 
     if not findings:
         out.append("No mechanical findings. The judgment still has to happen: "
@@ -670,9 +772,24 @@ def report(path, findings, stats, voice_name, notes):
                     out.append("    ... and %d more %s" % (n - 4, fid))
         out.append("")
 
+    if allowed:
+        out.append("suppressed by rabbit-allow (%d, not counted above)"
+                   % len(allowed))
+        for f in allowed:
+            out.append("    L%-4d %s" % (f["line"], f["label"]))
+            out.append("           allowed at L%d: %s"
+                       % (f["suppressed_at"], f["suppressed"]))
+        out.append("")
+
     pct = CORPUS["word_count_percentiles"]
     link = CORPUS["link_style_pct"]
-    out.append("corpus comparison (%d trending repos)" % CORPUS["n_repos"])
+    # Dated, because the study is a frozen snapshot skewed toward whatever was
+    # trending the week it was taken. Undated, "100 trending repos" reads as a
+    # standing fact, and a reader two years out has no way to discount it
+    # without going and finding the writeup.
+    measured = CORPUS.get("measured_at")
+    out.append("corpus comparison (%d trending repos%s)"
+               % (CORPUS["n_repos"], ", %s" % measured if measured else ""))
     rows = [
         ("prose words", stats.get("prose_words"), "median %d, p25 %d, p75 %d"
          % (pct["p50"], pct["p25"], pct["p75"])),
@@ -691,6 +808,12 @@ def report(path, findings, stats, voice_name, notes):
         ("license section words", stats.get("license_words"),
          "corpus median %g" % CORPUS["median_license_words"]),
     ]
+    # Reported whichever way it came out, including "none". A checker that only
+    # speaks up when it found something leaves the reader unable to tell a clean
+    # cross-check from one that never ran.
+    if "license_file" in stats:
+        rows.append(("license file", stats["license_file"] or "none found",
+                     "beside the README or up to the repository root"))
     for name, value, note in rows:
         if value is None:
             continue
@@ -717,8 +840,16 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None):
     check_toc(scored, findings, stats)
     check_links(scored, findings, stats)
     check_media_and_claims(raw, scored, findings, stats)
+    # After check_structure, which is what fills stats["sections"], and after
+    # the no-license finding it may sharpen.
+    check_license_file(readme_path, findings, stats)
 
-    voice_name = None
+    # The prose scan runs either way. `use_voice` decides whether a person's
+    # style rules apply, not whether the document gets read: a pasted citation
+    # marker or an unfilled placeholder is a P0 about how the file was produced,
+    # and skipping it because nobody set a voice is how the pre-commit hook came
+    # to check a stranger's structure while ignoring `citeturn0search0` in it.
+    voice_name, rules_path = None, None
     if use_voice:
         rules_path = voice_rules
         if rules_path is None:
@@ -726,26 +857,37 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None):
             if note:
                 notes.append(note)
         else:
-            voice_name = os.path.basename(rules_path).replace(".rules.json", "")
+            voice_name = strip_rules_suffix(os.path.basename(rules_path))
         # The rules file is the floor. Point at the profile prose every run,
         # because a clean scan reads like a pass and the half that decides
         # whether this sounds like anyone is in the markdown.
         if rules_path:
-            profile = rules_path.replace(".rules.json", ".md")
+            profile = strip_rules_suffix(rules_path) + ".md"
             if os.path.exists(profile):
                 notes.append("read %s too, the rules file is only the "
                              "regex-checkable subset of it" % profile)
-        prose_findings, prose_stats, note = run_prose_scan(raw, rules_path)
-        if note:
-            notes.append(note)
-        findings.extend(prose_findings)
-        for key in ("avg_sentence_words", "burstiness", "mattr", "em_dashes_per_1k"):
-            if key in prose_stats:
-                stats[key] = prose_stats[key]
+
+    prose_findings, prose_stats, note = run_prose_scan(
+        raw, rules_path, required=bool(use_voice and voice_rules))
+    if note:
+        notes.append(note)
+    findings.extend(prose_findings)
+    for key in ("avg_sentence_words", "burstiness", "mattr", "em_dashes_per_1k"):
+        if key in prose_stats:
+            stats[key] = prose_stats[key]
 
     note = language.note(raw)
     if note:
         notes.append(note)
+
+    # Inline `rabbit-allow` comments cover the structure half too. The prose
+    # half arrives already marked, because scan.scan applies them itself, and
+    # apply() skips a finding that is already suppressed so the reason does not
+    # get overwritten by a second pass over the same comments.
+    allowances, problems = suppress.parse(raw)
+    used = suppress.apply(findings, allowances)
+    findings.extend(suppress.audit(allowances, problems, used,
+                                   findings_mod.make))
 
     findings.sort(key=findings_mod.sort_key)
     return findings, stats, voice_name, notes
@@ -762,7 +904,8 @@ def main():
                     help="the path to record in the SARIF output, relative to the "
                          "repository root. Defaults to the file argument")
     ap.add_argument("--no-voice", action="store_true",
-                    help="skip the prose and voice scan, check structure only")
+                    help="apply no voice profile. Structure, fingerprints and "
+                         "craft are still checked")
     ap.add_argument("--voice-rules", metavar="PATH",
                     help="a voice's <name>.rules.json; overrides .rabbit-voice and ACTIVE")
     ap.add_argument("--check", action="store_true", help="exit 1 if any P0 finding is present")
@@ -775,8 +918,17 @@ def main():
         print("readme_check: %s" % exc, file=sys.stderr)
         return 2
 
-    findings, stats, voice_name, notes = check_readme(
-        raw, args.file, use_voice=not args.no_voice, voice_rules=args.voice_rules)
+    try:
+        findings, stats, voice_name, notes = check_readme(
+            raw, args.file, use_voice=not args.no_voice,
+            voice_rules=args.voice_rules)
+    except voices_mod.VoiceError as exc:
+        # Only reachable from an explicit --voice-rules. Same exit code and same
+        # reasoning as scan.py: a profile asked for by name and not read is an
+        # error, because the alternative is a clean voice band on a document
+        # nobody checked against it.
+        print("readme_check: %s" % exc, file=sys.stderr)
+        return 2
 
     if args.sarif:
         print(json.dumps(sarif.build(
@@ -784,6 +936,7 @@ def main():
             tool_version=CORPUS.get("schema_version"),
             information_uri="https://github.com/whit3rabbit/rabbit-writes",
             extra_properties={"corpusRepos": CORPUS["n_repos"],
+                              "corpusMeasuredAt": CORPUS.get("measured_at"),
                               "voice": voice_name}), indent=2))
     elif args.json:
         print(json.dumps({
@@ -799,7 +952,11 @@ def main():
     else:
         print(report(args.file, findings, stats, voice_name, notes))
 
-    if args.check and any(f["priority"] == "P0" for f in findings):
+    # A suppressed P0 does not fail the run, the same as scan.py. That is the
+    # point of the mechanism, and it is why the reason is mandatory and the
+    # finding is printed anyway.
+    if args.check and any(f["priority"] == "P0" and "suppressed" not in f
+                          for f in findings):
         return 1
     return 0
 

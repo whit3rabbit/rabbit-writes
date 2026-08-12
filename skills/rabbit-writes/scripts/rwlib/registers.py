@@ -20,7 +20,7 @@ rendered from the same data:
 validate.py runs --check, so editing the table by hand fails the build with the
 diff rather than shipping a document that describes a different engine.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 import json
@@ -118,15 +118,39 @@ def unimplemented_rules(path=REGISTERS_PATH):
     return [r["label"] for r in load(path)["rules"] if not r["id"]]
 
 
-def problems(known_ids, path=REGISTERS_PATH):
+def priorities(lexicon_path=None):
+    """{finding id: worst priority it can be raised at}.
+
+    Catalogue patterns carry their own, the engine's own findings are listed in
+    lexicon.SYNTHETIC_PRIORITIES, and the two id spaces do not overlap.
+
+    The argument names the *lexicon*, unlike every other `path` in this module.
+    Spelled out, because it read as the registers path and would have loaded
+    registers.json as a catalogue: no `patterns` key, no error, and every
+    catalogue priority silently missing from the answer.
+    """
+    from . import lexicon
+    out = dict(lexicon.SYNTHETIC_PRIORITIES)
+    for pattern in lexicon.load(lexicon_path or lexicon.LEXICON_PATH).get("patterns", []):
+        if pattern.get("id") and pattern.get("priority"):
+            out[pattern["id"]] = pattern["priority"]
+    return out
+
+
+def problems(known_ids, path=REGISTERS_PATH, id_priorities=None):
     """Everything wrong with the matrix, as messages. Run by validate.py.
 
     `known_ids` is every finding id the engine can raise. A cell naming an id
     outside it is a silent no-op: the register quietly stops honouring a
     tolerance it claims in the docs, and the only symptom is a finding somebody
     eventually learns to ignore.
+
+    `id_priorities` defaults to reading the lexicon, and exists as an argument
+    so a test can hand in a matrix that does not match the shipped catalogue.
     """
     data = load(path)
+    if id_priorities is None:
+        id_priorities = priorities()
     known_registers = set(data["registers"])
     out = []
     if data["default_register"] not in known_registers:
@@ -163,8 +187,18 @@ def problems(known_ids, path=REGISTERS_PATH):
                 out.append("%s says partial, which only means something for a "
                            "vocabulary rule (%s)"
                            % (where, ", ".join(data["vocabulary_rules"])))
+            # skip_table folds p0-only in with skip, on the stated grounds that
+            # every id it names is P1 or P2. Nothing used to check that, so a
+            # p0-only cell on a P0 id would have read in the docs as "the P0s
+            # still fire here" and behaved as a full suppression of a
+            # credibility killer.
+            if mode == "p0-only" and id_priorities.get(rule["id"]) == "P0":
+                out.append("%s says p0-only, but %r is itself a P0. That cell "
+                           "suppresses the finding outright, which is the "
+                           "opposite of what it says" % (where, rule["id"]))
+    relaxed = relax_table(path)
     for register, ids in skip_table(path).items():
-        overlap = sorted(ids & set(relax_table(path).get(register, {})))
+        overlap = sorted(ids & set(relaxed.get(register, {})))
         if overlap:
             out.append("register %r both skips and relaxes %s; skip wins, so "
                        "the allowance never applies" % (register, ", ".join(overlap)))

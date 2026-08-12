@@ -8,8 +8,26 @@ add em dashes or leave a draft with more tells than it started with. Edit mode
 writes to files, so a broken promise there is silent and destructive. This is
 what checks them.
 
-One of those checks is narrower than the promise: a file path is tracked only
-when it carries an extension, for the reason spelled out at PATH_RX. Everything
+Two of those checks are narrower than the promise, and both narrowings are
+measured rather than assumed. A file path is tracked only when it carries an
+extension, for the reason spelled out at PATH_RX.
+
+Image *sources* are checked, as of the pass that measured them. They used to be
+covered only incidentally, by URL_RX when the src is absolute and by PATH_RX
+when it is relative and carries an extension, so a relative extensionless src
+was unprotected. See uncovered_image_srcs: over the 100-README corpus the gap
+held 0 of 341 markdown images and 3 HTML ones, which is what made closing it
+obviously worth doing.
+
+Image *alt text* is still not covered, and that is now a decision with a number
+under it rather than a note. Over the same corpus: 337 images carry alt text,
+7,282 characters of it, containing 0 lexicon tells and 18 prose dashes. The 18
+cost nothing today, because both counters compare a before to an after and an
+editor that leaves alt text alone moves neither. What protecting it verbatim
+*would* cost is the legitimate edit: alt text in this corpus is overwhelmingly
+badge labels, and "PyPI" becoming "PyPI version" is a fix, not a violation.
+SKILL.md's guardrails never promised alt text was untouchable, so requiring it
+here would be this file inventing a promise the skill does not make. Everything
 else on the list is checked in full.
 
 Usage:
@@ -49,9 +67,10 @@ from rwlib.artifacts import norm_url                                  # noqa: E4
 # QUOTED_RX is a re-export, not a caller: test_verify.py asserts it is the
 # same object scan.py holds. See the note in scan.py.
 from rwlib.markdown import (BLOCKQUOTE_RX, FENCE_RX, FRONTMATTER_RX,  # noqa: E402,F401
-                            HEADING_RX, INLINE_CODE_RX, PATH_RX,
-                            PROSE_DASH_RX, QUOTED_RX, TABLE_ROW_RX,
-                            URL_RX, apply_exemptions, blank, context)
+                            HEADING_RX, HTML_IMG_RX, IMAGE_RX,
+                            INLINE_CODE_RX, PATH_RX, PROSE_DASH_RX, QUOTED_RX,
+                            TABLE_ROW_RX, URL_RX, apply_exemptions, blank,
+                            context)
 
 LEXICON_PATH = lexicon_mod.LEXICON_PATH
 
@@ -132,7 +151,36 @@ def extract(text):
         "headings": HEADING_RX.findall(prose),
         "urls": URL_RX.findall(text),
         "paths": PATH_RX.findall(unlinked),
+        "image_srcs": uncovered_image_srcs(prose),
     }
+
+
+def uncovered_image_srcs(text):
+    """Image sources that neither the URL check nor the path check would catch.
+
+    An image's src was covered incidentally: by URL_RX when it is absolute, and
+    by PATH_RX when it is relative and carries an extension. A relative
+    extensionless src, `<img src="assets/logo">`, fell through both, and an edit
+    could retarget it with nothing reported.
+
+    Only the leftovers are returned, for the reason spelled out at PATH_RX's
+    exclusion in extract(): a src reported by two checks is one broken promise
+    counted twice, and a reader tallying violations sees two problems where
+    there is one.
+
+    Measured before it was closed, over the 100-README corpus in
+    docs/readme-analysis: 341 markdown images, 300 absolute, 41 relative with an
+    extension, and none in this bucket. The HTML `<img>` half held 3. So the fix
+    is close to free, which is the argument for making it rather than the
+    argument against: nothing legitimate is going to trip it.
+    """
+    out = []
+    for src in ([m.group(2) for m in IMAGE_RX.finditer(text)]
+                + HTML_IMG_RX.findall(text)):
+        if URL_RX.match(src) or PATH_RX.search(src):
+            continue
+        out.append(src)
+    return out
 
 
 def tell_hits(text):
@@ -184,6 +232,7 @@ def validate(original, rewritten, allow_structure=False):
     check("tables", "table row altered or removed")
     check("blockquotes", "block quote altered or removed")
     check("paths", "file path altered or removed")
+    check("image_srcs", "image source altered or removed")
 
     if a["frontmatter"] != b["frontmatter"]:
         violations.append({"kind": "frontmatter altered", "detail": ""})

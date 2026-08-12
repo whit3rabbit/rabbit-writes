@@ -147,6 +147,10 @@ voice.>
 
 ## Quick reference card
 
+<Nothing new goes here. It is the sheet to keep open while drafting, and every
+line on it should be argued for somewhere above. See the same section in
+`whit3rabbit.md` for a filled-in one.>
+
 - **Always:** <Extracted from answers — core habits to follow>
 - **Never:** <Extracted from answers — specific things to avoid>
 - **Signature Phrases & Structures:** <Actual examples provided during interview/samples>
@@ -155,6 +159,10 @@ voice.>
 ---
 
 ## Anti-overfitting guide
+
+<Which rules above are absolute and which are tendencies. Worth filling in: a
+profile whose rules all read as equally binding is one an editor will apply
+equally, and the result is a caricature. `whit3rabbit.md` has a worked one.>
 
 - **Spirit Over Letter:** Internalize the author's taste, don't mechanically force every pattern into one piece.
 - **Frequency Guidance:**

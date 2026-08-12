@@ -21,6 +21,14 @@ with open(f"{BASE}/02_all_stats.json") as f:
 N = len(all_data)
 recs = list(all_data.values())
 
+# Step 03 overwrites 02_all_stats.json, so a batch that matched no READMEs
+# leaves it empty rather than leaving the last good run in place. Without this,
+# the first pct() call divides by zero and the traceback points at a helper
+# instead of at the step that actually failed.
+if not N:
+    sys.exit("04_aggregate: 02_all_stats.json has no analyzed repos. Rerun "
+             "03_analyze_readme.py --batch and check it found any READMEs.")
+
 def pct(cond_fn):
     return round(100 * sum(1 for r in recs if cond_fn(r)) / N, 1)
 
@@ -35,6 +43,20 @@ def median_of(fn):
     return round(statistics.median(vals), 2) if vals else 0
 
 summary = {"n_repos": N}
+
+# When this corpus was measured, taken from the corpus rather than from the
+# clock. The latest `pushed_at` across the sample is the last commit the fetch
+# could have seen, so the snapshot was taken at or after it, and it is stable:
+# re-running the aggregation over the same committed data gives the same answer.
+# A wall-clock stamp would move every time somebody reran step 04 and would
+# quietly claim the study was refreshed when only the arithmetic was.
+#
+# It exists so a reader in 2028 sees the age of the numbers without having to
+# find the writeup. The study is a frozen snapshot, and it skews toward AI
+# tooling because that is what was trending the week it was taken.
+_pushed = sorted(r["meta"].get("pushed_at") for r in recs if r["meta"].get("pushed_at"))
+if _pushed:
+    summary["measured_at"] = _pushed[-1][:10]
 
 # --- presence rates
 summary["pct_has_badges_in_header"] = pct(lambda r: r["stats"]["badges_in_header_block"] > 0)
@@ -128,11 +150,9 @@ for full_name, r in all_data.items():
     urls = [u for _, u in IMAGE_RE.findall(text)] + HTML_IMG_RE.findall(text)
     for url in urls:
         lu = url.lower()
-        matched = False
         for cat, kws in badge_keywords.items():
             if any(k in lu for k in kws):
                 badge_type_counts[cat] += 1
-                matched = True
                 break
 summary["badge_type_counts_corpus"] = dict(badge_type_counts.most_common())
 

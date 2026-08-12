@@ -6,7 +6,7 @@ Same shape and same reasoning as the rabbit-writes suite: the expensive runs are
 memoized, and test functions take no arguments so `run.py` can drive them
 without pytest installed. See that file's helpers.py for why.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 import glob
@@ -34,13 +34,22 @@ EXPECTED_CORPUS_READMES = 100
 
 _CACHE = {}
 
+# Every checker run happens from here rather than from wherever the suite was
+# invoked. `resolve_voice` probes the working directory for a `.rabbit-voice`
+# right after the README's own directory, so a repository that pins its own
+# house voice would silently decide the result of every test below, and the
+# failure would read as a bug in the checker. The samples directory has no pin
+# and is not going to grow one.
+NEUTRAL_CWD = SAMPLES
+
 
 def run(path, *extra):
     """Parsed --json output. Raises on any exit code other than 0 or --check's 1."""
     key = ("run", path) + extra
     if key not in _CACHE:
-        out = subprocess.run([sys.executable, CHECK, path, "--json", *extra],
-                             capture_output=True, text=True)
+        out = subprocess.run([sys.executable, CHECK, os.path.abspath(path),
+                              "--json", *extra],
+                             capture_output=True, text=True, cwd=NEUTRAL_CWD)
         if out.returncode not in (0, 1):
             raise SystemExit("readme_check failed on %s:\n%s" % (path, out.stderr))
         _CACHE[key] = json.loads(out.stdout)
@@ -49,8 +58,9 @@ def run(path, *extra):
 
 def run_code(path, *extra):
     """(parsed, exit code), for the documented --check contract."""
-    out = subprocess.run([sys.executable, CHECK, path, "--json", *extra],
-                         capture_output=True, text=True)
+    out = subprocess.run([sys.executable, CHECK, os.path.abspath(path),
+                          "--json", *extra],
+                         capture_output=True, text=True, cwd=NEUTRAL_CWD)
     return json.loads(out.stdout), out.returncode
 
 

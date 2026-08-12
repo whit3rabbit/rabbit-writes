@@ -25,13 +25,14 @@ Labels:
 A sample with no provenance is not a sample. `problems()` rejects it, and
 score.py refuses to publish a rate over a set that does not validate.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 import hashlib
 import json
 import os
 import re
+from html.parser import HTMLParser
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -51,6 +52,39 @@ PRE_GENERATION_CUTOFF = "2022-11-30"
 REQUIRED_FIELDS = ("id", "label", "register", "provenance", "sha256", "words")
 REQUIRED_HUMAN_PROVENANCE = ("source_url", "archive_url", "published", "why_credible")
 REQUIRED_GENERATED_PROVENANCE = ("model", "prompt", "generated")
+
+# A human sample can prove its date two ways, and the second one is not a web
+# archive at all.
+#
+# A published research corpus collected years before the cutoff is at least as
+# good as a single Wayback capture, and in one way better: the collection date
+# is documented, peer-reviewed, and citable, where a capture is one URL that one
+# crawler happened to visit. What it needs instead of an archive URL is enough
+# to identify the exact row again: the dataset, the revision it was pinned at,
+# the split, and the row index. A dataset without a revision is not a citation,
+# it is a name that will mean something different next year.
+#
+# `license` is required here and not for an archive sample, because a research
+# corpus comes with terms and a blog post does not come with any. Several of the
+# obvious candidates are non-commercial-research-only, which is fine for this and
+# is exactly the sort of thing that has to be recorded rather than remembered.
+REQUIRED_DATASET_PROVENANCE = ("dataset", "revision", "split", "row",
+                               "collected", "license", "why_credible")
+
+
+def human_provenance_kind(provenance):
+    """"archive", "dataset", or None when it is neither.
+
+    Chosen on which identifying key is present rather than on a `kind` field the
+    author has to remember to set, so a half-filled entry falls through to
+    `problems()` and gets named rather than being silently read as the other
+    shape.
+    """
+    if provenance.get("dataset"):
+        return "dataset"
+    if provenance.get("archive_url") or provenance.get("source_url"):
+        return "archive"
+    return None
 
 # Sample sizes below this produce an interval so wide it says nothing. Published
 # anyway, with the interval attached, because a wide interval is information and
@@ -108,6 +142,73 @@ def read_text(sample, texts_dir=None):
         return normalize(fh.read())
 
 
+# How a sample's text was produced from its source. Recorded per sample, because
+# it decides whether a hash is reproducible by anybody else.
+#
+#   fetch_samples   extract_text() below, over the bytes at archive_url. Anybody
+#                   can rerun fetch_samples.py and get the same hash.
+#   manual          somebody pasted the prose in by hand. Perfectly valid, and
+#                   not reproducible: two people trimming the same page's
+#                   navigation by eye do not agree to the byte.
+#
+# Absent means manual, because every sample added before this key existed was.
+EXTRACTION_AUTO = "fetch_samples"
+
+
+class _TextExtractor(HTMLParser):
+    """HTML to plain text, deterministically.
+
+    Deterministic is the whole requirement, and it is why this is 30 lines of
+    stdlib rather than a real readability implementation. The hash in the
+    manifest is a claim that a named URL produces named bytes, and a smarter
+    extractor that improves next year turns every committed hash into a
+    mismatch. This one is dumb and frozen: drop the non-prose elements, keep the
+    text, put a blank line after each block element.
+    """
+
+    DROP = {"script", "style", "head", "noscript", "svg", "template", "nav",
+            "form", "button", "select", "textarea", "iframe"}
+    BLOCK = {"p", "div", "br", "li", "tr", "section", "article", "header",
+             "footer", "blockquote", "pre", "h1", "h2", "h3", "h4", "h5", "h6"}
+
+    def __init__(self):
+        HTMLParser.__init__(self, convert_charrefs=True)
+        self.parts = []
+        self._skip = 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag in self.DROP:
+            self._skip += 1
+        elif tag in self.BLOCK:
+            self.parts.append("\n")
+
+    def handle_endtag(self, tag):
+        if tag in self.DROP:
+            self._skip = max(0, self._skip - 1)
+        elif tag in self.BLOCK:
+            self.parts.append("\n")
+
+    def handle_data(self, data):
+        if not self._skip:
+            self.parts.append(data)
+
+
+def extract_text(html):
+    """Readable text out of an HTML page, the same way every time.
+
+    Not markup-aware beyond the tag list above, and not trying to be. See
+    _TextExtractor on why a better extractor would be a worse one here.
+    """
+    parser = _TextExtractor()
+    parser.feed(html)
+    text = "".join(parser.parts)
+    # Collapse horizontal runs, keep paragraph breaks. Done after extraction
+    # rather than during, so the block-element newlines above survive.
+    text = re.sub(r"[ \t ]+", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return normalize(text)
+
+
 def problems(manifest, registers=()):
     """Everything wrong with the manifest, as messages.
 
@@ -136,13 +237,46 @@ def problems(manifest, registers=()):
             out.append("%s has a sha256 that is not a sha256" % sid)
 
         prov = sample["provenance"]
-        required = (REQUIRED_HUMAN_PROVENANCE if sample["label"] == "human"
-                    else REQUIRED_GENERATED_PROVENANCE)
+        if sample["label"] != "human":
+            required = REQUIRED_GENERATED_PROVENANCE
+        else:
+            kind = human_provenance_kind(prov)
+            if kind is None:
+                out.append("%s is labeled human and its provenance names "
+                           "neither an archive capture (source_url, "
+                           "archive_url) nor a dataset. One or the other is "
+                           "what makes the label evidence rather than a claim"
+                           % sid)
+                continue
+            required = (REQUIRED_DATASET_PROVENANCE if kind == "dataset"
+                        else REQUIRED_HUMAN_PROVENANCE)
         for field in required:
             if not prov.get(field):
                 out.append("%s provenance is missing %s" % (sid, field))
+
+        # Whichever field carries the date, it is compared against the cutoff
+        # the same way. `collected` is when the corpus was gathered, which is
+        # the date that bounds when its text could have been written.
+        dated = prov.get("published") or prov.get("collected")
+        if sample["label"] == "human" and dated:
+            prov = dict(prov, published=dated)
         if sample["label"] == "human" and prov.get("published"):
-            if prov["published"] >= PRE_GENERATION_CUTOFF:
+            # The cutoff below is a string comparison, which is exactly right
+            # for zero-padded ISO dates and silently wrong for anything else:
+            # "3/4/2019" sorts after "2022-11-30" and a 2019 sample would be
+            # rejected for being too recent. Checked rather than trusted,
+            # because add_sample.py only names the format in its help text.
+            # isinstance first. JSON happily holds `"published": 2019`, and both
+            # re.fullmatch and the `>=` below raise TypeError on an int, out of
+            # a function whose whole job is to return problems rather than throw
+            # them at score.py.
+            if (not isinstance(prov["published"], str)
+                    or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", prov["published"])):
+                out.append("%s provenance.published is %r, which is not "
+                           "YYYY-MM-DD. The cutoff is compared as a string, so "
+                           "any other shape compares wrong"
+                           % (sid, prov["published"]))
+            elif prov["published"] >= PRE_GENERATION_CUTOFF:
                 out.append("%s is labeled human but was published %s, after the "
                            "%s cutoff. A human label after that date rests on "
                            "somebody's word, which is what this corpus exists "
@@ -159,7 +293,12 @@ def wilson(successes, trials, z=1.96):
     interval runs below zero and reports a lower bound that cannot happen. The
     Wilson interval stays inside [0, 1] and does not collapse to a point when
     the count is zero, which is exactly the case that matters here: "0 of 50
-    flagged" is not "a 0% false-positive rate", it is "somewhere under 7%".
+    flagged" is not "a 0% false-positive rate", it is "somewhere under 7.2%".
+
+    The upper bound is what to size a sampling round against, and it falls
+    slowly: 16.1% at 20 samples, 8.8% at 40, 7.1% at 50, 6.0% at 60, 3.7% at
+    100. Fifty-two is where it crosses 7%. Those come from this function rather
+    than from the round numbers an earlier version of this docstring quoted.
     """
     if trials == 0:
         return (0.0, 0.0, 1.0)

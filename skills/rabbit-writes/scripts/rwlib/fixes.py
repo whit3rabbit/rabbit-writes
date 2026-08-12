@@ -32,13 +32,13 @@ Four rules on what gets in:
 4. Anything that depends on the register, the reader, or the sentence around it
    stays report-only, forever.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 import re
 
-from .artifacts import (AI_PARAM_RX, SPACE_LIKE_TOLERANCE, SPACE_LIKE_UNICODE,
-                        ZERO_WIDTH, norm_url)
+from .artifacts import (AI_PARAM_RX, HIDDEN_UNICODE, SPACE_LIKE_TOLERANCE,
+                        SPACE_LIKE_UNICODE, ZERO_WIDTH, norm_url, occurrences)
 from .markdown import (BLOCKQUOTE_RX, FENCE_RX, FRONTMATTER_RX, HEADING_RX,
                        INLINE_CODE_RX, PATH_RX, QUOTED_RX, TABLE_ROW_RX,
                        URL_RX, line_of)
@@ -132,32 +132,50 @@ def plan(text, voice_rules=None):
     quoted = span_mask(text, QUOTED_PATTERNS)
     edits, skipped = [], []
 
-    # 1. Invisible characters.
+    # 1. Invisible characters. `occurrences` rather than a scan of its own: it
+    #    is the same function scan.py counts with, and it is what keeps the
+    #    fixer from deleting the joiner in the middle of an emoji.
     for ch, name in ZERO_WIDTH.items():
-        for m in re.finditer(re.escape(ch), text):
-            if _free(mask, m.start(), m.end()):
-                edits.append((m.start(), m.end(), "",
-                              _record("hidden-unicode", text, m.start(), m.end(),
+        for start in occurrences(text, ch):
+            end = start + len(ch)
+            if _free(mask, start, end):
+                edits.append((start, end, "",
+                              _record("hidden-unicode", text, start, end,
                                       "U+%04X" % ord(ch), "", "deleted %s" % name)))
             else:
                 skipped.append(_record(
-                    "hidden-unicode", text, m.start(), m.end(),
+                    "hidden-unicode", text, start, end,
                     "U+%04X" % ord(ch), "",
                     "%s sits inside a span this skill promises not to touch. "
                     "Remove it by hand." % name))
 
     # 2. Space-like characters, past the count a typesetter would use.
+    #
+    #    The threshold counts every occurrence, masked ones included, because
+    #    that is what scan.py reports on. Thresholding on the editable ones
+    #    instead meant a document with 4 non-breaking spaces, 2 of them in a
+    #    fence, got a P2 from the scan and then nothing at all from --apply-safe:
+    #    no edit, and no line saying why. The masked ones now get a skip record,
+    #    the way the zero-width branch above has always done.
     for ch, replacement in SPACE_LIKE.items():
-        hits = [m for m in re.finditer(re.escape(ch), text)
-                if _free(mask, m.start(), m.end())]
-        if len(hits) <= SPACE_LIKE_TOLERANCE:
+        at = occurrences(text, ch)
+        if len(at) <= SPACE_LIKE_TOLERANCE:
             continue
-        for m in hits:
-            edits.append((m.start(), m.end(), replacement,
-                          _record("hidden-unicode", text, m.start(), m.end(),
-                                  "U+%04X" % ord(ch), "space",
-                                  "%d of them, past the %d a typesetter would use"
-                                  % (len(hits), SPACE_LIKE_TOLERANCE))))
+        for start in at:
+            end = start + len(ch)
+            if _free(mask, start, end):
+                edits.append((start, end, replacement,
+                              _record("hidden-unicode", text, start, end,
+                                      "U+%04X" % ord(ch), "space",
+                                      "%d of them, past the %d a typesetter would use"
+                                      % (len(at), SPACE_LIKE_TOLERANCE))))
+            else:
+                skipped.append(_record(
+                    "hidden-unicode", text, start, end,
+                    "U+%04X" % ord(ch), "space",
+                    "one of %d %s, but this one sits inside a span this skill "
+                    "promises not to touch. Replace it by hand."
+                    % (len(at), HIDDEN_UNICODE[ch])))
 
     # 3. AI tracking parameters. URLs are masked against every other rule here,
     #    so this is the one edit allowed to land inside one, and it is still not
@@ -174,9 +192,10 @@ def plan(text, voice_rules=None):
         else:
             skipped.append(_record(
                 "ai-utm", text, m.start(), m.end(), m.group(0), cleaned,
-                "the tracking parameter is inside code or a quoted example, "
-                "which this skill promises not to edit. Somebody is meant to "
-                "paste that line exactly as written."))
+                "the tracking parameter is inside a span this skill promises "
+                "not to edit: a fence, inline code, a table row, a block quote, "
+                "a heading, or a quoted example. Drop it by hand if the line is "
+                "not meant to be copied exactly as written."))
 
     # 4. A typed em dash, reported and never fixed.
     #

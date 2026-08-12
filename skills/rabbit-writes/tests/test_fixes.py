@@ -287,3 +287,30 @@ def test_a_p0_maps_to_the_sarif_error_level():
         shutil.rmtree(scratch, ignore_errors=True)
     levels = {r["properties"]["priority"]: r["level"] for r in log["runs"][0]["results"]}
     assert levels.get("P0") == "error", str(levels)
+
+
+def test_the_fixer_thresholds_space_like_characters_the_way_the_scan_counts_them():
+    """scan.py counts every occurrence in the raw text. The fixer used to count
+    only the ones it was allowed to edit, so a document with 4 non-breaking
+    spaces, 2 of them in a fence, got a P2 from the scan and then nothing at all
+    from --apply-safe: no edit, and no line saying why."""
+    from rwlib import fixes
+    text = ("Alpha\u00a0one and beta\u00a0two.\n\n"
+            "```\ncode\u00a0three and code\u00a0four\n```\n")
+    edits, skipped = fixes.plan(text)
+    nbsp_edits = [e for e in edits if e[3]["before"] == "U+00A0"]
+    nbsp_skips = [s for s in skipped if s["before"] == "U+00A0"]
+    assert len(nbsp_edits) == 2, nbsp_edits
+    assert len(nbsp_skips) == 2, nbsp_skips
+    assert all("not to touch" in s["note"] for s in nbsp_skips), nbsp_skips
+
+
+def test_the_fixer_leaves_the_joiner_inside_an_emoji_alone():
+    """Deleting it does not clean the document, it turns one glyph into two."""
+    from rwlib import fixes
+    fixed, applied, skipped = fixes.apply("Shipped by \U0001F468\u200d\U0001F4BB today.\n")
+    assert "\U0001F468\u200d\U0001F4BB" in fixed, repr(fixed)
+    assert not applied and not skipped, (applied, skipped)
+    stripped, applied, _ = fixes.apply("A wo\u200drd from a chat window.\n")
+    assert stripped == "A word from a chat window.\n", repr(stripped)
+    assert applied, applied

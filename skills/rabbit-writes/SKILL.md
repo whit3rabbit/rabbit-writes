@@ -97,6 +97,8 @@ Shipped with `whit3rabbit` as the active voice. It is an example, not a default 
 
 The guardrails constrain the editor, not the voice, which is why a voice preference cannot override them.
 
+A register still cannot soften a voice rule. What a voice can do is say which of its own rules applied where, with `mechanics_by_register` and with `applies_to_registers` on a `banned_regex` or `required_when` entry. That reads like the same thing and runs in the opposite direction: the writer decides, the register only selects. It exists because the profile markdown has always distinguished on the clock from off it, and until now the enforceable half had no way to say so.
+
 ## Ask, then convert
 
 In `voice` mode against a document that already exists, measure before you edit, then offer.
@@ -188,6 +190,22 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/verify.py original.md
 Non-zero exit means the rewrite altered something on the do-not-touch list, or added more tells than it removed. It is a brake, not a target: it cannot tell you an edit was too shallow, which is what guardrail 3 is for.
 
 It also does not see every path. A file path is tracked only when it has an extension, because an extensionless one is indistinguishable from "and/or" or "TCP/IP" by regex. `voices/ACTIVE` is still on the do-not-touch list in guardrail 6. Nothing mechanical is watching it, so you are.
+
+Image alt text is the other thing it does not watch, and that one is deliberate rather than a limit of regex. Alt text is prose a reader reads, an unhelpful one is worth fixing, and nothing on the do-not-touch list covers it. Image *sources* are watched, in full. `PROOF.md` has the corpus measurement behind both halves.
+
+## Suppressing a finding you have decided to keep
+
+Some documents trip a rule on purpose. A page that quotes a chat citation marker to warn about it raises `citation-leak`, because that pattern is checked against the raw text so a marker pasted into a block quote cannot hide. Until now the only answer was `files:` on the hook, which turns the check off for whole paths, or `--no-verify`, which turns off everything.
+
+```markdown
+<!-- rabbit-allow: citation-leak (this page catalogues the markers) -->
+```
+
+The reason is not optional. Without one the suppression does not apply and it raises a P1 of its own, because the entire value of the mechanism is that somebody had to write down why.
+
+Nothing is hidden. A suppressed finding still appears in the report, under its own heading, with the reason and the line that allowed it, and it still appears in `--json` carrying a `suppressed` key. What changes is the exit code. A fingerprint P0 is evidence about how a file was made, and a mechanism that made evidence vanish quietly would be worse than the scoping it replaces. A suppression that covers nothing is reported too, at P2, so a stale one does not sit there for a year covering a rule nobody is breaking.
+
+It applies to the whole file, for the ids it names. This repository does not use it on `references/patterns.md`, whose five P0s `PROOF.md` publishes on purpose: a tool that suppresses its own findings to look clean is doing the thing this plugin exists to criticize. The mechanism is for adopters who have made that call for themselves, in writing.
 
 ## The five moves that do most of the work
 

@@ -10,6 +10,7 @@ and the band is reported rather than asserted when it moves.
 """
 
 import os
+import re
 
 from helpers import (CORPUS_DIR, EXPECTED_CORPUS_READMES, corpus_p0_slugs,
                      corpus_readmes)
@@ -72,3 +73,27 @@ def test_the_corpus_is_present_in_this_checkout():
               "corpus regression did not run")
         return
     assert corpus_readmes(), "the corpus directory exists but holds no READMEs"
+
+
+def test_the_corpus_is_dated_in_the_shipped_extract():
+    """A frozen snapshot has to say when it was frozen. The study skews toward
+    whatever was trending the week it was taken, and the writeup says so; the
+    extract that ships with the skill did not, so the checker's report read as a
+    standing fact about READMEs rather than a measurement with an age."""
+    summary = corpus_mod.load()
+    measured = summary.get("measured_at")
+    assert measured, "corpus_summary.json carries no measured_at"
+    assert re.match(r"^\d{4}-\d{2}-\d{2}$", measured), measured
+
+
+def test_the_report_quotes_the_date_beside_the_count():
+    """Undated, "100 trending repos" is the thing a reader in 2028 cannot
+    discount without going and finding the writeup."""
+    import subprocess
+    import sys
+    from helpers import CHECK, NEUTRAL_CWD, sample
+    out = subprocess.run([sys.executable, CHECK, sample("good-readme.md")],
+                         capture_output=True, text=True, cwd=NEUTRAL_CWD)
+    line = [ln for ln in out.stdout.splitlines() if "corpus comparison" in ln]
+    assert line, out.stdout[:400]
+    assert corpus_mod.load()["measured_at"] in line[0], line[0]

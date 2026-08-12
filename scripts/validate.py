@@ -24,6 +24,8 @@ if ENGINE not in sys.path:
 # Findings the engine raises itself rather than from a lexicon pattern. Imported
 # rather than restated: this list existed in three files, and a new synthetic
 # finding added to two of them made the third reject a register that named it.
+from rwlib import inflect                       # noqa: E402
+from rwlib import registers as registers_mod    # noqa: E402
 from rwlib.lexicon import SYNTHETIC_FINDING_IDS  # noqa: E402
 
 problems = []
@@ -114,6 +116,12 @@ def check_skills():
     notes.append("skills: %s" % ", ".join(found))
 
 
+def _expanded(entries, expanded):
+    """"9" or "9 -> 14", so a profile leaning on `inflect` reports both."""
+    return ("%d" % len(entries) if len(expanded) == len(entries)
+            else "%d -> %d" % (len(entries), len(expanded)))
+
+
 def check_voices():
     if not os.path.isdir(VOICES):
         fail("no voices/ directory")
@@ -175,12 +183,47 @@ def check_voices():
                 except re.error as exc:
                     fail("voices/%s: required_when regex does not compile: %s"
                          % (fn, exc))
+        # A register named in a voice rules file and not in registers.json is a
+        # silent no-op: the rule quietly stops applying anywhere, or applies
+        # everywhere, and the only symptom is a finding that does not turn up.
+        # The same class of bug the tolerance matrix check catches one file over.
+        known_registers = set(registers_mod.registers())
+        scoped = [("mechanics_by_register", r)
+                  for r in data.get("mechanics_by_register", {})]
+        for key in ("banned_regex", "required_when"):
+            for entry in data.get(key, []):
+                scoped += [(key, r) for r in entry.get("applies_to_registers", [])]
+        for where, register in scoped:
+            if register not in known_registers:
+                fail("voices/%s: %s names register %r, which is not in "
+                     "registers.json (%s)"
+                     % (fn, where, register, ", ".join(sorted(known_registers))))
+
+        # A ban list entry is a plain string or `{"word": ..., "inflect": true}`.
+        # An entry that is neither names nothing, and scan.py drops it: that is
+        # right at runtime, where one bad line should cost one rule, and wrong
+        # here, where a profile silently enforcing fewer words than it lists is
+        # exactly what this validator is for.
         for key in ("banned_words", "banned_phrases"):
-            if key in data and not isinstance(data[key], list):
+            if key not in data:
+                continue
+            if not isinstance(data[key], list):
                 fail("voices/%s: %s must be a list" % (fn, key))
-        notes.append("voices/%s ok (%d words, %d phrases, %d regex)"
-                     % (fn, len(data.get("banned_words", [])),
-                        len(data.get("banned_phrases", [])),
+                continue
+            for entry in data[key]:
+                if not inflect.term_of(entry):
+                    fail("voices/%s: %s has an entry naming no term (%r). Write "
+                         "a string, or an object with a \"word\" key."
+                         % (fn, key, entry))
+        words = inflect.expand(data.get("banned_words", []))
+        phrases = inflect.expand(data.get("banned_phrases", []))
+        # Counted after expansion, and both numbers shown when they differ, so a
+        # profile that leans on `inflect` says how many terms it actually bans
+        # rather than how many lines it happens to be written on.
+        notes.append("voices/%s ok (%s words, %s phrases, %d regex)"
+                     % (fn,
+                        _expanded(data.get("banned_words", []), words),
+                        _expanded(data.get("banned_phrases", []), phrases),
                         len(data.get("banned_regex", []))))
 
     for required in ("TEMPLATE.md", "TEMPLATE.rules.json"):
@@ -504,7 +547,8 @@ def check_scripts_compile():
     """A syntax error in a bundled script only surfaces when a skill runs it."""
     import ast
     for rel in ("rabbit-writes/scripts/scan.py", "rabbit-writes/scripts/verify.py",
-                "readme-writing/scripts/readme_check.py"):
+                "readme-writing/scripts/readme_check.py",
+                "voice-setup/scripts/measure_voice.py"):
         path = os.path.join(SKILLS, rel)
         if not os.path.exists(path):
             continue
@@ -514,6 +558,172 @@ def check_scripts_compile():
         except SyntaxError as exc:
             fail("%s does not parse: %s" % (rel, exc))
     notes.append("bundled scripts compile")
+
+
+# A README that a stranger might plausibly commit. It carries a semicolon and an
+# em dash on purpose: both are P0 under this repository's own voice profile and
+# neither is a defect in anybody else's prose, so a hook that blocks on them is
+# the bug this check exists to catch. No P0 structure or fingerprint problems,
+# because those a hook is supposed to block on.
+CONSUMER_README = """# widget
+
+widget is a command-line tool that resizes images in bulk; it reads a directory
+and writes thumbnails next to each original — nothing else.
+
+## Install
+
+```sh
+npm install -g widget
+```
+
+## Usage
+
+```sh
+widget ./photos --size 240
+```
+
+## License
+
+MIT.
+"""
+
+
+def parse_hooks(text):
+    """[(id, entry, args)] out of .pre-commit-hooks.yaml.
+
+    Hand-rolled because this file is stdlib-only and PyYAML is not a dependency
+    worth adding to a validator. The shape it parses is the shape the file is
+    written in, and check_precommit_hooks fails loudly if it comes back empty.
+
+    Both YAML list spellings for `args`, flow and block. Flow-only, rewriting
+    `args: [--voice-rules, path]` into the block form that YAML documents prefer
+    dropped the arguments on the floor: the hook still ran, still passed, and
+    the `--voice-rules` regression this whole check exists for stopped being
+    covered without a word.
+    """
+    out = []
+    for block in text.split("\n- id: ")[1:]:
+        lines = block.splitlines()
+        hook_id = lines[0].strip()
+        entry, args, in_args = "", [], False
+        for line in lines[1:]:
+            stripped = line.strip()
+            if in_args and stripped.startswith("- "):
+                args.append(stripped[2:].strip().strip("'\""))
+                continue
+            in_args = False
+            if line.startswith("  entry:"):
+                entry = line.split(":", 1)[1].strip()
+            elif line.startswith("  args:"):
+                raw = line.split(":", 1)[1].strip().strip("[]")
+                args = [a.strip().strip("'\"") for a in raw.split(",") if a.strip()]
+                in_args = not args
+        out.append((hook_id, entry, args))
+    return out
+
+
+def check_precommit_hooks():
+    """Run every shipped hook the way pre-commit runs it: from somebody else's
+    repository, on somebody else's README.
+
+    Two shipped hooks were broken on arrival and both suites were blind to it,
+    because everything else in the tree runs from this repository root with this
+    repository's files. `readme-check` blocked a stranger's commit over this
+    author's semicolon, and `rabbit-scan-voice` passed a plugin-relative
+    `--voice-rules` path straight through to a working directory where it does
+    not exist, so scan.py exited 2 and precommit.py called that a P0 finding.
+    """
+    import shutil
+    import subprocess
+    import tempfile
+
+    hooks_path = os.path.join(ROOT, ".pre-commit-hooks.yaml")
+    if not os.path.exists(hooks_path):
+        fail(".pre-commit-hooks.yaml is missing, so the hooks ship unusable")
+        return
+    with open(hooks_path, encoding="utf-8") as fh:
+        hooks_text = fh.read()
+    hooks = parse_hooks(hooks_text)
+    if not hooks:
+        fail("no hooks parsed out of .pre-commit-hooks.yaml, so this check is "
+             "passing on an empty list. Did the file's shape change?")
+        return
+    # The same guard one level down. An empty hook list is loud; a hook whose
+    # `args` silently parsed to nothing is not, and the shipped voice flag is the
+    # single argument this whole check was written to cover. Written against
+    # `args:` rather than against a flag name, because the flag has changed once
+    # already: the invariant is that parse_hooks read the arguments, not which
+    # arguments they happen to be this release.
+    if "\n  args:" in hooks_text and not any(args for _, _, args in hooks):
+        fail(".pre-commit-hooks.yaml has an `args:` line but parse_hooks found "
+             "arguments on no hook, so the flags the hooks ship with are no "
+             "longer covered. Did the `args` shape change?")
+
+    precommit = os.path.join(ROOT, "scripts", "precommit.py")
+    if not os.access(precommit, os.X_OK):
+        fail("scripts/precommit.py is not executable, and `language: script` "
+             "runs the entry directly rather than through python3")
+
+    tmp = tempfile.mkdtemp(prefix="rabbit-hook-")
+    try:
+        readme = os.path.join(tmp, "README.md")
+        with open(readme, "w", encoding="utf-8") as fh:
+            fh.write(CONSUMER_README)
+        for hook_id, entry, args in hooks:
+            words = entry.split()
+            if not words or not words[0].endswith("precommit.py"):
+                fail("hook %r does not go through scripts/precommit.py, so the "
+                     "batching and the flag split are bypassed" % hook_id)
+                continue
+            # Whether this hook applies somebody's style rules, read off its own
+            # configuration rather than off its name. A substring test on the id
+            # turns the strongest assertion here off silently the day a hook is
+            # renamed, and it is the assertion that catches a default hook
+            # blocking a stranger's commit over this author's punctuation.
+            checker = words[1] if len(words) > 1 else ""
+            # `--voice` covers `--voice-rules` too, which is the point: a hook
+            # that names a profile any way at all is one that applies somebody's
+            # style rules, and this must not go stale the next time the flag
+            # spelling changes.
+            applies_voice = ("--no-voice" not in words
+                             and (checker == "readme"
+                                  or any(a.startswith("--voice") for a in args)))
+            # cwd is the temp directory, which is the whole point: pre-commit
+            # runs hooks from the consuming repository, and every relative path
+            # in `args` resolves there.
+            result = subprocess.run(
+                [sys.executable, precommit] + words[1:] + args + ["--", "README.md"],
+                cwd=tmp, capture_output=True, text=True)
+            if result.returncode == 2 or "could not check" in result.stderr:
+                fail("hook %r cannot run from a consuming repository: exit %d. %s"
+                     % (hook_id, result.returncode,
+                        result.stderr.strip().splitlines()[0] if result.stderr.strip()
+                        else "no stderr"))
+            elif not applies_voice and result.returncode:
+                fail("hook %r blocks an ordinary third-party README (exit %d). "
+                     "The default hooks may only fail on evidence, not on this "
+                     "repository's own style rules." % (hook_id, result.returncode))
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+    # The regression the VALUE_FLAGS set exists to prevent, pinned rather than
+    # left to the comment asking the next person to remember.
+    spec = importlib.util.spec_from_file_location("rw_precommit", precommit)
+    module = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(module)
+    except Exception as exc:                              # noqa: BLE001
+        fail("could not import scripts/precommit.py: %s" % exc)
+        return
+    flags, files = module.split_args(
+        ["--check", "--voice-rules", "voices/dana.rules.json", "a.md", "b.md"])
+    if files != ["a.md", "b.md"]:
+        fail("precommit.split_args treats a value-taking flag's value as a file: "
+             "got %r. Add the option to VALUE_FLAGS." % files)
+    if "voices/dana.rules.json" not in flags:
+        fail("precommit.split_args dropped the --voice-rules value: %r" % flags)
+    notes.append("%d pre-commit hook(s) run from a foreign working directory"
+                 % len(hooks))
 
 
 def check_cross_references():
@@ -557,6 +767,7 @@ check_single_definition()
 check_no_stale_skill_name()
 check_mode_contract()
 check_scripts_compile()
+check_precommit_hooks()
 check_cross_references()
 
 for note in notes:

@@ -209,3 +209,56 @@ def test_scan_and_verify_share_one_quoted_example_definition():
 
 def test_scan_and_verify_share_one_exemption_function():
     assert scan_module().apply_exemptions is verify_module().apply_exemptions
+
+
+# --------------------------------------------------------------------------
+# images
+# --------------------------------------------------------------------------
+#
+# Sources are checked and alt text is not, and both halves are measured over the
+# 100-README corpus rather than argued. See verify.py's docstring for the
+# numbers. These pin the behaviour those numbers bought.
+
+IMG_DOC = ("# Title\n\nSome prose about the project that runs on for a bit.\n\n"
+           "![architecture](assets/diagram)\n\nMore prose after the image.\n")
+
+
+def test_a_relative_extensionless_image_source_is_protected():
+    """The gap: neither URL_RX nor PATH_RX matches `assets/diagram`, so an edit
+    could retarget the image with nothing reported."""
+    moved = IMG_DOC.replace("assets/diagram", "assets/other")
+    result, code = run_verify(IMG_DOC, moved)
+    assert code != 0, result
+    assert any(v["kind"] == "image source altered or removed"
+               for v in result["violations"]), result["violations"]
+
+
+def test_an_html_image_source_is_protected_too():
+    doc = ('# Title\n\nProse about the project.\n\n'
+           '<img src="assets/logo" alt="logo">\n\nMore prose here.\n')
+    moved = doc.replace('src="assets/logo"', 'src="assets/wordmark"')
+    result, code = run_verify(doc, moved)
+    assert code != 0, result
+
+
+def test_a_source_already_covered_is_not_reported_twice():
+    """A src reported by both the URL check and the image check is one broken
+    promise counted twice, and a reader tallying violations sees two problems
+    where there is one."""
+    doc = ("# Title\n\nProse about the project here.\n\n"
+           "![logo](https://acme.example/logo.png)\n\nMore prose.\n")
+    moved = doc.replace("logo.png", "wordmark.png")
+    result, _ = run_verify(doc, moved)
+    kinds = [v["kind"] for v in result["violations"]]
+    assert "URL altered or removed" in kinds, kinds
+    assert "image source altered or removed" not in kinds, kinds
+
+
+def test_alt_text_stays_editable():
+    """Measured, not assumed: alt text in the corpus is overwhelmingly badge
+    labels, and "PyPI" becoming "PyPI version" is a fix. SKILL.md's guardrails
+    never promised alt text was untouchable, and this file does not invent a
+    promise the skill does not make."""
+    edited = IMG_DOC.replace("![architecture]", "![architecture diagram]")
+    result, code = run_verify(IMG_DOC, edited)
+    assert code == 0, result["violations"]
