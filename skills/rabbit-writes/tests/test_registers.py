@@ -16,7 +16,7 @@ where that check lives now.
 
 from helpers import lexicon, scan_module, scan_text
 
-from rwlib import registers
+from rwlib import injection, registers
 from rwlib.lexicon import SYNTHETIC_FINDING_IDS
 
 
@@ -75,6 +75,19 @@ def test_no_p0_fingerprint_is_skipped_or_relaxed_anywhere():
         for table in (registers.skip_table(), registers.relax_table())
         for entries in table.values() for pid in entries
         if band.get(pid) == "fingerprint" and priority.get(pid) == "P0")
+    assert not muffled, str(muffled)
+
+
+def test_no_safety_finding_is_skipped_or_relaxed_anywhere():
+    """The safety band applies in every register, the way a P0 fingerprint does.
+    A register that could switch off injection detection is a register an
+    attacker has a reason to ask for, and "casual" is not a claim about whether
+    a document is carrying a concealed instruction."""
+    muffled = sorted(
+        pid
+        for table in (registers.skip_table(), registers.relax_table())
+        for entries in table.values() for pid in entries
+        if pid in injection.FINDING_IDS)
     assert not muffled, str(muffled)
 
 

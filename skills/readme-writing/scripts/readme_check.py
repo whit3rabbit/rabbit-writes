@@ -725,11 +725,13 @@ def run_prose_scan(raw, rules_path, required=False):
 PRIORITY_TITLES = {"P0": "P0  a reader bounces here",
                    "P1": "P1  clear violation of the measured convention",
                    "P2": "P2  polish"}
-BAND_TITLES = {"structure": "  structure and format (readme-writing)",
+BAND_TITLES = {"safety": "  safety (concealed text, or text aimed at an agent)",
+               "structure": "  structure and format (readme-writing)",
                "voice": "  voice (this writer's own rules)",
                "fingerprint": "  fingerprints (evidence about production)",
                "craft": "  craft (bad writing regardless of author)"}
-BAND_ORDER = {"structure": 0, "voice": 1, "fingerprint": 2, "craft": 3}
+BAND_ORDER = {"safety": 0, "structure": 1, "voice": 2, "fingerprint": 3,
+              "craft": 4}
 
 
 def report(path, findings, stats, voice_name, notes):
@@ -754,7 +756,7 @@ def report(path, findings, stats, voice_name, notes):
         if not group:
             continue
         out.append(PRIORITY_TITLES[pri])
-        for band in ("structure", "voice", "fingerprint", "craft"):
+        for band in ("safety", "structure", "voice", "fingerprint", "craft"):
             sub = [f for f in group if f["band"] == band]
             if not sub:
                 continue
@@ -885,9 +887,9 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None):
     # apply() skips a finding that is already suppressed so the reason does not
     # get overwritten by a second pass over the same comments.
     allowances, problems = suppress.parse(raw)
-    used = suppress.apply(findings, allowances)
+    used, refused = suppress.apply(findings, allowances)
     findings.extend(suppress.audit(allowances, problems, used,
-                                   findings_mod.make))
+                                   findings_mod.make, refused))
 
     findings.sort(key=findings_mod.sort_key)
     return findings, stats, voice_name, notes

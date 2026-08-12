@@ -254,7 +254,7 @@ def check_engine():
                  % (len(data.get("patterns", [])), len(data.get("tier1", [])), bad))
 
     for ref in ("patterns.md", "false-positives.md", "context.md",
-                "voice.md", "craft.md", "checklist.md"):
+                "voice.md", "craft.md", "checklist.md", "injection.md"):
         if not os.path.exists(os.path.join(SKILLS, "rabbit-writes", "references", ref)):
             fail("rabbit-writes/references/%s is missing" % ref)
 

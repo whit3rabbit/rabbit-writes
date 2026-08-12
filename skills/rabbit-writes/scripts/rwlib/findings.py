@@ -44,11 +44,14 @@ PRIORITIES = ("P0", "P1", "P2")
 
 # Ordered by how much the reader is expected to argue with the finding.
 #
+#   safety       concealed text, or text addressed to an agent. The one band
+#                nobody is meant to argue with, and the only one that is never
+#                fixable: it is quarantined and quoted, never rewritten.
 #   structure    the shape of the document, measured against the corpus.
 #   voice        this writer's own rules. A hit is a defect, not a suggestion.
 #   fingerprint  evidence about how the text was produced.
 #   craft        general writing problems, never evidence about authorship.
-BANDS = ("structure", "voice", "fingerprint", "craft")
+BANDS = ("safety", "structure", "voice", "fingerprint", "craft")
 
 PRIORITY_RANK = {p: i for i, p in enumerate(PRIORITIES)}
 BAND_RANK = {b: i for i, b in enumerate(BANDS)}

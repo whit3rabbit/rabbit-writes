@@ -27,7 +27,10 @@ SYNTHETIC_FINDING_IDS = frozenset({
     "uniformity", "low-diversity", "trigram-repetition", "uniform-paragraphs",
     "em-dash-rate",
     # Findings about the suppression comments themselves. See rwlib/suppress.py.
-    "suppression-invalid", "suppression-unused",
+    "suppression-invalid", "suppression-unused", "suppression-refused",
+    # The safety band. See rwlib/injection.py.
+    "injection-hidden-directive", "injection-tag-smuggling",
+    "injection-hidden-text", "injection-visible-directive",
 })
 
 # The worst priority each of those can be raised at, which a catalogue pattern
@@ -43,6 +46,13 @@ SYNTHETIC_FINDING_IDS = frozenset({
 # raises on any id that is only in one.
 SYNTHETIC_PRIORITIES = {
     "hidden-unicode": "P0",
+    # Concealment and a directive in the same span. The co-occurrence is the
+    # attack, and either one alone sits a band lower.
+    "injection-hidden-directive": "P0",
+    "injection-tag-smuggling": "P0",
+    "injection-hidden-text": "P1",
+    "injection-visible-directive": "P2",
+    "suppression-refused": "P1",
     "tier1": "P1",
     "clarity": "P1",
     "tier2-cluster": "P1",

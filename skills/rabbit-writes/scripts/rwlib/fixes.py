@@ -38,10 +38,12 @@ Stdlib only, 3.9+.
 import re
 
 from .artifacts import (AI_PARAM_RX, HIDDEN_UNICODE, SPACE_LIKE_TOLERANCE,
-                        SPACE_LIKE_UNICODE, ZERO_WIDTH, norm_url, occurrences)
+                        SPACE_LIKE_UNICODE, TAG_NAME, TAG_RX, ZERO_WIDTH,
+                        norm_url, occurrences, range_occurrences)
+from .injection import tag_runs
 from .markdown import (BLOCKQUOTE_RX, FENCE_RX, FRONTMATTER_RX, HEADING_RX,
                        INLINE_CODE_RX, PATH_RX, QUOTED_RX, TABLE_ROW_RX,
-                       URL_RX, line_of)
+                       URL_RX, invisible_entities, line_of)
 
 # The two space-like characters, mapped to what they become. Separated from the
 # zero-width ones because deleting a non-breaking space closes a word gap, and
@@ -148,6 +150,51 @@ def plan(text, voice_rules=None):
                     "U+%04X" % ord(ch), "",
                     "%s sits inside a span this skill promises not to touch. "
                     "Remove it by hand." % name))
+
+    # 1b. Unicode tag characters, minus any run injection.tag_runs claims. A
+    #     run that decodes to readable words is evidence of an attack: scan.py's
+    #     --apply-safe gate refuses the whole run before this module is even
+    #     called, and the exclusion here is the same boundary enforced locally,
+    #     so a caller reaching fixes.apply directly cannot destroy the evidence
+    #     either. What remains is unreadable residue with no honest use at any
+    #     count, deleted the way a zero-width space is.
+    smuggled = [(at, at + len(msg)) for at, msg in tag_runs(text)]
+    for start in range_occurrences(text, TAG_RX):
+        if any(lo <= start < hi for lo, hi in smuggled):
+            continue
+        end = start + 1
+        if _free(mask, start, end):
+            edits.append((start, end, "",
+                          _record("hidden-unicode", text, start, end,
+                                  "U+%04X" % ord(text[start]), "",
+                                  "deleted %s" % TAG_NAME)))
+        else:
+            skipped.append(_record(
+                "hidden-unicode", text, start, end,
+                "U+%04X" % ord(text[start]), "",
+                "%s sits inside a span this skill promises not to touch. "
+                "Remove it by hand." % TAG_NAME))
+
+    # 1c. Entity spellings of the deletable invisibles. `&#8203;` renders as
+    #     nothing, so deleting the reference changes nothing on the page; the
+    #     report-only characters keep their entity forms for the same reason
+    #     they keep their literals. Length changes here, which is fine: edits
+    #     carry original offsets and apply() replays them left to right.
+    for m, ch in invisible_entities(text):
+        if not (ch in ZERO_WIDTH or TAG_RX.match(ch)):
+            continue
+        if _free(mask, m.start(), m.end()):
+            edits.append((m.start(), m.end(), "",
+                          _record("hidden-unicode", text, m.start(), m.end(),
+                                  m.group(0), "",
+                                  "deleted the entity spelling of %s"
+                                  % HIDDEN_UNICODE.get(ch, TAG_NAME))))
+        else:
+            skipped.append(_record(
+                "hidden-unicode", text, m.start(), m.end(), m.group(0), "",
+                "an entity spelling of %s inside a span this skill promises "
+                "not to touch. Remove it by hand."
+                % HIDDEN_UNICODE.get(ch, TAG_NAME)))
 
     # 2. Space-like characters, past the count a typesetter would use.
     #

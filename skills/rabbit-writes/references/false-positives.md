@@ -10,6 +10,8 @@ Commercial detector audits report false-positive rates above 60% on non-native E
 
 **Look for clusters, never isolated hits.** One em dash means nothing. Em dashes plus a rule-of-three stack plus a "vibrant tapestry" plus a "Conclusion" section is a confession.
 
+**The `safety` band is the exception, and it is the only one.** An injection is a single-hit finding by construction: one concealed span carrying one instruction, in a document that is otherwise ordinary. Waiting for a cluster there means waiting for a second attack. What replaces the cluster rule is the pair: concealment and a directive in the same span, which is the same reasoning applied across two strong signals instead of many weak ones. A hidden instruction is not a judgment about a writer and there is nobody to be unfair to, so the caution this file exists to enforce does not transfer. `references/injection.md` has the rest.
+
 ---
 
 ## Not a tell on its own

@@ -19,7 +19,12 @@ comment.
 Stdlib only, 3.9+.
 """
 
+import html
 import re
+
+from .artifacts import HIDDEN_UNICODE, REPORT_ONLY_UNICODE, SPACE_LIKE_UNICODE
+from .artifacts import TAG_RX as _TAG_RX
+from .artifacts import VS_RX as _VS_RX
 
 # --------------------------------------------------------------------------
 # code and literal spans
@@ -91,6 +96,36 @@ PROSE_DASH_RX = re.compile(
     r"—|%s|–(?!\d)|(?<!\d)–|%s(?!\d)|(?<!\d)%s"
     % (EM_DASH_ENTITY, EN_DASH_ENTITY, EN_DASH_ENTITY))
 
+def invisible_entities(text):
+    """Every character reference that renders as a concealment character, as
+    (match, decoded character) pairs.
+
+    The principle is PROSE_DASH_RX's, pointed the other way: a document written
+    with `&#8203;` renders a zero-width space, so it is one to the counter as
+    well. Decoded with html.unescape rather than a hand-kept alternation,
+    because HTML5 gives U+200B four named spellings beyond ZeroWidthSpace and a
+    list here would drift from the tables in artifacts.py.
+
+    The two space-like characters are deliberately excluded. `&nbsp;` is
+    ubiquitous, visible in the source, and the reason blank_entities exists;
+    nothing about it is concealed from anybody. The zero-widths and the
+    directional controls are different: their entity forms exist to put an
+    invisible character into the rendered page, and the number in the source
+    tells a reader nothing about what it does.
+    """
+    out = []
+    for m in HTML_ENTITY_RX.finditer(text):
+        decoded = html.unescape(m.group(0))
+        if len(decoded) != 1 or decoded == m.group(0):
+            continue
+        if decoded in SPACE_LIKE_UNICODE:
+            continue
+        if (decoded in HIDDEN_UNICODE or decoded in REPORT_ONLY_UNICODE
+                or _TAG_RX.match(decoded) or _VS_RX.match(decoded)):
+            out.append((m, decoded))
+    return out
+
+
 # --------------------------------------------------------------------------
 # links, images, URLs
 # --------------------------------------------------------------------------
@@ -135,6 +170,11 @@ HTML_ANCHOR_RX = re.compile(r"<a\b[^>]*>(.*?)</a>", re.I | re.S)
 # blocks, and listing tags by hand guarantees missing one.
 HTML_TAG_LINE_RX = re.compile(r"^\s*</?[a-zA-Z][a-zA-Z0-9]*(?:\s|>|/>)")
 HTML_CENTER_RX = re.compile(r"<(p|div|h[1-6])\s+align=[\"']center[\"']", re.I)
+
+# Rendered-invisible HTML (hiding CSS, the hidden attribute, white text,
+# comments) is rwlib/injection.py's fact, not this module's: concealment is a
+# safety judgement, and the two copies that briefly existed here had already
+# drifted from its corpus-calibrated thresholds by the time they merged.
 
 # File paths, and only the ones carrying an extension. An extensionless path
 # like `voices/ACTIVE` is not tracked, and that is a deliberate ceiling rather

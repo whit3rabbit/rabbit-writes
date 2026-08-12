@@ -44,6 +44,42 @@ self-scan number were re-run after both.
   off-the-clock distinction the profile markdown has always drawn and the rules
   file could not express. A register still cannot relax a voice rule.
 
+### Hidden text, measured against the corpus before it shipped
+
+- **The concealment tables.** `artifacts.py` now names the channels somebody
+  uses on purpose, beside the paste residue it always named: directional
+  formatting (the Trojan Source characters), variation selectors, Hangul
+  fillers, braille blanks, interlinear annotation, and the invisible math
+  operators. Everything report-only raises at P1 with the reason it is never
+  auto-removed, the tolerated few (direction marks, braille blanks) at P2 past
+  an allowance, and a category sweep backstops the tables: any format or
+  control character nothing names reports as unlisted, which covers ANSI
+  terminal escapes. Zero findings from all of it over the 100-README corpus,
+  and `PROOF.md` publishes the measurement.
+- **The Unicode Tags block is tiled by two detectors with no gap.** Runs that
+  decode to readable words are the safety band's `injection-tag-smuggling` P0
+  and are never edited, even by a caller reaching `fixes.apply` directly. The
+  residue below that threshold reports as `hidden-unicode` P0 and strips like
+  a zero-width space, because unreadable noise has no honest use at any count.
+- **An entity spelling of an invisible is the invisible.** `&#8203;` renders a
+  zero-width space, so it reports as one, at P1 because the reference is at
+  least visible in the source. `&nbsp;` stays exempt: it is ubiquitous,
+  visible, and the reason `blank_entities` exists. The deletable ones strip
+  with `--apply-safe`, and the report-only ones keep their entity forms too.
+- **White text and the `hidden` attribute joined the safety band's
+  concealment axis.** `color:#fff` with no declared background, the `<font
+  color="white">` spelling, and `hidden`/`hidden="until-found"` all count as
+  concealment now, and a hidden element or white span carrying prose is the
+  same P1 a hidden comment carries. A style that declares any background stays
+  silent, because that author is managing contrast, not hiding.
+- **`scan.py` reads Word documents.** A `.docx` routes through
+  `rwlib/docx_text.py`: the visible text gets the ordinary prose scan, and the
+  runs the file itself declares hidden (`w:vanish`, `w:webHidden`, white
+  `w:color`, a `w:sz` of two points or less) are judged the way the safety
+  band judges a concealed span, with the paragraph number for a line. Word
+  splits runs mid-sentence, so adjacent hidden runs are judged as one stretch.
+  `--apply-safe` refuses the format rather than pretending a zip is text.
+
 ### New tools
 
 - **`scan.py --voice auto`**, which resolves `.rabbit-voice`, then
@@ -149,8 +185,8 @@ last two review passes spent themselves.
 ### Tests
 
 - **Both suites split** from one ordered 900-line function into named test files
-  with memoized fixtures. `run.py` drives them with nothing installed; `pytest`
-  collects the same files. `run.py -k <substring>` selects by name.
+  with memoized fixtures. `run.py` drives them with nothing installed, and
+  `pytest` collects the same files. `run.py -k <substring>` selects by name.
 - **`tests/test_invariants.py`** makes the blanking invariant a property instead
   of a comment repeated in six places. It found two live bugs in its first hour:
   the `--apply-safe` em-dash conversion above, and a tracking-parameter fix that

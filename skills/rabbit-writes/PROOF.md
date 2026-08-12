@@ -15,14 +15,15 @@ Run it from `skills/rabbit-writes/`. It covers every row in the table below, inc
 
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 2, registers 1, measured 11 August 2026, fifth pass)
+## Result (v0.1.0, lexicon 2, registers 1, measured 12 August 2026, sixth pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 2,692 | 0 | 0 | 0 | 0.70 | 0.73 | 0.0 |
-| `PROOF.md` | 4,764 | 0 | 0 | 0 | 0.58 | 0.73 | 0.0 |
+| `SKILL.md` | 2,805 | 0 | 0 | 0 | 0.69 | 0.73 | 0.0 |
+| `PROOF.md` | 5,177 | 0 | 0 | 0 | 0.59 | 0.73 | 0.0 |
 | `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.86 | 0.77 | 1.8 |
-| `references/false-positives.md` | 786 | 0 | 0 | 0 | 0.70 | 0.82 | 0.0 |
+| `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
+| `references/injection.md` | 865 | 0 | 0 | **9** | 0.66 | 0.71 | 0.0 |
 | `references/context.md` | 567 | 0 | 0 | 0 | 0.75 | 0.81 | 0.0 |
 | `references/voice.md` | 1,047 | 0 | 0 | 0 | 0.77 | 0.73 | 0.0 |
 | `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
@@ -38,6 +39,29 @@ Two patterns opt out of it, `curly-quote` and `citation-leak`, and each says why
 Every word count in this table dropped between the second review and the third, and no prose was cut. Item 32 below is why: heading text and block quotes used to be measured as this document's own sentences. The findings columns did not move with them, because flagging already exempted both.
 
 The counts moved again in the fourth pass, this time because the documents changed: the engine was extracted into `scripts/rwlib/`, the tolerance matrix became a data file, and three skill files gained sections. `voices/whit3rabbit.md` fell from 9 P2 hits to 7 by dropping two paraphrases of rules that are defined elsewhere, which is the same drift the one-definition tripwire in `scripts/validate.py` now fails the build over.
+
+The sixth pass added the `safety` band, and the only column it moved is its own. `references/injection.md` is new and scores 9 P2 hits on itself, which is the same story `patterns.md` tells one rule further on: a file that lists the directive shapes it catches will match them. Every one is visible in running prose or a list, which is exactly the finding the band raises at P2 and calls quotable rather than concealed. Zero P0s anywhere in this table, including on the file that documents the attack.
+
+That number is left visible for the reason the `patterns.md` paragraph above gives. The alternative was to fence every example so the exemption swallows it, and the band deliberately does not honour the exemption, so fencing them would have proved nothing except that the author knew where the blind spot was.
+
+**Measured against somebody else's writing, not just ours.** The band was run over the 100-README corpus in `docs/readme-analysis/repos/` before it was wired into anything, because a P0 here fails `--check`, and `--check` is what the `rabbit-scan` pre-commit hook runs in a stranger's repository.
+
+| Finding | 100 trending READMEs |
+|---|---:|
+| `injection-hidden-directive` (P0) | 0 |
+| `injection-tag-smuggling` (P0) | 0 |
+| `injection-hidden-text` (P1) | 4 |
+| `injection-visible-directive` (P2) | 0 |
+
+Zero P0s is what makes the hook gating defensible, and `test_no_corpus_readme_raises_a_safety_p0` asserts it rather than reporting it: a tightening that puts a P0 on ordinary documentation has to be argued before it ships, not after somebody's commit is blocked.
+
+The 4 P1s are the honest cost. All four are maintainer notes in HTML comments, two of them the same "Keep these links. Translations will automatically update with the README." A build-marker allowlist cut the raw count from 8 to 4, and the remaining four are prose somebody wrote rather than a marker a tool emits, which is exactly what the P1 says. Tuning them away would mean either dropping the rule or special-casing four repositories, and the number is published instead.
+
+The concealment tables that landed beside the band were held to the same bar. Directional formatting, variation selectors, Hangul fillers, braille blanks, tag-character residue below the smuggling threshold, entity spellings of the invisibles, and the category sweep for unlisted format and control characters were each run over the same 100 READMEs after wiring: zero findings from all of them, at every priority. The only `hidden-unicode` hit in the corpus is one README's 1,134 non-breaking spaces, which the space-like rule already reported before any of this existed. The tolerances (three direction marks, three braille blanks, the emoji carve-outs for the joiner and the presentation selectors) are what that zero cost, and each one is pinned in `tests/test_hidden_text.py`.
+
+Three directive families were cut or narrowed against that corpus before anything shipped. `instead of editing` is ordinary English. An unanchored agent-noun rule read `state model, output formats` and `In your agent, run it once per repo` as instructions. A bare `forget everything` matched "the three essentials (if you forget everything else)" in two of this plugin's own voice profiles. Each was measured, not guessed.
+
+**One design decision came out of review rather than measurement.** The safety band cannot be suppressed. Every other band answers to `rabbit-allow`, and that comment lives inside the document being scanned: whoever can plant a concealed instruction can plant the comment excusing it, and both arrive in the same file from the same hand. A suppression naming a safety id is refused and reported at P1 rather than silently ignored. `test_a_safety_p0_cannot_be_suppressed` holds it.
 
 The fifth pass moved them for the same reason and not because the engine changed its mind about anything above. `voices/whit3rabbit.md` gained the Quick reference card and Anti-overfitting sections that `TEMPLATE.md` has always had and the worked example did not, which is 335 more words and three more list-label advisories. `references/voice.md`, `SKILL.md`, and `../voice-setup/SKILL.md` grew where blending, per-register mechanics, and `measure_voice.py` are now documented. Every P0 and P1 column is where it was.
 

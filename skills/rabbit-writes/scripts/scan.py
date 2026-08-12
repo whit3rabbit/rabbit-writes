@@ -12,7 +12,10 @@ positive rates above 60% on non-native English writers (Liang et al., Stanford,
 Patterns 2023). A number invites a verdict; a list of named findings invites a
 check.
 
-Findings come back in three bands:
+Findings come back in four bands:
+
+    safety       concealed text, or text addressed to an agent. Never fixable,
+                 never suppressible, and a P0 here stops --apply-safe dead.
 
     voice        this writer's own rules, from --voice-rules or --voice.
                  A hit is a defect.
@@ -70,13 +73,17 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
 
+from rwlib import docx_text                      # noqa: E402
 from rwlib import fixes as fixes_mod             # noqa: E402
-from rwlib import inflect, language, registers, sarif, suppress  # noqa: E402
+from rwlib import inflect, injection, language, registers, sarif, suppress  # noqa: E402
 from rwlib import findings as findings_mod       # noqa: E402
 from rwlib import lexicon as lexicon_mod         # noqa: E402
 from rwlib import voices as voices_mod           # noqa: E402
-from rwlib.artifacts import (HIDDEN_UNICODE, SPACE_LIKE_TOLERANCE,  # noqa: E402
-                             SPACE_LIKE_UNICODE, occurrences)
+from rwlib.artifacts import (HIDDEN_UNICODE, REPORT_ONLY_TOLERANCE,  # noqa: E402
+                             REPORT_ONLY_UNICODE, SPACE_LIKE_TOLERANCE,
+                             SPACE_LIKE_UNICODE, TAG_NAME, TAG_RX, VS_NAME,
+                             VS_RX, occurrences, range_occurrences,
+                             unlisted_invisibles)
 # QUOTED_RX and SENTENCE_SENTINEL are re-exports rather than callers. Two
 # tests assert `scan.QUOTED_RX is verify.QUOTED_RX` and pin the sentinel
 # codepoint through this module, which is what makes "one home per fact"
@@ -86,7 +93,8 @@ from rwlib.markdown import (BLOCKQUOTE_RX, CURLY_QUOTE_RX, FENCE_RX,  # noqa: E4
                             FRONTMATTER_RX, HEADING_LINE_RX, INLINE_CODE_RX,
                             PROSE_DASH_RX, QUOTED_RX, TABLE_ROW_RX,
                             URL_GREEDY_RX, apply_exemptions, blank_entities,
-                            excerpt, is_prose_block, line_of)
+                            excerpt, invisible_entities, is_prose_block,
+                            line_of)
 from rwlib.sentences import (SENTENCE_SENTINEL, split_sentences,  # noqa: E402,F401
                              syllables, tokenize)
 
@@ -639,6 +647,89 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
                          % (n, SPACE_LIKE_TOLERANCE) if space_like
                          else "%d occurrence(s) of %s" % (n, name))))
 
+    # 1b. The concealment tables, same id and same skip gate. Everything here
+    #     is softer than the P0 above and says so at the call site, the way the
+    #     space-like half does: these characters have honest uses (RTL
+    #     typography, CJK variation sequences, braille art), so a bare presence
+    #     is a P1 to read, not a P0 to strip, and the fixer never touches them.
+    #     The one exception is the Unicode Tags block, which has no honest use
+    #     at any count: runs long enough to decode into words are
+    #     injection-tag-smuggling P0s in the safety band, and what is reported
+    #     here is only the residue below that threshold, so the two detectors
+    #     tile the block with no gap and no double count.
+    if "hidden-unicode" not in skip:
+        for ch, name in REPORT_ONLY_UNICODE.items():
+            at = occurrences(raw_text, ch)
+            allowed = REPORT_ONLY_TOLERANCE.get(ch, 0)
+            if not at or len(at) <= allowed:
+                continue
+            findings.append(findings_mod.make(
+                "hidden-unicode", "Hidden unicode: %s" % name, "fingerprint",
+                "P2" if allowed else "P1", line_of(raw_text, at[0]),
+                match="U+%04X x%d" % (ord(ch), len(at)),
+                excerpt=("%d of them, past the %d honest typography uses. "
+                         "Check they are deliberate before replacing them."
+                         % (len(at), allowed) if allowed else
+                         "%d occurrence(s) of %s. Never auto-removed: "
+                         "deleting one from a document that needs it breaks "
+                         "its rendering. Read the span and decide."
+                         % (len(at), name))))
+
+        smuggled = [(at, at + len(msg))
+                    for at, msg in injection.tag_runs(raw_text)]
+        tag_at = [i for i in range_occurrences(raw_text, TAG_RX)
+                  if not any(lo <= i < hi for lo, hi in smuggled)]
+        if tag_at:
+            findings.append(findings_mod.make(
+                "hidden-unicode", "Hidden unicode: %s" % TAG_NAME,
+                "fingerprint", SYNTH("hidden-unicode"),
+                line_of(raw_text, tag_at[0]),
+                match="U+E0001-U+E007F x%d" % len(tag_at),
+                excerpt="%d character(s) in the invisible Unicode Tags block, "
+                        "too few to decode into a message. No honest use at "
+                        "any count." % len(tag_at)))
+
+        vs_at = range_occurrences(raw_text, VS_RX)
+        if vs_at:
+            findings.append(findings_mod.make(
+                "hidden-unicode", "Hidden unicode: %s" % VS_NAME,
+                "fingerprint", "P1", line_of(raw_text, vs_at[0]),
+                match="U+FE00-U+FE0D/U+E0100-U+E01EF x%d" % len(vs_at),
+                excerpt="%d variation selector(s) outside emoji presentation. "
+                        "Honest in CJK ideograph variation sequences; a run in "
+                        "other text is a byte-per-character data channel."
+                        % len(vs_at)))
+
+        for ch, at in sorted(unlisted_invisibles(raw_text).items()):
+            findings.append(findings_mod.make(
+                "hidden-unicode", "Hidden unicode: unlisted format or control "
+                "character", "fingerprint", "P1", line_of(raw_text, at[0]),
+                match="U+%04X x%d" % (ord(ch), len(at)),
+                excerpt="An invisible character no table in this engine names. "
+                        "Escape sequences and stray controls land here, which "
+                        "covers ANSI terminal injection."))
+
+        # An entity spelling of an invisible character renders identically, so
+        # it counts identically: PROSE_DASH_RX's reasoning, pointed the other
+        # way. Softer than the literal, because the entity is at least visible
+        # in the raw source. Scored against the exempted copy, unlike every
+        # literal above and for placeholder's reason rather than
+        # citation-leak's: a fence renders as code, so an entity inside one
+        # never renders invisible, and `&#8203;` in backticks is a document
+        # explaining the trick. This file's own changelog was the first false
+        # positive.
+        by_entity = {}
+        for m, ch in invisible_entities(scored):
+            by_entity.setdefault(m.group(0), []).append(m.start())
+        for ent, at in sorted(by_entity.items()):
+            findings.append(findings_mod.make(
+                "hidden-unicode", "Hidden unicode spelled as %s" % ent,
+                "fingerprint", "P1", line_of(raw_text, at[0]),
+                match="%s x%d" % (ent, len(at)),
+                excerpt="A character reference that renders as an invisible "
+                        "character. Visible in the source, invisible on the "
+                        "page."))
+
     # 2. Catalog regexes.
     for p, rx in lexicon_mod.compiled_patterns(skip=skip):
         allowed = relax.get(p["id"], 0)
@@ -752,18 +843,26 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
                 excerpt="Guidance, not a ban. A user's writing sample overrides this. "
                         "Never add one during a rewrite."))
 
+    # The safety band, on the raw text and never on `scored`. The quoted-example
+    # exemption is about content, and an injection hides in exactly the spans it
+    # protects. See rwlib/injection.py. Skip-gated per id like every other stage,
+    # though no shipped register skips any of them: registers.py forbids it.
+    findings.extend(f for f in injection.scan(raw_text)
+                    if f["id"] not in skip)
+
     # Voice rules run last and are never suppressed by the register profile.
     if voice_rules:
         apply_voice_rules(scored, raw_text, voice_rules, stats, findings)
 
     # Inline `rabbit-allow` comments, after every finding exists and before the
     # sort. Marked, never dropped: a suppressed finding is still reported, it
-    # just stops counting. See rwlib/suppress.py.
+    # just stops counting. See rwlib/suppress.py. The safety band is refused
+    # there, because that comment lives in the document under attack.
     if suppressions:
         allowances, problems = suppress.parse(raw_text)
-        used = suppress.apply(findings, allowances)
+        used, refused = suppress.apply(findings, allowances)
         findings.extend(suppress.audit(allowances, problems, used,
-                                       findings_mod.make))
+                                       findings_mod.make, refused))
 
     stats.pop("_profile", None)
     findings.sort(key=findings_mod.sort_key)
@@ -786,6 +885,7 @@ def band_note(value, key):
 
 
 BAND_HEADERS = {
+    "safety": "  safety (concealed text, or text aimed at an agent)",
     "voice": "  voice (this writer's own rules)",
     "fingerprint": "  fingerprints (evidence about production)",
     "craft": "  craft (bad writing regardless of author)",
@@ -826,7 +926,7 @@ def report(findings, stats, profile, exempt, voice_name=None, notes=()):
                       "P1": "P1  obvious machine smell",
                       "P2": "P2  polish"}
             out.append(titles[pri])
-            for band in ("voice", "fingerprint", "craft"):
+            for band in ("safety", "voice", "fingerprint", "craft"):
                 sub = [f for f in group if f["band"] == band]
                 if not sub:
                     continue
@@ -923,6 +1023,31 @@ def run_apply_safe(text, path, voice_rules, write, to_stdout=False,
     read through universal newlines, so the comparison it runs has already
     normalized the difference away.
     """
+    # The safety gate, before any edit is even planned. A document carrying a
+    # concealed instruction is not auto-edited at all, and the span is quoted
+    # verbatim rather than summarized: a person decides, and the tool does not
+    # get to paraphrase an attack into something that reads as harmless.
+    #
+    # Refusing the whole run rather than masking the span. Masking would ship an
+    # edited file that still contains the injection, and the next tool down the
+    # pipeline has no way to know it was there. This is the same reasoning as
+    # rule 2 in fixes.py, one step stronger: there the promise outranks the fix,
+    # here the evidence does.
+    blocking = [f for f in injection.scan(text) if f["priority"] == "P0"]
+    if blocking:
+        stream = sys.stderr if to_stdout else sys.stdout
+        print("rabbit-writes --apply-safe: refused, nothing was written.",
+              file=stream)
+        print("%s carries concealed text addressed to an agent. Read it before "
+              "letting any tool process this document:\n" % (path or "stdin"),
+              file=stream)
+        for f in blocking:
+            print("  L%-4d %s" % (f["line"], f["label"]), file=stream)
+            print("        %s" % f["match"], file=stream)
+        print("\nNothing in the safety band is fixable, and a `rabbit-allow` "
+              "comment cannot clear it: see rwlib/injection.py.", file=stream)
+        return 1
+
     fixed, applied, skipped = fixes_mod.apply(text, voice_rules)
 
     # Imported here rather than at module scope. verify.py is a sibling script
@@ -1045,7 +1170,24 @@ def main():
     # written against "\n", and handing it a "\r" would move the scan's own
     # numbers to fix a problem that only exists on the write path.
     newlines = None
-    if args.file:
+    docx_findings = None
+    if args.file and docx_text.is_docx(args.file):
+        # A Word document: the visible text goes through the ordinary scan, and
+        # the runs the file itself declares hidden come back as safety findings
+        # with the paragraph number for a line. No write-back: --apply-safe
+        # edits text files, and pretending to edit a zip would either destroy
+        # the document or silently write a .md beside it.
+        if args.apply_safe:
+            print("scan: --apply-safe edits text files and cannot write a "
+                  ".docx. Scan it without --apply-safe instead.",
+                  file=sys.stderr)
+            return 2
+        try:
+            text, docx_findings = docx_text.extract(args.file)
+        except docx_text.DocxError as exc:
+            print("scan: %s" % exc, file=sys.stderr)
+            return 2
+    elif args.file:
         with open(args.file, encoding="utf-8") as fh:
             text = fh.read()
             newlines = fh.newlines
@@ -1093,6 +1235,12 @@ def main():
 
     exempt = not args.no_exempt
     findings, stats = scan(text, args.profile, exempt, voice_rules)
+    if docx_findings:
+        # The docx-declared hidden runs, merged after the scan over the visible
+        # text so both halves land in one report and one --check verdict. Their
+        # `line` is the paragraph number; the excerpt says so.
+        findings.extend(docx_findings)
+        findings.sort(key=findings_mod.sort_key)
     notes = [n for n in (language.note(text), voice_note) if n]
 
     if args.sarif:

@@ -122,3 +122,38 @@ def test_blank_entities_leaves_the_dash_entities_visible_to_the_counter():
     blanked = md.blank_entities(text)
     assert "&mdash;" not in blanked
     assert md.PROSE_DASH_RX.search(text)
+
+
+# --------------------------------------------------------------------------
+# the concealment direction: an entity invisible is invisible
+# --------------------------------------------------------------------------
+
+def test_every_spelling_of_a_zero_width_space_is_an_invisible_entity():
+    for spelling in ("&#8203;", "&#x200B;", "&#x200b;", "&ZeroWidthSpace;",
+                     "&NegativeThinSpace;"):
+        found = md.invisible_entities("word%sbreak" % spelling)
+        assert len(found) == 1 and found[0][1] == "\u200b", spelling
+
+
+def test_entity_forms_of_the_concealment_tables_are_flagged():
+    cases = {"&#173;": "\u00ad",       # soft hyphen
+             "&shy;": "\u00ad",
+             "&#8238;": "\u202e",      # right-to-left override
+             "&#xFEFF;": "\ufeff",     # byte-order mark
+             "&#917536;": "\U000e0020",  # tag space
+             "&#65024;": "\ufe00"}     # variation selector 1
+    for spelling, ch in cases.items():
+        found = md.invisible_entities("a%sb" % spelling)
+        assert len(found) == 1 and found[0][1] == ch, spelling
+
+
+def test_nbsp_entities_are_not_concealment():
+    """`&nbsp;` is visible in the source and ubiquitous in README headers;
+    blank_entities exists because of it. Flagging it would put a wall of
+    findings on every centered header block."""
+    line = "spaced&nbsp;out&nbsp;and&nbsp;wide &#160; &#8239;"
+    assert md.invisible_entities(line) == []
+
+
+def test_visible_entities_are_not_concealment():
+    assert md.invisible_entities("&amp; &mdash; &#39; &copy; &lt;") == []

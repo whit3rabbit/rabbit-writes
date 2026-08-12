@@ -21,6 +21,8 @@ Modules:
     registers   the tolerance matrix, read from registers.json.
     corpus      the README corpus figures, and the drift check against them.
     findings    the finding schema and its version.
+    injection   the safety band: concealed text, and text aimed at an agent.
+                Surfaces and quarantines. Nothing here is ever fixable.
     voices      voice rules files, including `extends` inheritance.
     language    the English-only scope check. Warns, never fails.
     sarif       findings as SARIF 2.1.0, for PR annotations.
@@ -31,4 +33,5 @@ where a person can argue with it.
 """
 
 __all__ = ["markdown", "sentences", "lexicon", "sections", "registers",
-           "corpus", "findings", "voices", "language", "sarif", "fixes"]
+           "corpus", "findings", "voices", "language", "sarif", "fixes",
+           "injection"]

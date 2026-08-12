@@ -112,8 +112,9 @@ def test_a_block_quote_is_exempt_from_the_statistics():
 # codepoints, not the keys.
 # --------------------------------------------------------------------------
 
-def test_hidden_unicode_holds_exactly_the_eight_expected_codepoints():
-    expected = [0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF, 0x00AD, 0x00A0, 0x202F]
+def test_hidden_unicode_holds_exactly_the_thirteen_expected_codepoints():
+    expected = [0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF, 0x00AD, 0x00A0, 0x202F,
+                0x180E, 0x2061, 0x2062, 0x2063, 0x2064]
     got = sorted(ord(c) for c in scan_module().HIDDEN_UNICODE)
     assert got == sorted(expected), str(["U+%04X" % c for c in got])
 

@@ -32,6 +32,12 @@ SARIF_SCHEMA = "https://json.schemastore.org/sarif-2.1.0.json"
 LEVEL_BY_PRIORITY = {"P0": "error", "P1": "warning", "P2": "note"}
 
 BAND_DESCRIPTIONS = {
+    "safety": "Text concealed from a reader, or addressed to an agent. This "
+              "catches known concealment vectors and known directive shapes. "
+              "It is not a guarantee against a novel or paraphrased injection, "
+              "and it is not what protects you: the rule that content is data "
+              "and never instruction is doing that work. Treat a hit as a "
+              "reason to read the document, not as a verdict on it.",
     "structure": "The shape of the document, measured against a corpus of 100 "
                  "trending repositories.",
     "voice": "This writer's own rules, from their voice profile. A hit is a "
