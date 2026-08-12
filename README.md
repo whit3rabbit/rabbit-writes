@@ -28,7 +28,7 @@ codex plugin marketplace add whit3rabbit/rabbit-writes
 codex plugin add rabbit-writes@rabbit-writes
 ```
 
-Restart, then confirm the three skills loaded: `claude plugin list | grep rabbit-writes`, or `/skills` in Codex.
+In Claude Code, `/reload-plugins` applies the install without a restart. In Codex, restart. Then confirm the three skills loaded: `claude plugin list | grep rabbit-writes`, or `/skills` in Codex.
 
 Python 3.9+ with the standard library, and only if you want the scripts. Nothing to build.
 
@@ -67,14 +67,23 @@ Both hosts also pick a skill implicitly when your request matches its descriptio
 <details>
 <summary><b>Working on the plugin itself</b></summary>
 
-Clone it and symlink the whole repo, not the individual skills. The skills reference each other through `${CLAUDE_PLUGIN_ROOT}`, and the scripts resolve their siblings by walking up from their own path, so the directory layout has to survive the install:
+For a session or two, point Claude Code at the clone and skip installing anything:
+
+```bash
+git clone https://github.com/whit3rabbit/rabbit-writes
+claude --plugin-dir "$PWD/rabbit-writes"
+```
+
+`${CLAUDE_PLUGIN_ROOT}` becomes the path you passed, so every command in every skill resolves. Nothing lands in `~/.claude`, which is the point: there is no second copy to collide with an install you already have.
+
+For a permanent working copy, symlink the whole repo, not the individual skills. The skills reference each other through `${CLAUDE_PLUGIN_ROOT}`, and the scripts resolve their siblings by walking up from their own path, so the directory layout has to survive the install:
 
 ```bash
 git clone https://github.com/whit3rabbit/rabbit-writes
 ln -s "$PWD/rabbit-writes" ~/.claude/skills/rabbit-writes
 ```
 
-That loads as `rabbit-writes@skills-dir` on the next restart and picks up edits without a reinstall. Don't run both installs at once: two copies of the same three skills means every request matches twice.
+The `.claude-plugin/` manifests come along with it, so that loads as `rabbit-writes@skills-dir` rather than as three loose skills, and `${CLAUDE_PLUGIN_ROOT}` still resolves. It picks up edits without a reinstall. Don't run both installs at once: two copies of the same three skills means every request matches twice.
 
 </details>
 

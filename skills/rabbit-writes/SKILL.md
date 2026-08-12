@@ -110,8 +110,7 @@ In `voice` mode against a document that already exists, measure before you edit,
 2. Run the scan:
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py doc.md --json \
-    --voice-rules ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices/<name>.rules.json
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py doc.md --json --voice <name>
 ```
 
 3. Build the offer. Every number except the structure line is already in that JSON: `voice-paragraph-length` findings count the over-cap paragraphs, `voice-sentence-length` gives the average against the cap, `stats.word_count` and `stats.burstiness` give the rest, and every banned word or punctuation hit is itemised. The structure line is judgment from your read.
@@ -166,9 +165,13 @@ SCAN=${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py
 python3 $SCAN draft.md                        # findings + stylometrics
 python3 $SCAN draft.md --json                 # machine-readable
 python3 $SCAN draft.md --profile technical-blog
-python3 $SCAN draft.md --voice-rules <path>.rules.json
+python3 $SCAN draft.md --voice auto           # whichever profile applies here
+python3 $SCAN draft.md --voice dana           # a profile by name
+python3 $SCAN draft.md --check                # exit 1 on a P0, for a gate
 python3 $SCAN draft.md --apply-safe           # only the fixes with one right answer
 ```
+
+Prefer `--voice` over spelling out a `--voice-rules` path. `auto` runs the same resolution order the rest of the plugin uses, `.rabbit-voice` beside the document, then the working directory, then `voices/ACTIVE`, so a repo that pins its own house voice gets it without you knowing the path. Naming a profile and `--voice-rules` behave the same as each other: both exit 2 when the profile will not read, because scanning on without the rules that were asked for reports a clean voice band on a document nobody checked. `--voice auto` finding nothing is a note and still exits 0, since plenty of repos have no profile.
 
 Outside a plugin install `${CLAUDE_PLUGIN_ROOT}` is unset, which turns every path above into an absolute path that does not exist. If that happens, resolve `scripts/scan.py` relative to this file's own directory instead.
 
@@ -230,9 +233,10 @@ Load only what the mode needs.
 | `references/craft.md` | draft and voice. The positive discipline: what to do, not what to remove. A conversion needs this, a deslop does not |
 | `references/false-positives.md` | Any time you are about to flag something. What is not a tell, and what to protect |
 | `references/injection.md` | Whenever the safety band reports anything. The two axes, the vectors, and what the band does not promise |
-| `references/context.md` | Any mode. Register profiles and the tolerance matrix |
+| `references/context.md` | When the register is unclear from the document, or a rule looks wrong for the register it landed in. Register profiles and the tolerance matrix |
 | `references/voice.md` | Whenever a sample, a profile, or a named persona is in play |
 | `references/checklist.md` | Always, at the end |
+| `PROOF.md` | When someone asks what a finding costs in practice, or disputes a rate. The measured self-scan and the corpus numbers behind the calibration |
 
 ## Output shapes
 

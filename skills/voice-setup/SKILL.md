@@ -10,8 +10,8 @@ metadata:
 
 Turn one person's way of writing into two files a machine can apply:
 
-- `voices/<name>.md` — the profile the model reads. Structure, mechanics, tone, register, refusals.
-- `voices/<name>.rules.json` — the subset a regex can decide. Enforced by `scan.py` at whatever priority the profile sets.
+- `voices/<name>.md`, the profile the model reads. Structure, mechanics, tone, register, refusals.
+- `voices/<name>.rules.json`, the subset a regex can decide. Enforced by `scan.py` at whatever priority the profile sets.
 
 Both live in `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices/`. They are plain text under version control, so a voice is editable, diffable, and shareable.
 
@@ -38,9 +38,9 @@ Pick based on what the person has.
 ### 1. Taste Interviewer protocol (no samples, 5-10 minutes)
 
 Adopt the role of a **Taste Interviewer**:
-> You are a Taste Interviewer — your job is to extract the DNA of how the author thinks, writes, and sees the world. You’re not here to be polite; you’re here to get to the truth. Most people give vague, socially acceptable answers ("I like to keep things simple"). Your job is to break through that by asking for concrete examples ("Simple how? Show me a sentence you'd write and one you'd refuse to write.") and calling out contradictions.
+> You are a Taste Interviewer. Your job is to extract the DNA of how the author thinks, writes, and sees the world. You're not here to be polite, you're here to get to the truth. Most people give vague, socially acceptable answers ("I like to keep things simple"). Your job is to break through that by asking for concrete examples ("Simple how? Show me a sentence you'd write and one you'd refuse to write.") and calling out contradictions.
 
-**CRITICAL RULE: Never conduct a lengthy 100-question interview.** Users should never have to spend hours typing answers by keyboard.
+Keep it short. Nobody builds a voice profile by typing answers for an hour, and the person who quits at question 40 leaves you a worse profile than the one who answered 10 and stayed engaged.
 
 Keep the interview to **10 high-signal questions max** covering the 7 core categories, asked in 2 quick batches of 5:
 
@@ -71,7 +71,7 @@ Point to 3 or 4 pieces written by the author (e.g. Substack posts like [Ruben Su
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/measure_voice.py sample1.md sample2.md sample3.md
 ```
 
-One command. It prints a per-sample table so an outlier is visible rather than averaged away, the aggregate with the spread between samples, the **Measured from samples** block ready to paste, and a starter `mechanics` object with the count behind every line. It exits 1 if any sample carries a P0.
+One command. It prints a per-sample table so an outlier is visible rather than averaged away, the aggregate with the spread between samples, the **Measured from samples** block ready to paste, and a starter `mechanics` object with the count behind every line. It exits 1 if any sample carries a P0. Add `--json` when you want to read the numbers programmatically rather than off the table.
 
 Everything it suggests comes from those three or four documents and nothing else, so treat each line as a question rather than an answer. Someone who used no semicolon in four blog posts may still use them in email, and a profile that bans them because a script counted zero is wrong in a way its owner did not choose. The script's job is to make the question specific.
 
@@ -152,11 +152,10 @@ Reach for `extends` when a person's voice is unchanged and the context is not. R
 
 **Set the priority deliberately.** `default_priority` is `P0` by default, meaning a hit is a defect on the same tier as a chatbot artifact. Some people want their preferences at `P1` instead. Ask, and say which you set.
 
-**Test the rules before saving.** Write a short paragraph that deliberately breaks four or five of them, run the scan, and confirm each one fires:
+**Test the rules before saving.** Write a short paragraph that deliberately breaks four or five of them, save it as `/tmp/violations.md`, then scan it and confirm each rule fires:
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py /tmp/violations.md \
-    --voice-rules ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices/<name>.rules.json
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py /tmp/violations.md --voice <name>
 ```
 
 A rule that does not fire is worse than no rule, because it reads as coverage.
@@ -170,6 +169,8 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate.py
 ```
 
 Confirms JSON syntax, regex compilation, active voice alignment, and file pairing.
+
+Note the path. That one sits at the repository root rather than under `${CLAUDE_PLUGIN_ROOT}/skills/`, so it only exists in a full-repo install and is absent when the three skills were copied in loose. When it is missing, scan the new profile against a real sample instead, which is the check that actually matters: a rules file that parses but never fires is the failure mode.
 
 **Activate it:**
 

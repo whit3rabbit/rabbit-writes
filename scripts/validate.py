@@ -41,6 +41,21 @@ def read(*parts):
         return fh.read()
 
 
+# The two schemastore URLs, pinned as literals. Nothing else in the repo checks
+# them: `claude plugin validate` ignores `$schema`, so a fat-fingered URL costs
+# you editor validation and reports nothing. The marketplace one shipped wrong
+# (`claude-code-marketplace-manifest.json`, a 404) and nobody noticed. Both were
+# fetched by hand and returned 200 at the values below. They stay literals rather
+# than a request because CI is stdlib-only and offline-safe, and the failure worth
+# catching is a typo here rather than an outage at schemastore.
+SCHEMA_URLS = {
+    os.path.join(".claude-plugin", "plugin.json"):
+        "https://json.schemastore.org/claude-code-plugin-manifest.json",
+    os.path.join(".claude-plugin", "marketplace.json"):
+        "https://json.schemastore.org/claude-code-marketplace.json",
+}
+
+
 def check_manifests():
     for rel, required in (
         (os.path.join(".claude-plugin", "plugin.json"),
@@ -60,6 +75,10 @@ def check_manifests():
         for key in required:
             if not data.get(key):
                 fail("%s missing key: %s" % (rel, key))
+        want = SCHEMA_URLS[rel]
+        if data.get("$schema") != want:
+            fail("%s $schema is %r, expected %r. A wrong one is a 404 that only "
+                 "an editor notices." % (rel, data.get("$schema"), want))
         notes.append("%s ok" % rel)
 
     try:
@@ -76,6 +95,14 @@ def check_manifests():
         if not os.path.isdir(os.path.join(ROOT, src)):
             fail("marketplace plugin %r points at missing source %r"
                  % (entry.get("name"), src))
+        # The schema allows `version` on a marketplace entry as well as in
+        # plugin.json, and this repo deliberately carries it only in plugin.json:
+        # a second copy is the drift one-home-per-fact exists to prevent, and the
+        # marketplace catalog reads the plugin manifest anyway. Anyone who adds one
+        # back has to keep the two in step, which is what this says out loud.
+        if entry.get("version") and entry["version"] != plugin.get("version"):
+            fail("marketplace entry %r pins version %r while plugin.json says %r"
+                 % (entry.get("name"), entry["version"], plugin.get("version")))
 
 
 def check_skills():

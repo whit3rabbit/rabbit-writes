@@ -15,12 +15,12 @@ Run it from `skills/rabbit-writes/`. It covers every row in the table below, inc
 
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 2, registers 1, measured 12 August 2026, sixth pass)
+## Result (v0.1.0, lexicon 2, registers 1, measured 12 August 2026, seventh pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 2,805 | 0 | 0 | 0 | 0.69 | 0.73 | 0.0 |
-| `PROOF.md` | 5,177 | 0 | 0 | 0 | 0.59 | 0.73 | 0.0 |
+| `SKILL.md` | 2,899 | 0 | 0 | 0 | 0.70 | 0.73 | 0.0 |
+| `PROOF.md` | 5,461 | 0 | 0 | 0 | 0.59 | 0.73 | 0.0 |
 | `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.86 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 865 | 0 | 0 | **9** | 0.66 | 0.71 | 0.0 |
@@ -29,8 +29,8 @@ Every number below was measured against a particular pattern catalogue, and the 
 | `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
 | `references/checklist.md` | 640 | 0 | 0 | 0 | 0.46 | 0.74 | 0.0 |
 | `voices/whit3rabbit.md` | 1,518 | 0 | 0 | **10** | 0.69 | 0.79 | 0.0 |
-| `../voice-setup/SKILL.md` | 1,582 | 0 | 0 | 0 | 0.61 | 0.75 | 1.3 |
-| `../readme-writing/SKILL.md` | 2,378 | 0 | 0 | **7** | 0.63 | 0.73 | 0.0 |
+| `../voice-setup/SKILL.md` | 1,678 | 0 | 0 | 0 | 0.63 | 0.75 | 0.0 |
+| `../readme-writing/SKILL.md` | 2,369 | 0 | 0 | 0 | 0.63 | 0.73 | 0.0 |
 
 Scores are with the self-reference exemption applied, the rule this skill states in prose: quoted examples, code, tables, and block quotes are exempt from flagging. `apply_exemptions()` in `scan.py` is that rule's executable form. Run with `--no-exempt` to see the raw numbers.
 
@@ -65,6 +65,10 @@ Three directive families were cut or narrowed against that corpus before anythin
 
 The fifth pass moved them for the same reason and not because the engine changed its mind about anything above. `voices/whit3rabbit.md` gained the Quick reference card and Anti-overfitting sections that `TEMPLATE.md` has always had and the worked example did not, which is 335 more words and three more list-label advisories. `references/voice.md`, `SKILL.md`, and `../voice-setup/SKILL.md` grew where blending, per-register mechanics, and `measure_voice.py` are now documented. Every P0 and P1 column is where it was.
 
+The seventh pass moved three rows, and two of them are the plugin failing its own rules in public. `../readme-writing/SKILL.md` dropped from 7 P2 hits to 0: every one was `list-label-period`, its own craft band firing on its own bolded list labels. `../voice-setup/SKILL.md` went from 1.3 em dashes per 1,000 words to 0.0, which matters because the active voice forbids em dashes outright and `CLAUDE.md` states that as the repo's convention. `SKILL.md` grew where `--voice auto` and the `PROOF.md` reference row are now documented. No P0 or P1 column moved anywhere.
+
+One of those em dashes is worth naming, because the scan did not find it and a reader has to. An em dash on a list line that also carries an inline code span is not reported, while the same dash on a plain list line is. Two of the three in `../voice-setup/SKILL.md` sat behind a code span in exactly that shape. They were found by sweeping the file for codepoints above 127, which is the habit `CLAUDE.md` already prescribes for invisible characters, and the same habit turns out to catch a visible one the counters miss.
+
 ## What it found in our own writing
 
 **`patterns.md` scores worst, and that is structural.** A catalog listing the words it catalogs will hit its own lexicon. Three Tier-1 words, nine `-ing` analyses, and three Tier-2 clusters all come from the vocabulary tables: the comma-separated lists of the words each rule exists to catch. Those are unquoted by design, because quoting a 36-item list would make it unreadable.
@@ -98,7 +102,7 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `references/false-positives.md` | 1 | serial-comma advisory |
 | `references/voice.md` | 2 | one one-word sentence, one serial-comma advisory |
 | `voices/whit3rabbit.md` | 4 | serial-comma advisories |
-| `../voice-setup/SKILL.md` | 3 | serial-comma advisories |
+| `../voice-setup/SKILL.md` | 4 | serial-comma advisories |
 | `SKILL.md` | 6 | serial-comma advisories |
 | `references/context.md` | 6 | 4 over-cap paragraphs, 1 one-word sentence, 1 advisory |
 | `references/patterns.md` | 25 | 10 em dashes, 7 semicolons, 2 one-word sentences, 6 advisories |
