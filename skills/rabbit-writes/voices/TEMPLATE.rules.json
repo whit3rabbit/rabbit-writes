@@ -46,13 +46,15 @@
   "_banned_phrases_example": [{"phrase": "thought leader", "inflect": true}],
   "banned_phrases": [],
 
-  "_banned_regex_note": "Full control. Each entry needs id, label, rx. Optional: priority (P0/P1/P2), max_allowed (flag only past N hits, for overuse rather than a ban), note, applies_to_registers (a list of register names; the entry is skipped everywhere else, and omitting it means everywhere).",
+  "_banned_regex_note": "Full control. Each entry needs id, label, rx. Optional: priority (P0/P1/P2), max_allowed (flag only past N hits, for overuse rather than a ban), note, applies_to_registers (a list of register names; the entry is skipped everywhere else, and omitting it means everywhere), example.",
+  "_banned_regex_example_note": "`example` is a line this pattern has to catch, and it is the only way anything can prove the rule works: a regex cannot be run backwards into text. build_voice.py --check runs it through scan.py and reports an entry without one as unproven rather than passing it. With max_allowed set, the example needs one more hit than the cap or the entry is allowed to stay quiet.",
   "banned_regex": [
     {
       "id": "example-rule",
       "label": "Example, delete this",
       "rx": "(?i)\\bexample phrase you never write\\b",
       "priority": "P0",
+      "example": "Here is an example phrase you never write.",
       "note": "Shown so the shape is obvious. Delete it."
     }
   ],

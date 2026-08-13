@@ -26,6 +26,8 @@ if ENGINE not in sys.path:
 # finding added to two of them made the third reject a register that named it.
 from rwlib import inflect                       # noqa: E402
 from rwlib import registers as registers_mod    # noqa: E402
+from rwlib import stylometry as stylometry_mod  # noqa: E402
+from rwlib import voice_check                   # noqa: E402
 from rwlib.lexicon import SYNTHETIC_FINDING_IDS  # noqa: E402
 
 problems = []
@@ -179,6 +181,24 @@ def check_voices():
                 notes.append("note: voices/%s.md has no matching %s.rules.json"
                              % (vname, vname))
 
+        # A fingerprint is read by scan.py only through its profile's rules
+        # path, so one without a rules file beside it is never loaded: no
+        # error, no distance, nothing to notice. Checked here for the same
+        # reason a register named in a rules file is checked, which is that a
+        # silent no-op reads exactly like a rule somebody is honouring.
+        if fn.endswith(stylometry_mod.FINGERPRINT_SUFFIX):
+            # Only the orphan check lives here. Whether a fingerprint is
+            # readable and current is voice_check's, reached from the rules
+            # file, and an orphan is exactly the case that reaches nothing:
+            # scan.py finds a fingerprint only through its profile's rules path,
+            # so one with no rules file beside it is never loaded at all. No
+            # error, no distance, nothing to notice.
+            vname = fn[:-len(stylometry_mod.FINGERPRINT_SUFFIX)]
+            if not os.path.exists(os.path.join(VOICES, vname + ".rules.json")):
+                fail("voices/%s has no %s.rules.json, so scan.py never finds it "
+                     "and no distance is ever measured" % (fn, vname))
+            continue
+
         if not fn.endswith(".rules.json"):
             continue
 
@@ -190,58 +210,22 @@ def check_voices():
             fail("voices/%s does not parse: %s" % (fn, exc))
             continue
 
-        if "voice" in data and data["voice"] != vname and vname != "TEMPLATE":
-            fail("voices/%s: 'voice' field %r does not match filename %r"
-                 % (fn, data["voice"], vname))
+        # Everything structural is voice_check's, so this validator and the one
+        # a person runs on their own machine cannot disagree about what a valid
+        # profile is. `voice-setup/scripts/build_voice.py --check` is the other
+        # caller, and it adds the half that needs the engine: whether the rules
+        # actually fire.
+        #
+        # TEMPLATE is the form rather than a profile, so it is exempt from the
+        # checks that are about being one: its `voice` field is "<name>", its
+        # underscore keys are its documentation, and its example-rule entry is
+        # the shape it exists to show.
+        if vname != "TEMPLATE":
+            for entry in voice_check.check_profile(os.path.join(VOICES, fn),
+                                                   VOICES):
+                if entry["level"] == voice_check.FAIL:
+                    fail("voices/%s: %s" % (fn, entry["message"]))
 
-        for entry in data.get("banned_regex", []):
-            if "id" not in entry or "rx" not in entry:
-                fail("voices/%s: banned_regex entry needs id and rx" % fn)
-                continue
-            try:
-                re.compile(entry["rx"])
-            except re.error as exc:
-                fail("voices/%s: regex %s does not compile: %s"
-                     % (fn, entry["id"], exc))
-        for entry in data.get("required_when", []):
-            for rx in entry.get("any_of_rx", []):
-                try:
-                    re.compile(rx)
-                except re.error as exc:
-                    fail("voices/%s: required_when regex does not compile: %s"
-                         % (fn, exc))
-        # A register named in a voice rules file and not in registers.json is a
-        # silent no-op: the rule quietly stops applying anywhere, or applies
-        # everywhere, and the only symptom is a finding that does not turn up.
-        # The same class of bug the tolerance matrix check catches one file over.
-        known_registers = set(registers_mod.registers())
-        scoped = [("mechanics_by_register", r)
-                  for r in data.get("mechanics_by_register", {})]
-        for key in ("banned_regex", "required_when"):
-            for entry in data.get(key, []):
-                scoped += [(key, r) for r in entry.get("applies_to_registers", [])]
-        for where, register in scoped:
-            if register not in known_registers:
-                fail("voices/%s: %s names register %r, which is not in "
-                     "registers.json (%s)"
-                     % (fn, where, register, ", ".join(sorted(known_registers))))
-
-        # A ban list entry is a plain string or `{"word": ..., "inflect": true}`.
-        # An entry that is neither names nothing, and scan.py drops it: that is
-        # right at runtime, where one bad line should cost one rule, and wrong
-        # here, where a profile silently enforcing fewer words than it lists is
-        # exactly what this validator is for.
-        for key in ("banned_words", "banned_phrases"):
-            if key not in data:
-                continue
-            if not isinstance(data[key], list):
-                fail("voices/%s: %s must be a list" % (fn, key))
-                continue
-            for entry in data[key]:
-                if not inflect.term_of(entry):
-                    fail("voices/%s: %s has an entry naming no term (%r). Write "
-                         "a string, or an object with a \"word\" key."
-                         % (fn, key, entry))
         words = inflect.expand(data.get("banned_words", []))
         phrases = inflect.expand(data.get("banned_phrases", []))
         # Counted after expansion, and both numbers shown when they differ, so a
@@ -575,7 +559,8 @@ def check_scripts_compile():
     import ast
     for rel in ("rabbit-writes/scripts/scan.py", "rabbit-writes/scripts/verify.py",
                 "readme-writing/scripts/readme_check.py",
-                "voice-setup/scripts/measure_voice.py"):
+                "voice-setup/scripts/measure_voice.py",
+                "voice-setup/scripts/build_voice.py"):
         path = os.path.join(SKILLS, rel)
         if not os.path.exists(path):
             continue

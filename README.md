@@ -137,6 +137,8 @@ python3 skills/rabbit-writes/scripts/verify.py original.md rewritten.md   # did 
 python3 skills/rabbit-writes/scripts/scan.py draft.md --apply-safe        # the fixes with one right answer
 python3 skills/rabbit-writes/scripts/scan.py draft.md --sarif             # for a pull request annotation
 python3 skills/voice-setup/scripts/measure_voice.py a.md b.md c.md        # samples in, profile numbers out
+python3 skills/voice-setup/scripts/measure_voice.py a.md b.md c.md \
+    --name ada --write-fingerprint                                       # and a voice to measure against
 python3 skills/rabbit-writes/scripts/rwlib/voices.py --blend ada grace --weight 0.7
 ```
 
@@ -273,18 +275,16 @@ Set up my writing voice
 
 #### 3. By hand, from the template
 
-Copy the template files and edit them directly:
+Scaffold the pair rather than copying it. The templates carry inline guidance keys and a worked `banned_regex` entry, and both are enforced if a copy leaves them in:
 
 ```bash
-cp skills/rabbit-writes/voices/TEMPLATE.md skills/rabbit-writes/voices/<you>.md
-cp skills/rabbit-writes/voices/TEMPLATE.rules.json skills/rabbit-writes/voices/<you>.rules.json
+python3 skills/voice-setup/scripts/build_voice.py --scaffold --name <you>
 ```
 
-Fill in your rules, then validate and activate:
+Fill in your rules, then check and activate. The check validates the structure and then puts every rule you wrote through `scan.py`, because a rule that does not fire reads as coverage:
 
 ```bash
-python3 scripts/validate.py
-echo "<you>" > skills/rabbit-writes/voices/ACTIVE
+python3 skills/voice-setup/scripts/build_voice.py --check <you> --activate
 ```
 
 Taste is boundaries: roughly 80% of a working profile is **refusals** (what you will never write). What you say you like usually describes half the writers alive. What you refuse to put your name on is your fingerprint.
@@ -298,6 +298,12 @@ Three skills.
 Underneath sit 63 patterns in a priority-tiered catalog, a false-positive discipline, register profiles, Orwell and Simplified Technical English as a positive craft layer, a 33-item self-check, and two scripts. The engine half knows nothing about any particular person.
 
 **`voice-setup`**: builds, measures, edits, blends, and switches voice profiles. Ships `measure_voice.py`, which takes three or four things you wrote and prints the aggregate, the spread between samples, the profile block ready to paste, and a starter `mechanics` object with the count behind every line. It stops if a sample carries a P0, because a tell that reaches a profile is then reproduced on purpose.
+
+It reports the distributions an average hides, too: sentence openers, connectors, the contractions you actually use, and how each sample ends.
+
+It also writes a **voice fingerprint**. Every voice rule is a refusal, and a draft can break none of them and still sound like nobody. The fingerprint is the other half: function-word rates measured against your own writing, calibrated by how far your own pieces sit from each other.
+
+`scan.py --voice` then reports how far a document is from that. P2, never a build failure, because sounding unlike yourself is sometimes the point. `skills/rabbit-writes/references/voice.md` has the reading.
 
 **`readme-writing`**: drafts or audits a `README.md` against patterns measured from 100 real GitHub repos (section order, sentence length, badge and link conventions) instead of generic advice, in your voice rather than a generated open-source register. Ships `readme_check.py`, which checks structure, links, badges, claims, and the active voice in one pass. The full study is in `docs/README_WRITEUP.md`.
 
@@ -326,11 +332,12 @@ rabbit-writes/
         ACTIVE                 one line: whose voice is live
         whit3rabbit.md         shipped example profile
         whit3rabbit.rules.json its enforceable subset
-        TEMPLATE.md            copy this to add your own
+        TEMPLATE.md            scaffold from this to add your own
         TEMPLATE.rules.json
     voice-setup/
       SKILL.md
       scripts/              measure_voice.py, samples in and a profile starting point out
+                            build_voice.py, scaffolds a profile and proves its rules fire
     readme-writing/
       SKILL.md
       references/           patterns (the full catalog), checklist

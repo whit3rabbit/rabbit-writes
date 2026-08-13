@@ -41,9 +41,20 @@ BODY = ("The build reads a manifest and writes a report. It runs from a "
         "and nobody outside the team noticed, which is the outcome you want "
         "and never get to write about.\n\n")
 
+# A second piece by the same imaginary person, for the tests that need two
+# samples that are not the same file twice.
+OTHER_BODY = ("The hook runs from somebody else's checkout, which is the only "
+              "place it matters. We tested it here for a year and here is not "
+              "where it fails. Two of them shipped broken because of that.\n\n"
+              "So the fixture is a stranger's repository now, built in a "
+              "temporary directory and thrown away after. It costs a second "
+              "per run and it caught both bugs on the first pass.\n\n")
 
-def run(*paths):
-    out = subprocess.run([sys.executable, MEASURE, *paths, "--json"],
+
+def run(*paths, **kwargs):
+    extra = kwargs.pop("extra", ())
+    assert not kwargs, kwargs
+    out = subprocess.run([sys.executable, MEASURE, *paths, "--json", *extra],
                          capture_output=True, text=True)
     assert out.stdout, out.stderr
     return json.loads(out.stdout), out.returncode
@@ -162,3 +173,102 @@ def test_no_readable_sample_is_an_error_and_not_an_empty_profile():
     out = subprocess.run([sys.executable, MEASURE, "/nonexistent/nope.md"],
                          capture_output=True, text=True)
     assert out.returncode == 2, out.stdout
+
+
+# --------------------------------------------------------------------------
+# the fingerprint and the distributions
+# --------------------------------------------------------------------------
+
+def test_it_builds_a_fingerprint_from_two_or_more_samples():
+    """The calibration band is the output worth having. A raw distance means
+    nothing on its own, and "0.9, where this writer's own samples sit under
+    0.6" is a claim a person can act on.
+
+    Two different bodies, because two copies of one file have a self-distance of
+    exactly zero and would assert nothing about whether the band is measured."""
+    directory, paths = scratch({"a.md": BODY * 2, "b.md": OTHER_BODY * 2})
+    try:
+        result = run(*paths)[0]
+        fp = result["fingerprint"]
+        assert fp["n_samples"] == 2, fp
+        assert fp["self_distance"]["max"] > 0, fp["self_distance"]
+        assert result["fingerprint_written_to"] is None, result
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_one_sample_gets_no_fingerprint_rather_than_an_uncalibrated_one():
+    directory, paths = scratch({"a.md": BODY * 2})
+    try:
+        assert run(*paths)[0]["fingerprint"] is None
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_write_fingerprint_lands_where_scan_looks_for_it():
+    directory, paths = scratch({"a.md": BODY * 2, "b.md": BODY * 2})
+    try:
+        result = run(*paths, extra=("--name", "tester", "--write-fingerprint",
+                                    "--voices-dir", directory))[0]
+        target = os.path.join(directory, "tester.fingerprint.json")
+        assert result["fingerprint_written_to"] == target, result
+        with open(target, encoding="utf-8") as fh:
+            assert json.load(fh)["voice"] == "tester"
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_a_fingerprint_is_never_written_from_a_contaminated_sample():
+    """Every other output here is a suggestion a person reads and confirms.
+    This one is a file a later scan measures against without asking, so an
+    assisted sample in it makes the assisted register the target."""
+    directory = tempfile.mkdtemp(prefix="rabbit-measure-")
+    try:
+        result, code = run(sample("ai-sample.md"), sample("human-sample.md"),
+                           extra=("--name", "tester", "--write-fingerprint",
+                                  "--voices-dir", directory))
+        assert code == 1, result
+        assert result["fingerprint_written_to"] is None, result
+        assert not os.path.exists(os.path.join(directory,
+                                               "tester.fingerprint.json"))
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_write_fingerprint_without_a_name_is_an_error():
+    """The name decides the filename and labels the fingerprint. Guessing one
+    writes a profile nobody asked for into somebody's voices directory."""
+    directory, paths = scratch({"a.md": BODY * 2, "b.md": BODY * 2})
+    try:
+        out = subprocess.run([sys.executable, MEASURE, *paths,
+                              "--write-fingerprint"],
+                             capture_output=True, text=True)
+        assert out.returncode == 2, out.stdout
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_exemplars_are_opt_in_because_they_copy_the_writers_prose():
+    directory, paths = scratch({"a.md": BODY * 2, "b.md": BODY * 2})
+    try:
+        assert "exemplars" not in run(*paths)[0]["fingerprint"]
+        with_them = run(*paths, extra=("--with-exemplars",))[0]["fingerprint"]
+        assert with_them["exemplars"], with_them
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_the_distributions_carry_what_the_means_hide():
+    """Openers, connectors, contractions and the sign-off. None of these is a
+    threshold: they are what a person reads before writing the markdown half of
+    a profile, which is the half no counter reaches."""
+    directory, paths = scratch({"a.md": BODY * 2})
+    try:
+        dist = run(*paths)[0]["samples"][0]["distributions"]
+        for key in ("sentence_openers", "paragraph_openers", "connectors",
+                    "contractions", "hedges", "closer"):
+            assert key in dist, (key, sorted(dist))
+        assert dist["closer"], dist
+        assert "\n" not in dist["closer"], repr(dist["closer"])
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)

@@ -51,25 +51,29 @@
       "id": "condescend-seniority",
       "label": "Condescension by seniority",
       "rx": "(?i)(if you'?d been (doing this|here) as long as|when you'?ve been (doing this|around) as long as|with all due respect,)",
-      "priority": "P0"
+      "priority": "P0",
+      "example": "With all due respect, the schedule was never realistic."
     },
     {
       "id": "fear-mongering",
       "label": "Fear-mongering",
       "rx": "(?i)(before it'?s too late|you can'?t afford (not )?to|the (threat|risk) has never been (greater|higher)|it'?s only a matter of time before you'?re)",
-      "priority": "P0"
+      "priority": "P0",
+      "example": "Patch the gateway before it's too late."
     },
     {
       "id": "absolute-claim",
       "label": "Absolute security claim",
       "rx": "(?i)\\b((100|one hundred) ?% (secure|safe|effective|accurate|reliable)|impossible to (hack|breach|compromise)|guarantees? (complete|total|full) (security|protection)|zero risk)",
-      "priority": "P0"
+      "priority": "P0",
+      "example": "The appliance is 100% secure out of the box."
     },
     {
       "id": "war-metaphor",
       "label": "War metaphor on desk work",
       "rx": "(?i)\\b(battle ?rhythm|kill chain|in the trenches|war ?room|weaponi[sz]e[ds]?|force multiplier|troops on the ground|boots on the ground)",
-      "priority": "P0"
+      "priority": "P0",
+      "example": "The team ran a war room for three days."
     },
     {
       "id": "efficiency-overuse",
@@ -77,38 +81,44 @@
       "rx": "(?i)\\b(efficienc(y|ies)|improve(s|d|ment|ments)?)\\b",
       "priority": "P2",
       "max_allowed": 2,
-      "note": "Not banned, overused. Two uses pass; the third and every one after it is flagged. Name what got faster or better instead."
+      "note": "Not banned, overused. Two uses pass; the third and every one after it is flagged. Name what got faster or better instead.",
+      "example": "Efficiency improves when the process improves."
     },
     {
       "id": "motivational-cadence",
       "label": "Motivational-poster cadence",
       "rx": "(?m)^[A-Z][^.!?\\n]{4,60}[.!?]\\s*\\n\\s*\\n[A-Z][^.!?\\n]{4,60}[.!?]\\s*\\n\\s*\\n[A-Z][^.!?\\n]{4,60}[.!?]\\s*$",
       "priority": "P0",
-      "note": "Three consecutive one-sentence paragraphs. Write in sentences."
+      "note": "Three consecutive one-sentence paragraphs. Write in sentences.",
+      "example": "Ship the work.\n\nMeasure the result.\n\nThen do it again."
     },
     {
       "id": "hedge-softener",
       "label": "Tidy over-hedging",
       "rx": "(?i)\\b(i (just )?wanted to (reach out|check in|follow up)|i was (just )?wondering if|if that (makes|would make) sense|does that (sound|work) (good|ok)|no worries (at all|if not))",
-      "priority": "P1"
+      "priority": "P1",
+      "example": "I just wanted to check in on the draft."
     },
     {
       "id": "manufactured-enthusiasm",
       "label": "Manufactured enthusiasm",
       "rx": "(?i)(i'?m (so |really |super )?(excited|thrilled|pumped) to|we'?re (thrilled|excited) to announce|can'?t wait to|absolutely love(d)? (this|it)|amazing work!|fantastic job!)",
-      "priority": "P0"
+      "priority": "P0",
+      "example": "We're thrilled to announce the new release."
     },
     {
       "id": "credential-substitute",
       "label": "Credential as substitute for substance",
       "rx": "(?i)(as (a|an) (certified|seasoned|veteran) [a-z ]{3,30},|in my \\d+ years of (experience|doing this)|speaking as (a|an) (expert|professional))",
-      "priority": "P0"
+      "priority": "P0",
+      "example": "As a certified network engineer, I would not do that."
     },
     {
       "id": "numeric-date",
       "label": "Ambiguous numeric date (use 12 September 2025)",
       "rx": "\\b\\d{1,2}/\\d{1,2}/\\d{2,4}\\b",
-      "priority": "P1"
+      "priority": "P1",
+      "example": "It shipped on 09/12/2025."
     }
   ],
   "required_when": [

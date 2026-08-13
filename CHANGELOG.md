@@ -9,6 +9,31 @@ self-scan number were re-run after both.
 
 ### What the engine flags, changed on purpose
 
+- **A voice is a measurable target now, not only a list of refusals.**
+  `measure_voice.py --name <voice> --write-fingerprint` writes
+  `voices/<name>.fingerprint.json` from the same samples the profile came from,
+  and `scan.py --voice` finds it beside the rules file and reports the distance
+  to it. The measure is Burrows' Delta over 190 function words, calibrated
+  against the writer's own samples, so the number reads as "0.97, where their
+  own pieces sit within 0.61 of each other" rather than as a bare score.
+  Everything the voice band enforced before this was a refusal, and a document
+  could clear every one of them and still sound like nobody. `voice-distance`
+  is P2 forever, never fails `--check`, and is not reported under 250 words: a
+  writer is allowed to sound unlike themselves on purpose, and a number that
+  blocked a commit over register would be the humanizer-shaped failure this
+  plugin exists to avoid. Every reported distance names the markers responsible
+  with the direction and both rates, because "further from the profile" tells a
+  rewrite pass nothing and "furthermore at +16 sd, so at -2.4" tells it what to
+  trade. Profiles without a fingerprint are unaffected, and a stranger's
+  repository has none, so the pre-commit hooks do not move.
+- **`measure_voice.py` reports the distributions the averages hide.** Sentence
+  and paragraph openers, connectors by group, which contractions this person
+  actually uses, their hedges and intensifiers, and how each sample ends
+  verbatim. Two writers with the same 18-word average sound nothing alike if one
+  opens half her sentences with "But", and none of that reached the old table.
+  It also refuses to write a fingerprint from a contaminated sample: every other
+  output of that script is a suggestion a person confirms, and this one is a
+  file a later scan measures against without asking.
 - **An HTML character reference is the character it renders as.** `&mdash;` and
   `&#8212;` count as em dashes now, so a find-and-replace no longer walks a
   document past `verify.py`'s "no em dashes added" gate or a voice that forbids
@@ -92,6 +117,26 @@ self-scan number were re-run after both.
   into one command: a per-sample table, the aggregate with the spread, the
   `Measured from samples` block ready to paste, and a starter `mechanics` object
   with the count behind every line. Exits 1 if any sample carries a P0.
+- **`voice-setup/scripts/build_voice.py`**, which builds a profile and then
+  proves it. `--scaffold --name <voice> --out <dir>` writes the pair from the
+  templates with the template's own residue already gone: the underscore-prefixed
+  guidance keys, and the `banned_regex` entry labeled "Example, delete this".
+  That entry compiles, so a hand copy that kept it enforced a rule nobody chose,
+  at the profile's priority, against the name of the person who did not choose
+  it, and nothing in the repository noticed. `--check` runs the structure pass
+  and then puts every banned word, banned phrase, forbidden mechanic and regex
+  example through `scan.py`, reporting anything that produces no finding: a rule
+  that does not fire is worse than no rule, because it reads as coverage. It is
+  the validator that ships with the skill, which matters because
+  `scripts/validate.py` sits at the repository root and a plugin install has no
+  such file. `--activate` writes `voices/ACTIVE`, and refuses when the check
+  failed or the profile lives outside `voices/`, where `ACTIVE` cannot resolve
+  a name at all.
+- **`banned_regex` entries take an optional `example`**, a line the pattern has
+  to catch. It is the only way anything can prove a regex works, because a
+  pattern cannot be run backwards into text, and an entry without one is
+  reported as unproven rather than passed. The ten regexes in
+  `voices/whit3rabbit.rules.json` each carry one now.
 - **`rwlib/voices.py --blend a b --weight 0.7`**, for the half of blending a
   script can do. Bans union, the stricter side wins whatever the weight says,
   genuine conflicts are reported by name, and the lineage goes into the file.
@@ -152,6 +197,19 @@ last two review passes spent themselves.
 - **`lexicon.json` and `registers.json` carry a `version`**, echoed in
   `scan.py --json` and in `PROOF.md`'s heading. `validate.py` fails when they
   disagree, so a published measurement names the catalogue that produced it.
+- **`rwlib/voice_check.py`** decides whether a rules file is a profile.
+  `scripts/validate.py` and `voice-setup/scripts/build_voice.py --check` are
+  both callers, so the repository validator and the one a person runs on their
+  own machine cannot disagree about what valid means. `validate.py` lost its own
+  copy of the regex-compilation, register-name and ban-entry checks in the
+  trade, and gained the ones it never had: template residue in either file, the
+  mechanic vocabulary, and a rules file with no markdown beside it.
+- **`rwlib/voices.MECHANIC_VALUES`** is the mechanics vocabulary, assembled from
+  the `STRICTNESS` and `NUMERIC_MECHANICS` tables that were already there rather
+  than restated. An unknown key and a misspelled value both failed silently
+  before: `mech.get("semicolons")` is None, the comparison is False, and the rule
+  the author believes they wrote never runs. A test holds the template's
+  `_options` block against it.
 
 ### New
 

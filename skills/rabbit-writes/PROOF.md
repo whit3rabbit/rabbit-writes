@@ -19,17 +19,17 @@ Every number below was measured against a particular pattern catalogue, and the 
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 2,899 | 0 | 0 | 0 | 0.70 | 0.73 | 0.0 |
-| `PROOF.md` | 5,526 | 0 | 0 | 0 | 0.59 | 0.73 | 0.0 |
+| `SKILL.md` | 3,058 | 0 | 0 | 0 | 0.69 | 0.73 | 0.0 |
+| `PROOF.md` | 5,894 | 0 | 0 | 0 | 0.58 | 0.72 | 0.0 |
 | `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.86 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 865 | 0 | 0 | **9** | 0.66 | 0.71 | 0.0 |
 | `references/context.md` | 579 | 0 | 0 | 0 | 0.66 | 0.80 | 0.0 |
-| `references/voice.md` | 1,047 | 0 | 0 | 0 | 0.76 | 0.73 | 0.0 |
+| `references/voice.md` | 1,484 | 0 | 0 | 0 | 0.74 | 0.71 | 0.0 |
 | `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
 | `references/checklist.md` | 640 | 0 | 0 | 0 | 0.46 | 0.74 | 0.0 |
 | `voices/whit3rabbit.md` | 1,518 | 0 | 0 | **10** | 0.69 | 0.79 | 0.0 |
-| `../voice-setup/SKILL.md` | 1,678 | 0 | 0 | 0 | 0.63 | 0.75 | 0.0 |
+| `../voice-setup/SKILL.md` | 2,314 | 0 | 0 | 0 | 0.64 | 0.74 | 0.0 |
 | `../readme-writing/SKILL.md` | 2,369 | 0 | 0 | 0 | 0.63 | 0.73 | 0.0 |
 
 Scores are with the self-reference exemption applied, the rule this skill states in prose: quoted examples, code, tables, and block quotes are exempt from flagging. `apply_exemptions()` in `scan.py` is that rule's executable form. Run with `--no-exempt` to see the raw numbers.
@@ -69,6 +69,10 @@ The seventh pass moved three rows, and two of them are the plugin failing its ow
 
 One of those em dashes is worth naming, because the scan did not find it and a reader has to. An em dash on a list line that also carries an inline code span is not reported, while the same dash on a plain list line is. Two of the three in `../voice-setup/SKILL.md` sat behind a code span in exactly that shape. They were found by sweeping the file for codepoints above 127, which is the habit `CLAUDE.md` already prescribes for invisible characters, and the same habit turns out to catch a visible one the counters miss.
 
+Those same three rows moved once more when the voice fingerprint landed, and for the same reason: `SKILL.md`, `references/voice.md`, and `../voice-setup/SKILL.md` are where it is documented. `references/voice.md` picked up a second serial-comma advisory with the words. No P0 or P1 column moved.
+
+`../voice-setup/SKILL.md` grew again with `build_voice.py`, which is where scaffolding a profile and proving its rules fire are now documented, and picked up a fifth serial-comma advisory with the words. Same story as every row above it: the document changed, the engine did not, and no P0 or P1 column moved.
+
 ## What it found in our own writing
 
 **`patterns.md` scores worst, and that is structural.** A catalog listing the words it catalogs will hit its own lexicon. Three Tier-1 words, nine `-ing` analyses, and three Tier-2 clusters all come from the vocabulary tables: the comma-separated lists of the words each rule exists to catch. Those are unquoted by design, because quoting a 36-item list would make it unreadable.
@@ -100,10 +104,10 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `../readme-writing/SKILL.md` | 0 | |
 | `PROOF.md` | 1 | serial-comma advisory |
 | `references/false-positives.md` | 1 | serial-comma advisory |
-| `references/voice.md` | 1 | serial-comma advisory |
+| `references/voice.md` | 2 | serial-comma advisories |
 | `references/context.md` | 1 | serial-comma advisory |
 | `voices/whit3rabbit.md` | 4 | serial-comma advisories |
-| `../voice-setup/SKILL.md` | 4 | serial-comma advisories |
+| `../voice-setup/SKILL.md` | 5 | serial-comma advisories |
 | `SKILL.md` | 6 | serial-comma advisories |
 | `references/patterns.md` | 25 | 10 em dashes, 7 semicolons, 2 one-word sentences, 6 advisories |
 
@@ -116,6 +120,16 @@ The serial-comma rows are the `oxford_comma` mechanic, which reports at P2 and n
 **An early run found nine semicolons in `whit3rabbit.md`, in a profile that bans semicolons.** They came from the source style guide, which used them while forbidding them. Fixed by splitting the sentences, which is what the rule asks for. This is the case the voice band exists to catch: a person's stated rules and their actual habits disagreeing, in the document that is supposed to define them.
 
 **Merging the two prose skills introduced one of its own.** The "Paths." paragraph, added to every `SKILL.md` so Codex users can resolve `${CLAUDE_PLUGIN_ROOT}` by hand, used a semicolon. Three files, one sentence, caught by this scan and split.
+
+### The voice distance is not calibrated on anybody real yet
+
+`voice-distance` is new, and this table cannot exercise it: no profile in this repository ships a fingerprint, because a fingerprint is built from a person's writing samples and this repository has none of the author's. Nothing in the table above moved, and nothing in a stranger's repository moves either, since the finding only exists where a `voices/<name>.fingerprint.json` does.
+
+What the measure has been tested against is two synthetic voices in `tests/test_stylometry.py`: four samples on four unrelated subjects in one register, a fifth held-out sample by the same writer, and a formal committee report. The held-out sample lands inside the band, the report lands at roughly 1.6x it, and the markers the report is charged with are `furthermore`, `therefore`, and `however`. That is the property the module claims and it is the property a test can own without a real person's prose in the repository.
+
+It is not evidence that the band separates two real writers of similar register, that a person's own samples cluster as tightly as these fixtures do, or that the three verdict thresholds are set at the right places. Those need real profiles, and the honest reading until then is that the number is a signal to look at rather than a measurement to trust. This is why it is P2, why it never fails `--check`, and why the finding text says the measure cannot tell a deliberate change of register from a conversion that did not land.
+
+Two known limits are structural rather than uncalibrated. The marker list is English, like every other calibration in this engine. And a document shorter than 250 words is measured and reported with the number, with no finding raised off it, because below that the marker rates are sampling noise.
 
 ## Bugs found by dogfooding
 

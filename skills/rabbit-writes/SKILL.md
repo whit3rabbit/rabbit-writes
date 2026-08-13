@@ -123,11 +123,15 @@ Converting to whit3rabbit's voice means:
   paragraphs  6 over the 5-sentence cap, split
   sentences   avg 24 words against a cap of 22, roughly 30 rewritten
   mechanics   11 rule hits: 7 em dashes, 4 semicolons
+  distance    0.97 from whit3rabbit, whose own samples sit under 0.61
+              driven by: furthermore, therefore, however
   size        roughly 10-20% shorter (37 wordiness and throat-clearing spans)
 Full conversion, or just the 11 mechanical hits?
 ```
 
 The first four lines are exact counts and should be stated exactly. The size line is not: it is derived by summing the words in spans a pass would delete outright, so give it as a band rounded to 5% with its basis beside it. A flat "-15%" claims a precision the method does not have, and most profiles ask for exact numbers on anything serious.
+
+The distance line only exists when the profile has a fingerprint beside it, which not every profile does. It comes from `voice_distance` in the same JSON, and its `contributors` are the markers to name. Leave the line out rather than inventing it, and never state it as a verdict about who wrote the document. It measures register, and `references/voice.md` has the reading.
 
 Skip the question, and say which depth you chose and why, when the user already asked for a full rewrite, when the document is under about 150 words (the scan's own reliability floor, and the diff is cheap enough to just show), or when another skill called this one.
 
@@ -148,6 +152,8 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/verify.py original.md
 `--allow-structure` is required here and only here. Without it, `verify.py` treats a changed or added heading as a violation, which is correct for `deslop` and would fail every conversion that did its job. The flag moves those two checks into a reported list. Code, tables, quotes, URLs, added em dashes, and the tell counter stay hard.
 
 Report in those same four bands plus the word delta, so the user can see whether the conversion was structural or only lexical. A report that lists only word swaps after a full conversion means step 1 did not happen.
+
+**Where the profile has a fingerprint, close the loop with it.** Rescan the converted document and report the distance both ways: `0.97 -> 0.58, in range`. `verify.py` answers "did the conversion break anything" and this answers "did it land". A pass that cleared eleven mechanical hits and moved the distance from 0.97 to 0.95 changed the punctuation and left the register alone, which is the shallow conversion no rule-by-rule report can see. Read the remaining `contributors` for what to trade next. If the number will not move without rewriting sentences the source needs, say that instead of chasing it: the distance is a signal, never a target to game.
 
 ## Workflow
 

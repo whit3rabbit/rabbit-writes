@@ -229,6 +229,48 @@ OPINION_MECHANICS = {"oxford_comma": "allow", "date_format": "any"}
 
 PRIORITY_ORDER = ("P0", "P1", "P2")
 
+# The whole mechanics vocabulary: which keys a rules file may set, and which
+# values each one takes. Assembled rather than restated, because most of it is
+# already here. STRICTNESS orders the forbid/allow ones, NUMERIC_MECHANICS names
+# the caps, and only the two with no strictness order have to be spelled out.
+#
+# It lives beside the merge rules rather than in whatever checks a profile,
+# because a vocabulary stated twice is a vocabulary that drifts, and scan.py
+# reads these values by hand in `apply_voice_rules`. The template's
+# `_options` block is the third statement of it, and a test holds the two
+# together.
+MECHANIC_VALUES = dict(STRICTNESS)
+MECHANIC_VALUES["oxford_comma"] = ("require", "forbid", "allow")
+MECHANIC_VALUES["date_format"] = ("dmy", "mdy", "iso", "any")
+
+
+def mechanic_problems(mechanics):
+    """[(key, message)] for every mechanic this engine will not act on.
+
+    An unknown key and a misspelled value fail the same way at runtime, which is
+    silently: `mech.get("semicolons")` is None, `== "forbid"` is False, and the
+    rule the author believes they wrote never runs.
+    """
+    out = []
+    for key, value in mechanics.items():
+        if key.startswith("_"):
+            continue                    # template guidance, reported elsewhere
+        if key in NUMERIC_MECHANICS:
+            try:
+                float(value)
+            except (TypeError, ValueError):
+                out.append((key, "%r is not a number" % (value,)))
+            continue
+        allowed = MECHANIC_VALUES.get(key)
+        if allowed is None:
+            out.append((key, "is not a mechanic this engine reads. Known: %s"
+                        % ", ".join(sorted(set(MECHANIC_VALUES) |
+                                           set(NUMERIC_MECHANICS)))))
+        elif value not in allowed:
+            out.append((key, "is %r, which is not one of: %s"
+                        % (value, ", ".join(allowed))))
+    return out
+
 
 def _blend_mechanic(key, left, right, weight, notes):
     """One mechanic, with the strict side winning wherever "strict" means

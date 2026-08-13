@@ -76,6 +76,7 @@ if HERE not in sys.path:
 from rwlib import docx_text                      # noqa: E402
 from rwlib import fixes as fixes_mod             # noqa: E402
 from rwlib import inflect, injection, language, registers, sarif, suppress  # noqa: E402
+from rwlib import stylometry                       # noqa: E402
 from rwlib import findings as findings_mod       # noqa: E402
 from rwlib import lexicon as lexicon_mod         # noqa: E402
 from rwlib import voices as voices_mod           # noqa: E402
@@ -597,8 +598,61 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
                 entry.get("note", "")))
 
 
+def apply_voice_distance(raw_text, fingerprint, stats, findings):
+    """How far this document sits from how the profile's owner writes.
+
+    The one voice measurement that is not a refusal. Everything else in the
+    band is a rule a document either breaks or does not, and a document can
+    clear all of them and still sound like nobody. This is the number for that,
+    calibrated against the writer's own samples: `references/voice.md` and
+    rwlib/stylometry.py carry the reasoning.
+
+    Three deliberate limits, all of them about not overclaiming:
+
+      P2, always, and never a `--check` failure. A writer is allowed to sound
+      unlike themselves on purpose, and a distance that blocked a commit would
+      be the humanizer-shaped failure this plugin exists to avoid.
+
+      Reported only past the reliability floor. Under it the marker rates are
+      sampling noise, the same reason scan.py labels a short document.
+
+      Reported only when the document is further from the profile than any of
+      the writer's own samples are from each other. `near` is a real reading
+      and it is not a finding: half the corpus would carry one.
+
+    The measurement lands in `stats` whatever the verdict, so a rewrite loop can
+    read the before and after numbers without parsing a report. Measured over
+    the stripped prose, the copy compute_stats measures, because a code fence
+    has no function words in it and counting one as register would make every
+    documented API read like a stranger.
+    """
+    try:
+        measured = stylometry.distance(fingerprint, strip_for_stats(raw_text))
+    except ValueError as exc:
+        # A fingerprint written by a different marker list. Reported on stderr
+        # and dropped, the way lexicon.py drops a pattern that will not
+        # compile: one stale optional file should cost its own measurement and
+        # not the scan somebody is waiting on.
+        print("scan: %s" % exc, file=sys.stderr)
+        return
+    stats["voice_distance"] = measured
+    if not measured["reliable"] or measured["verdict"] != "out_of_range":
+        return
+
+    top = ", ".join("%s %+.1fsd" % (c["marker"], c["z"])
+                    for c in measured["contributors"][:3])
+    findings.append(voice_finding(
+        "voice-distance",
+        "Register distance %.2f, this writer's own samples sit under %.2f"
+        % (measured["delta"], measured["band"]["max"]), "P2", 1,
+        "%d markers off profile" % len(measured["contributors"]),
+        "Furthest markers: %s. A signal about register, never a defect: a "
+        "writer may sound unlike themselves on purpose, and this cannot tell "
+        "that from a conversion that did not land." % top))
+
+
 def scan(raw_text, profile=None, exempt=True, voice_rules=None,
-         suppressions=True):
+         suppressions=True, voice_fingerprint=None):
     """`suppressions=False` leaves the inline `rabbit-allow` comments alone.
 
     readme_check.py passes it, because it merges these findings with its own
@@ -854,6 +908,12 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
     if voice_rules:
         apply_voice_rules(scored, raw_text, voice_rules, stats, findings)
 
+    # The one voice measurement that is not a rule, and the only one that runs
+    # without a rules file: a fingerprint is a separate artifact and a profile
+    # may have one without the other.
+    if voice_fingerprint:
+        apply_voice_distance(raw_text, voice_fingerprint, stats, findings)
+
     # Inline `rabbit-allow` comments, after every finding exists and before the
     # sort. Marked, never dropped: a suppressed finding is still reported, it
     # just stops counting. See rwlib/suppress.py. The safety band is refused
@@ -972,6 +1032,19 @@ def report(findings, stats, profile, exempt, voice_name=None, notes=()):
             continue
         note = band_note(value, key) if key else ""
         out.append("  %-26s %-8s%s" % (name, value, note))
+
+    # Printed at every verdict, including in_range, because "0.58, in range" is
+    # the line a conversion is checked against and a measurement that only
+    # appears when it fails cannot be a before-and-after.
+    measured = stats.get("voice_distance")
+    if measured:
+        out.append("  %-26s %-8s  %s, this writer's samples sit under %.2f%s"
+                   % ("voice distance", measured["delta"],
+                      measured["verdict"].replace("_", " "),
+                      measured["band"]["max"],
+                      "" if measured["reliable"] else
+                      "   (under %d words: directional only)"
+                      % stylometry.RELIABLE_WORDS))
     out.append("")
     out.append("Flesch-Kincaid is a diagnostic, never a target. Readability formulas "
                "are poor proxies for comprehension and reward gaming.")
@@ -986,6 +1059,13 @@ def json_payload(findings, stats, profile, exempt, voice_name, notes,
     finds out at parse time when the shape moves rather than by rendering
     blanks, and because a published measurement is only reproducible if the
     report says which lexicon produced it."""
+    # Lifted out of `stats` rather than copied, so the measurement has one place
+    # in the document. It is not a stylometric like the rest of that block: it
+    # is a comparison against a stored artifact, and a consumer reading it wants
+    # it whether or not a finding was raised off it. `null` when no fingerprint
+    # was found, which is the common case and is not an error.
+    stats = dict(stats)
+    measured = stats.pop("voice_distance", None)
     return {
         "schema_version": findings_mod.SCHEMA_VERSION,
         "lexicon_version": lexicon_mod.version(),
@@ -997,6 +1077,7 @@ def json_payload(findings, stats, profile, exempt, voice_name, notes,
         "reliability": reliability(stats.get("word_count", 0)),
         "notes": list(notes),
         "stats": stats,
+        "voice_distance": measured,
         "human_ranges": BANDS,
         "counts": findings_mod.counts(findings),
         "findings": findings,
@@ -1229,19 +1310,34 @@ def main():
         else:
             voice_name = voice_rules.get("voice", os.path.basename(rules_path))
 
+    # The fingerprint belongs to whichever profile was resolved above, and is
+    # looked for beside its rules file. Optional at every step: most profiles
+    # will never have one, and an unreadable one is a note rather than an exit,
+    # because it measures register and every rule in the band still ran.
+    voice_fingerprint, fingerprint_note = None, None
+    fingerprint_path = stylometry.path_for(rules_path)
+    if fingerprint_path:
+        try:
+            voice_fingerprint = stylometry.load(fingerprint_path)
+        except (OSError, ValueError) as exc:
+            fingerprint_note = ("could not read %s (%s), so no voice distance "
+                                "was measured"
+                                % (os.path.basename(fingerprint_path), exc))
+
     if args.apply_safe:
         return run_apply_safe(text, args.file, voice_rules, args.write,
                               to_stdout=args.stdout, newline=newlines)
 
     exempt = not args.no_exempt
-    findings, stats = scan(text, args.profile, exempt, voice_rules)
+    findings, stats = scan(text, args.profile, exempt, voice_rules,
+                           voice_fingerprint=voice_fingerprint)
     if docx_findings:
         # The docx-declared hidden runs, merged after the scan over the visible
         # text so both halves land in one report and one --check verdict. Their
         # `line` is the paragraph number; the excerpt says so.
         findings.extend(docx_findings)
         findings.sort(key=findings_mod.sort_key)
-    notes = [n for n in (language.note(text), voice_note) if n]
+    notes = [n for n in (language.note(text), voice_note, fingerprint_note) if n]
 
     if args.sarif:
         uri = args.sarif_uri or args.file or "stdin"

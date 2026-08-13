@@ -123,6 +123,46 @@ contraction_rate: high
 
 ---
 
+## The fingerprint, and the distance to it
+
+Everything above is a rule a document either breaks or does not. A draft can clear every one of them, break no ban, use no em dash, stay under the paragraph cap, and still sound like nobody. That gap is the whole reason this engine is not just a linter, and until now nothing measured it.
+
+The fingerprint is the measurement. `measure_voice.py` builds it from the same samples the profile came from and writes it beside the profile:
+
+```bash
+python3 skills/voice-setup/scripts/measure_voice.py a.md b.md c.md \
+  --name <voice> --write-fingerprint
+```
+
+That gives a profile three files instead of two: `<name>.md` for what a person reads, `<name>.rules.json` for what a regex enforces, and `<name>.fingerprint.json` for what a distance measures. `scan.py --voice <name>` finds the third automatically and reports the distance.
+
+**What it measures.** Function-word rates, z-scored against the writer's baseline and averaged, which is Burrows' Delta, the standard authorship-attribution distance. Function words on purpose: content words are about the topic, and a voice has to survive a change of topic. "also" against "additionally", the contraction rate, how often a sentence opens with "but". That is the connective tissue where a generic register creeps back in, and it is exactly what no ban list reaches.
+
+**What makes the number readable.** The fingerprint carries its own calibration: each sample's distance to a fingerprint built from the other samples. A raw Delta means nothing on its own. "0.97, where this writer's own pieces sit within 0.61 of each other" is a claim somebody can act on.
+
+| verdict | reading |
+|---|---|
+| `in_range` | at or under the writer's own band. Indistinguishable from another sample of theirs by this measure |
+| `near` | under 1.5x the band. Drifting. Read the contributors |
+| `out_of_range` | past that. This does not sound like the profile's owner |
+
+**What it is not.** It is a P2 signal and it is never enforced. A writer is allowed to sound unlike themselves on purpose, and the measure cannot tell that from a conversion that did not land. It is also not an authorship verdict, for every reason `references/false-positives.md` gives. Under 250 words it is reported with the number and no finding, because below that the rates are sampling noise.
+
+**The half that says what to change.** Every reported distance names the markers responsible, with the direction and both rates:
+
+```
+voice-distance   Register distance 0.97, this writer's own samples sit under 0.61
+                 Furthest markers: furthermore +16.4sd, therefore +16.4sd, however +9.2sd
+```
+
+That is what a conversion pass reads. A bare distance says a document is wrong and not what to change.
+
+**Use it as the attainment check.** Measure before and after a conversion. `0.97 -> 0.58, in range` says the conversion landed. A pass that fixed eleven mechanical hits and moved the distance from 0.97 to 0.95 changed the punctuation and not the voice, which is the failure a rule-by-rule report cannot see and this number can.
+
+**Exemplars.** `--with-exemplars` embeds the writer's own paragraphs in the fingerprint, and `stylometry.nearest_exemplars` returns the three closest in register and shape to whatever is being rewritten. A profile describes and an exemplar demonstrates. Opt in, because it copies somebody's prose into a file that then travels with the plugin, so ask them first.
+
+---
+
 ## Blending
 
 A blend has two halves, and only one of them is a script.
