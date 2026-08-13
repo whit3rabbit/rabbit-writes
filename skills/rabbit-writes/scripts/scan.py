@@ -33,6 +33,7 @@ Usage:
     python3 scan.py draft.md --json
     python3 scan.py draft.md --sarif > scan.sarif
     python3 scan.py draft.md --profile technical-blog
+    python3 scan.py draft.md --profile auto   # detect a register from structure
     python3 scan.py draft.md --voice-rules ../../rabbit-writes/voices/whit3rabbit.rules.json
     python3 scan.py draft.md --voice auto     # whichever profile this repo pins
     python3 scan.py draft.md --voice dana     # voices/dana.rules.json
@@ -48,6 +49,13 @@ stranger's README. `--voice auto` is the opt-in.
 
 A register profile relaxes the general rules. It never relaxes a voice rule:
 lowercase and loose punctuation are fine off the clock, a banned phrase is not.
+
+`--profile auto` is the same kind of opt-in as `--voice auto`: the default stays
+DEFAULT_REGISTER unless auto is asked for by name, so an existing --profile-less
+hook invocation is unaffected. Detection only fires for the handful of forms with
+an unambiguous structural tell (docs, linkedin, formal);
+everything else falls through to the default rather than guessing at a formality
+band with no structural signal to back it.
 
 Exit codes: 0 clean; 1 when --check is passed and a P0 finding is present; 2 when
 a profile *named by hand*, with --voice-rules or `--voice <name>`, cannot be read
@@ -1244,8 +1252,13 @@ def main():
         examples=examples
     )
     ap.add_argument("file", nargs="?", help="file to scan; omit to read stdin")
-    ap.add_argument("--profile", default=DEFAULT_REGISTER, choices=sorted(REGISTERS),
-                    help="register profile (default: %s)" % DEFAULT_REGISTER)
+    ap.add_argument("--profile", default=DEFAULT_REGISTER,
+                    choices=sorted(REGISTERS) + ["auto"],
+                    help="register profile (default: %s). 'auto' detects a "
+                         "handful of unambiguous forms (docs, linkedin, "
+                         "formal) from document structure and "
+                         "falls back to %s otherwise; an explicit --profile "
+                         "always wins over detection" % (DEFAULT_REGISTER, DEFAULT_REGISTER))
     ap.add_argument("--json", action="store_true", help="machine-readable output")
     ap.add_argument("--sarif", action="store_true",
                     help="SARIF 2.1.0, for GitHub pull request annotations")
@@ -1341,6 +1354,16 @@ def main():
     else:
         text = sys.stdin.read()
 
+    register_note = None
+    if args.profile == "auto":
+        # Detection is opt-in only: omitting --profile still means
+        # DEFAULT_REGISTER, exactly as before this flag existed. 'auto' has to
+        # be asked for by name, the same rule --voice auto already follows.
+        detected, confidence, signals = registers.detect_register(text, path=args.file)
+        args.profile = detected
+        register_note = ("register auto-detected as %r (%s)"
+                         % (detected, ", ".join(signals) if signals else confidence))
+
     voice_rules, voice_name, lineage = None, None, []
     # `named` is the difference between "you asked for this profile" and "this
     # is the one that turned up". A profile asked for by name and not readable
@@ -1414,7 +1437,8 @@ def main():
         # `line` is the paragraph number; the excerpt says so.
         findings.extend(docx_findings)
         findings.sort(key=findings_mod.sort_key)
-    notes = [n for n in (language.note(text), voice_note, fingerprint_note) if n]
+    notes = [n for n in (language.note(text), voice_note, fingerprint_note,
+                        register_note) if n]
 
     if args.sarif:
         uri = args.sarif_uri or args.file or "stdin"

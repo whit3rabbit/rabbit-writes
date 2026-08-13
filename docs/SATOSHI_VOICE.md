@@ -31,10 +31,12 @@ Pure Authored Corpus: 62,660 Words
 
 | Register | Source Documents | Pure Authored Words | Primary Function |
 |---|---|---:|---|
-| **Formal (`formal` / `technical-blog`)** | Bitcoin Whitepaper (2008) | 3,560 words | Mathematical foundations, consensus proofs, state machine design |
+| **Formal (`formal`)** | Bitcoin Whitepaper (2008) | 3,560 words | Mathematical foundations, consensus proofs, state machine design |
 | **Informal (`informal`)** | 39 Cryptography Mailing List Emails | 8,386 words | Architecture debate, cryptographic trade-offs, security bounds |
 | **Chat (`chat`)** | 539 BitcoinTalk Forum Posts | 50,714 words | Release announcements, bug triage, protocol economics, community Q&A |
 | **Aggregate Total** | **All 3 Formats Combined** | **62,660 words** | **Unified stylistic baseline** |
+
+Three partitions, not four. `technical-blog` is a real, mechanically distinct register in the engine (Section 3), but Satoshi left no writing in that register, so it has no row of its own here and no independent fingerprint: `--profile technical-blog` measures against the Aggregate Total row, not the whitepaper-only row. Section 3 explains the fallback in full.
 
 ---
 
@@ -105,6 +107,8 @@ complexity: 0.65      # Conceptually dense systems logic expressed in simple, un
 | `informal` | None, or `Hi,` | `Satoshi Nakamoto` | Explains architectural trade-offs to mailing list peers |
 | `technical-blog` | None | None | Systematic breakdown of design choices and economic incentives |
 | `formal` | `Abstract` | `References` | 3rd person / academic first-person plural (`We propose`), formal probability math |
+
+`technical-blog` has no fingerprint of its own. Satoshi's corpus (Section 1) has no writing in that register, only whitepaper, emails, and forum posts, so `--profile technical-blog` measures stylometric distance against the general/aggregate fingerprint instead of a fabricated register-specific one. The register's mechanical relaxations still apply (`registers.json`: vocabulary exemption, relaxed hedging and curly quotes, skipped diff-anchoring). Only the stylometric comparison target falls back.
 
 ### Hard Nos (Refusals)
 
@@ -204,8 +208,8 @@ SATOSHI NAKAMOTO ORACLE DISCRIMINATION TEST SUITE
 [PASS [REJECTED]] Tim May: Crypto Anarchist Manifesto (499 words) -> Delta: 1.176 | Verdict: out_of_range | Voice violations: 3
 
 --- NEGATIVE TESTS (Modern Crypto Hype & AI Slop) ---
-[PASS [REJECTED]] Modern Web3 Hype Pitch (112 words) -> Delta: 1.123 | Voice violations: 19 | P0s: 19
-[PASS [REJECTED]] Standard AI-generated Guide (120 words) -> Delta: 1.121 | Voice violations: 5 | P0s: 7
+[PASS [REJECTED]] Modern Web3 Hype Pitch (112 words) -> Delta: 1.462 | Voice violations: 19 | P0s: 19
+[PASS [REJECTED]] Standard AI-generated Guide (120 words) -> Delta: 1.51 | Voice violations: 5 | P0s: 7
 
 ================================================================================
 ORACLE TEST SUMMARY
@@ -216,6 +220,8 @@ Positive Sensitivity (Recall on Satoshi): 6/6 (100.0%)
 Negative Specificity (Rejection of Non-Satoshi): 9/9 (100.0%)
 ================================================================================
 ```
+
+The two "Modern Crypto Hype & AI Slop" deltas (1.462 and 1.51) are measured with `--profile technical-blog`, the only two tests in this suite that are. They read higher than they used to (formerly 1.123 and 1.121) because the comparison target changed with the fingerprint fix in Section 3: both now measure against the Aggregate Total fingerprint rather than a whitepaper-only one that was never actually independent of `formal`. Every other row in this table uses `--profile formal` or the general fingerprint and is unaffected. All 15 verdicts, including these two, are unchanged.
 
 ---
 
@@ -273,6 +279,9 @@ python3 skills/voice-setup/scripts/build_voice.py --check satoshi
 # 2. Scan any document against Satoshi's voice rules
 python3 skills/rabbit-writes/scripts/scan.py draft.md --voice satoshi --profile technical-blog
 
+# 2b. Or detect the register from document structure instead of naming it
+python3 skills/rabbit-writes/scripts/scan.py draft.md --voice satoshi --profile auto
+
 # 3. Check attainment when rewriting into Satoshi's voice
 python3 skills/rabbit-writes/scripts/attain.py original.md rewritten.md --voice satoshi
 
@@ -282,3 +291,5 @@ python3 skills/rabbit-writes/scripts/verify.py original.md rewritten.md --allow-
 # 5. Run the Oracle discrimination test suite
 python3 scripts/satoshi_oracle_test.py
 ```
+
+`--profile auto` (command 2b) only detects `docs`, `linkedin`, and `formal` shapes: the engine-wide signals strong enough to trust unattended, none specific to this voice. Forum-post and mailing-list prose, the two registers most of Satoshi's own corpus is measured in, have no reliable structural tell and are not auto-detected, so `--profile chat` or `--profile informal` named explicitly is still the right call for that content.

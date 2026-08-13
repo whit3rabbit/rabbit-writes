@@ -14,7 +14,10 @@ every skip set unable to fire in any register, and rwlib.registers.problems is
 where that check lives now.
 """
 
-from helpers import lexicon, scan_module, scan_text
+import glob
+import os
+
+from helpers import ROOT, lexicon, scan_module, scan_text
 
 from rwlib import injection, registers
 from rwlib.lexicon import SYNTHETIC_FINDING_IDS
@@ -303,3 +306,134 @@ def test_a_p0_only_cell_on_a_p0_finding_is_rejected():
     lying = dict(real, tier1="P0")
     complaints = registers.problems(known_ids(), id_priorities=lying)
     assert any("p0-only" in c for c in complaints), complaints
+
+
+# --------------------------------------------------------------------------
+# register auto-detection
+# --------------------------------------------------------------------------
+#
+# One representative document per detectable form, plus the negative cases
+# that document why chat and technical-blog are NOT in DETECTABLE_REGISTERS:
+# both were tried and both produced false positives against real prose
+# (a plain blog blurb for chat, most of the 100-README corpus for
+# technical-blog) before being dropped. That history is why the fallback
+# tests below exist, not just the positive ones.
+
+DOCS_SAMPLE = (
+    "# Setup\n\n## Prerequisites\n\n- Python 3.9+\n\n"
+    "## Installation\n\nRun pip install.\n\n## Usage\n\nRun the script.\n"
+)
+
+LINKEDIN_SAMPLE = (
+    ("Excited to share our latest release. " * 20)
+    + "\n\n#buildinpublic #python #opensource\n"
+)
+
+FORMAL_SAMPLE = (
+    "Subject: Quick question about the release\n\n"
+    "Hi Alice,\n\n"
+    "Could you confirm the release date for next week? I want to line up "
+    "the changelog.\n\n"
+    "Thanks,\nBob\n"
+)
+
+AMBIGUOUS_SHORT_SAMPLE = (
+    "This is a short, plain paragraph with no headings, no greeting, and no "
+    "code fence. It reads like the opening of a blog post, not a chat "
+    "message, but nothing here structurally rules that out.\n"
+)
+
+
+def test_detect_register_finds_docs_shaped_headings():
+    register, confidence, signals = registers.detect_register(
+        DOCS_SAMPLE, path="SETUP.md")
+    assert register == "docs", (register, signals)
+    assert confidence == "detected"
+
+
+def test_detect_register_carves_out_readme_from_docs():
+    """references/forms/docs.md routes a file literally named README.md to
+    the separate readme-writing skill instead. A README with docs-shaped
+    headings must not be auto-detected as docs."""
+    register, confidence, signals = registers.detect_register(
+        DOCS_SAMPLE, path="README.md")
+    assert register == registers.default_register(), (register, signals)
+    assert confidence == "default"
+
+
+def test_detect_register_finds_a_linkedin_shaped_post():
+    register, confidence, signals = registers.detect_register(LINKEDIN_SAMPLE)
+    assert register == "linkedin", (register, signals)
+    assert confidence == "detected"
+
+
+def test_detect_register_finds_an_email_shaped_document():
+    register, confidence, signals = registers.detect_register(FORMAL_SAMPLE)
+    assert register == "formal", (register, signals)
+    assert confidence == "detected"
+
+
+def test_detect_register_falls_back_to_default_for_ambiguous_prose():
+    """The regression case: a short, headingless, greeting-free paragraph is
+    NOT evidence for chat. It is what a chat message looks like and also what
+    the first paragraph of a blog post looks like, which is exactly why chat
+    was tried and dropped from DETECTABLE_REGISTERS."""
+    register, confidence, signals = registers.detect_register(
+        AMBIGUOUS_SHORT_SAMPLE)
+    assert register == registers.default_register(), (register, signals)
+    assert confidence == "default"
+    assert signals == []
+
+
+def test_detect_register_only_returns_declared_detectable_registers():
+    assert set(registers.DETECTABLE_REGISTERS) <= set(registers.registers())
+    assert "chat" not in registers.DETECTABLE_REGISTERS
+    assert "technical-blog" not in registers.DETECTABLE_REGISTERS
+
+
+def test_profile_auto_flows_through_scan_py():
+    payload, code = scan_text(DOCS_SAMPLE, "--profile", "auto")
+    assert code == 0, payload
+    assert payload["profile"] == "docs", payload
+    assert any("auto-detected" in n for n in payload["notes"]), payload["notes"]
+
+
+def test_profile_auto_defaults_when_nothing_matches():
+    payload, code = scan_text(AMBIGUOUS_SHORT_SAMPLE, "--profile", "auto")
+    assert code == 0, payload
+    assert payload["profile"] == registers.default_register(), payload
+    assert any("auto-detected" in n for n in payload["notes"]), payload["notes"]
+
+
+def test_explicit_profile_still_wins_over_auto_shaped_content():
+    """--profile is never overridden by detection; 'auto' has to be asked for
+    by name, exactly like --voice auto."""
+    payload, code = scan_text(DOCS_SAMPLE, "--profile", "chat")
+    assert code == 0, payload
+    assert payload["profile"] == "chat", payload
+
+
+README_CORPUS = sorted(glob.glob(os.path.join(
+    ROOT, "..", "..", "docs", "readme-analysis", "repos", "*", "README.md")))
+
+
+def test_detect_register_calibrated_against_the_100_readme_corpus():
+    """Calibrate before wiring, the same discipline every other detector in
+    this repo follows. This corpus is what caught technical-blog's real
+    false-positive rate (62 of 100, even after narrowing the unit regex it
+    was still 17) before this shipped, so it stays as a regression test:
+    every README here is expected to fall through to the default register,
+    since none of them are docs (the README carve-out), linkedin, or
+    email/letter shaped."""
+    assert len(README_CORPUS) >= 90, (
+        "expected the docs/readme-analysis corpus, found %d files"
+        % len(README_CORPUS))
+    default = registers.default_register()
+    misdetected = []
+    for readme in README_CORPUS:
+        with open(readme, encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+        register, _, signals = registers.detect_register(text, path=readme)
+        if register != default:
+            misdetected.append("%s -> %s %s" % (readme, register, signals))
+    assert not misdetected, "\n".join(misdetected)

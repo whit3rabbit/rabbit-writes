@@ -25,7 +25,13 @@ Stdlib only, 3.9+.
 
 import json
 import os
+import re
 import sys
+
+try:
+    from . import markdown as markdown_mod
+except ImportError:                     # run as a script: rwlib/ is on sys.path
+    import markdown as markdown_mod
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCRIPTS = os.path.dirname(HERE)
@@ -134,6 +140,96 @@ def vocab_exempt_registers(path=REGISTERS_PATH):
 def unimplemented_rules(path=REGISTERS_PATH):
     """Labels of rules with no pattern, applied by reading rather than by regex."""
     return [r["label"] for r in load(path)["rules"] if not r["id"]]
+
+
+# --------------------------------------------------------------------------
+# detection
+# --------------------------------------------------------------------------
+
+# One regex per structural signal named in references/forms/*.md. Deliberately
+# narrow: a greeting or signoff line has to be the whole line, not a phrase
+# that happens to appear inside a paragraph, or "Hi there, the incident
+# started at 3pm" in the middle of a technical-blog post would read as a
+# letter opener.
+_GREETING_RX = re.compile(r"(?im)^\s*(hi|hello|hey|dear)\b[^\n]{0,40}[,:]?\s*$")
+_SIGNOFF_RX = re.compile(
+    r"(?im)^\s*(sincerely|regards|best regards|best|thanks|cheers|"
+    r"yours truly|yours sincerely)[,]?\s*$"
+)
+_HASHTAG_LINE_RX = re.compile(r"(?m)^(?:\s*#\w+\s*){2,}$")
+_DOCS_HEADINGS = ("prerequisites", "installation", "usage", "steps", "verification")
+
+# The registers detect_register() will ever return other than the default.
+# Chat and technical-blog were both tried and dropped: neither has a signal
+# that is *present* rather than merely plausible-sounding. Chat's only
+# candidate, "short, no headings, no greeting," fires on a plain blog blurb
+# just as readily -- it is the absence of every other signal, not evidence
+# for this one. Technical-blog's candidate, "fenced code plus a number with a
+# unit," misfired on 62 of the 100 READMEs in docs/readme-analysis/repos
+# (every project with a code block and an install size or version number,
+# which is most of them); narrowing the unit list to actual latency/
+# throughput units still misfired on 17. A README and a technical writeup
+# both legitimately have code and numbers -- the form's real differentiator
+# (references/forms/technical-blog.md: the problem stated from the reader's
+# own system, a benchmark with methodology, a failed attempt included) is
+# prose judgment, not a structural marker. Essay, substack, and generic
+# long-form blog prose were never attempted, for the same underlying reason:
+# formality is a judgment call. Every register below instead has a marker
+# that has to be *present* to fire, verified against the same 100-README
+# corpus at zero false positives, which is what keeps this list short.
+DETECTABLE_REGISTERS = ("docs", "linkedin", "formal")
+
+
+def detect_register(text, path=None, registers_path=REGISTERS_PATH):
+    """Guess a register from structural signals, or fall back to the default.
+
+    references/forms/*.md already documents, for a human, which structural
+    shape routes to which register. This reads the same short list of strong,
+    unambiguous signals mechanically: a run of Prerequisites/Installation/
+    Usage/Steps/Verification headings for docs (skipped for a file literally
+    named README.md, which routes to the separate readme-writing skill
+    instead), a trailing hashtag line for linkedin, and a greeting-then-
+    signoff shape for formal (covers both the email and letter forms, which
+    route to the same register).
+
+    Every other form -- chat, technical-blog, essay, substack, plain
+    long-form prose -- has no structural tell that survives contact with a
+    false positive (see DETECTABLE_REGISTERS for what was tried and why it
+    was dropped), so it is left undetected on purpose and falls through to
+    the default register, exactly as an unclassified document does today.
+
+    Returns (register, confidence, signals). confidence is "detected" when a
+    register-specific rule fired and "default" when nothing did; signals is
+    the list of checks that matched, for a caller to report as a note.
+    """
+    known = set(registers(registers_path))
+    stripped_lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    word_count = len(text.split())
+    has_fence = bool(markdown_mod.FENCE_RX.search(text))
+    headings = [m.group(2).strip().lower()
+                for m in markdown_mod.HEADING_RX.finditer(text)]
+
+    if "docs" in known:
+        doc_hits = sum(1 for h in _DOCS_HEADINGS
+                       if any(h in heading for heading in headings))
+        is_readme = path is not None and os.path.basename(path).lower() == "readme.md"
+        if doc_hits >= 2 and not is_readme:
+            return ("docs", "detected", ["%d docs-shaped headings" % doc_hits])
+
+    if "linkedin" in known and 100 <= word_count <= 350:
+        tail = "\n".join(stripped_lines[-2:])
+        if _HASHTAG_LINE_RX.search(tail):
+            return ("linkedin", "detected",
+                    ["%d words" % word_count, "hashtag line near the end"])
+
+    if "formal" in known:
+        greeting = any(_GREETING_RX.match(ln) for ln in stripped_lines[:5])
+        signoff = any(_SIGNOFF_RX.match(ln) for ln in stripped_lines[-3:])
+        if greeting and signoff and not has_fence and not headings:
+            return ("formal", "detected",
+                    ["greeting near the top", "signoff near the end"])
+
+    return (default_register(registers_path), "default", [])
 
 
 def priorities(lexicon_path=None):

@@ -191,6 +191,8 @@ Read `voice-caricature` the same way and in the other direction. It fires when t
 
 **2. Set the register, which is also the form.** Infer it, or take it from the user. The set is a formality spine, `chat` to `informal` to `blog` (the default) to `formal`, plus three genre columns, `technical-blog`, `docs`, and `linkedin`, and it decides which general rules apply at full strength. `references/context.md` has the signals and the tolerance matrix, and `references/forms/` has what the document's own shape asks for. Most profiles also define their own register axis, on the clock versus off, and the profile's version wins where both apply.
 
+`scan.py --profile auto` mechanizes this inference for the handful of forms with a structural tell strong enough to trust unattended: docs (Prerequisites/Installation/Usage/Steps/Verification headings, skipped for a file named README.md), linkedin (a trailing hashtag line), and formal by way of email or letter shape (a greeting, then a signoff). It is opt-in, has to be named, and falls back to `blog` rather than guess when nothing matches. Chat and technical-blog were both tried against real documents and dropped: chat's only candidate signal (short, no headings, no greeting) fired on a plain blog paragraph, and technical-blog's (fenced code plus a number with a unit) misdetected most of the 100-README calibration corpus. Everything past that four-register set is still a judgment call, the same as before this flag existed.
+
 **3. Load the voice.** As above. Hold the profile's Hard nos in mind, they are the part a reader notices first.
 
 **4. Run the mechanical pass.** For anything longer than a paragraph:
@@ -201,6 +203,7 @@ SCAN=${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py
 python3 $SCAN draft.md                        # findings + stylometrics
 python3 $SCAN draft.md --json                 # machine-readable
 python3 $SCAN draft.md --profile technical-blog
+python3 $SCAN draft.md --profile auto          # detect a register from structure
 python3 $SCAN draft.md --voice auto           # whichever profile applies here
 python3 $SCAN draft.md --voice dana           # a profile by name
 python3 $SCAN draft.md --check                # exit 1 on a P0, for a gate

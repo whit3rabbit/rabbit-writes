@@ -114,6 +114,8 @@ When someone refuses to understand or repeats flawed premises, disengage cleanly
 | `technical-blog` | None | None | Systematic breakdown of design choices and economic incentives |
 | `formal` | `Abstract` | `References` | 3rd person / academic first-person plural (`We propose`), formal probability math |
 
+`technical-blog` has no fingerprint of its own: Satoshi left no writing in that register (the corpus is whitepaper, mailing-list emails, and forum posts, nothing blog-shaped), so it measures against the general fingerprint rather than a fabricated register-specific one. The mechanical relaxations for `technical-blog` in `registers.json` still apply regardless.
+
 ## Humor
 
 Dry, deadpan, and strictly pragmatic. Never goofy, satirical, or slapstick.
