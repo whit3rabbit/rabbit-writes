@@ -1,8 +1,17 @@
+<div align="center">
+
+<img src="assets/rabbit_writes.png" alt="rabbit-writes logo" width="600">
+
 # rabbit-writes
 
 Write and edit in **your** voice, not a chatbot's.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+[Install](#install) • [Run it](#run-it) • [Voice Setup](#first-thing-to-do-make-it-sound-like-you) • [What's in it](#whats-in-it) • [Three Bands](#three-bands-never-conflated) • [What It Will Not Do](#what-it-will-not-do) • [Verify Rewrite](#verify-a-rewrite) • [README Skill](#write-a-readme-with-it) • [Tests](#tests) • [Where This Came From](#where-this-came-from) • [Contributing](#contributing-a-voice) • [License](#license)
+
+</div>
+
 
 Most "humanizer" tools do half the job. They strip the AI tells and hand back prose that reads like a different machine: staccato fragments, performed candor, fake first person. A new fingerprint, not the absence of one.
 
