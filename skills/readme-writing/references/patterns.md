@@ -66,6 +66,28 @@ Badge types by frequency across the corpus (counted from badge URLs, Markdown an
 
 A badge row of four to six typed badges is the convention here, not an exception to apologize for. What the tail shows is the failure mode: ECC carries 17, and past roughly a dozen the marginal badge carries no information. Wire every badge to something real, and drop the ones that only exist to fill the row.
 
+### Centered header with banner, badges, and inline navigation (TOC)
+
+Centering the header (76% corpus) inside a `<div align="center">` block provides a clean, unified presentation for projects with visual assets. Combining the logo/banner, `# Title`, tagline, badge row, and a dot-separated inline anchor navigation bar satisfies both the pitch-first rule and the table of contents convention (32% corpus) without wasting vertical scroll:
+
+```html
+<div align="center">
+
+<img src="assets/banner.png" alt="Project Logo" width="600">
+
+# Project Name
+
+Write and edit in **your** voice, not a chatbot's.
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/owner/repo/ci.yml)](https://github.com/owner/repo/actions)
+[![Version](https://img.shields.io/pypi/v/project.svg)](https://pypi.org/project/project/)
+
+[Install](#install) • [Quickstart](#quickstart) • [Docs](#documentation) • [Contributing](#contributing) • [License](#license)
+
+</div>
+```
+
 GIFs are less common (14%) than generic README advice suggests. When this corpus does show proof of output, it's more often a static screenshot, a linked hosted demo page, or — distinctively — a literal terminal transcript pasted as a code block. A pasted transcript is cheap to produce and reads as more credible than a staged screenshot; default to it for CLI tools over commissioning a GIF.
 
 ## Named techniques worth imitating

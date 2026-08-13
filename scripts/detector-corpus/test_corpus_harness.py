@@ -257,7 +257,7 @@ def dataset_sample(**overrides):
     entry = {
         "id": "human-ds-0001",
         "label": "human",
-        "register": "casual",
+        "register": "chat",
         "words": 400,
         "sha256": "0" * 64,
         "provenance": {
@@ -279,7 +279,7 @@ def dataset_sample(**overrides):
 def test_a_dataset_sample_is_recognised_as_provenance():
     kind = corpus_io.human_provenance_kind(dataset_sample()["provenance"])
     check("a dataset row counts as provenance", kind == "dataset", str(kind))
-    issues = corpus_io.problems({"samples": [dataset_sample()]}, ("casual",))
+    issues = corpus_io.problems({"samples": [dataset_sample()]}, ("chat",))
     check("and validates without an archive_url", not issues, str(issues))
 
 
@@ -289,7 +289,7 @@ def test_a_dataset_sample_still_has_to_predate_the_cutoff():
     nothing about whether a generator wrote its rows."""
     late = dataset_sample()
     late["provenance"]["collected"] = "2024-05-01"
-    issues = corpus_io.problems({"samples": [late]}, ("casual",))
+    issues = corpus_io.problems({"samples": [late]}, ("chat",))
     check("a corpus collected after the cutoff is rejected",
           any("cutoff" in i for i in issues), str(issues))
 
@@ -299,7 +299,7 @@ def test_a_dataset_sample_without_a_revision_is_rejected():
     and the hash stops meaning anything."""
     loose = dataset_sample()
     del loose["provenance"]["revision"]
-    issues = corpus_io.problems({"samples": [loose]}, ("casual",))
+    issues = corpus_io.problems({"samples": [loose]}, ("chat",))
     check("a missing revision is a problem",
           any("revision" in i for i in issues), str(issues))
     url, why = fetch_samples.fetchable(loose)
@@ -310,7 +310,7 @@ def test_a_dataset_sample_without_a_revision_is_rejected():
 def test_a_sample_with_neither_kind_of_provenance_is_named():
     bare = dataset_sample()
     bare["provenance"] = {"why_credible": "trust me"}
-    issues = corpus_io.problems({"samples": [bare]}, ("casual",))
+    issues = corpus_io.problems({"samples": [bare]}, ("chat",))
     check("a human label with no evidence at all is rejected",
           any("neither" in i for i in issues), str(issues))
 

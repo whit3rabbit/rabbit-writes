@@ -5,7 +5,8 @@ A tool that flags "delve" in your draft should survive its own pass. This is the
 Reproduce in one command, no dependencies:
 
 ```bash
-for f in SKILL.md PROOF.md references/*.md voices/whit3rabbit.md \
+for f in SKILL.md PROOF.md references/*.md references/forms/*.md \
+         voices/whit3rabbit.md \
          ../voice-setup/SKILL.md ../readme-writing/SKILL.md; do
   echo "== $f"; python3 scripts/scan.py "$f"
 done
@@ -15,22 +16,35 @@ Run it from `skills/rabbit-writes/`. It covers every row in the table below, inc
 
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 2, registers 1, measured 13 August 2026, eighth pass)
+## Result (v0.1.0, lexicon 2, registers 2, measured 13 August 2026, tenth pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 3,675 | 0 | 0 | 0 | 0.72 | 0.72 | 0.0 |
-| `PROOF.md` | 6,699 | 0 | 0 | 0 | 0.61 | 0.72 | 0.0 |
+| `SKILL.md` | 3,806 | 0 | 0 | 0 | 0.71 | 0.72 | 0.0 |
+| `PROOF.md` | 7,241 | 0 | 0 | **1** | 0.61 | 0.72 | 0.0 |
 | `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.86 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 865 | 0 | 0 | **9** | 0.66 | 0.71 | 0.0 |
-| `references/context.md` | 579 | 0 | 0 | 0 | 0.66 | 0.80 | 0.0 |
+| `references/context.md` | 689 | 0 | 0 | 0 | 0.65 | 0.79 | 0.0 |
 | `references/voice.md` | 1,799 | 0 | 0 | 0 | 0.76 | 0.71 | 0.0 |
 | `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
 | `references/checklist.md` | 748 | 0 | 0 | 0 | 0.49 | 0.73 | 0.0 |
-| `voices/whit3rabbit.md` | 1,518 | 0 | 0 | **10** | 0.69 | 0.79 | 0.0 |
+| `references/forms/blog.md` | 400 | 0 | 0 | **4** | 0.81 | 0.71 | 0.0 |
+| `references/forms/chat.md` | 489 | 0 | 0 | **4** | 0.82 | 0.70 | 0.0 |
+| `references/forms/docs.md` | 547 | 0 | 0 | **6** | 0.66 | 0.70 | 0.0 |
+| `references/forms/email.md` | 590 | 0 | 0 | **5** | 0.76 | 0.69 | 0.0 |
+| `references/forms/essay.md` | 520 | 0 | 0 | **5** | 0.86 | 0.67 | 0.0 |
+| `references/forms/letter.md` | 521 | 0 | 0 | **8** | 0.91 | 0.71 | 0.0 |
+| `references/forms/linkedin.md` | 570 | 0 | 0 | **7** | 0.75 | 0.71 | 0.0 |
+| `references/forms/substack.md` | 601 | 0 | 0 | **6** | 0.75 | 0.69 | 0.0 |
+| `references/forms/technical-blog.md` | 426 | 0 | 0 | **6** | 0.74 | 0.72 | 0.0 |
+| `voices/whit3rabbit.md` | 1,558 | 0 | 0 | **10** | 0.69 | 0.78 | 0.0 |
 | `../voice-setup/SKILL.md` | 3,064 | 0 | 0 | 0 | 0.62 | 0.73 | 0.0 |
-| `../readme-writing/SKILL.md` | 2,369 | 0 | 0 | 0 | 0.63 | 0.73 | 0.0 |
+| `../readme-writing/SKILL.md` | 2,385 | 0 | 0 | 0 | 0.63 | 0.73 | 0.0 |
+
+**The nine `references/forms/` rows are new,** and every P2 in them is the same finding: a bold list label ending in a period, which is how `references/craft.md` has always written its own bullets and why it carries seven. The rule is skipped in the `docs` register and these rows are measured with no register at all, which is what the reproduce command above does.
+
+Two findings in those files were real and were fixed rather than published. `forms/docs.md` raised a significance-inflation P0 on a phrase it was naming to describe a tolerance, and it now names it in a code span, which is what the quoted-example exemption is for. `forms/substack.md` raised a self-labeling P1 on a sentence announcing that the point it had just made was the important one.
 
 Scores are with the self-reference exemption applied, the rule this skill states in prose: quoted examples, code, tables, and block quotes are exempt from flagging. `apply_exemptions()` in `scan.py` is that rule's executable form. Run with `--no-exempt` to see the raw numbers.
 
@@ -41,6 +55,8 @@ Every word count in this table dropped between the second review and the third, 
 The counts moved again in the fourth pass, this time because the documents changed: the engine was extracted into `scripts/rwlib/`, the tolerance matrix became a data file, and three skill files gained sections. `voices/whit3rabbit.md` fell from 9 P2 hits to 7 by dropping two paraphrases of rules that are defined elsewhere, which is the same drift the one-definition tripwire in `scripts/validate.py` now fails the build over.
 
 The sixth pass added the `safety` band, and the only column it moved is its own. `references/injection.md` is new and scores 9 P2 hits on itself, which is the same story `patterns.md` tells one rule further on: a file that lists the directive shapes it catches will match them. Every one is visible in running prose or a list, which is exactly the finding the band raises at P2 and calls quotable rather than concealed. Zero P0s anywhere in this table, including on the file that documents the attack.
+
+This file carries one of its own now, for the same reason: the `forget` paragraph below quotes an attack shape to say what the rule matches, and the band reads raw text, so a fence would not have hidden it and hiding it was never the point.
 
 That number is left visible for the reason the `patterns.md` paragraph above gives. The alternative was to fence every example so the exemption swallows it, and the band deliberately does not honour the exemption, so fencing them would have proved nothing except that the author knew where the blind spot was.
 
@@ -61,7 +77,11 @@ The concealment tables that landed beside the band were held to the same bar. Di
 
 Three directive families were cut or narrowed against that corpus before anything shipped. `instead of editing` is ordinary English. An unanchored agent-noun rule read `state model, output formats` and `In your agent, run it once per repo` as instructions. A bare `forget everything` matched "the three essentials (if you forget everything else)" in two of this plugin's own voice profiles. Each was measured, not guessed.
 
+The `forget` family took a second pass, in review rather than against the corpus, because the corpus never showed it: requiring one pronoun after the verb left `forget you|your|what`, which is `don't forget your API key` and `I'll never forget what happened`. In visible prose that is a P2 nuisance. In an HTML comment it is concealment plus a directive, so it is a P0 that halts `--apply-safe` on somebody's own maintainer note, and the safety band takes no suppression by design. It now matches the whole instruction shape, which also picked up `forget the above instructions`, an attack the pronoun version never saw. Corpus counts are unchanged: 0 P0, 4 P1, 0 P2.
+
 **One design decision came out of review rather than measurement.** The safety band cannot be suppressed. Every other band answers to `rabbit-allow`, and that comment lives inside the document being scanned: whoever can plant a concealed instruction can plant the comment excusing it, and both arrive in the same file from the same hand. A suppression naming a safety id is refused and reported at P1 rather than silently ignored. `test_a_safety_p0_cannot_be_suppressed` holds it.
+
+The ninth pass moved one row, this file's, and it moved a findings column. A bug-fix pass narrowed the `forget` rule and the paragraph explaining it quotes an attack shape, which the safety band reads and reports at P2 the way it reports the nine in `references/injection.md`. Two other fixes could have moved a column here and did not: tier-1 words no longer double-count a tier-1 phrase they sit inside, which cost nothing in this table because both hits were in exempted spans, and `verify.py` stopped reporting a path inside a table row twice, which nothing in this table measures.
 
 The eighth pass moved four rows and no findings column. `SKILL.md`, `references/voice.md`, `references/checklist.md`, and `../voice-setup/SKILL.md` grew where the attainment gate, the caricature guard, the fact check, the plan-then-execute rule, and the samples-plus-interview route are documented. Every one of them still scores zero at every priority.
 
@@ -95,6 +115,20 @@ That was half right. `CLAUDE.md` states the repo's prose convention as no em das
 
 **`checklist.md` has the lowest burstiness at 0.46.** A numbered checklist is supposed to be metronomic. This is the detector correctly measuring a shape that is correct for its genre and wrong for prose, which is why `context.md` exists and why a number never renders a verdict on its own.
 
+## The new register, measured on somebody else's documents
+
+`informal` is the one column the forms work added rather than renamed, and a column that quietly reports nothing is the failure mode `curly-quote` already demonstrated once. Run over the same 100 trending READMEs in `docs/readme-analysis/repos/`:
+
+| Priority | 100 trending READMEs, `--profile informal` |
+|---|---:|
+| P0 | 0 |
+| P1 | 249 |
+| P2 | 1,077 |
+
+Zero P0s is the number that matters, for the same reason it matters in the safety table above: `--check` is what the `rabbit-scan` pre-commit hook runs in a stranger's repository. A README is a `docs` document and nobody would scan one under `informal` on purpose, so this measures the column against ordinary prose rather than against its own genre.
+
+It is a published number rather than a test, deliberately. A corpus sweep costs about a second per document per register in process, so asserting this for every register would add several minutes to a suite that already runs about 2:20 for weaker coverage than the per-cell tests give. `tests/test_registers.py` exercises all 49 cells in the matrix instead: every skip cell has to silence a document that fires without it, and every relaxed cell has to stay silent at its allowance and report past it. That is the property `curly-quote` violated, checked on every cell rather than sampled.
+
 ## The voice band, applied to ourselves
 
 The active voice is `whit3rabbit`, whose rules ban em dashes, semicolons, emojis, one-word sentences for emphasis, US date order, paragraphs over five sentences, and a specific buzzword list. Running the plugin against those rules:
@@ -105,12 +139,21 @@ Every file is listed this time. An earlier version of this table showed five, wh
 |---|---:|---|
 | `references/craft.md` | 0 |  |
 | `references/injection.md` | 0 |  |
+| `references/forms/docs.md` | 0 |  |
+| `references/forms/essay.md` | 0 |  |
+| `references/forms/substack.md` | 0 |  |
 | `../readme-writing/SKILL.md` | 0 |  |
 | `references/checklist.md` | 1 | serial-comma advisory |
 | `references/false-positives.md` | 1 | serial-comma advisory |
-| `references/context.md` | 1 | serial-comma advisory |
+| `references/forms/blog.md` | 1 | serial-comma advisory |
+| `references/forms/chat.md` | 1 | serial-comma advisory |
+| `references/forms/email.md` | 1 | serial-comma advisory |
+| `references/forms/letter.md` | 1 | serial-comma advisory |
+| `references/forms/linkedin.md` | 1 | serial-comma advisory |
+| `references/forms/technical-blog.md` | 1 | serial-comma advisory |
 | `references/voice.md` | 2 | serial-comma advisories |
 | `PROOF.md` | 2 | serial-comma advisories |
+| `references/context.md` | 3 | serial-comma advisories |
 | `voices/whit3rabbit.md` | 4 | serial-comma advisories |
 | `SKILL.md` | 6 | serial-comma advisories |
 | `../voice-setup/SKILL.md` | 6 | serial-comma advisories |

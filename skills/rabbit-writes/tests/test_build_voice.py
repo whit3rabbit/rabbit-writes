@@ -344,12 +344,12 @@ def test_a_regex_without_an_example_is_unproven_rather_than_passed():
 
 
 def test_a_rule_scoped_to_a_register_is_probed_in_that_register():
-    """A rule that only applies to `casual` does not fire in a blog scan, and
+    """A rule that only applies to `chat` does not fire in a blog scan, and
     reporting the author's own scoping as a broken rule would teach them to
     delete the scoping."""
     rules = {"voice": "dana",
              "banned_regex": [{"id": "r", "label": "r", "rx": "(?i)war room",
-                               "applies_to_registers": ["casual"],
+                               "applies_to_registers": ["chat"],
                                "example": "They ran a war room for a week."}]}
     assert fired(rules) == {"banned_regex r": True}
 

@@ -77,7 +77,7 @@ def test_a_register_never_relaxes_a_voice_rule():
     is not."""
     strict = set(voice_ids(bad_letter_result()))
     relaxed, _ = scan_text(BAD_LETTER, "--voice-rules", WHIT3RABBIT_RULES,
-                           "--profile", "casual")
+                           "--profile", "chat")
     assert strict == set(voice_ids(relaxed)), "lost: %s" % (
         strict - set(voice_ids(relaxed)))
 
@@ -436,13 +436,24 @@ def test_a_repo_pin_outranks_active():
 
 def test_resolve_with_no_document_still_answers():
     """scan.py reads stdin as happily as a path, so there is not always a file
-    to look beside. ACTIVE still decides."""
+    to look beside. ACTIVE still decides.
+
+    Runs from the scratch directory rather than from wherever the suite was
+    invoked. With no document, `resolve` probes the working directory for a
+    `.rabbit-voice`, so a repository that pins its own house voice (this one
+    does) would otherwise decide the result and the failure would read as a bug
+    in the resolution order. The readme-writing suite draws the same line in its
+    NEUTRAL_CWD.
+    """
     scratch = scratch_voices("ada")
+    original = os.getcwd()
     try:
         written(scratch, "ACTIVE", "ada\n")
+        os.chdir(scratch)
         rules, name, note = voices.resolve(None, voices_dir=scratch)
         assert name == "ada" and note is None, "%s %s" % (name, note)
     finally:
+        os.chdir(original)
         shutil.rmtree(scratch, ignore_errors=True)
 
 
@@ -453,11 +464,28 @@ def test_installed_leaves_the_template_out():
     assert "whit3rabbit" in voices.installed(VOICES)
 
 
-def test_voice_auto_applies_the_active_profile():
+def test_voice_auto_applies_a_pinned_profile():
     """The flag exists so a writer does not have to spell out a path that moves
-    when the plugin is installed somewhere else."""
-    result, _ = scan_text(BAD_LETTER, "--voice", "auto")
-    assert "voice-em-dash" in voice_ids(result), result["findings"]
+    when the plugin is installed somewhere else.
+
+    The pin is written here rather than borrowed from the checkout. This used to
+    lean on whatever `voices/ACTIVE` said, which shipped naming this
+    repository's author and no longer names anybody: a test that passes because
+    the developer's tree happens to have a voice active is asserting a fact
+    about the tree.
+    """
+    scratch = tempfile.mkdtemp()
+    try:
+        written(scratch, ".rabbit-voice", "whit3rabbit\n")
+        path = written(scratch, "letter.md", BAD_LETTER)
+        out = subprocess.run(
+            [sys.executable, SCAN, path, "--json", "--voice", "auto"],
+            capture_output=True, text=True, cwd=scratch)
+        result = json.loads(out.stdout)
+        assert result["voice"] == "whit3rabbit", result.get("notes")
+        assert "voice-em-dash" in voice_ids(result), result["findings"]
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
 
 
 def test_no_voice_flag_means_no_voice_band():
@@ -499,7 +527,7 @@ def test_voice_and_voice_rules_cannot_both_be_given():
 #
 # This is not the register relaxing a voice rule, which stays forbidden and is
 # pinned above. It is the writer saying which of their own rules applied where.
-# The direction matters: `--profile casual` still cannot soften anything on its
+# The direction matters: `--profile chat` still cannot soften anything on its
 # own, it can only select among rules the author already wrote.
 
 SHOUTY = "This is fine. No. It really is fine, and the build stays green.\n"
@@ -508,11 +536,21 @@ SHOUTY = "This is fine. No. It really is fine, and the build stays green.\n"
 def test_a_mechanic_can_be_scoped_to_a_register():
     rules = {"voice": "t", "default_priority": "P0",
              "mechanics": {"one_word_sentence": "forbid"},
-             "mechanics_by_register": {"casual": {"one_word_sentence": "allow"}}}
+             "mechanics_by_register": {"chat": {"one_word_sentence": "allow"}}}
     strict, _ = scan_with_rules(SHOUTY, rules)
-    relaxed, _ = scan_with_rules(SHOUTY, rules, "--profile", "casual")
+    relaxed, _ = scan_with_rules(SHOUTY, rules, "--profile", "chat")
     assert "voice-one-word-sentence" in voice_ids(strict), strict["findings"]
     assert "voice-one-word-sentence" not in voice_ids(relaxed), relaxed["findings"]
+
+
+def test_a_one_word_sentence_after_two_spaces_is_still_caught():
+    """The lookbehind is fixed-width, so the one-space form let anybody who
+    types two spaces after a period out of this rule entirely."""
+    rules = {"voice": "t", "default_priority": "P0",
+             "mechanics": {"one_word_sentence": "forbid"}}
+    wide = "This is fine.  No.  It really is fine, and the build stays green.\n"
+    result, _ = scan_with_rules(wide, rules)
+    assert "voice-one-word-sentence" in voice_ids(result), result["findings"]
 
 
 def test_an_unscoped_mechanic_still_applies_everywhere():
@@ -520,7 +558,7 @@ def test_an_unscoped_mechanic_still_applies_everywhere():
     behaves exactly as it did, in every register."""
     rules = {"voice": "t", "default_priority": "P0",
              "mechanics": {"one_word_sentence": "forbid"}}
-    for profile in ("blog", "casual", "docs", "linkedin"):
+    for profile in ("blog", "chat", "docs", "linkedin"):
         result, _ = scan_with_rules(SHOUTY, rules, "--profile", profile)
         assert "voice-one-word-sentence" in voice_ids(result), profile
 
@@ -533,29 +571,29 @@ def test_a_banned_regex_can_be_scoped_to_a_register():
                                "applies_to_registers": ["blog", "docs"]}]}
     text = "hey, the build is green and the report is attached.\n"
     strict, _ = scan_with_rules(text, rules, "--profile", "blog")
-    off, _ = scan_with_rules(text, rules, "--profile", "casual")
+    off, _ = scan_with_rules(text, rules, "--profile", "chat")
     assert "no-lowercase-opener" in voice_ids(strict), strict["findings"]
     assert "no-lowercase-opener" not in voice_ids(off), off["findings"]
 
 
 def test_scoped_mechanics_merge_two_levels_deep_under_extends():
-    """A child overriding one mechanic in `casual` must not drop the others the
+    """A child overriding one mechanic in `chat` must not drop the others the
     parent scoped there. A shallow update silently unbans them, which is the
     failure the whole merge section of voices.py is written against."""
-    parent = {"mechanics_by_register": {"casual": {"emoji": "allow",
+    parent = {"mechanics_by_register": {"chat": {"emoji": "allow",
                                                    "one_word_sentence": "allow"}}}
-    child = {"mechanics_by_register": {"casual": {"emoji": "forbid"}}}
-    merged = voices.merge(parent, child)["mechanics_by_register"]["casual"]
+    child = {"mechanics_by_register": {"chat": {"emoji": "forbid"}}}
+    merged = voices.merge(parent, child)["mechanics_by_register"]["chat"]
     assert merged == {"emoji": "forbid", "one_word_sentence": "allow"}, merged
 
 
 def test_voice_mechanics_resolves_the_active_register():
     scan = load_scan()
     rules = {"mechanics": {"emoji": "forbid", "semicolon": "forbid"},
-             "mechanics_by_register": {"casual": {"emoji": "allow"}}}
+             "mechanics_by_register": {"chat": {"emoji": "allow"}}}
     assert scan.voice_mechanics(rules, "blog") == {"emoji": "forbid",
                                                    "semicolon": "forbid"}
-    assert scan.voice_mechanics(rules, "casual") == {"emoji": "allow",
+    assert scan.voice_mechanics(rules, "chat") == {"emoji": "allow",
                                                      "semicolon": "forbid"}
 
 
@@ -615,6 +653,20 @@ def test_a_real_conflict_is_broken_by_weight_and_reported():
     assert heavy_left["mechanics"]["date_format"] == "dmy"
     assert heavy_right["mechanics"]["date_format"] == "mdy"
     assert any("date_format" in n for n in notes), notes
+
+
+def test_a_blend_drops_template_guidance_from_both_mechanic_levels():
+    """The template's underscore keys are its own documentation and it tells its
+    copier to delete them. `mechanics` was filtered and `mechanics_by_register`
+    was not, so the guidance could survive a blend by the back door and end up
+    in a file with somebody's name on it."""
+    left = dict(LEFT, mechanics_by_register={
+        "_example": {"em_dash": "allow"},
+        "chat": {"_note": "what this key is for", "em_dash": "allow"}})
+    rules, _ = voices.blend(left, GRACE, 0.9)
+    scoped = rules.get("mechanics_by_register", {})
+    assert "_example" not in scoped, scoped
+    assert scoped["chat"] == {"em_dash": "allow"}, scoped
 
 
 def test_the_lineage_is_written_into_the_file():

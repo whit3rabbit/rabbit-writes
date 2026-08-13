@@ -6,16 +6,26 @@ Two independent axes. **Register** sets how strict to be. **Voice** sets how the
 
 ## Register profiles
 
+The set is a formality spine plus three genre columns.
+
+**The spine,** loosest first: `chat`, `informal`, `blog`, `formal`. This is the axis a document form maps onto. `references/forms/` holds one file per form, and each names the rung it sits on.
+
+**The genre columns,** `technical-blog`, `docs`, and `linkedin`, sit outside the spine because each carries tolerances no formality band captures: the vocabulary exemption below, parameter lists, hashtags and bold hooks. A genre column is not stricter or looser than a rung. It is a different kind of document.
+
+The split is data, in `scripts/registers.json` under `spine`, so a rung that names nothing fails the build rather than reading as a claim this page makes.
+
 Infer from the text unless the user names one.
 
 | Signal | Register |
 |---|---|
-| Under 300 words with hashtags or @-mentions | `linkedin` |
+| A `Subject:` line, or a salutation with a signoff | `formal`, `informal` in a peer thread. See `forms/email.md` |
+| A salutation and a date, no subject line | `formal`. See `forms/letter.md` |
+| Under about 100 words, no structure, no greeting | `chat`. A DM, a reply, an issue comment |
+| Hashtags or @-mentions, under 300 words | `linkedin` |
 | Code blocks, API references, architecture | `technical-blog` |
-| Salutation plus fundraising language | `investor-email` |
 | Step-by-step instructions, parameter docs, README shape | `docs` |
-| Short reply, chat, DM, issue comment | `casual` |
-| No strong signal | `blog`, the safe default, all rules at full strength |
+| Sectioned long-form with a personal frame | `informal` for a newsletter, `formal` for an essay |
+| No strong signal | `blog`, the neutral default, all rules at full strength |
 
 If the inference feels wrong, say which register you picked and why. The user can override.
 
@@ -23,38 +33,38 @@ If the inference feels wrong, say which register you picked and why. The user ca
 
 Rules not listed apply at full strength everywhere.
 
-| Rule | linkedin | blog | technical-blog | investor-email | docs | casual |
-|---|---|---|---|---|---|---|
-| Em dashes | relaxed (2/post) | strict | strict | strict | relaxed | skip |
-| Bold overuse | relaxed (hooks OK) | strict | strict | strict | relaxed | skip |
-| Emoji in headers | relaxed (1-2, end of line) | strict | strict | strict | skip | skip |
-| Excessive bullets | skip | strict | relaxed | strict | skip | skip |
-| Hedging | strict | strict | relaxed ("may" is accurate) | strict | relaxed | skip |
-| Tier-1 vocabulary | strict | strict | **partial**, see below | strict | **partial**, see below | P0 only |
-| Promotional language | relaxed (some sell expected) | strict | strict | **extra strict** | strict | skip |
-| Significance inflation | strict | strict | strict | **extra strict** | relaxed | skip |
-| Copula avoidance | skip | strict | relaxed | strict | skip | skip |
-| Uniform paragraph length | skip | strict | strict | strict | skip | skip |
-| Numbered-list inflation | relaxed | strict | relaxed | strict | skip | skip |
-| Rhetorical questions | relaxed (1 hook) | strict | strict | strict | skip | skip |
-| Transition phrases | skip | strict | strict | strict | relaxed | skip |
-| Generic conclusions | skip | strict | strict | **extra strict** | skip | skip |
-| Hashtag stuffing | strict | strict | strict | **extra strict** | skip | skip |
-| Bullet-NP lists | strict | strict | relaxed | strict | relaxed (parameter lists) | skip |
-| Subjectless fragments | relaxed (the register) | strict | relaxed | strict | skip | skip |
-| Boilerplate clusters | strict | strict | strict | **extra strict** | relaxed | skip |
-| Future-narrative closers | strict | strict | strict | **extra strict** | skip | skip |
-| Social endorsement closers | strict | strict | strict | strict | skip | relaxed (1 in a DM) |
-| Wall-of-text replies | strict | skip | skip | skip | skip | strict |
-| Curly quotes | skip | skip | relaxed (plain-text contexts) | skip | relaxed | relaxed |
-| Tier-2 clusters | strict | strict | **partial**, see below | strict | **partial**, see below | skip |
-| Tier-3 density | skip | strict | **partial**, see below | strict | **partial**, see below | skip |
-| Confidence calibration | strict | strict | strict | strict | strict | skip |
-| Signposting | strict | strict | strict | strict | strict | skip |
-| Diff-anchored writing | strict | strict | skip | strict | skip | strict |
-| List-label periods | strict | strict | strict | strict | skip | strict |
+| Rule | chat | informal | blog | formal | technical-blog | docs | linkedin |
+|---|---|---|---|---|---|---|---|
+| Em dashes | skip | strict | strict | strict | strict | relaxed | relaxed (2/post) |
+| Bold overuse | skip | strict | strict | strict | strict | relaxed | relaxed (hooks OK) |
+| Emoji in headers | skip | strict | strict | strict | strict | skip | relaxed (1-2, end of line) |
+| Excessive bullets | skip | strict | strict | strict | relaxed | skip | skip |
+| Hedging | skip | strict | strict | strict | relaxed ("may" is accurate) | relaxed | strict |
+| Tier-1 vocabulary | P0 only | strict | strict | strict | **partial**, see below | **partial**, see below | strict |
+| Promotional language | skip | strict | strict | **extra strict** | strict | strict | relaxed (some sell expected) |
+| Significance inflation | skip | strict | strict | **extra strict** | strict | relaxed | strict |
+| Copula avoidance | skip | relaxed | strict | strict | relaxed | skip | skip |
+| Uniform paragraph length | skip | strict | strict | strict | strict | skip | skip |
+| Numbered-list inflation | skip | strict | strict | strict | relaxed | skip | relaxed |
+| Rhetorical questions | skip | relaxed (1 hook) | strict | strict | strict | skip | relaxed (1 hook) |
+| Transition phrases | skip | strict | strict | strict | strict | relaxed | skip |
+| Generic conclusions | skip | strict | strict | **extra strict** | strict | skip | skip |
+| Hashtag stuffing | skip | strict | strict | **extra strict** | strict | skip | strict |
+| Bullet-NP lists | skip | strict | strict | strict | relaxed | relaxed (parameter lists) | strict |
+| Subjectless fragments | skip | relaxed (the register) | strict | strict | relaxed | skip | relaxed (the register) |
+| Boilerplate clusters | skip | strict | strict | **extra strict** | strict | relaxed | strict |
+| Future-narrative closers | skip | strict | strict | **extra strict** | strict | skip | strict |
+| Social endorsement closers | relaxed (1 in a DM) | relaxed (1 subscribe line) | strict | strict | strict | skip | strict |
+| Wall-of-text replies | strict | skip | skip | skip | skip | skip | strict |
+| Curly quotes | relaxed | skip | skip | skip | relaxed (plain-text contexts) | relaxed | skip |
+| Tier-2 clusters | skip | strict | strict | strict | **partial**, see below | **partial**, see below | strict |
+| Tier-3 density | skip | strict | strict | strict | **partial**, see below | **partial**, see below | skip |
+| Confidence calibration | skip | strict | strict | strict | strict | strict | strict |
+| Signposting | skip | strict | strict | strict | strict | strict | strict |
+| Diff-anchored writing | strict | strict | strict | strict | skip | skip | strict |
+| List-label periods | strict | strict | strict | strict | strict | skip | strict |
 
-**Extra strict** means flag borderline instances. In an investor email, one "thriving ecosystem" undermines the message.
+**Extra strict** means flag borderline instances. In a `formal` document, an investor email or a letter, one "thriving ecosystem" undermines the message.
 
 **Skip** means do not audit this category here. The rule does not apply.
 
@@ -64,7 +74,7 @@ One kind of cell has no mechanical form: a rule with no pattern in `lexicon.json
 
 **Vocabulary exceptions, `technical-blog` and `docs`.** This is what **partial** means in the three vocabulary rows, and it is why those two registers do not take a hit allowance: an allowance would let a second `delve` through, and this does not. These words carry real technical meaning and are not flagged in either register: `robust`, `comprehensive`, `seamless`, `ecosystem`, `leverage` (actual platform leverage), `facilitate`, `underpin`, `streamline`, `scalable`, `dynamic`. Still flagged at full strength: `delve`, `tapestry`, `beacon`, `embark`, `testament to`, `game-changer`, `harness`. The list itself is `technical_exempt` in `lexicon.json`.
 
-P0 fingerprints (chatbot artifacts, cutoff disclaimers, citation leaks, tracking parameters, hidden unicode, placeholders) apply at full strength in **every** register, including `casual`.
+P0 fingerprints (chatbot artifacts, cutoff disclaimers, citation leaks, tracking parameters, hidden unicode, placeholders) apply at full strength in **every** register, including `chat`.
 
 ---
 
@@ -84,10 +94,10 @@ A persona is optional. If the writer does not name one, infer from the input's e
 
 ## How the axes compose
 
-A voice target always applies, even where a register would skip that category: `technical` voice still prefers plain copulatives inside a `casual` register that otherwise ignores copula avoidance.
+A voice target always applies, even where a register would skip that category: `technical` voice still prefers plain copulatives inside a `chat` register that otherwise ignores copula avoidance.
 
 Where both govern the same rule and agree, they reinforce. Where they disagree, **resolve toward the stricter of the two.** A `warm` voice in `docs` still gets no decorative tables.
 
 A user-supplied writing sample outranks both. See `voice.md`.
 
-Sensible pairings: casual↔casual, professional↔linkedin/investor-email, technical↔docs/technical-blog.
+Sensible pairings: casual↔chat/informal, professional↔linkedin/formal, technical↔docs/technical-blog.

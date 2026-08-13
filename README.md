@@ -153,7 +153,9 @@ python3 skills/voice-setup/scripts/measure_voice.py a.md b.md c.md \
 python3 skills/rabbit-writes/scripts/rwlib/voices.py --blend ada grace --weight 0.7
 ```
 
-`--voice auto` looks for a `.rabbit-voice` file beside the document or in the working directory, then `voices/ACTIVE`, then a lone installed profile. No profile applies unless you ask for one, because this is what the pre-commit hook runs in somebody else's repository.
+`--voice auto` looks for a `.rabbit-voice` file beside the document or in the working directory, then `voices/ACTIVE`. If neither names a profile it resolves none and says so.
+
+The profiles that ship here are examples, and enforcing one nobody chose is somebody else's P0 bans on your prose. No profile applies unless you ask for one, because this is what the pre-commit hook runs in somebody else's repository.
 
 ### `--apply-safe`
 
@@ -204,9 +206,9 @@ repos:
 
 Scope `rabbit-scan` with `files`. Unscoped it runs on every markdown file in the repository, including the generated ones nobody wrote by hand.
 
-`readme-check` and `rabbit-scan` apply no voice profile. pre-commit clones this repository to run the hook, so `voices/ACTIVE` arrives naming this repository's author, and a semicolon that is a P0 in one person's profile is not a defect in anybody else's prose. Structure, fingerprints and craft are all still checked, which is the part that is evidence rather than taste.
+`readme-check` and `rabbit-scan` apply no voice profile, and neither does anything else until you name one: a semicolon that is a P0 in one person's profile is not a defect in anybody else's prose. Structure, fingerprints and craft are all still checked, which is the part that is evidence rather than taste.
 
-The voice halves are separate hooks, `readme-check-voice` and `rabbit-scan-voice`, and they are worth enabling once `voice-setup` has written your profile or a `.rabbit-voice` file in your repository pins one. Both resolve the profile themselves, in the order `.rabbit-voice`, then the plugin's `voices/ACTIVE`, then a lone installed profile, so a pin in your repository wins:
+The voice halves are separate hooks, `readme-check-voice` and `rabbit-scan-voice`, and they are worth enabling once `voice-setup` has written your profile or a `.rabbit-voice` file in your repository pins one. Both resolve the profile themselves, in the order `.rabbit-voice`, then the plugin's `voices/ACTIVE`, so a pin in your repository wins:
 
 ```yaml
       - id: rabbit-scan-voice
@@ -300,6 +302,41 @@ python3 skills/voice-setup/scripts/build_voice.py --check <you> --activate
 
 Taste is boundaries: roughly 80% of a working profile is **refusals** (what you will never write). What you say you like usually describes half the writers alive. What you refuse to put your name on is your fingerprint.
 
+### Case Study: Satoshi Nakamoto Voice Profile
+
+For a full empirical walkthrough of extracting and testing a voice profile from real-world writings (62k words across the Bitcoin whitepaper, cryptography mailing list emails, and forum posts), see [**`docs/SATOSHI_VOICE.md`**](docs/SATOSHI_VOICE.md). It documents the stylometric metrics (sentence distributions, 97.5% double-spacing after periods, British orthography), machine rules, 100% accurate oracle discrimination testing against contemporary cypherpunks, and cross-voice rewrites.
+
+### Switching Voices
+
+You can switch between installed profiles (`whit3rabbit`, `satoshi`, or your own) in four ways:
+
+1. **Per-repository pin (recommended):** Add a `.rabbit-voice` file to the root of your project or working directory containing the voice name:
+   ```bash
+   echo satoshi > .rabbit-voice
+   ```
+   All scans with `--voice auto` and all skill invocations in that directory will automatically use this voice.
+
+2. **Global active voice:** Set the default profile in `skills/rabbit-writes/voices/ACTIVE`:
+   ```bash
+   # Via build_voice.py:
+   python3 skills/voice-setup/scripts/build_voice.py --check satoshi --activate
+
+   # Or manually:
+   echo satoshi > skills/rabbit-writes/voices/ACTIVE
+   ```
+
+3. **Command-line flag:** Explicitly specify the voice on any script:
+   ```bash
+   python3 skills/rabbit-writes/scripts/scan.py draft.md --voice satoshi
+   python3 skills/rabbit-writes/scripts/attain.py before.md after.md --voice satoshi
+   ```
+
+4. **Conversational prompt:** In Claude Code or Codex, simply tell the assistant:
+   ```
+   Switch my active voice to satoshi
+   Rewrite this section in satoshi's voice
+   ```
+
 ## What's in it
 
 Three skills.
@@ -374,7 +411,9 @@ python3 skills/rabbit-writes/scripts/scan.py draft.md \
     --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
 ```
 
-A register profile (`--profile casual`, `--profile docs`) relaxes the general rules. It never relaxes a voice rule. Lowercase and loose punctuation are fine off the clock. "Circle back" never is.
+A register profile (`--profile chat`, `--profile docs`) relaxes the general rules. It never relaxes a voice rule. Lowercase and loose punctuation are fine off the clock. "Circle back" never is.
+
+The register is also the document form. `chat`, `informal`, `blog`, and `formal` are a formality ladder that an email, a chat message, a newsletter, or an essay maps onto, and `references/forms/` holds one file per form saying what slots that form has. Those files give constraints and never example phrases, because a form file that supplied a greeting would open every user's email the same way.
 
 ## What it will not do
 

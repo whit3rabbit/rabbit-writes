@@ -32,20 +32,20 @@
 # exactly that: precommit.py still falls back to resolving a plugin-relative
 # `--voice-rules` against its own root, but nothing shipped depends on it now.
 # `auto` asks the same question readme_check.py asks, in the same order: a
-# `.rabbit-voice` file in your repository, then the plugin's voices/ACTIVE, then
-# a lone installed profile. Your pin wins, which is the behaviour a path could
-# not give you. Point `args` at `--voice-rules <your path>` to be explicit.
+# `.rabbit-voice` file in your repository, then the plugin's voices/ACTIVE. Your
+# pin wins, which is the behaviour a path could not give you. Point `args` at
+# `--voice-rules <your path>` to be explicit.
 #
 # They gate on P0 only. A P1 is a convention worth arguing about and a P2 is
 # polish, and a hook that blocks a commit over polish is a hook people learn to
 # pass --no-verify to, at which point it stops catching the P0s as well.
 #
-# No voice profile by default. pre-commit clones this repository, so
-# voices/ACTIVE arrives set to this repository's author, and under a hook the
-# note explaining the fallback goes nowhere anybody reads. A stranger's em dash
-# is not a defect in a stranger's README. Opt in with readme-check-voice or
-# rabbit-scan-voice once you have run voice-setup or dropped a .rabbit-voice in
-# your repository.
+# No voice profile by default, at two levels. These two hooks do not ask for
+# one, and the clone they run from ships voices/ACTIVE empty, so nothing
+# resolves until you say whose voice it is: a stranger's em dash is not a defect
+# in a stranger's README, and under a hook the note explaining a fallback goes
+# nowhere anybody reads. Opt in with readme-check-voice or rabbit-scan-voice
+# once you have run voice-setup or dropped a .rabbit-voice in your repository.
 #
 # `rabbit-scan` is P0-gated and unscoped by default. One of those P0s is a chat
 # citation marker, which is checked against the raw text, so a document that
@@ -98,10 +98,10 @@
   name: prose scan against a voice
   description: >-
     The same scan with a voice profile applied, so a banned word is a defect
-    rather than a note. Resolves your `.rabbit-voice` first. Without one it
-    falls back to the cloned plugin's voices/ACTIVE, which is this repository's
-    author and almost certainly not you: drop a .rabbit-voice in your repository,
-    or override `args` with `--voice-rules <path relative to your root>`.
+    rather than a note. Resolves your `.rabbit-voice` first, then the cloned
+    plugin's voices/ACTIVE, which ships empty. With neither it enforces nothing
+    and says so: drop a .rabbit-voice in your repository, or override `args`
+    with `--voice-rules <path relative to your root>`.
   entry: scripts/precommit.py scan --check
   language: script
   types: [markdown]

@@ -106,6 +106,28 @@ people's warmth tool is not what they expect it to be.>
 <How you shift by audience, channel, seniority, and whether you're on the clock.
 Which markers appear in one register and never in another.>
 
+<Then fill the table below, which is the per-form half. `references/forms/` says
+what slots a form has and never what goes in them, because a form file that
+supplied a greeting would open every user's email the same way. This table is
+where you fill them, and it is the only place that may. Leave a cell blank and
+the slot stays plain, which is a real answer.>
+
+| Register | Opener | Closer | What else changes |
+|---|---|---|---|
+| `chat` | | | |
+| `informal` | | | |
+| `blog` | | | |
+| `formal` | | | |
+
+<The genre columns, `technical-blog`, `docs`, and `linkedin`, take a row only if
+you write them differently. Most people do not need all seven.>
+
+The enforceable half of this section goes in `<name>.rules.json`, in two keys
+that already exist: `mechanics_by_register` for a mechanic that moves by
+register, and `applies_to_registers` on a `banned_regex` or `required_when`
+entry for a rule that only applies to some. A register cannot soften a rule you
+wrote. It selects among the rules you wrote, which runs the other way.
+
 ## Humor
 
 <Kind, target, and the conditions under which it stays spoken rather than

@@ -60,6 +60,24 @@ def registers(path=REGISTERS_PATH):
     return tuple(load(path)["registers"])
 
 
+def spine(path=REGISTERS_PATH):
+    """The formality ladder, loosest first. The rest are genre columns.
+
+    A document form maps onto this axis and never onto a third one:
+    references/forms/*.md each name one register, and the ones naming a genre
+    column do it because that genre carries tolerances no formality band
+    captures. Data rather than prose, so `problems` can check it and so the
+    split is not a claim some document makes about the matrix.
+    """
+    return tuple(load(path).get("spine", ()))
+
+
+def genre_registers(path=REGISTERS_PATH):
+    """Every register that is not on the formality spine, in matrix order."""
+    on_spine = set(spine(path))
+    return tuple(r for r in registers(path) if r not in on_spine)
+
+
 def default_register(path=REGISTERS_PATH):
     return load(path)["default_register"]
 
@@ -156,6 +174,13 @@ def problems(known_ids, path=REGISTERS_PATH, id_priorities=None):
     if data["default_register"] not in known_registers:
         out.append("default_register %r is not in registers"
                    % data["default_register"])
+    # A spine entry naming nothing is the same silent no-op as a cell naming an
+    # id the engine cannot raise: the docs describe a formality ladder, a form
+    # file routes onto it, and the rung is not there.
+    for name in data.get("spine", ()):
+        if name not in known_registers:
+            out.append("spine names %r, which is not a register in %r"
+                       % (name, data["registers"]))
     seen_labels = set()
     for rule in data["rules"]:
         label = rule["label"]

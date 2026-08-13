@@ -114,6 +114,30 @@ def test_a_shell_comment_in_a_fence_is_not_a_heading():
     assert result["ok"] and code == 0, str(result["violations"])
 
 
+def test_a_path_inside_a_table_row_is_reported_once():
+    """One edit, one violation. The table row is already compared verbatim, so
+    reporting the path inside it as well shows a reader two broken promises where
+    there is one. Same argument as the URL and inline-code carve-outs above,
+    one span type over."""
+    table = ("| file | what it does |\n| - | - |\n"
+             "| docs/setup.md | how to install it |\n")
+    edited = table.replace("docs/setup.md", "docs/install.md")
+    result, _ = run_verify(table, edited)
+    kinds = [v["kind"] for v in result["violations"]]
+    assert any("table" in k for k in kinds), str(kinds)
+    assert not any("path" in k for k in kinds), str(kinds)
+
+
+def test_the_same_path_on_a_prose_line_is_still_reported():
+    """The other half. Blanking the spans that carry their own promise must not
+    turn the path check off everywhere else."""
+    prose = "The installer reads docs/setup.md before it does anything.\n"
+    result, _ = run_verify(prose, prose.replace("docs/setup.md",
+                                                "docs/install.md"))
+    assert any("path" in v["kind"] for v in result["violations"]), str(
+        result["violations"])
+
+
 def test_a_path_inside_a_url_is_not_reported_as_a_path():
     urly = "See https://raw.githubusercontent.com/user/repo/main/README.md now.\n"
     result, _ = run_verify(urly, urly.replace("now", "here"))

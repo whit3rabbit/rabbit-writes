@@ -173,6 +173,26 @@ def test_a_matched_quote_pair_still_exempts_the_span():
     assert "tier1" not in ids(result), str([f["match"] for f in result["findings"]])
 
 
+def test_a_tier1_phrase_is_one_finding_and_not_two():
+    """`delve into` is on both tier-1 lists, so it matched the phrase regex and
+    the word regex and produced two P1 findings about one token. The phrase
+    takes the span first now, the way facts.numbers() orders its takes."""
+    result, _ = scan_text("The team will delve into the findings this week and "
+                          "report back to everyone.\n")
+    hits = [f for f in result["findings"] if f["id"] == "tier1"]
+    assert len(hits) == 1, str([(f["label"], f["match"]) for f in hits])
+    assert hits[0]["match"] == "delve into", hits[0]
+
+
+def test_a_tier1_word_outside_a_phrase_is_still_caught():
+    """The other direction: blanking the phrase spans must not blank the word
+    pass along with them."""
+    result, _ = scan_text("The team will delve deeper on the findings this week "
+                          "and report back to everyone.\n")
+    hits = [f for f in result["findings"] if f["id"] == "tier1"]
+    assert [f["match"] for f in hits] == ["delve"], str(hits)
+
+
 def test_one_non_breaking_space_is_not_a_p0():
     """Correct French typography, and a document typeset properly should not be
     told it has a credibility problem."""

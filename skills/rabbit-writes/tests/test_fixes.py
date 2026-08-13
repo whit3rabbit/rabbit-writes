@@ -198,6 +198,22 @@ def test_apply_safe_write_writes_and_reports_verification():
         shutil.rmtree(scratch, ignore_errors=True)
 
 
+def test_write_and_stdout_without_apply_safe_are_refused():
+    """Both flags are read by run_apply_safe and by nothing else, so without
+    --apply-safe they were accepted and quietly did nothing. `--stdout` is the
+    dangerous half: a caller redirecting the output into a file got the report
+    where it expected the document."""
+    scratch = tempfile.mkdtemp()
+    try:
+        path = written(scratch, "draft.md", "Plain prose about the outage.\n")
+        for flag in ("--stdout", "--write"):
+            result = run_scan([path, flag])
+            assert result.returncode == 2, (flag, result.stdout)
+            assert "--apply-safe" in result.stderr, (flag, result.stderr)
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
 def test_apply_safe_stdout_prints_the_document():
     scratch = tempfile.mkdtemp()
     try:

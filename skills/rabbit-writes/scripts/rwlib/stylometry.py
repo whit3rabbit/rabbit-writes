@@ -755,7 +755,7 @@ def measure_gaps(fp, measured, tolerance=ATTAIN_TOLERANCE):
 # --------------------------------------------------------------------------
 
 def fingerprint(sample_texts, voice=None, exemplars=False,
-                sample_measures=None, sentence_lengths=None):
+                sample_measures=None, sentence_lengths=None, register=None):
     """The stored fingerprint for a set of the writer's samples.
 
     Carries the calibration with it: each sample's leave-one-out distance to
@@ -774,9 +774,18 @@ def fingerprint(sample_texts, voice=None, exemplars=False,
     from `scan.compute_stats` and this module does not import scan.py. Both are
     optional rather than required, so a caller with a bare string can still
     build a fingerprint to measure a distance against, which is what this
-    module's own tests do. A missing block is announced on stderr rather than
-    raising, because it costs the attainment gate and not the distance, and
-    `validate.py` fails a committed fingerprint that has one.
+    module's own tests do. A missing block is not announced at all: the comment
+    below the return value says why, and `rwlib/voice_check.py` is what fails a
+    stored fingerprint that has one.
+
+    `register` names the register these samples were written in, and it is the
+    layer where document forms actually diverge. A person's chat register and
+    their essay register are two different statistical objects, and averaging
+    them produces a fingerprint of nobody, which is what `per_sample_median`
+    already exists to make visible. Stored here as well as in the filename so
+    the two can be checked against each other: a file renamed by hand is
+    otherwise a fingerprint measuring one register while claiming another.
+    None is the general fingerprint, used for any register with no measured one.
     """
     if len(sample_texts) < 2:
         raise ValueError("a fingerprint needs at least 2 samples: "
@@ -808,6 +817,10 @@ def fingerprint(sample_texts, voice=None, exemplars=False,
     out = {
         "schema_version": SCHEMA_VERSION,
         "voice": voice,
+        # Additive, so no SCHEMA_VERSION bump: it changes nothing about what any
+        # stored number means. A fingerprint written before this key existed is
+        # the general one, which is exactly what `None` says here.
+        "register": register,
         "n_samples": len(sample_texts),
         "sample_words": words,
         "thin_samples": len(thin),
@@ -888,18 +901,52 @@ def distance(fp, text):
     }
 
 
-def path_for(rules_path):
+def register_fingerprint_path(rules_path, register):
+    """Where a register's own fingerprint would live, whether or not it does."""
+    return "%s.%s%s" % (strip_rules_suffix(rules_path), register,
+                        FINGERPRINT_SUFFIX)
+
+
+def path_for(rules_path, register=None):
     """The fingerprint that belongs to a voice's rules file, if it exists.
 
     Beside the rules rather than named separately, so whichever profile
     `rwlib.voices.resolve` picked is the one measured against. A profile
     resolved by `.rabbit-voice` and a fingerprint found by some other rule
     would be the two-checkers-disagreeing bug resolve() was written to end.
+
+    `register` asks for that register's own fingerprint first and falls back to
+    the general one, which is the whole of the per-form support: the refusals in
+    a profile carry across forms unchanged, the mechanics carry with the
+    per-register overrides the writer authored, and the statistical target
+    switches wholesale, because that is the layer where forms diverge most.
+    The fallback is silent and has to be, since almost no profile will ever
+    carry more than one.
     """
     if not rules_path:
         return None
+    if register:
+        scoped = register_fingerprint_path(rules_path, register)
+        if os.path.exists(scoped):
+            return scoped
     candidate = strip_rules_suffix(rules_path) + FINGERPRINT_SUFFIX
     return candidate if os.path.exists(candidate) else None
+
+
+def register_of(path):
+    """The register a fingerprint filename claims, or None for the general one.
+
+    Read off the filename rather than out of the file, because this is what
+    decides which file gets loaded and the two are checked against each other
+    afterwards. A middle segment that is not a register is not a register-scoped
+    fingerprint at all, and the caller has to say so rather than treating a typo
+    as a profile whose name happens to contain a dot.
+    """
+    base = os.path.basename(path)
+    if not base.endswith(FINGERPRINT_SUFFIX):
+        return None
+    stem = base[:-len(FINGERPRINT_SUFFIX)]
+    return stem.rsplit(".", 1)[1] if "." in stem else None
 
 
 def load(path):

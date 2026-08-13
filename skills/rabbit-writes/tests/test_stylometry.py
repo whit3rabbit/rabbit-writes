@@ -394,3 +394,88 @@ def test_no_fingerprint_is_not_an_error():
     result, code = scan_text(A_HELD_OUT, "--voice-rules", rules_path, "--check")
     assert code == 0, result
     assert result["voice_distance"] is None, result["voice_distance"]
+
+
+# --------------------------------------------------------------------------
+# per-register fingerprints
+# --------------------------------------------------------------------------
+#
+# A person's chat register and their essay register are two different
+# statistical objects, and averaging them produces a fingerprint of nobody,
+# which is the fact `per_sample_median` already exists to make visible. This is
+# the layer where document forms actually diverge: the refusals in a profile
+# carry across forms unchanged, the mechanics carry with the per-register
+# overrides the writer authored, and the statistical target switches wholesale.
+
+
+def test_a_fingerprint_records_the_register_it_measured():
+    fp = stylometry.fingerprint(A, voice="tester", register="chat")
+    assert fp["register"] == "chat", fp["register"]
+    assert stylometry.fingerprint(A, voice="tester")["register"] is None
+
+
+def test_recording_the_register_did_not_move_the_schema():
+    """Additive, so a stored fingerprint from before this key means exactly what
+    it always meant: the general one. A bump would have invalidated every
+    fingerprint anybody had built."""
+    assert stylometry.SCHEMA_VERSION == 2
+    assert (stylometry.fingerprint(A, voice="tester", register="chat")
+            ["schema_version"] == 2)
+
+
+def test_path_for_prefers_the_register_and_falls_back_to_the_general_one():
+    directory = tempfile.mkdtemp(prefix="rabbit-voice-")
+    rules_path = os.path.join(directory, "tester.rules.json")
+    with open(rules_path, "w", encoding="utf-8") as fh:
+        json.dump({"voice": "tester"}, fh)
+    general = os.path.join(directory, "tester.fingerprint.json")
+    stylometry.save(stylometry.fingerprint(A, voice="tester"), general)
+
+    # No scoped file yet: every register falls back, silently, because almost no
+    # profile will ever carry more than one.
+    assert stylometry.path_for(rules_path, "chat") == general
+    assert stylometry.path_for(rules_path) == general
+
+    scoped = stylometry.register_fingerprint_path(rules_path, "chat")
+    stylometry.save(stylometry.fingerprint(A, voice="tester", register="chat"),
+                    scoped)
+    assert stylometry.path_for(rules_path, "chat") == scoped
+    assert stylometry.path_for(rules_path, "formal") == general
+    assert stylometry.path_for(rules_path) == general
+
+
+def test_register_of_reads_the_scope_off_the_filename():
+    """The filename decides which file is loaded, so it is what the scope is
+    read from. The stored `register` field is then checked against it, because a
+    file renamed by hand measures one register while claiming another."""
+    assert stylometry.register_of("a/tester.chat.fingerprint.json") == "chat"
+    assert stylometry.register_of("a/tester.fingerprint.json") is None
+    assert stylometry.register_of("a/tester.rules.json") is None
+
+
+def test_scan_measures_against_the_register_it_was_given():
+    """The whole point of the scoped file. The two fingerprints below are built
+    from different writers, so a scan under `chat` and a scan with no register
+    cannot report the same distance unless the scoping did nothing."""
+    directory = tempfile.mkdtemp(prefix="rabbit-voice-")
+    rules_path = os.path.join(directory, "tester.rules.json")
+    with open(rules_path, "w", encoding="utf-8") as fh:
+        json.dump({"voice": "tester"}, fh)
+    stylometry.save(fingerprint_a(),
+                    os.path.join(directory, "tester.fingerprint.json"))
+    # The scoped one is built from the formal-register document's own
+    # paragraphs, so it is that register's target rather than voice A's.
+    stylometry.save(
+        stylometry.fingerprint(B_DOC.split("\n\n"), voice="tester",
+                               register="chat"),
+        stylometry.register_fingerprint_path(rules_path, "chat"))
+
+    general, _ = scan_text(B_DOC, "--voice-rules", rules_path)
+    scoped, _ = scan_text(B_DOC, "--voice-rules", rules_path, "--profile", "chat")
+    assert general["voice_distance"] is not None
+    assert scoped["voice_distance"] is not None
+    assert (scoped["voice_distance"]["delta"]
+            < general["voice_distance"]["delta"]), (
+        "B measured against B's own chat fingerprint should sit closer than B "
+        "measured against A: %s vs %s"
+        % (scoped["voice_distance"], general["voice_distance"]))

@@ -64,6 +64,7 @@ if HERE not in sys.path:
 
 import scan as scan_mod                                          # noqa: E402
 from rwlib import cli_error                                      # noqa: E402
+from rwlib import registers as registers_mod                     # noqa: E402
 from rwlib import stylometry                                     # noqa: E402
 from rwlib import voices as voices_mod                           # noqa: E402
 
@@ -73,6 +74,15 @@ SCHEMA_VERSION = 1
 # counts as a regression. Without it, noise in a measure a pass never touched
 # reads as the pass making things worse.
 REGRESSION_EPSILON_SD = 0.25
+
+# The same allowance for the document's Delta, as a fraction of the profile's
+# own self-distance band rather than an absolute number. A raw Delta means
+# nothing on its own, which is the argument stylometry.distance already makes:
+# the band is what makes 0.9 readable, so it is also what says how much of a
+# move is noise. Without this the per-measure comparison was careful and the
+# document verdict was not, and a conversion that landed all six measures and
+# drifted the Delta from 0.912 to 0.914 reported `regressed` and failed --check.
+REGRESSION_EPSILON_DELTA_FRACTION = 0.05
 
 # `flat` is the verdict this script exists for. A conversion is flat when it
 # closed less than this fraction of the distance it had to close, and no single
@@ -117,13 +127,22 @@ def measure_verdict(before_gap, after_gap, within):
     the profile does not carry the measure or the document does not have it.
     None is not a pass, and every caller has to say which it means: here it is
     `unmeasured`, and it stays out of the summary counts a verdict is built on.
+
+    **Tolerance is tested before movement.** A regression is a measure that ends
+    up somewhere the profile does not reach, so a measure sitting inside the
+    tolerance band is `on_target` whichever way it moved to get there. The other
+    order called -0.1 sd to +0.5 sd a regression, and one such row failed the
+    whole document under --check, which is the opposite of what a tolerance is
+    for.
     """
     if within is None:
         return "unmeasured"
+    if within:
+        return "on_target"
     if (before_gap is not None and after_gap is not None
             and after_gap > before_gap + REGRESSION_EPSILON_SD):
         return "regressed"
-    return "on_target" if within else "missed"
+    return "missed"
 
 
 def compare(before, after, fingerprint, tolerance):
@@ -168,7 +187,7 @@ def compare(before, after, fingerprint, tolerance):
         # not, and every other verdict here is a claim about a pair. The table
         # is still the whole point of running it this way.
         verdict = "unpaired"
-    elif summary["regressed"] or (b_delta is not None and a_delta > b_delta):
+    elif summary["regressed"] or _delta_regressed(b_delta, a_delta, band):
         verdict = "regressed"
     elif _is_flat(b_delta, a_delta, band, rows):
         verdict = "flat"
@@ -180,6 +199,20 @@ def compare(before, after, fingerprint, tolerance):
 
     return {"measures": rows, "summary": summary, "verdict": verdict,
             "reliable": reliable}
+
+
+def _delta_regressed(before_delta, after_delta, band):
+    """The document's Delta moved away from the profile, and it matters.
+
+    Two conditions, and the second is the one measure_verdict states in sd:
+    a document that ends inside the writer's own band has not regressed, it has
+    arrived, and how it got there is not a defect anybody can act on. The first
+    is the noise floor, scaled to the band for the reason the constant gives.
+    """
+    if before_delta is None:
+        return False
+    return (after_delta > before_delta + REGRESSION_EPSILON_DELTA_FRACTION * band
+            and after_delta > band)
 
 
 def _is_flat(before_delta, after_delta, band, rows):
@@ -201,12 +234,28 @@ def _is_flat(before_delta, after_delta, band, rows):
     return True
 
 
-def report(result, voice, fingerprint, tolerance, plan_for=None):
+def report(result, voice, fingerprint, tolerance, plan_for=None,
+           fingerprint_path=None, register=None):
     fp = fingerprint
     out = ["voice attainment: %s   (%d samples, %d measures, band max %.2f, "
            "tolerance %.1f sd)"
            % (voice, fp.get("n_samples", 0), len(fp.get("measures") or {}),
-              fp["self_distance"]["max"], tolerance), ""]
+              fp["self_distance"]["max"], tolerance)]
+    # Which fingerprint, named rather than implied. Once a register can have its
+    # own, "the profile's fingerprint" is no longer one file, and a reader
+    # comparing two runs has no way to tell which target moved.
+    if fingerprint_path:
+        measured = fp.get("register")
+        if register and not measured:
+            how = ("no %s fingerprint for this profile, measured against the "
+                   "general one" % register)
+        elif measured:
+            how = "the %s fingerprint" % measured
+        else:
+            how = "the general fingerprint"
+        out.append("  against: %s (%s)"
+                   % (os.path.basename(fingerprint_path), how))
+    out.append("")
 
     d = result["distance"]
     out.append("  %-22s %-9s %-9s %-17s %-8s %s"
@@ -264,8 +313,8 @@ VERDICT_NOTES = {
     "flat": "The distance barely moved and no measure moved a full sd. This is "
             "the shallow conversion: mechanics fixed, register untouched. "
             "Guardrail 3 in SKILL.md is the rule it broke.",
-    "regressed": "Something moved away from the profile. Check the regressed "
-                 "rows before anything else.",
+    "regressed": "Something moved away from the profile and ended outside it. "
+                 "Check the regressed rows before anything else.",
     "unmeasurable": "Under the reliability floor, or the fingerprint carries no "
                     "measures. Nothing here is a verdict about the writing.",
     "unpaired": "One document, so this says where it sits and not whether an "
@@ -337,9 +386,13 @@ def resolve_profile(args, examples):
 
     Same resolution order as scan.py and readme_check.py, through
     rwlib.voices.resolve, so the three cannot disagree about whose rules are in
-    force. The one difference is at the end: scan.py continues without a
-    fingerprint and this refuses, because a clean attainment report over nothing
-    measured is a false pass.
+    force. That order ends in nothing rather than in a profile nobody chose, and
+    here that means exit 2 with the note attached: an attainment report measured
+    against a stranger's fingerprint is worse than no report.
+
+    The other difference is at the end: scan.py continues without a fingerprint
+    and this refuses, because a clean attainment report over nothing measured is
+    a false pass.
     """
     rules_path = args.voice_rules
     if args.voice == "auto":
@@ -396,6 +449,13 @@ def main():
                             "resolution order as scan.py")
     group.add_argument("--voice-rules", metavar="PATH",
                        help="spell the profile's rules path out")
+    ap.add_argument("--profile", metavar="REGISTER",
+                    choices=sorted(registers_mod.registers()),
+                    help="the register the documents are in. Measures against "
+                         "that register's own fingerprint when the profile has "
+                         "one, and against the general fingerprint otherwise. A "
+                         "chat message measured against an essay fingerprint "
+                         "reports a change of form as a conversion that missed")
     ap.add_argument("--tolerance", type=float,
                     default=stylometry.ATTAIN_TOLERANCE, metavar="SD",
                     help="how far off the profile mean a measure may sit before "
@@ -415,9 +475,15 @@ def main():
         args.voice = "auto"
 
     rules_path, voice_name = resolve_profile(args, examples)
-    fingerprint_path = stylometry.path_for(rules_path)
+    fingerprint_path = stylometry.path_for(rules_path, args.profile)
     if not fingerprint_path:
-        measure_script = os.path.join("skills", "voice-setup", "scripts", "measure_voice.py")
+        # Resolved by walking up from this file rather than assembled from the
+        # repository root, so the command in the error works from whatever
+        # directory somebody ran this in. Same rule as every other sibling
+        # lookup in the plugin.
+        measure_script = os.path.join(os.path.dirname(os.path.dirname(HERE)),
+                                      "voice-setup", "scripts",
+                                      "measure_voice.py")
         print(cli_error.format_file_error(
             "attain.py", rules_path, "fingerprint",
             expected_type="voice fingerprint file (.fingerprint.json)",
@@ -481,7 +547,8 @@ def main():
                 stylometry.shape_target(shape, n) for n in plan_for] if shape else []
         print(json.dumps(payload, indent=2))
     else:
-        print(report(result, voice_name, fingerprint, args.tolerance, plan_for))
+        print(report(result, voice_name, fingerprint, args.tolerance, plan_for,
+                     fingerprint_path, args.profile))
 
     if args.check and result["verdict"] in VERDICTS_THAT_FAIL_CHECK:
         return 1

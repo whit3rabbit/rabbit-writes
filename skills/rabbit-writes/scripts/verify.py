@@ -143,6 +143,21 @@ def extract(text):
     # altered" and "file path altered", and a reader counting violations saw two
     # broken promises where there was one.
     unlinked = INLINE_CODE_RX.sub(blank, URL_RX.sub(blank, prose))
+    # Tables, block quotes and frontmatter go the same way, and for the third
+    # time the same argument: each is compared verbatim below, so a path inside
+    # one is already a promise this function keeps. Left in, an edited path in a
+    # table row reported "table row altered" and "file path altered", which is
+    # one edit and two violations. Measured over the 100-README corpus, blanking
+    # them takes 2,275 raw path tokens down to 1,617 prose ones, so 29% of every
+    # path in a README sits somewhere this check does not have to look.
+    #
+    # HTML tags deliberately stay in for this pass, though the fact pass below
+    # takes them out. uncovered_image_srcs skips any src PATH_RX matches, so
+    # blanking tags here would open exactly the gap that function exists to
+    # close: a relative `<img src="assets/logo.svg">` would be reported by
+    # neither.
+    unquoted = TABLE_ROW_RX.sub(
+        blank, BLOCKQUOTE_RX.sub(blank, FRONTMATTER_RX.sub(blank, unlinked)))
     # The facts are read from a copy with every span that is already compared
     # verbatim taken out of it, which is the argument extract() already makes
     # for keeping PATH_RX out of URLs: a number inside a table is one broken
@@ -164,8 +179,7 @@ def extract(text):
     # already documented above as prose an editor may legitimately improve, so
     # protecting it verbatim here would contradict the decision this file
     # already made.
-    fact_text = blank_entities(HTML_TAG_RX.sub(blank, TABLE_ROW_RX.sub(
-        blank, BLOCKQUOTE_RX.sub(blank, FRONTMATTER_RX.sub(blank, unlinked)))))
+    fact_text = blank_entities(HTML_TAG_RX.sub(blank, unquoted))
     return {
         "fences": FENCE_RX.findall(text),
         "inline_code": INLINE_CODE_RX.findall(text),
@@ -175,7 +189,7 @@ def extract(text):
         "blockquotes": BLOCKQUOTE_RX.findall(prose),
         "headings": HEADING_RX.findall(prose),
         "urls": URL_RX.findall(text),
-        "paths": PATH_RX.findall(unlinked),
+        "paths": PATH_RX.findall(unquoted),
         "image_srcs": uncovered_image_srcs(prose),
         "numbers": [canon for canon, _ in facts.numbers(fact_text)],
         "dates": [iso for iso, _ in facts.dates(fact_text)],

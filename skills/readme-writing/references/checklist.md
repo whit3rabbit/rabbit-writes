@@ -4,7 +4,7 @@ Run through before delivering a draft, restructure, or audit. Every item is yes 
 
 ## Structure
 
-1. Does the first two sentences say what the project is and why it exists, before any badge, sponsor content, or hero image?
+1. Do the first two sentences say what the project is and why it exists, before any badge, sponsor content, or hero image?
 2. Does installation come right after the pitch, not buried past several other sections?
 3. Is there a working, copy-pasteable path from "clone/install" to "it's running" — not just a list of prerequisites?
 4. Is license the last section (or close to it), and short — name plus link, not restated terms?

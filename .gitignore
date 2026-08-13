@@ -90,3 +90,7 @@ docs/detector-corpus/texts/
 # Reconstruction eval texts. The manifest carries hashes, the prose belongs to
 # whoever wrote it, and it is not this repository's to publish.
 docs/voice-eval/texts/
+
+# Scratch directory
+scratch/
+

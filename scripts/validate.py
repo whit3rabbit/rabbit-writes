@@ -151,19 +151,36 @@ def _expanded(entries, expanded):
             else "%d -> %d" % (len(entries), len(expanded)))
 
 
+def _fingerprint_register(path):
+    """The register a stored fingerprint claims, or None if it claims none."""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh).get("register")
+    except (OSError, ValueError):
+        return None                 # unreadable is voice_check's to report
+
+
 def check_voices():
     if not os.path.isdir(VOICES):
         fail("no voices/ directory")
         return
 
+    # An empty ACTIVE is the shipped state and the correct one. The plugin
+    # carries example profiles, and a marketplace install that arrives with one
+    # of them active enforces a stranger's P0 bans on somebody's prose. Naming a
+    # profile that is not there is still a failure: that is a claim nothing
+    # backs, and `--voice auto` reports it as a note nobody reads under a hook.
     active_path = os.path.join(VOICES, "ACTIVE")
     if not os.path.exists(active_path):
-        fail("voices/ACTIVE is missing; nothing tells the skill whose voice to use")
+        fail("voices/ACTIVE is missing; build_voice.py --activate writes it and "
+             "resolve() reads it, so the file itself should exist even empty")
     else:
         with open(active_path, encoding="utf-8") as fh:
             active = fh.read().strip()
         if not active:
-            fail("voices/ACTIVE is empty")
+            notes.append("no active voice, which is what ships: `--voice auto` "
+                         "enforces nothing until somebody runs --activate or "
+                         "drops a .rabbit-voice")
         elif not os.path.exists(os.path.join(VOICES, active + ".md")):
             fail("voices/ACTIVE names %r but voices/%s.md does not exist"
                  % (active, active))
@@ -194,6 +211,25 @@ def check_voices():
             # so one with no rules file beside it is never loaded at all. No
             # error, no distance, nothing to notice.
             vname = fn[:-len(stylometry_mod.FINGERPRINT_SUFFIX)]
+            # A register-scoped fingerprint is <voice>.<register>.fingerprint.json,
+            # so the profile name is the stem minus that segment. Checked rather
+            # than assumed: a misspelled register produces a file scan.py never
+            # asks for, and treating it as a profile whose name contains a dot
+            # would report the orphan against a profile nobody named.
+            register = stylometry_mod.register_of(fn)
+            if register:
+                known = set(registers_mod.registers())
+                if register not in known:
+                    fail("voices/%s is scoped to %r, which is not a register "
+                         "(%s), so nothing ever loads it"
+                         % (fn, register, ", ".join(sorted(known))))
+                    continue
+                vname = vname[:-(len(register) + 1)]
+                declared = _fingerprint_register(os.path.join(VOICES, fn))
+                if declared is not None and declared != register:
+                    fail("voices/%s says it measures the %s register, so one of "
+                         "the two is wrong and the file measures a register "
+                         "nobody will read it as" % (fn, declared))
             if not os.path.exists(os.path.join(VOICES, vname + ".rules.json")):
                 fail("voices/%s has no %s.rules.json, so scan.py never finds it "
                      "and no distance is ever measured" % (fn, vname))
@@ -554,6 +590,140 @@ def check_mode_contract():
     notes.append("mode contract intact")
 
 
+# --------------------------------------------------------------------------
+# the CLAUDE.md files, against the code they describe
+# --------------------------------------------------------------------------
+#
+# `check_matrix_doc` above exists because a documented tolerance the engine never
+# had is worse than no documentation. The CLAUDE.md files sat outside it and
+# drifted exactly that way: one named six registers, four of which do not exist,
+# and showed `verify.py <file>` for a script that takes two paths and exits 2
+# without them. Both are things a reader would act on and neither would fail
+# anything.
+#
+# Two narrow checks rather than a prose linter. Each one reads the answer out of
+# the code or the data file, so neither can drift on its own.
+
+# A positional is an add_argument whose first argument is not a flag. Optional
+# ones say so with nargs, and `+` still requires one.
+POSITIONAL_RX = re.compile(r"""add_argument\(\s*["'](?P<name>[a-z][\w-]*)["'](?P<rest>[^)]*)""",
+                           re.S)
+FLAG_RX = re.compile(r"""add_argument\(\s*["'](--[\w-]+)["'](?P<rest>[^)]*)""", re.S)
+STORE_RX = re.compile(r"""action\s*=\s*["'](?:store_true|store_false|count|"""
+                      r"""help|version)["']""")
+
+
+def script_signature(path):
+    """(required positional count, flags that take a value) for one CLI script.
+
+    Read out of the script's own `add_argument` calls, so a flag added tomorrow
+    is covered without touching this file. Deliberately not `precommit.py`'s
+    VALUE_FLAGS: that is a curated allowlist a hook uses at runtime to split a
+    `args:` list, and tying a documentation check to it would make a doc edit
+    able to change what the hook does.
+    """
+    try:
+        with open(path, encoding="utf-8") as fh:
+            source = fh.read()
+    except OSError:
+        return None
+    required = 0
+    for m in POSITIONAL_RX.finditer(source):
+        rest = m.group("rest")
+        if "nargs" in rest and re.search(r"""nargs\s*=\s*["'][?*]["']""", rest):
+            continue
+        required += 1
+    value_flags = {m.group(1) for m in FLAG_RX.finditer(source)
+                   if not STORE_RX.search(m.group("rest"))}
+    return required, value_flags
+
+
+def documented_commands(text):
+    """[(script path, [tokens])] for every `python3 <path> ...` line in a fence."""
+    out, fenced = [], False
+    for line in text.split("\n"):
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+            continue
+        if not fenced:
+            continue
+        stripped = line.strip().rstrip("\\").strip()
+        if not stripped.startswith("python3 "):
+            continue
+        # Comments after the command are documentation, not arguments.
+        stripped = stripped.split("#")[0].strip()
+        tokens = stripped.split()[1:]
+        if tokens:
+            out.append((tokens[0], tokens[1:]))
+    return out
+
+
+def check_claude_md():
+    """The CLAUDE.md files against registers.json and against the scripts.
+
+    A command that cannot run and a register that does not exist are both facts
+    with a home elsewhere in the tree, which is the same argument
+    check_matrix_doc makes for the tolerance table.
+    """
+    known = set(registers_mod.registers())
+    try:
+        modes = set(registers_mod.load().get("_modes", {}))
+    except Exception as exc:                                  # noqa: BLE001
+        fail("could not read registers.json: %s" % exc)
+        return
+    checked = 0
+    for base, _dirs, files in os.walk(ROOT):
+        if ".git" in base or "_to_delete" in base:
+            continue
+        if "CLAUDE.md" not in files:
+            continue
+        rel = os.path.relpath(os.path.join(base, "CLAUDE.md"), ROOT)
+        with open(os.path.join(base, "CLAUDE.md"), encoding="utf-8") as fh:
+            text = fh.read()
+        checked += 1
+
+        # A run of backticked bare words on a line about registers is a list of
+        # register names. Mode names from the same data file are allowed there,
+        # because the matrix is described in both vocabularies.
+        for line in text.split("\n"):
+            if "register" not in line.lower():
+                continue
+            names = re.findall(r"`([a-z][a-z0-9-]*)`", line)
+            if len(names) < 3:
+                continue
+            unknown = [n for n in names if n not in known and n not in modes]
+            if unknown:
+                fail("%s names %s as register(s); registers.json has %s"
+                     % (rel, ", ".join(sorted(set(unknown))),
+                        ", ".join(sorted(known))))
+
+        for script, tokens in documented_commands(text):
+            path = os.path.join(ROOT, script)
+            if not os.path.exists(path):
+                # A command run from somewhere else in the tree (the corpus
+                # scripts document a `cd` first). Nothing to check it against.
+                continue
+            signature = script_signature(path)
+            if signature is None:
+                continue
+            required, value_flags = signature
+            positionals, skip = 0, False
+            for token in tokens:
+                if skip:
+                    skip = False
+                    continue
+                if token.startswith("-"):
+                    skip = token in value_flags and "=" not in token
+                    continue
+                positionals += 1
+            if positionals < required:
+                fail("%s documents `python3 %s` with %d argument(s); the script "
+                     "requires %d and exits 2 without them"
+                     % (rel, script, positionals, required))
+    notes.append("%d CLAUDE.md file(s) match registers.json and the scripts"
+                 % checked)
+
+
 def check_scripts_compile():
     """A syntax error in a bundled script only surfaces when a skill runs it."""
     import ast
@@ -738,6 +908,147 @@ def check_precommit_hooks():
                  % len(hooks))
 
 
+# The sentence every form file states once. Pinned the way check_mode_contract
+# pins SKILL.md, and for the same reason: it is the rule that stops this plugin
+# building a shared fingerprint at the genre level, and it is one careless
+# reword away from meaning nothing.
+FORM_GUARDRAIL = "A form file supplies slots. Only the voice may fill them."
+FORM_REGISTER_RX = re.compile(r"(?m)^\*\*Register:\*\*\s*`([a-z0-9-]+)`\s*$")
+FORM_HEADINGS = ("## Slots", "## Bands", "## Tells",
+                 "## What the mechanical layer sees here")
+# Everything from `## Tells` to the next heading of the same level. Quoted
+# phrases live there and nowhere else.
+FORM_TELLS_RX = re.compile(r"(?ms)^## Tells$(.*?)(?=^## |\Z)")
+# A double-quoted phrase. Backticks are deliberately not matched: they mark
+# register names, filenames, and identifiers, and banning those would ban the
+# file from naming the thing it is about.
+FORM_QUOTE_RX = re.compile(r'"[^"\n]{2,}"')
+
+
+def check_form_files():
+    """A form file supplies slots, and only the voice may fill them.
+
+    The moment a form file contains an example greeting, every user of this
+    plugin opens their email the same way, which is a shared fingerprint at the
+    genre level: the humanizer failure references/false-positives.md describes
+    at the persona level, one floor up. Prose cannot hold that line on its own,
+    because the erosion is always a helpful example somebody added.
+
+    So the mechanical half is a location rule rather than a meaning rule. No
+    regex can tell a prescribed phrase from a proscribed one, and it does not
+    have to: every quoted phrase belongs under `## Tells`, where the section
+    header already says the phrases in it are the ones to avoid. A quoted phrase
+    anywhere else fails, whatever it says.
+
+    The other half is routing. Every register must be named by at least one
+    form, or a column exists that nothing sends a document to, which is the
+    silent no-op class that let `curly-quote` sit unfirable in every register.
+    """
+    forms_dir = os.path.join(SKILLS, "rabbit-writes", "references", "forms")
+    if not os.path.isdir(forms_dir):
+        fail("skills/rabbit-writes/references/forms/ is missing, so no document "
+             "form has a home and every slot decision is improvised per draft")
+        return
+    known = set(registers_mod.registers())
+    routed = {}
+    files = sorted(f for f in os.listdir(forms_dir) if f.endswith(".md"))
+    if not files:
+        fail("references/forms/ has no form files in it")
+        return
+    for fn in files:
+        rel = os.path.join("skills", "rabbit-writes", "references", "forms", fn)
+        with open(os.path.join(forms_dir, fn), encoding="utf-8") as fh:
+            text = fh.read()
+
+        if FORM_GUARDRAIL not in text:
+            fail("%s does not state the slot guardrail verbatim: %r. Without it "
+                 "the next editor adds a helpful example greeting and the "
+                 "plugin ships one opening for everybody" % (rel, FORM_GUARDRAIL))
+        for heading in FORM_HEADINGS:
+            if heading not in text:
+                fail("%s has no %r section" % (rel, heading))
+
+        m = FORM_REGISTER_RX.search(text)
+        if not m:
+            fail("%s has no `**Register:** `<name>`` line, so nothing says "
+                 "which tolerances this form is written against" % rel)
+            continue
+        register = m.group(1)
+        if register not in known:
+            fail("%s names register %r, which is not in registers.json (%s). A "
+                 "form routing to a register that does not exist is a document "
+                 "scanned under the default while its file says otherwise"
+                 % (rel, register, ", ".join(sorted(known))))
+        else:
+            routed.setdefault(register, []).append(fn)
+
+        # Each Tells section removed on its own. Joining them first and removing
+        # the concatenation finds nothing the moment a file has two, which fails
+        # open: every quoted phrase in the file would then be reported.
+        elsewhere = text
+        for section in FORM_TELLS_RX.findall(text):
+            elsewhere = elsewhere.replace(section, "")
+        stray = sorted(set(FORM_QUOTE_RX.findall(elsewhere)))
+        if stray:
+            fail("%s has quoted phrases outside its `## Tells` section: %s. A "
+                 "form file names phrases only to forbid them. Move it under "
+                 "Tells, or drop the quotation marks if it is not a phrase"
+                 % (rel, ", ".join(stray[:4])))
+
+    unrouted = sorted(known - set(routed))
+    if unrouted:
+        fail("no form file routes to %s. A register nothing routes to is a "
+             "column of tolerances that never applies to a real document"
+             % ", ".join(unrouted))
+    notes.append("forms: %d files routing to %d of %d registers"
+                 % (len(files), len(routed), len(known)))
+
+
+def check_template_registers():
+    """The template names registers too, and nothing was checking it.
+
+    `check_voices` exempts TEMPLATE from `voice_check` on the grounds that the
+    form is supposed to fail the checks about being a profile. Register names
+    are not one of those: they are the same fact every profile is held to, and
+    the template is the file every new profile is copied from, so a stale name
+    here propagates rather than sitting still.
+
+    Its prose is checked too. The guidance note used to restate the register
+    list, and by the time anybody looked it named four registers that do not
+    exist. `registers.json` states that list. Every other copy drifts.
+    """
+    path = os.path.join(VOICES, "TEMPLATE.rules.json")
+    if not os.path.exists(path):
+        return
+    with open(path, encoding="utf-8") as fh:
+        raw = fh.read()
+    try:
+        data = json.loads(raw)
+    except ValueError:
+        return                      # check_voices reports the parse failure
+    known = set(registers_mod.registers())
+
+    named = list(data.get("mechanics_by_register", {}))
+    for entry in (list(data.get("banned_regex", []))
+                  + list(data.get("required_when", []))):
+        named += list(entry.get("applies_to_registers", []))
+    for name in sorted(set(named)):
+        if name not in known:
+            fail("voices/TEMPLATE.rules.json names register %r, which is not in "
+                 "registers.json. Every profile is copied from this file, so a "
+                 "stale name here is a rule that silently stops applying in "
+                 "somebody else's profile" % name)
+
+    # A parenthesised run of two or more register names is the list restated.
+    for group in re.findall(r"\(([^()]{0,200})\)", raw):
+        hits = [n for n in re.split(r",\s*", group) if n.strip() in known]
+        if len(hits) >= 2:
+            fail("voices/TEMPLATE.rules.json restates the register list (%s). "
+                 "registers.json states it, references/context.md renders it, "
+                 "and this copy is the one that went stale last time"
+                 % ", ".join(hits))
+
+
 def check_cross_references():
     """A ${CLAUDE_PLUGIN_ROOT} path that points nowhere fails silently at runtime."""
     rx = re.compile(r"\$\{CLAUDE_PLUGIN_ROOT\}/([A-Za-z0-9_./-]+)")
@@ -778,6 +1089,9 @@ check_versions()
 check_single_definition()
 check_no_stale_skill_name()
 check_mode_contract()
+check_form_files()
+check_template_registers()
+check_claude_md()
 check_scripts_compile()
 check_precommit_hooks()
 check_cross_references()

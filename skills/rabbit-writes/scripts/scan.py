@@ -36,7 +36,7 @@ Usage:
     python3 scan.py draft.md --voice-rules ../../rabbit-writes/voices/whit3rabbit.rules.json
     python3 scan.py draft.md --voice auto     # whichever profile this repo pins
     python3 scan.py draft.md --voice dana     # voices/dana.rules.json
-    python3 scan.py --profile casual < input.txt
+    python3 scan.py --profile chat < input.txt
     python3 scan.py draft.md --no-exempt      # score quoted examples too
     python3 scan.py draft.md --apply-safe     # show the mechanical fixes
     python3 scan.py draft.md --apply-safe --write
@@ -93,9 +93,9 @@ from rwlib.artifacts import (HIDDEN_UNICODE, REPORT_ONLY_TOLERANCE,  # noqa: E40
 from rwlib.markdown import (BLOCKQUOTE_RX, CURLY_QUOTE_RX, FENCE_RX,  # noqa: E402,F401
                             FRONTMATTER_RX, HEADING_LINE_RX, INLINE_CODE_RX,
                             PROSE_DASH_RX, QUOTED_RX, TABLE_ROW_RX,
-                            URL_GREEDY_RX, apply_exemptions, blank_entities,
-                            excerpt, invisible_entities, is_prose_block,
-                            line_of)
+                            URL_GREEDY_RX, apply_exemptions, blank,
+                            blank_entities, excerpt, invisible_entities,
+                            is_prose_block, line_of)
 from rwlib.sentences import (SENTENCE_SENTINEL, split_sentences,  # noqa: E402,F401
                              syllables, tokenize)
 
@@ -295,7 +295,11 @@ def find(text, rx, pattern_id, label, band, priority, findings, allowed=0):
 EMOJI_RX = re.compile(
     "[" "\U0001F300-\U0001FAFF" "\u2600-\u27BF" "\U0001F900-\U0001F9FF"
     "\u2B00-\u2BFF" "\uFE0F" "]")
-ONE_WORD_SENTENCE_RX = re.compile(r"(?m)(?:^|(?<=[.!?]\s))([A-Z][a-z']{1,14})\.(?=\s|$)")
+# Two lookbehinds rather than one, because `re` fixes their width: with only the
+# one-space form, a two-space typist's emphatic fragments were never checked at
+# all, which is a rule that silently does not apply to whoever writes that way.
+ONE_WORD_SENTENCE_RX = re.compile(
+    r"(?m)(?:^|(?<=[.!?]\s)|(?<=[.!?]\s\s))([A-Z][a-z']{1,14})\.(?=\s|$)")
 # Titles and abbreviations that this pattern would otherwise read as a one-word
 # sentence: "...ran late. Dr. Smith arrived" is a name, not emphasis. Narrower
 # than ABBREV_RX on purpose. `No.` is left out because a bare "No." in prose is
@@ -371,10 +375,10 @@ def voice_mechanics(rules, register):
     they say what changes off the clock:
 
         "mechanics": {"one_word_sentence": "forbid", "emoji": "forbid"},
-        "mechanics_by_register": {"casual": {"one_word_sentence": "allow"}}
+        "mechanics_by_register": {"chat": {"one_word_sentence": "allow"}}
 
     This does not break the rule that a register never relaxes a voice rule. It
-    is the opposite direction. `--profile casual` still cannot soften anything;
+    is the opposite direction. `--profile chat` still cannot soften anything;
     what it can do now is select which of the writer's own rules the writer said
     applied there. The profile markdown has always drawn this line ("on the
     clock: full polish, off the clock: relaxed, lowercase"), and until now the
@@ -805,10 +809,17 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
 
     if "tier1" not in skip:
         t1 = [w for w in lex["tier1"] if w.lower() not in exempt_words]
-        find(scored, lexicon_mod.word_regex(t1), "tier1", "Tier-1 vocabulary",
+        # Phrases first, then the word pass over a copy with their spans blanked.
+        # `delve into` is on both lists, so run the other way round it was two P1
+        # findings about one token: the phrase takes its span first, the way
+        # facts.numbers() orders its takes. Blanking preserves length and
+        # newlines, so lines and excerpts are the same either way.
+        t1_phrases = lexicon_mod.phrase_regex(lex["tier1_phrases"])
+        find(scored, t1_phrases, "tier1", "Tier-1 phrase",
              "fingerprint", SYNTH("tier1"), findings)
-        find(scored, lexicon_mod.phrase_regex(lex["tier1_phrases"]), "tier1", "Tier-1 phrase",
-             "fingerprint", SYNTH("tier1"), findings)
+        find(t1_phrases.sub(blank, scored), lexicon_mod.word_regex(t1),
+             "tier1", "Tier-1 vocabulary", "fingerprint", SYNTH("tier1"),
+             findings)
 
     if "clarity" not in skip:
         find(scored, lexicon_mod.word_regex(lex["clarity"]), "clarity", "Wordiness",
@@ -1254,8 +1265,8 @@ def main():
                              help="resolve the profile instead of spelling out a path. "
                                   "'auto' uses the same order readme_check.py does "
                                   "(.rabbit-voice beside the file or in the working "
-                                  "directory, then voices/ACTIVE, then a lone installed "
-                                  "profile), and anything else loads "
+                                  "directory, then voices/ACTIVE, and no profile at all "
+                                  "if neither names one), and anything else loads "
                                   "voices/<NAME>.rules.json")
     ap.add_argument("--check", action="store_true",
                     help="exit 1 if any P0 finding is present")
@@ -1273,6 +1284,21 @@ def main():
                     help="with --apply-safe, print the fixed document instead of "
                          "the report, so it can be diffed or piped")
     args = ap.parse_args()
+
+    # Both of these are read by run_apply_safe and by nothing else, so without
+    # --apply-safe they were accepted and silently did nothing. `--stdout` is the
+    # worse half: a caller piping the output got the report where it expected the
+    # document, which is a fixed file that was never fixed.
+    dead = [flag for flag, on in (("--write", args.write),
+                                  ("--stdout", args.stdout)) if on]
+    if dead and not args.apply_safe:
+        print(cli_error.format_llm_error(
+            "scan.py",
+            "%s only applies with --apply-safe, which is what produces the "
+            "fixed document. Without it there is nothing to write or print."
+            % " and ".join(dead),
+            parser=ap, examples=examples), file=sys.stderr)
+        return 2
 
     # `newlines` records the line endings the file actually used, so --write can
     # put them back. Reading stays universal: every regex in the engine is
@@ -1361,7 +1387,12 @@ def main():
     # will never have one, and an unreadable one is a note rather than an exit,
     # because it measures register and every rule in the band still ran.
     voice_fingerprint, fingerprint_note = None, None
-    fingerprint_path = stylometry.path_for(rules_path)
+    # Scoped to the register being scanned, falling back to the general one. A
+    # writer's chat register and their essay register are two different
+    # statistical objects, so measuring a chat message against an essay
+    # fingerprint reports a distance that is a change of form rather than a
+    # conversion that missed.
+    fingerprint_path = stylometry.path_for(rules_path, args.profile)
     if fingerprint_path:
         try:
             voice_fingerprint = stylometry.load(fingerprint_path)

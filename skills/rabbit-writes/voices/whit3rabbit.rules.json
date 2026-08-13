@@ -126,14 +126,16 @@
       "id": "missing-closer",
       "label": "Missing closer",
       "applies_to_registers": [
-        "casual",
-        "blog"
+        "chat",
+        "informal",
+        "blog",
+        "formal"
       ],
       "any_of_rx": [
         "(?im)^\\s*(thanks,|v/r|-\\s*whit3rabbit)"
       ],
       "priority": "P2",
-      "note": "Informal: 'Thanks,' + '-whit3rabbit'. Official: 'v/r'. Only checked when the text opens like correspondence.",
+      "note": "Which closer depends on the rung: 'Thanks,' + '-whit3rabbit' at chat, informal, and blog, 'v/r' at formal. Only checked when the text opens like correspondence, which is why it is scoped to the spine and not to the genre columns: a README does not take a signoff.",
       "when_rx": "(?im)^\\s*(good morning|good afternoon|good evening|afternoon,|morning,|hi |hello |dear |sir|ma'am)"
     }
   ],

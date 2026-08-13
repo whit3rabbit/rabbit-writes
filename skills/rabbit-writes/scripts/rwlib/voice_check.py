@@ -424,11 +424,31 @@ def _measure_problems(data):
 
 
 def check_fingerprint(rules_path):
-    """The optional third file, when there is one."""
+    """The optional third file, and any register-scoped ones beside it.
+
+    A profile may carry one general fingerprint and any number of
+    `<name>.<register>.fingerprint.json`, because a person's chat register and
+    their essay register are two different statistical objects. Every one of
+    them is held to the same structural checks: a scoped file that fails them
+    fails silently otherwise, since it is loaded only when somebody scans that
+    register.
+    """
+    out = []
+    stem = voices_mod.strip_rules_suffix(rules_path)
+    paths = [stem + stylometry_mod.FINGERPRINT_SUFFIX]
+    for register in registers_mod.registers():
+        scoped = stylometry_mod.register_fingerprint_path(rules_path, register)
+        if os.path.exists(scoped):
+            paths.append(scoped)
+    for path in paths:
+        out += _check_one_fingerprint(rules_path, path)
+    return out
+
+
+def _check_one_fingerprint(rules_path, path):
     out = []
     name = _name_of(rules_path)
-    path = (voices_mod.strip_rules_suffix(rules_path)
-            + stylometry_mod.FINGERPRINT_SUFFIX)
+    register = stylometry_mod.register_of(path)
     if not os.path.exists(path):
         return out
     try:
@@ -450,6 +470,14 @@ def check_fingerprint(rules_path):
         out.append(_finding(FAIL, "%s%s: `voice` field %r does not match the "
                             "filename" % (name, stylometry_mod.FINGERPRINT_SUFFIX,
                                           data.get("voice"))))
+    elif data.get("register") not in (None, register):
+        # The filename decides which file gets loaded and the field says what
+        # was measured, so a disagreement means the numbers describe a register
+        # nobody will read them as.
+        out.append(_finding(FAIL, "%s says it measures the %s register and its "
+                            "filename says %s. One of the two is wrong"
+                            % (os.path.basename(path), data.get("register"),
+                               register or "no register")))
     else:
         problems = _measure_problems(data)
         for message in problems:
@@ -459,9 +487,10 @@ def check_fingerprint(rules_path):
         if not problems:
             band = data.get("self_distance", {})
             shape = data.get("sentence_shape") or {}
-            out.append(_finding(NOTE, "%s has a fingerprint (%s samples, band "
+            out.append(_finding(NOTE, "%s has a %sfingerprint (%s samples, band "
                                 "max %s, %d measures, %s sentences)"
-                                % (name, data.get("n_samples", "?"),
+                                % (name, "%s " % register if register else "",
+                                   data.get("n_samples", "?"),
                                    band.get("max", "?"),
                                    len(data.get("measures") or {}),
                                    shape.get("n_sentences", "no"))))

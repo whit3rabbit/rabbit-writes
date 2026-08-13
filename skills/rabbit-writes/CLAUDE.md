@@ -23,8 +23,9 @@ python3 skills/rabbit-writes/scripts/scan.py <file> --voice-rules skills/rabbit-
 # Check mode gate (exit code 1 on errors)
 python3 skills/rabbit-writes/scripts/scan.py <file> --check
 
-# Post-edit integrity check (facts, dates, quotes, numbers)
-python3 skills/rabbit-writes/scripts/verify.py <file>
+# Post-edit integrity check (facts, dates, quotes, numbers). Two files: it
+# compares a rewrite against what it was rewritten from.
+python3 skills/rabbit-writes/scripts/verify.py <original> <rewritten>
 
 # Measure voice conversion delta between two files
 python3 skills/rabbit-writes/scripts/attain.py <source> <target> --voice whit3rabbit
@@ -39,10 +40,11 @@ python3 skills/rabbit-writes/scripts/attain.py <source> <target> --voice whit3ra
   - `verify.py`: Integrity and fact-preservation checker.
   - `attain.py`: CLI tool measuring conversion progress and stylometric distance.
   - `lexicon.json`: Machine-writing pattern rules.
-  - `registers.json`: Tolerance matrix across registers (`formal`, `docs`, `technical`, `casual`, `narrative`, `internal`).
+  - `registers.json`: The tolerance matrix, and the only home for the register names. `references/context.md` renders its table from this file, `scan.py` derives its skip and relax sets from it, and restating the list here is how this line came to name four registers that do not exist.
   - `rwlib/`: Shared engine library containing stylometry, injection checks, fixes, suppression, fact checking, voice resolution, SARIF export, and docx text extraction.
 - **`voices/`**: Holds active voice marker (`ACTIVE`), voice markdown profiles (`<name>.md`), rule definitions (`<name>.rules.json`), and fingerprints (`<name>.fingerprint.json`). Includes `TEMPLATE` files.
 - **`references/`**: Technical and craft reference documentation (`craft.md`, `false-positives.md`, `injection.md`, `patterns.md`, `context.md`, `voice.md`, `checklist.md`).
+- **`references/forms/`**: One file per document form. Each names the register it routes to and gives that form's slots, length bands, and tells. A form file supplies slots and never fills them: `check_form_files` in `scripts/validate.py` enforces that by requiring every quoted phrase to sit under `## Tells`, where the heading already says the phrases in it are the ones to avoid.
 - **`tests/`**: Suite of 20+ test files verifying engine logic, fixes, stylometry, injection rules, and invariants.
 
 ## Conventions & Gotchas

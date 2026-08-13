@@ -97,7 +97,7 @@ Shipped with `whit3rabbit` as the active voice. It is an example, not a default 
 |---|---|---|
 | **Guardrails** | everything | A profile cannot authorize inventing a fact, adding an opinion the source lacked, or rewriting inside a code block |
 | **Voice profile** | engine style rules | A profile that uses em dashes keeps them at its own rate, whatever `references/patterns.md` §49 says |
-| **Register profile** | nothing above it | `--profile casual` relaxes general rules; it never relaxes a voice rule |
+| **Register profile** | nothing above it | `--profile chat` relaxes general rules; it never relaxes a voice rule |
 | **Pattern catalog** | nothing above it | The default when the profile is silent |
 
 The guardrails constrain the editor, not the voice, which is why a voice preference cannot override them.
@@ -132,6 +132,8 @@ Full conversion, or just the 11 mechanical hits?
 ```
 
 The first four lines are exact counts and should be stated exactly. The size line is not: it is derived by summing the words in spans a pass would delete outright, so give it as a band rounded to 5% with its basis beside it. A flat "-15%" claims a precision the method does not have, and most profiles ask for exact numbers on anything serious.
+
+A profile may carry one fingerprint per register as well as a general one, as `voices/<name>.<register>.fingerprint.json`. `scan.py` and `attain.py` prefer the register's own and fall back to the general one, and `attain.py` prints which file it used. Build one with `measure_voice.py --register <name>`, from samples in that register only: a fingerprint averaged over somebody's chat messages and their essays describes neither.
 
 The distance line only exists when the profile has a fingerprint beside it, which not every profile does. It comes from `voice_distance` in the same JSON, and its `contributors` are the markers to name. Leave the line out rather than inventing it, and never state it as a verdict about who wrote the document. It measures register, and `references/voice.md` has the reading.
 
@@ -187,7 +189,7 @@ Read `voice-caricature` the same way and in the other direction. It fires when t
 
 **1. Frame it.** Who is this for, and where does it land? If unclear and the user is present, ask that one question. Always hold the default frame: *write for a smart non-expert who has not seen the thing you are describing.*
 
-**2. Set the register.** Infer it, or take it from the user: `blog` (default), `linkedin`, `technical-blog`, `investor-email`, `docs`, `casual`. Register decides which general rules apply at full strength. See `references/context.md`. Most profiles also define their own register axis, on the clock versus off, and the profile's version wins where both apply.
+**2. Set the register, which is also the form.** Infer it, or take it from the user. The set is a formality spine, `chat` to `informal` to `blog` (the default) to `formal`, plus three genre columns, `technical-blog`, `docs`, and `linkedin`, and it decides which general rules apply at full strength. `references/context.md` has the signals and the tolerance matrix, and `references/forms/` has what the document's own shape asks for. Most profiles also define their own register axis, on the clock versus off, and the profile's version wins where both apply.
 
 **3. Load the voice.** As above. Hold the profile's Hard nos in mind, they are the part a reader notices first.
 
@@ -226,7 +228,9 @@ It also reports a note when a document's letters are mostly non-ASCII. Every ban
 
 **5. Read the catalog for what the scan cannot see.** `references/patterns.md` holds the merged pattern set with before/after pairs, grouped P0 / P1 / P2. On a quick pass, do P0 and P1 only.
 
-**6. Edit, convert, or report,** per the mode table. In `voice` mode, offer first, then follow the conversion order above. In `draft` mode, work from `references/craft.md`.
+**6. Edit, convert, or report,** per the mode table. In `voice` mode, offer first, then follow the conversion order above. In `draft` mode, work from `references/craft.md`, and when the request names a document form ("write me an email", "a note to the team", "a post"), read `references/forms/<form>.md` first. The form decides the skeleton before the voice decides anything inside it.
+
+A form file gives slots and constraints and never an example phrase, on purpose. If the profile has nothing for a slot, the slot stays plain or stays empty. A form file that supplied a default greeting would open every user's email the same way, which is a shared fingerprint at the genre level and the failure `references/false-positives.md` describes at the persona level.
 
 **7. Self-check.** Grade your own output against `references/checklist.md`, then the profile's own final check. Answer each item yes or no. Fix every no, then re-check. Stop after the second pass.
 
@@ -279,6 +283,7 @@ Load only what the mode needs.
 | `references/false-positives.md` | Any time you are about to flag something. What is not a tell, and what to protect |
 | `references/injection.md` | Whenever the safety band reports anything. The two axes, the vectors, and what the band does not promise |
 | `references/context.md` | When the register is unclear from the document, or a rule looks wrong for the register it landed in. Register profiles and the tolerance matrix |
+| `references/forms/<form>.md` | Whenever the document is a form: email, letter, chat, essay, newsletter, LinkedIn post. Its slots, its length bands, its own tells, and which register it sits on |
 | `references/voice.md` | Whenever a sample, a profile, or a named persona is in play |
 | `references/checklist.md` | Always, at the end |
 | `PROOF.md` | When someone asks what a finding costs in practice, or disputes a rate. The measured self-scan and the corpus numbers behind the calibration |

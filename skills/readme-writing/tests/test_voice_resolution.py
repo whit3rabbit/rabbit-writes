@@ -3,8 +3,10 @@
 Which voice governs, and what happens when the answer is unclear.
 
 Resolution order: --voice-rules, then a `.rabbit-voice` file beside the README
-or in the working directory, then voices/ACTIVE, then the single installed
-profile as an announced fallback.
+or in the working directory, then voices/ACTIVE, then nothing. There is no
+fallback to whichever profile happens to be installed: the plugin ships example
+profiles, and enforcing one nobody chose is a stranger's P0 bans on somebody
+else's prose.
 
 These run against a throwaway voices/ directory, so they assert the mechanism
 rather than whichever profile this checkout happens to ship or have active.
@@ -24,16 +26,33 @@ VOICED = "voiced-readme.md"
 TEST_RULES = "test-voice.rules.json"
 
 
-def test_the_active_voice_resolves_without_being_named():
-    result = run(sample(VOICED))
-    assert result["voice"] is not None, "notes: %s" % result["notes"]
+def test_a_resolved_voice_reaches_the_payload_without_being_named():
+    """End to end: the resolution order decides, and what it decided comes out
+    in the report.
 
-
-def test_the_profile_markdown_is_pointed_at_and_not_just_the_rules_file():
-    """A clean scan reads like a pass, and the half that decides whether this
-    sounds like anyone is in the markdown."""
-    result = run(sample(VOICED))
-    assert any(".md" in note for note in result["notes"]), result["notes"]
+    Driven through a scratch voices/ and an ACTIVE, because the suite runs from
+    a working directory with no pin and the plugin no longer falls back to
+    whatever profile it happens to ship. Asserting against the shipped one would
+    be asserting that this checkout has a voice active, which is a fact about
+    this checkout and not about the checker.
+    """
+    rc = check_module()
+    tmp, readme = scratch_voices()
+    real = rc.VOICES_DIR
+    try:
+        rc.VOICES_DIR = tmp
+        with open(os.path.join(tmp, "ACTIVE"), "w") as fh:
+            fh.write("grace\n")
+        with open(readme, "w") as fh:
+            fh.write("# Title\n\nA sentence about the thing.\n")
+        raw = open(readme).read()
+        _, _, voice, notes = rc.check_readme(raw, readme)
+        assert voice == "grace", (voice, notes)
+        # A clean scan reads like a pass, and the half that decides whether this
+        # sounds like anyone is in the markdown.
+        assert any(".md" in note for note in notes), notes
+    finally:
+        restore(rc, real, tmp)
 
 
 def test_voice_findings_land_in_a_readme():
@@ -113,12 +132,18 @@ def test_no_active_with_several_profiles_asks_instead_of_guessing():
     try:
         rc.VOICES_DIR = tmp
         rules, name, note = rc.resolve_voice(readme)
-        assert rules is None and "Name one" in (note or ""), note
+        assert rules is None, rules
+        assert "--activate" in (note or ""), note
     finally:
         restore(rc, real, tmp)
 
 
-def test_no_active_with_one_profile_falls_back_and_says_so():
+def test_no_active_with_one_profile_still_asks():
+    """The single-profile case is the one that mattered, because the plugin
+    ships exactly one and it is an example. Falling back to it meant every fresh
+    install enforcing a stranger's P0 bans, announced in a note that under a
+    pre-commit hook goes nowhere anybody reads. The note names the command that
+    claims a profile instead, and nothing is enforced until somebody runs it."""
     rc = check_module()
     tmp, readme = scratch_voices()
     real = rc.VOICES_DIR
@@ -126,8 +151,8 @@ def test_no_active_with_one_profile_falls_back_and_says_so():
         rc.VOICES_DIR = tmp
         os.remove(os.path.join(tmp, "ada.rules.json"))
         rules, name, note = rc.resolve_voice(readme)
-        assert name == "grace" and rules is not None, "%s %s" % (name, rules)
-        assert "falling back" in (note or ""), note
+        assert rules is None and name is None, "%s %s" % (name, rules)
+        assert "grace" in (note or "") and "--activate" in (note or ""), note
     finally:
         restore(rc, real, tmp)
 

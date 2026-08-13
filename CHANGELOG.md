@@ -2,10 +2,73 @@
 
 ## Unreleased
 
-Two passes. The first was architecture and evidence and changed nothing about
-what the engine flags. The second, below, changes it in six places and says so.
-The 100-repo corpus regression, the calibration fixtures, and every published
-self-scan number were re-run after both.
+Three passes. The first was architecture and evidence and changed nothing about
+what the engine flags. The second changes it in six places and says so. The
+third, below, is a review pass over eight reported defects: four of them are a
+rule contradicting itself, two are one span counted twice, one is a default that
+enforced this author's voice on strangers, and one is a documentation file that
+drifted from the data it describes. The 100-repo corpus regression, the
+calibration fixtures, and every published self-scan number were re-run after all
+three.
+
+### Eight defects, found in review
+
+- **`attain.py` called two different things a regression, and disagreed with
+  itself about both.** The per-measure comparison applied a noise epsilon and
+  the document verdict applied none, so a conversion that landed all six
+  measures and drifted the Delta from 0.912 to 0.914 reported `regressed` and
+  failed `--check`. And `measure_verdict` tested movement before tolerance, so a
+  measure that went from 0.1 to 0.5 sample sd off the profile mean, well inside
+  the band, was `regressed` and could fail the document on its own. Both halves
+  now say the same thing: a regression has to end up outside the tolerance it is
+  measured against, and the Delta gets an epsilon scaled to the profile's own
+  self-distance band, because the band is what makes a Delta readable at all.
+- **The lone-profile voice fallback is gone, and `voices/ACTIVE` ships empty.**
+  `resolve()` fell back to "the only profile installed", and this plugin ships
+  exactly one, an example. On a fresh install `--voice auto` therefore enforced
+  a stranger's `default_priority: P0` bans on somebody's prose, announced in a
+  note that under a pre-commit hook goes nowhere anybody reads. `SKILL.md` had
+  said not to do that in prose for three releases. Resolution now ends in
+  nothing, and the note names the one command that claims a profile. This
+  repository keeps its own house voice through a root `.rabbit-voice`, which is
+  the same mechanism a consumer uses.
+- **`verify.py` reported one edit as two broken promises, one span type further
+  on.** Inline code and URLs were already blanked before the path pass. Tables,
+  block quotes and frontmatter were not, so an edited path inside a table row
+  came back as "table row altered" and "file path altered". Over the 100-README
+  corpus that is 658 of 2,275 path tokens sitting inside a span the checker
+  already compares verbatim.
+- **The `forget` branch of the injection detector read ordinary English as an
+  attack.** `forget` plus a pronoun matches `don't forget your API key` and
+  `I'll never forget what happened`. In visible prose that is a P2 nuisance.
+  Inside an HTML comment it is concealment plus a directive, so it is a P0 that
+  halts `--apply-safe` on somebody's own maintainer note, and the safety band
+  takes no suppression by design. It now matches the instruction shape, and
+  picked up `forget the above instructions` on the way, which the pronoun
+  version never saw. Corpus counts are unchanged at 0 P0, 4 P1, 0 P2.
+- **Tier-1 words and tier-1 phrases counted the same token twice.** `delve into`
+  matched both lists and produced two P1 findings about one word. The phrase
+  takes its span first now, the way `facts.numbers()` orders its takes.
+- **Four small ones.** `--stdout` and `--write` without `--apply-safe` were
+  accepted and silently did nothing, which on the `--stdout` path means a caller
+  redirecting into a file got the report where it expected the document. Both
+  are refused now. `voices.blend` filtered the template's guidance keys out of
+  `mechanics` and not out of `mechanics_by_register`. `attain.py` built the
+  `measure_voice.py` path in its error message relative to nothing, so the
+  suggested command only worked from the repository root. And the one-word
+  sentence rule's lookbehind wanted exactly one space after the period, so
+  anybody who types two was never checked by it at all.
+- **`stylometry.fingerprint`'s docstring described a version that never
+  shipped**, promising a stderr warning eight lines above the comment explaining
+  why it deliberately says nothing. The code was right.
+- **`CLAUDE.md` drifted from the data it describes, and now something fails when
+  it does.** One file named six registers, four of which do not exist, and
+  documented `verify.py <file>` for a script that takes two paths and exits 2
+  without them. `check_claude_md` in `scripts/validate.py` reads the register
+  names out of `registers.json` and the required argument counts out of each
+  script's own `add_argument` calls, which is the same argument `check_matrix_doc`
+  already makes for the tolerance table: a documented fact the code never had is
+  worse than no documentation.
 
 ### The conversion is checkable now, and the rewrite is a plan
 

@@ -81,7 +81,8 @@ if RWLIB_PARENT not in sys.path:
     sys.path.insert(0, RWLIB_PARENT)
 # Where a written fingerprint lands, resolved the same way and for the same
 # reason. rwlib.voices owns the answer, so a moved voices/ directory moves this.
-from rwlib import cli_error, stylometry, voices as voices_mod   # noqa: E402
+from rwlib import cli_error, registers as registers_mod, stylometry  # noqa: E402
+from rwlib import voices as voices_mod                               # noqa: E402
 
 # Which measures exist, and in what order, is stylometry.MEASURES: they are the
 # block a fingerprint stores and a later attainment check reads. What survives
@@ -375,19 +376,25 @@ def mechanics_block(suggestions):
     return json.dumps({"mechanics": body}, indent=2)
 
 
-def build_fingerprint(samples, name, exemplars=False):
+def build_fingerprint(samples, name, exemplars=False, register=None):
     """The stored fingerprint, or None when there are too few samples.
 
     Two is the floor and it is thin: with two samples the calibration band is a
     single number, and a single number cannot say how much a person varies. The
     caller prints that rather than hiding it.
+
+    `register` is the answer to the `register-gap` question this script already
+    asks. Samples are whichever registers somebody happened to keep, and a
+    fingerprint built from two of them describes neither, so a run that knows
+    which register it measured says so and writes to that register's own file.
     """
     if len(samples) < 2:
         return None
     return stylometry.fingerprint(
         [s["prose"] for s in samples], voice=name, exemplars=exemplars,
         sample_measures=[s["measures"] for s in samples],
-        sentence_lengths=[s["sentence_lengths"] for s in samples])
+        sentence_lengths=[s["sentence_lengths"] for s in samples],
+        register=register)
 
 
 def roll_up_distributions(samples):
@@ -785,6 +792,13 @@ def main():
     ap.add_argument("--write-fingerprint", action="store_true",
                     help="save the fingerprint to voices/<name>.fingerprint.json, "
                          "where scan.py --voice will find it. Needs --name")
+    ap.add_argument("--register", metavar="NAME",
+                    choices=sorted(registers_mod.registers()),
+                    help="the register these samples are written in. Writes "
+                         "voices/<name>.<register>.fingerprint.json, which "
+                         "scan.py and attain.py prefer over the general one "
+                         "when scanning that register. Omit it for a profile's "
+                         "one general fingerprint")
     ap.add_argument("--with-exemplars", action="store_true",
                     help="embed the writer's own paragraphs in the fingerprint, "
                          "for conditioning a conversion. This copies their prose "
@@ -816,7 +830,8 @@ def main():
     agg = aggregate(samples)
     suggestions = suggest_mechanics(samples)
     contaminated = [s for s in samples if s["p0"]]
-    fingerprint = build_fingerprint(samples, args.name, args.with_exemplars)
+    fingerprint = build_fingerprint(samples, args.name, args.with_exemplars,
+                                    args.register)
     questions, dropped = derive_questions(samples, suggestions)
 
     # Never written from contaminated samples. Every other output of this script
@@ -826,8 +841,10 @@ def main():
     # to prevent, made permanent.
     written_to = None
     if args.write_fingerprint and fingerprint and not contaminated:
+        stem = (args.name if not args.register
+                else "%s.%s" % (args.name, args.register))
         written_to = os.path.join(args.voices_dir,
-                                  args.name + stylometry.FINGERPRINT_SUFFIX)
+                                  stem + stylometry.FINGERPRINT_SUFFIX)
         try:
             stylometry.save(fingerprint, written_to)
         except OSError as exc:

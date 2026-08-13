@@ -1,0 +1,842 @@
+{
+  "schema_version": 2,
+  "voice": "satoshi",
+  "register": "formal",
+  "n_samples": 2,
+  "sample_words": [
+    2067,
+    1754
+  ],
+  "thin_samples": 0,
+  "markers": {
+    "the": {
+      "mean": 61.724,
+      "sd": 18.758
+    },
+    "a": {
+      "mean": 48.42,
+      "sd": 0.058
+    },
+    "an": {
+      "mean": 6.583,
+      "sd": 5.204
+    },
+    "of": {
+      "mean": 23.066,
+      "sd": 8.431
+    },
+    "to": {
+      "mean": 33.838,
+      "sd": 1.329
+    },
+    "in": {
+      "mean": 9.183,
+      "sd": 4.118
+    },
+    "on": {
+      "mean": 6.565,
+      "sd": 0.39
+    },
+    "at": {
+      "mean": 2.151,
+      "sd": 0.989
+    },
+    "by": {
+      "mean": 8.872,
+      "sd": 0.453
+    },
+    "for": {
+      "mean": 8.146,
+      "sd": 0.574
+    },
+    "with": {
+      "mean": 7.049,
+      "sd": 0.294
+    },
+    "from": {
+      "mean": 3.49,
+      "sd": 1.515
+    },
+    "into": {
+      "mean": 1.209,
+      "sd": 1.71
+    },
+    "over": {
+      "mean": 0.484,
+      "sd": 0.684
+    },
+    "under": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "about": {
+      "mean": 0.484,
+      "sd": 0.684
+    },
+    "between": {
+      "mean": 0.527,
+      "sd": 0.061
+    },
+    "through": {
+      "mean": 0.484,
+      "sd": 0.684
+    },
+    "during": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "against": {
+      "mean": 0.57,
+      "sd": 0.806
+    },
+    "without": {
+      "mean": 3.075,
+      "sd": 1.124
+    },
+    "within": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "across": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "after": {
+      "mean": 1.78,
+      "sd": 0.904
+    },
+    "before": {
+      "mean": 1.296,
+      "sd": 0.22
+    },
+    "and": {
+      "mean": 14.954,
+      "sd": 0.622
+    },
+    "or": {
+      "mean": 2.065,
+      "sd": 0.501
+    },
+    "but": {
+      "mean": 3.205,
+      "sd": 1.112
+    },
+    "nor": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "if": {
+      "mean": 5.511,
+      "sd": 0.268
+    },
+    "then": {
+      "mean": 1.296,
+      "sd": 0.22
+    },
+    "than": {
+      "mean": 2.263,
+      "sd": 1.588
+    },
+    "when": {
+      "mean": 1.538,
+      "sd": 0.562
+    },
+    "while": {
+      "mean": 1.339,
+      "sd": 0.525
+    },
+    "where": {
+      "mean": 0.57,
+      "sd": 0.806
+    },
+    "because": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "since": {
+      "mean": 0.769,
+      "sd": 0.281
+    },
+    "although": {
+      "mean": 0.285,
+      "sd": 0.403
+    },
+    "though": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "unless": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "until": {
+      "mean": 1.054,
+      "sd": 0.122
+    },
+    "whereas": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "i": {
+      "mean": 1.425,
+      "sd": 2.016
+    },
+    "you": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "he": {
+      "mean": 4.017,
+      "sd": 1.576
+    },
+    "she": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "it": {
+      "mean": 9.054,
+      "sd": 6.353
+    },
+    "we": {
+      "mean": 5.226,
+      "sd": 0.135
+    },
+    "they": {
+      "mean": 2.834,
+      "sd": 0.782
+    },
+    "me": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "him": {
+      "mean": 0.812,
+      "sd": 0.464
+    },
+    "her": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "us": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "them": {
+      "mean": 2.108,
+      "sd": 0.244
+    },
+    "my": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "your": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "his": {
+      "mean": 1.339,
+      "sd": 0.525
+    },
+    "its": {
+      "mean": 1.581,
+      "sd": 0.183
+    },
+    "our": {
+      "mean": 1.011,
+      "sd": 0.623
+    },
+    "their": {
+      "mean": 1.624,
+      "sd": 0.928
+    },
+    "this": {
+      "mean": 4.985,
+      "sd": 0.207
+    },
+    "that": {
+      "mean": 8.786,
+      "sd": 1.943
+    },
+    "these": {
+      "mean": 0.484,
+      "sd": 0.684
+    },
+    "those": {
+      "mean": 0.285,
+      "sd": 0.403
+    },
+    "which": {
+      "mean": 1.538,
+      "sd": 0.562
+    },
+    "who": {
+      "mean": 0.57,
+      "sd": 0.806
+    },
+    "whom": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "whose": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "what": {
+      "mean": 0.769,
+      "sd": 0.281
+    },
+    "any": {
+      "mean": 1.823,
+      "sd": 0.159
+    },
+    "some": {
+      "mean": 1.097,
+      "sd": 0.867
+    },
+    "all": {
+      "mean": 2.747,
+      "sd": 2.273
+    },
+    "no": {
+      "mean": 1.011,
+      "sd": 0.623
+    },
+    "none": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "each": {
+      "mean": 2.505,
+      "sd": 1.93
+    },
+    "every": {
+      "mean": 1.011,
+      "sd": 0.623
+    },
+    "both": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "either": {
+      "mean": 0.285,
+      "sd": 0.403
+    },
+    "neither": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "such": {
+      "mean": 1.296,
+      "sd": 0.22
+    },
+    "same": {
+      "mean": 0.57,
+      "sd": 0.806
+    },
+    "own": {
+      "mean": 0.812,
+      "sd": 0.464
+    },
+    "other": {
+      "mean": 1.253,
+      "sd": 0.965
+    },
+    "another": {
+      "mean": 0.527,
+      "sd": 0.061
+    },
+    "is": {
+      "mean": 12.958,
+      "sd": 2.2
+    },
+    "are": {
+      "mean": 3.957,
+      "sd": 3.983
+    },
+    "was": {
+      "mean": 0.484,
+      "sd": 0.684
+    },
+    "were": {
+      "mean": 1.823,
+      "sd": 0.159
+    },
+    "be": {
+      "mean": 10.125,
+      "sd": 1.418
+    },
+    "been": {
+      "mean": 0.812,
+      "sd": 0.464
+    },
+    "being": {
+      "mean": 1.14,
+      "sd": 1.613
+    },
+    "am": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "do": {
+      "mean": 0.769,
+      "sd": 0.281
+    },
+    "does": {
+      "mean": 0.527,
+      "sd": 0.061
+    },
+    "did": {
+      "mean": 0.484,
+      "sd": 0.684
+    },
+    "have": {
+      "mean": 1.823,
+      "sd": 0.159
+    },
+    "has": {
+      "mean": 2.592,
+      "sd": 0.44
+    },
+    "had": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "will": {
+      "mean": 4.458,
+      "sd": 0.146
+    },
+    "would": {
+      "mean": 2.548,
+      "sd": 1.185
+    },
+    "can": {
+      "mean": 5.555,
+      "sd": 1.014
+    },
+    "could": {
+      "mean": 1.624,
+      "sd": 0.928
+    },
+    "should": {
+      "mean": 0.812,
+      "sd": 0.464
+    },
+    "shall": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "may": {
+      "mean": 0.769,
+      "sd": 0.281
+    },
+    "might": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "must": {
+      "mean": 1.209,
+      "sd": 1.71
+    },
+    "more": {
+      "mean": 2.065,
+      "sd": 0.501
+    },
+    "most": {
+      "mean": 0.527,
+      "sd": 0.061
+    },
+    "less": {
+      "mean": 0.527,
+      "sd": 0.061
+    },
+    "least": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "few": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "many": {
+      "mean": 0.769,
+      "sd": 0.281
+    },
+    "much": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "very": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "quite": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "rather": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "too": {
+      "mean": 0.527,
+      "sd": 0.061
+    },
+    "enough": {
+      "mean": 1.054,
+      "sd": 0.122
+    },
+    "only": {
+      "mean": 2.022,
+      "sd": 1.246
+    },
+    "even": {
+      "mean": 0.527,
+      "sd": 0.061
+    },
+    "still": {
+      "mean": 1.624,
+      "sd": 0.928
+    },
+    "yet": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "just": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "so": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "also": {
+      "mean": 0.726,
+      "sd": 1.026
+    },
+    "however": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "additionally": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "moreover": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "furthermore": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "therefore": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "thus": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "hence": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "instead": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "otherwise": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "meanwhile": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "indeed": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "anyway": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "besides": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "really": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "actually": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "honestly": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "probably": {
+      "mean": 0.285,
+      "sd": 0.403
+    },
+    "possibly": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "perhaps": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "maybe": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "certainly": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "clearly": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "obviously": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "arguably": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "roughly": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "basically": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "essentially": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "mostly": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "usually": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "often": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "sometimes": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "never": {
+      "mean": 0.855,
+      "sd": 1.209
+    },
+    "always": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "again": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "now": {
+      "mean": 0.57,
+      "sd": 0.806
+    },
+    "here": {
+      "mean": 0.285,
+      "sd": 0.403
+    },
+    "there": {
+      "mean": 1.054,
+      "sd": 0.122
+    },
+    "not": {
+      "mean": 4.086,
+      "sd": 1.747
+    },
+    "don't": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "doesn't": {
+      "mean": 0.57,
+      "sd": 0.806
+    },
+    "didn't": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "isn't": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "aren't": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "wasn't": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "weren't": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "can't": {
+      "mean": 0.769,
+      "sd": 0.281
+    },
+    "won't": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "wouldn't": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "couldn't": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "shouldn't": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "it's": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "that's": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "there's": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "what's": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "i'm": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "i've": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "i'd": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "i'll": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "you're": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "you've": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "we're": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "we've": {
+      "mean": 0.0,
+      "sd": 0.0
+    },
+    "they're": {
+      "mean": 0.242,
+      "sd": 0.342
+    },
+    "let's": {
+      "mean": 0.0,
+      "sd": 0.0
+    }
+  },
+  "self_distance": {
+    "per_sample": [
+      0.603,
+      0.603
+    ],
+    "mean": 0.603,
+    "max": 0.603
+  },
+  "measures": {
+    "avg_sentence_words": {
+      "mean": 25.75,
+      "sd": 5.586,
+      "min": 21.8,
+      "max": 29.7,
+      "n": 2
+    },
+    "sentence_sd": {
+      "mean": 15.45,
+      "sd": 6.718,
+      "min": 10.7,
+      "max": 20.2,
+      "n": 2
+    },
+    "burstiness": {
+      "mean": 0.584,
+      "sd": 0.133,
+      "min": 0.49,
+      "max": 0.678,
+      "n": 2
+    },
+    "mattr": {
+      "mean": 0.649,
+      "sd": 0.027,
+      "min": 0.63,
+      "max": 0.668,
+      "n": 2
+    },
+    "em_dashes_per_1k": {
+      "mean": 0.0,
+      "sd": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "n": 2
+    }
+  },
+  "sentence_shape": {
+    "n_sentences": 154,
+    "quantiles": [
+      4,
+      8,
+      13,
+      18,
+      20,
+      22,
+      26,
+      29,
+      33,
+      39,
+      113
+    ],
+    "mean": 24.81,
+    "sd": 15.47,
+    "short_share": 0.11,
+    "long_share": 0.292,
+    "per_sample_median": [
+      21,
+      25
+    ]
+  }
+}

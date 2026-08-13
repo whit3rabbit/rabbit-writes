@@ -74,7 +74,14 @@ BAND = "safety"
 # after measuring against the 100-README corpus and this plugin's own files:
 #
 #   `forget everything` alone hit "the three essentials (if you forget
-#   everything else)" in two shipped voice profiles, so it now needs a target.
+#   everything else)" in two shipped voice profiles, so it needed a target.
+#   Requiring one pronoun after it was not enough: `forget you|your|what` is
+#   ordinary English (`don't forget your API key`, `I'll never forget what
+#   happened`), and inside an HTML comment that reads as concealment plus a
+#   directive, which is a P0 that halts --apply-safe and cannot be suppressed by
+#   design. It now takes the whole instruction shape, spelled out in three
+#   branches below, and picked up `forget the above instructions` on the way,
+#   which the pronoun version never matched.
 #   `send it to` and a bare `reply with` are ordinary English and were cut down
 #   to the shapes an exfiltration payload actually uses.
 DIRECTIVE_RX = re.compile(r"""(?imx)
@@ -84,8 +91,18 @@ DIRECTIVE_RX = re.compile(r"""(?imx)
         (?:instruction|instructions|prompt|prompts|rule|rules)
     | disregard \s+ (?:the\s+|all\s+|any\s+)?
         (?:above|previous|prior|earlier|preceding)
-    | forget \s+ (?:all\s+|everything\s+)?
-        (?:you|your|above|previous|prior|earlier|what)
+    # `forget`, three shapes. Each one is an instruction with an object, which
+    # is what separates the attack from the verb: the pronoun alone is English.
+    # Plural before singular in each alternation, so the quoted evidence is the
+    # whole word rather than `instruction` out of `instructions`.
+    | forget \s+ (?:all\s+|everything\s+|any\s+|the\s+)*
+        (?:previous|above|prior|earlier|preceding)
+        (?:\s+ (?:instructions|instruction|prompts|prompt|rules|rule|context))?
+    | forget \s+ (?:all\s+|everything\s+)? (?:you|your) \s+
+        (?:\w+\s+){0,2}?
+        (?:told|instructed|taught|given|said|read|know|knew|learned)
+    | forget \s+ (?:all\s+)? (?:your|the) \s+
+        (?:instructions|instruction|prompts|prompt|rules|rule|training|system)
     # role and turn injection: the shapes a chat transcript is framed in
     | ^ \s* (?:system|assistant) \s* :
     | <\|im_(?:start|end)\|>

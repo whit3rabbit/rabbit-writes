@@ -246,7 +246,7 @@ def destination_note(out_dir, name):
 def _probe_registers(rules):
     """Every register a rule in this profile is scoped to, plus the default.
 
-    A rule scoped to `casual` does not fire in a scan of a blog post, so a probe
+    A rule scoped to `chat` does not fire in a scan of a blog post, so a probe
     run in one register only would report the author's own scoping as a rule
     that does not work.
     """

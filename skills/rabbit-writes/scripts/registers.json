@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "_comment": "The tolerance matrix, and the only copy of it. scan.py derives its skip and relax tables from this file, and the markdown table in references/context.md is rendered from it by `python3 scripts/rwlib/registers.py --write`. The matrix used to live in three places at once: prose in context.md, PROFILE_SKIP and PROFILE_RELAX in scan.py, and a test that parsed the markdown table to check the two agreed. That test was a workaround for stating the same fact twice, and it broke on table formatting rather than on a real disagreement.",
   "_modes": {
     "strict": "the rule runs at full strength. The default; rules not listed in this file are strict everywhere.",
@@ -9,7 +9,9 @@
     "extra-strict": "flag borderline instances. A reading instruction with no mechanical form: no regex knows what borderline means.",
     "p0-only": "everything below P0 is suppressed. Implemented as a skip, because the ids it names are all P1 or P2 and the P0 fingerprints are never suppressed anywhere."
   },
-  "registers": ["linkedin", "blog", "technical-blog", "investor-email", "docs", "casual"],
+  "_spine_comment": "`spine` is the formality ladder, loosest first, and it is the axis a document form maps onto: references/forms/*.md each name one register. Every register not on the spine is a genre column, kept because it carries tolerances no formality band captures: `technical-blog` and `docs` for the vocabulary exemption and parameter lists, `linkedin` for hashtags, bold hooks, and emoji at the end of a heading. Stated as data so the split is checkable rather than a claim in a document. `casual` and `investor-email` used to sit in this list: the first collided with the voice persona of the same name, and the second was a document form posing as a strictness level, which is the whole reason forms are registers now.",
+  "registers": ["chat", "informal", "blog", "formal", "technical-blog", "docs", "linkedin"],
+  "spine": ["chat", "informal", "blog", "formal"],
   "default_register": "blog",
   "vocabulary_rules": ["tier1", "tier2-cluster", "tier3-density"],
   "rules": [
@@ -17,193 +19,198 @@
       "label": "Em dashes",
       "id": "em-dash-rate",
       "cells": {
-        "linkedin": {"mode": "relaxed", "allowance": 2, "note": "2/post"},
+        "chat": {"mode": "skip"},
         "docs": {"mode": "relaxed", "allowance": 6},
-        "casual": {"mode": "skip"}
+        "linkedin": {"mode": "relaxed", "allowance": 2, "note": "2/post"}
       }
     },
     {
       "label": "Bold overuse",
       "id": null,
       "cells": {
-        "linkedin": {"mode": "relaxed", "note": "hooks OK"},
+        "chat": {"mode": "skip"},
         "docs": {"mode": "relaxed"},
-        "casual": {"mode": "skip"}
+        "linkedin": {"mode": "relaxed", "note": "hooks OK"}
       }
     },
     {
       "label": "Emoji in headers",
       "id": "emoji-heading",
       "cells": {
-        "linkedin": {"mode": "relaxed", "allowance": 2, "note": "1-2, end of line"},
+        "chat": {"mode": "skip"},
         "docs": {"mode": "skip"},
-        "casual": {"mode": "skip"}
+        "linkedin": {"mode": "relaxed", "allowance": 2, "note": "1-2, end of line"}
       }
     },
     {
       "label": "Excessive bullets",
       "id": null,
       "cells": {
-        "linkedin": {"mode": "skip"},
+        "chat": {"mode": "skip"},
         "technical-blog": {"mode": "relaxed"},
         "docs": {"mode": "skip"},
-        "casual": {"mode": "skip"}
+        "linkedin": {"mode": "skip"}
       }
     },
     {
       "label": "Hedging",
       "id": "hedge-stack",
       "cells": {
+        "chat": {"mode": "skip"},
         "technical-blog": {"mode": "relaxed", "allowance": 2, "note": "\"may\" is accurate"},
-        "docs": {"mode": "relaxed", "allowance": 2},
-        "casual": {"mode": "skip"}
+        "docs": {"mode": "relaxed", "allowance": 2}
       }
     },
     {
       "label": "Tier-1 vocabulary",
       "id": "tier1",
       "cells": {
+        "chat": {"mode": "p0-only"},
         "technical-blog": {"mode": "partial"},
-        "docs": {"mode": "partial"},
-        "casual": {"mode": "p0-only"}
+        "docs": {"mode": "partial"}
       }
     },
     {
       "label": "Promotional language",
       "id": "promotional",
       "cells": {
-        "linkedin": {"mode": "relaxed", "allowance": 1, "note": "some sell expected"},
-        "investor-email": {"mode": "extra-strict"},
-        "casual": {"mode": "skip"}
+        "chat": {"mode": "skip"},
+        "formal": {"mode": "extra-strict"},
+        "linkedin": {"mode": "relaxed", "allowance": 1, "note": "some sell expected"}
       }
     },
     {
       "label": "Significance inflation",
       "id": "significance-inflation",
       "cells": {
-        "investor-email": {"mode": "extra-strict"},
-        "docs": {"mode": "relaxed", "allowance": 1},
-        "casual": {"mode": "skip"}
+        "chat": {"mode": "skip"},
+        "formal": {"mode": "extra-strict"},
+        "docs": {"mode": "relaxed", "allowance": 1}
       }
     },
     {
       "label": "Copula avoidance",
       "id": null,
       "cells": {
-        "linkedin": {"mode": "skip"},
+        "chat": {"mode": "skip"},
+        "informal": {"mode": "relaxed"},
         "technical-blog": {"mode": "relaxed"},
         "docs": {"mode": "skip"},
-        "casual": {"mode": "skip"}
+        "linkedin": {"mode": "skip"}
       }
     },
     {
       "label": "Uniform paragraph length",
       "id": "uniform-paragraphs",
       "cells": {
-        "linkedin": {"mode": "skip"},
+        "chat": {"mode": "skip"},
         "docs": {"mode": "skip"},
-        "casual": {"mode": "skip"}
+        "linkedin": {"mode": "skip"}
       }
     },
     {
       "label": "Numbered-list inflation",
       "id": null,
       "cells": {
-        "linkedin": {"mode": "relaxed"},
+        "chat": {"mode": "skip"},
         "technical-blog": {"mode": "relaxed"},
         "docs": {"mode": "skip"},
-        "casual": {"mode": "skip"}
+        "linkedin": {"mode": "relaxed"}
       }
     },
     {
       "label": "Rhetorical questions",
       "id": "rhetorical-question",
       "cells": {
-        "linkedin": {"mode": "relaxed", "allowance": 1, "note": "1 hook"},
+        "chat": {"mode": "skip"},
+        "informal": {"mode": "relaxed", "allowance": 1, "note": "1 hook"},
         "docs": {"mode": "skip"},
-        "casual": {"mode": "skip"}
+        "linkedin": {"mode": "relaxed", "allowance": 1, "note": "1 hook"}
       }
     },
     {
       "label": "Transition phrases",
       "id": "transition-stack",
       "cells": {
-        "linkedin": {"mode": "skip"},
+        "chat": {"mode": "skip"},
         "docs": {"mode": "relaxed", "allowance": 3},
-        "casual": {"mode": "skip"}
+        "linkedin": {"mode": "skip"}
       }
     },
     {
       "label": "Generic conclusions",
       "id": "generic-conclusion",
       "cells": {
-        "linkedin": {"mode": "skip"},
-        "investor-email": {"mode": "extra-strict"},
+        "chat": {"mode": "skip"},
+        "formal": {"mode": "extra-strict"},
         "docs": {"mode": "skip"},
-        "casual": {"mode": "skip"}
+        "linkedin": {"mode": "skip"}
       }
     },
     {
       "label": "Hashtag stuffing",
       "id": null,
       "cells": {
-        "investor-email": {"mode": "extra-strict"},
-        "docs": {"mode": "skip"},
-        "casual": {"mode": "skip"}
+        "chat": {"mode": "skip"},
+        "formal": {"mode": "extra-strict"},
+        "docs": {"mode": "skip"}
       }
     },
     {
       "label": "Bullet-NP lists",
       "id": null,
       "cells": {
+        "chat": {"mode": "skip"},
         "technical-blog": {"mode": "relaxed"},
-        "docs": {"mode": "relaxed", "note": "parameter lists"},
-        "casual": {"mode": "skip"}
+        "docs": {"mode": "relaxed", "note": "parameter lists"}
       }
     },
     {
       "label": "Subjectless fragments",
       "id": null,
       "cells": {
-        "linkedin": {"mode": "relaxed", "note": "the register"},
+        "chat": {"mode": "skip"},
+        "informal": {"mode": "relaxed", "note": "the register"},
         "technical-blog": {"mode": "relaxed"},
         "docs": {"mode": "skip"},
-        "casual": {"mode": "skip"}
+        "linkedin": {"mode": "relaxed", "note": "the register"}
       }
     },
     {
       "label": "Boilerplate clusters",
       "id": "boilerplate-phrase",
       "cells": {
-        "investor-email": {"mode": "extra-strict"},
-        "docs": {"mode": "relaxed", "allowance": 2},
-        "casual": {"mode": "skip"}
+        "chat": {"mode": "skip"},
+        "formal": {"mode": "extra-strict"},
+        "docs": {"mode": "relaxed", "allowance": 2}
       }
     },
     {
       "label": "Future-narrative closers",
       "id": "future-narrative",
       "cells": {
-        "investor-email": {"mode": "extra-strict"},
-        "docs": {"mode": "skip"},
-        "casual": {"mode": "skip"}
+        "chat": {"mode": "skip"},
+        "formal": {"mode": "extra-strict"},
+        "docs": {"mode": "skip"}
       }
     },
     {
       "label": "Social endorsement closers",
       "id": "social-cta",
       "cells": {
-        "docs": {"mode": "skip"},
-        "casual": {"mode": "relaxed", "allowance": 1, "note": "1 in a DM"}
+        "chat": {"mode": "relaxed", "allowance": 1, "note": "1 in a DM"},
+        "informal": {"mode": "relaxed", "allowance": 1, "note": "1 subscribe line"},
+        "docs": {"mode": "skip"}
       }
     },
     {
       "label": "Wall-of-text replies",
       "id": null,
       "cells": {
+        "informal": {"mode": "skip"},
         "blog": {"mode": "skip"},
+        "formal": {"mode": "skip"},
         "technical-blog": {"mode": "skip"},
-        "investor-email": {"mode": "skip"},
         "docs": {"mode": "skip"}
       }
     },
@@ -211,45 +218,46 @@
       "label": "Curly quotes",
       "id": "curly-quote",
       "cells": {
-        "linkedin": {"mode": "skip"},
+        "chat": {"mode": "relaxed", "allowance": 4},
+        "informal": {"mode": "skip"},
         "blog": {"mode": "skip"},
+        "formal": {"mode": "skip"},
         "technical-blog": {"mode": "relaxed", "allowance": 4, "note": "plain-text contexts"},
-        "investor-email": {"mode": "skip"},
         "docs": {"mode": "relaxed", "allowance": 4},
-        "casual": {"mode": "relaxed", "allowance": 4}
+        "linkedin": {"mode": "skip"}
       }
     },
     {
       "label": "Tier-2 clusters",
       "id": "tier2-cluster",
       "cells": {
+        "chat": {"mode": "skip"},
         "technical-blog": {"mode": "partial"},
-        "docs": {"mode": "partial"},
-        "casual": {"mode": "skip"}
+        "docs": {"mode": "partial"}
       }
     },
     {
       "label": "Tier-3 density",
       "id": "tier3-density",
       "cells": {
-        "linkedin": {"mode": "skip"},
+        "chat": {"mode": "skip"},
         "technical-blog": {"mode": "partial"},
         "docs": {"mode": "partial"},
-        "casual": {"mode": "skip"}
+        "linkedin": {"mode": "skip"}
       }
     },
     {
       "label": "Confidence calibration",
       "id": "confidence-calibration",
       "cells": {
-        "casual": {"mode": "skip"}
+        "chat": {"mode": "skip"}
       }
     },
     {
       "label": "Signposting",
       "id": "signposting",
       "cells": {
-        "casual": {"mode": "skip"}
+        "chat": {"mode": "skip"}
       }
     },
     {

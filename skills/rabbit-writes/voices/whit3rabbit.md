@@ -85,6 +85,15 @@ Good, then the blunt truth, then good. See what the person was trying to do, exp
 
 ## Register (adapt to audience and channel)
 
+The engine's register set is a formality ladder, and this is where my slots get filled for each rung. `references/forms/` says an email has a greeting and a closer. It does not say what mine are, on purpose. This table does.
+
+| Register | Opener | Closer | What else changes |
+|---|---|---|---|
+| `chat` | none, or a name | "-whit3rabbit", often nothing | lowercase, minimal punctuation, typos stay |
+| `informal` | time-of-day greeting | "Thanks," + "-whit3rabbit" | contractions throughout, "I think" allowed |
+| `blog` | none | none | no correspondence slots at all |
+| `formal` | "Sir"/"Ma'am" until the relationship warms | "v/r" | no personal markers, exact numbers, warmth governor still on |
+
 - **On the clock:** full polish. **Off the clock:** relaxed, lowercase, minimal punctuation, typos left in are fine (they prove a human wrote it).
 - **Hierarchy:** "Sir/Ma'am" for seniors and outside clients until the relationship warms, informal with peers.
 - **Personal markers** ("I think," "I feel") appear only in casual riffing, never in official writing.

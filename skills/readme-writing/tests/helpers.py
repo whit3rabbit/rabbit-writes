@@ -115,8 +115,15 @@ def corpus_readmes():
     return _CACHE["corpus"]
 
 
+from concurrent.futures import ThreadPoolExecutor
+
+
 def corpus_p0_slugs():
     if "corpus_p0" not in _CACHE:
-        _CACHE["corpus_p0"] = [slug for slug, path in corpus_readmes()
-                               if run(path, "--no-voice")["counts"]["P0"]]
+        readmes = corpus_readmes()
+        workers = min(32, (os.cpu_count() or 2) * 4)
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            results = list(ex.map(lambda item: (item[0], run(item[1], "--no-voice")["counts"]["P0"]), readmes))
+        _CACHE["corpus_p0"] = [slug for slug, count in results if count]
     return _CACHE["corpus_p0"]
+

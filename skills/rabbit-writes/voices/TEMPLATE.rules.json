@@ -32,9 +32,9 @@
     "date_format": "any"
   },
 
-  "_mechanics_by_register_note": "Optional. What changes off the clock. Merged over `mechanics` key by key for the register being scanned, so an entry names only what moves. This is not the register relaxing your rule: --profile cannot soften anything on its own, it selects among rules you wrote. Register names must exist in scripts/registers.json (linkedin, blog, technical-blog, investor-email, docs, casual) or validate.py fails, because a typo here is a rule that silently stops applying.",
+  "_mechanics_by_register_note": "Optional. What changes off the clock. Merged over `mechanics` key by key for the register being scanned, so an entry names only what moves. This is not the register relaxing your rule: --profile cannot soften anything on its own, it selects among rules you wrote. Register names must exist in scripts/registers.json or validate.py fails, because a typo here is a rule that silently stops applying. The list is rendered into references/context.md, and restating it here is how this note once named four registers that do not exist.",
   "_mechanics_by_register_example": {
-    "casual": {"one_word_sentence": "allow", "curly_quotes": "allow"}
+    "chat": {"one_word_sentence": "allow", "curly_quotes": "allow"}
   },
   "mechanics_by_register": {},
 
@@ -71,7 +71,7 @@
       "max_allowed": 6,
       "max_per_1000w": 3.0,
       "min_per_1000w": 0.5,
-      "applies_to_registers": ["blog", "casual"],
+      "applies_to_registers": ["blog", "chat"],
       "note": "The short verdict line after a long paragraph. Two or three a piece. More is a tic."
     }
   ],

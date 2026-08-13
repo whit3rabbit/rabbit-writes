@@ -56,8 +56,8 @@ LIST_BY_ID_KEYS = ("banned_regex", "required_when")
 # Keys merged key by key, child wins.
 DICT_MERGE_KEYS = ("mechanics", "preferred_substitutions")
 # The same, one level deeper: {register: {mechanic: value}}. A shallow update
-# would let a child overriding one mechanic in `casual` drop every other
-# mechanic the parent scoped to `casual`, which is the silent unbanning this
+# would let a child overriding one mechanic in `chat` drop every other
+# mechanic the parent scoped to `chat`, which is the silent unbanning this
 # file's merge rules exist to prevent.
 NESTED_DICT_MERGE_KEYS = ("mechanics_by_register",)
 
@@ -356,10 +356,18 @@ def blend(left, right, weight=0.5, name=None):
         for key in sorted(mech_keys)
     }
 
+    # Underscore keys are filtered at both levels here, the same as `mechanics`
+    # above. Filtering one and not the other let the template's guidance survive
+    # a blend by the back door, as a register named `_example` or an override
+    # key inside a real one.
     scoped = {}
     for source in (lighter, heavier):
         for register, overrides in source.get("mechanics_by_register", {}).items():
-            scoped.setdefault(register, {}).update(overrides)
+            if register.startswith("_"):
+                continue
+            keep = {k: v for k, v in overrides.items() if not k.startswith("_")}
+            if keep:
+                scoped.setdefault(register, {}).update(keep)
     if scoped:
         out["mechanics_by_register"] = scoped
 
@@ -413,12 +421,19 @@ def _first_line(path):
 def resolve(target_path=None, voices_dir=None):
     """(path_to_rules, voice_name, note). Which profile applies, and why.
 
-    Whoever is active governs. Nothing here knows or prefers a particular
-    person: a `.rabbit-voice` file pins a repo's house voice, otherwise
-    `voices/ACTIVE` decides, and only when neither exists does the one profile
-    sitting in `voices/` get used as a fallback. That last case is announced in
-    a note rather than assumed, because writing in the wrong person's register
-    is worse than writing in none.
+    Whoever is active governs, and somebody has to have said so. A
+    `.rabbit-voice` file pins a repo's house voice, otherwise `voices/ACTIVE`
+    decides, and when neither exists this resolves nothing. Nothing here knows
+    or prefers a particular person.
+
+    **A profile nobody chose is never enforced.** This used to fall back to the
+    one profile sitting in `voices/`, with a note saying so. The plugin ships
+    exactly one, an example, so on a fresh install that fallback was a stranger's
+    `default_priority: P0` bans applied to somebody's prose, and a note attached
+    to full enforcement is close to what SKILL.md calls silent. The note now says
+    which profile is there and which command claims it, and the answer is one
+    command run once. Writing in the wrong person's register is worse than
+    writing in none.
 
     `target_path` is the document being checked, if there is one: a repo's pin
     sits beside its files, so the document's own directory is searched before
@@ -456,15 +471,15 @@ def resolve(target_path=None, voices_dir=None):
     why = ("voices/ACTIVE is missing" if not os.path.exists(active)
            else "voices/ACTIVE is empty")
     others = installed(voices_dir)
-    if len(others) == 1:
-        return (os.path.join(voices_dir, others[0] + RULES_SUFFIX), others[0],
-                "%s, falling back to the only profile installed (%s). Say so in the "
-                "report, and offer voice-setup: this is probably not the user's voice"
-                % (why, others[0]))
     if others:
-        return None, None, ("%s and %d profiles are installed (%s). Name one with "
-                            "--voice-rules rather than guessing"
-                            % (why, len(others), ", ".join(others)))
+        return None, None, (
+            "%s and %d profile%s installed (%s), none of them chosen. Nothing "
+            "is enforced until one is: run `python3 skills/voice-setup/scripts/"
+            "build_voice.py --activate <name>` once, drop a `.rabbit-voice` "
+            "holding the name in your repository, or pass --voice-rules <path>. "
+            "The profiles that ship with this plugin are examples, not yours."
+            % (why, len(others), " is" if len(others) == 1 else "s are",
+               ", ".join(others)))
     return None, None, ("%s and no profile is installed, prose checked against "
                         "craft rules only" % why)
 

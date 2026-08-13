@@ -29,7 +29,7 @@ import shutil
 import sys
 import tempfile
 
-from helpers import SCRIPTS, run_attain, written
+from helpers import ATTAIN, SCRIPTS, load_module, run_attain, written
 
 sys.path.insert(0, SCRIPTS)
 from rwlib import stylometry                                       # noqa: E402
@@ -234,6 +234,61 @@ def test_missed_is_never_a_check_failure():
         missed = [n for n, r in result["measures"].items()
                   if r["verdict"] == "missed"]
         assert result["verdict"] not in ("flat", "regressed"), result["verdict"]
+        assert code == 0, result["verdict"]
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+
+
+# --------------------------------------------------------------------------
+# what a regression is, and what it is not
+# --------------------------------------------------------------------------
+
+def test_a_measure_inside_tolerance_is_on_target_whichever_way_it_moved():
+    """Tolerance is tested before movement.
+
+    A measure that went from a tenth of a sample sd off the profile mean to half
+    of one moved away from it and is still somewhere the writer's own samples
+    go. Called `regressed`, one such row failed the whole document under
+    --check, which is the opposite of what a tolerance band is for.
+    """
+    attain = load_module("rw_attain_test", ATTAIN)
+    assert attain.measure_verdict(0.1, 0.5, True) == "on_target"
+    assert attain.measure_verdict(0.1, 2.0, False) == "regressed"
+    # The epsilon still stands where the measure ends up outside: a hair of
+    # movement in a measure the pass never touched is noise, not a regression.
+    assert attain.measure_verdict(1.9, 2.0, False) == "missed"
+    assert attain.measure_verdict(None, None, None) == "unmeasured"
+
+
+def test_a_delta_that_drifts_inside_the_band_is_not_a_regression():
+    """The document half of the same rule.
+
+    Both documents here are the writer's own paragraphs and both sit inside the
+    self-distance band, so neither is a conversion that went wrong. Before this,
+    any growth in the Delta at all was `regressed` with no epsilon, and --check
+    exited 1 on noise while the per-measure comparison next to it carefully
+    applied one.
+    """
+    d = build_fixture()
+    try:
+        from helpers import scan_module
+        scan = scan_module()
+        fp = stylometry.load(
+            os.path.join(d, "tester" + stylometry.FINGERPRINT_SUFFIX))
+        band = fp["self_distance"]["max"]
+        # Stated as a premise and asserted rather than assumed: this test means
+        # nothing if the two documents are not both in range with the second
+        # further out.
+        pair = [_doc(A_PARAS, r) for r in ((0, 1, 2, 3, 5), (0, 1, 2, 4, 5))]
+        deltas = [stylometry.distance(fp, scan.strip_for_stats(t))["delta"]
+                  for t in pair]
+        assert deltas[0] < deltas[1] <= band, (deltas, band)
+
+        result, code = run_attain(written(d, "before.md", pair[0]),
+                                  written(d, "after.md", pair[1]),
+                                  "--voice-rules", rules_of(d), "--check")
+        assert result["reliable"], result
+        assert result["verdict"] != "regressed", (result["verdict"], deltas)
         assert code == 0, result["verdict"]
     finally:
         shutil.rmtree(d, ignore_errors=True)

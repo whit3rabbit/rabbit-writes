@@ -14,7 +14,7 @@
     {
       "id": "missing-closer",
       "label": "Missing closer",
-      "applies_to_registers": ["casual", "blog"],
+      "applies_to_registers": ["chat", "blog"],
       "any_of_rx": ["(?im)^\\s*thanks,"],
       "priority": "P2",
       "note": "Gated to correspondence registers. A README at register docs must never trip this."

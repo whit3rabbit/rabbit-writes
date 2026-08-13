@@ -34,7 +34,28 @@ def test_the_matrix_is_not_empty():
     which is how the previous version of this suite passed for a while."""
     data = registers.load()
     assert len(data["rules"]) >= 25, "got %d rules" % len(data["rules"])
-    assert len(registers.registers()) == 6, str(registers.registers())
+    assert len(registers.registers()) == 7, str(registers.registers())
+
+
+def test_the_spine_is_a_ladder_of_real_registers():
+    """The formality axis a document form maps onto. Data rather than prose, so
+    a rung naming nothing fails here instead of reading as a claim context.md
+    makes about the matrix."""
+    spine = registers.spine()
+    assert spine == ("chat", "informal", "blog", "formal"), str(spine)
+    assert set(spine) <= set(registers.registers())
+    assert registers.default_register() in spine
+
+
+def test_every_register_is_on_the_spine_or_is_a_genre_column():
+    """No third category, and no register in neither. `technical-blog`, `docs`,
+    and `linkedin` sit outside the ladder because each carries tolerances no
+    formality band captures, which is a different thing from being stricter or
+    looser than a rung."""
+    assert (set(registers.spine()) | set(registers.genre_registers())
+            == set(registers.registers()))
+    assert not set(registers.spine()) & set(registers.genre_registers())
+    assert registers.genre_registers() == ("technical-blog", "docs", "linkedin")
 
 
 def test_context_md_matches_the_data_file():
@@ -81,7 +102,7 @@ def test_no_p0_fingerprint_is_skipped_or_relaxed_anywhere():
 def test_no_safety_finding_is_skipped_or_relaxed_anywhere():
     """The safety band applies in every register, the way a P0 fingerprint does.
     A register that could switch off injection detection is a register an
-    attacker has a reason to ask for, and "casual" is not a claim about whether
+    attacker has a reason to ask for, and "chat" is not a claim about whether
     a document is carrying a concealed instruction."""
     muffled = sorted(
         pid
@@ -118,6 +139,155 @@ def test_a_relaxed_rule_still_fires_past_its_allowance():
 def test_a_register_that_skips_a_rule_stays_silent():
     strict, _ = scan_text(QUOTES, "--profile", "blog")
     assert not [f for f in strict["findings"] if f["id"] == "curly-quote"]
+
+
+# --------------------------------------------------------------------------
+# every cell changes what the engine reports
+# --------------------------------------------------------------------------
+#
+# The two tests above check one cell each, by hand, and that is how `curly-quote`
+# sat in every skip set unable to fire in any register: the cells nobody wrote a
+# test for are exactly the ones that quietly stop meaning anything.
+#
+# So every cell is exercised, from one document per finding id built by repeating
+# a unit that raises it. TRIGGERS is required to cover every id the matrix names,
+# which is what makes this hold up: adding a cell for a new id fails the coverage
+# test until somebody writes the unit that fires it.
+#
+# FILLER carries the word count for the three rules that only fire on a long
+# enough document, and is checked for raising nothing itself.
+
+FILLER = (
+    "The team met on Tuesday and went through the backlog one item at a time. "
+    "Two of the tickets were closed the same afternoon and a third went back "
+    "to the person who filed it, since nobody could work out what the report "
+    "was asking for. The build ran green afterwards. We agreed to look at the "
+    "queue again on Friday, and to write down what we decided this time so the "
+    "next person reading it has somewhere to start. Nothing else came up. The "
+    "room was cold and the coffee was old, which is roughly how these go. One "
+    "more item went to the list for next month, and then we all went back to "
+    "what we had been doing before the meeting started.\n\n")
+
+# id -> (unit that raises it once, joiner, prefix, floor)
+#
+# `prefix` is filler for a rule that needs a word count before it looks at
+# anything. `floor` is a minimum number of units, and it is only legitimate on an
+# id with no relaxed cell, because a floor would swallow the allowance the
+# relaxed test is measuring. The test below asserts that.
+TRIGGERS = {
+    "boilerplate-phrase": ("The emerging sector matters here.", " ", "", 0),
+    "confidence-calibration": ("It is worth noting that this holds.", " ", "", 0),
+    "curly-quote": ("“", "q ", "A note about ", 0),
+    "diff-anchored": ("This function was added to replace the old one.", " ", "", 0),
+    "em-dash-rate": ("a — b", " and ", "Text: ", 0),
+    "emoji-heading": ("# \U0001F680 Heading", "\n\n", "", 0),
+    "future-narrative": (
+        "It may become one of the most important narratives.", " ", "", 0),
+    "generic-conclusion": ("In conclusion, the work is done.", " ", "", 0),
+    "hedge-stack": ("This could potentially work.", " ", "", 0),
+    "list-label-period": ("- **Label.** Text on the line.", "\n", "", 0),
+    "promotional": ("The house is nestled in the hills.", " ", "", 0),
+    "rhetorical-question": ("What does this mean?", "\n\n", "", 0),
+    "significance-inflation": ("It stands as a testament.", " ", "", 0),
+    "signposting": ("Let's dive in.", " ", "", 0),
+    "social-cta": ("Bookmark this.", " ", "", 0),
+    "tier1": ("We delve into the tapestry.", " ", "", 0),
+    "tier2-cluster": ("Harness and streamline the work.", " ", "", 0),
+    "tier3-density": ("The result was significant and innovative.", " ", FILLER, 0),
+    "transition-stack": ("Moreover, it works.", "\n\n", "", 0),
+    # No filler here, deliberately. This rule fires on paragraphs being the same
+    # length as each other, so a filler paragraph of a different length is the
+    # one thing that stops it, and the word count has to come from the units.
+    "uniform-paragraphs": (
+        "This is a sentence of a fairly ordinary length right here. "
+        "And here is a second one that runs about the same distance.",
+        "\n\n", "", 8),
+}
+
+
+def matrix_ids():
+    out = set()
+    for table in (registers.skip_table(), registers.relax_table()):
+        for entries in table.values():
+            out |= set(entries)
+    return out
+
+
+def trigger_doc(finding_id, n):
+    unit, joiner, prefix, floor = TRIGGERS[finding_id]
+    return prefix + joiner.join([unit] * max(n, floor)) + "\n"
+
+
+def hits_for(text, register, finding_id):
+    payload, _ = scan_text(text, "--profile", register)
+    return len([f for f in payload["findings"] if f["id"] == finding_id])
+
+
+def test_every_id_in_the_matrix_has_a_trigger_document():
+    """The coverage half, and the reason the test below cannot rot. A cell added
+    for an id with no unit here fails right now rather than passing vacuously."""
+    missing = sorted(matrix_ids() - set(TRIGGERS))
+    assert not missing, "no trigger document for: %s" % ", ".join(missing)
+
+    relaxed = {fid for entries in registers.relax_table().values()
+               for fid in entries}
+    floored = {fid for fid, spec in TRIGGERS.items() if spec[3]}
+    both = sorted(relaxed & floored)
+    assert not both, ("%s has a unit floor and a relaxed cell. The floor would "
+                      "swallow the allowance, so the relaxed test would pass "
+                      "without measuring anything" % ", ".join(both))
+
+
+def test_every_trigger_document_actually_fires():
+    """A probe that raises nothing makes every assertion about it vacuous, which
+    is the shape of the bug this whole section exists to catch."""
+    dead = []
+    for finding_id in sorted(TRIGGERS):
+        biggest = max([0] + [r.get(finding_id, 0)
+                             for r in registers.relax_table().values()])
+        text = trigger_doc(finding_id, biggest + 3)
+        if not any(hits_for(text, register, finding_id)
+                   for register in registers.registers()):
+            dead.append(finding_id)
+    assert not dead, "trigger raises nothing in any register: %s" % ", ".join(dead)
+
+
+def test_every_skip_cell_silences_a_document_that_would_otherwise_report():
+    skip = registers.skip_table()
+    failures = []
+    for register, ids in sorted(skip.items()):
+        for finding_id in sorted(ids):
+            biggest = max([0] + [r.get(finding_id, 0)
+                                 for r in registers.relax_table().values()])
+            text = trigger_doc(finding_id, biggest + 3)
+            got = hits_for(text, register, finding_id)
+            if got:
+                failures.append("%s x %s reported %d despite skipping it"
+                                % (register, finding_id, got))
+    assert not failures, "\n".join(failures)
+
+
+def test_every_relaxed_cell_honours_its_allowance_and_still_fires_past_it():
+    """Both halves, because relaxing is not skipping. A cell that reported at
+    the allowance would be strict wearing a tolerance, and one that stayed
+    silent past it would be a skip with an allowance written beside it, which is
+    the confusion that left `curly-quote` unfirable everywhere."""
+    failures = []
+    for register, entries in sorted(registers.relax_table().items()):
+        for finding_id, allowance in sorted(entries.items()):
+            at = hits_for(trigger_doc(finding_id, allowance), register, finding_id)
+            if at:
+                failures.append(
+                    "%s x %s reported %d at its allowance of %d"
+                    % (register, finding_id, at, allowance))
+            past = hits_for(trigger_doc(finding_id, allowance + 3), register,
+                            finding_id)
+            if not past:
+                failures.append(
+                    "%s x %s stayed silent %d past its allowance of %d, so the "
+                    "cell is a skip rather than a tolerance"
+                    % (register, finding_id, 3, allowance))
+    assert not failures, "\n".join(failures)
 
 
 def test_a_p0_only_cell_on_a_p0_finding_is_rejected():

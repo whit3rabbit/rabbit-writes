@@ -67,7 +67,7 @@ from rwlib import findings as findings_mod        # noqa: E402
 from rwlib import language, sarif, suppress       # noqa: E402
 from rwlib import voices as voices_mod            # noqa: E402
 from rwlib.markdown import (BARE_URL_RX, FENCE_RX, HEADING_RX,  # noqa: E402
-                            HTML_ANCHOR_RX, HTML_IMG_RX, HTML_TAG_LINE_RX,
+                            HTML_ANCHOR_RX, HTML_IMG_RX, HTML_LINK_RX, HTML_TAG_LINE_RX,
                             HTML_TAG_RX, IMAGE_RX, INLINE_CODE_RX, LINK_RX,
                             REF_DEF_RX, REF_LINK_RX, TABLE_ROW_RX, blank,
                             is_badge, is_prose_block, line_of, strip_images,
@@ -121,6 +121,17 @@ MEASURE_NOUNS = {"word", "line", "char", "character", "byte", "kilobyte", "megab
                  "page", "sentence", "paragraph", "commit", "star", "issue", "entry"}
 
 
+# HTML patterns for alt text and comments
+HTML_IMG_ALT_RX = re.compile(r"""<img\b[^>]*?\balt\s*=\s*["']([^"']*)["']""", re.I)
+HTML_COMMENT_RX = re.compile(r"<!--.*?-->", re.S)
+
+INVARIANT_OR_S_SINGULARS = {
+    "alias", "status", "canvas", "basis", "lens", "series", "species",
+    "corpus", "analysis", "hypothesis", "parenthesis", "focus", "virus",
+    "census", "radius", "syllabus", "bus"
+}
+
+
 def _singular(noun):
     """A grouping key for a countable noun, so a plural and its singular
     collapse together.
@@ -137,9 +148,13 @@ def _singular(noun):
     only fires after a sibilant, so "cases" still drops one s to "case" and
     stays a unit of measure rather than becoming "cas"."""
     n = noun.lower()
+    if n in INVARIANT_OR_S_SINGULARS:
+        return n
     if n.endswith("ies") and len(n) > 4:
         return n[:-3] + "y"
     if n.endswith(("sses", "shes", "ches", "xes", "zes")):
+        return n[:-2]
+    if n.endswith("ses") and len(n) > 4 and n[:-2] in INVARIANT_OR_S_SINGULARS:
         return n[:-2]
     if n.endswith("s") and not n.endswith("ss"):
         return n[:-1]
@@ -454,8 +469,11 @@ def check_toc(scored, findings, stats):
     words = stats["prose_words"]
     anchor_links = [u for _, u in LINK_RX.findall(strip_images(scored))
                     if u.startswith("#")]
+    html_anchors = [m.group(1) for m in HTML_LINK_RX.finditer(scored)
+                    if m.group(1).startswith("#")]
+    total_anchors = len(anchor_links) + len(html_anchors)
     has_heading = "toc" in stats["sections"]
-    has_toc = has_heading or len(anchor_links) >= 3
+    has_toc = has_heading or total_anchors >= 3
     stats["has_toc"] = has_toc
     if has_toc and words < TOC_MIN_WORDS:
         findings.append(finding(
@@ -483,7 +501,10 @@ def check_links(scored, findings, stats):
                for m in REF_DEF_RX.finditer(scored)}
     refs = [(text, label) for text, label in REF_LINK_RX.findall(scored)
             if (label.strip() or text.strip()).lower() in defined]
-    bare = list(BARE_URL_RX.finditer(strip_wrapped_urls(scored)))
+    # Blank HTML comments so internal URLs (<!-- https://internal.dev -->) do not
+    # trigger bare-url warnings intended for reader-visible content.
+    uncommented = HTML_COMMENT_RX.sub(blank, scored)
+    bare = list(BARE_URL_RX.finditer(strip_wrapped_urls(uncommented)))
     stats["inline_links"] = len(inline)
     stats["reference_links"] = len(refs)
     stats["bare_urls"] = len(bare)
@@ -623,6 +644,9 @@ def check_media_and_claims(raw, scored, findings, stats):
         prominent.append((m.group(2), line_of(scored, m.start())))
     for m in IMAGE_RX.finditer(scored):
         prominent.append((m.group(1), line_of(scored, m.start())))
+    for m in HTML_IMG_ALT_RX.finditer(scored):
+        if m.group(1).strip():
+            prominent.append((m.group(1), line_of(scored, m.start())))
 
     pairs = {}
     for text, line in prominent:
@@ -693,7 +717,7 @@ def resolve_voice(readme_path):
     """Which profile applies to this README, and why.
 
     A thin alias. The resolution order (`.rabbit-voice`, then `voices/ACTIVE`,
-    then a lone installed profile) used to be written out here and nowhere else,
+    then nothing) used to be written out here and nowhere else,
     so `scan.py` next door had none of it and the two checkers in one plugin
     could disagree about whose rules were in force. It lives in rwlib.voices
     now. The name stays because the report and the tests speak it.
