@@ -10,6 +10,7 @@ literal characters, invisibly, and only a byte-level check caught it.
 """
 
 import os
+import unicodedata
 
 # Invisible characters are written as escapes here, never as literals, for
 # exactly the reason scan.py's HIDDEN_UNICODE says: as literals they are
@@ -35,6 +36,45 @@ def test_artifacts_source_is_pure_ascii():
         source = fh.read()
     stray = sorted({"U+%04X" % ord(c) for c in source if ord(c) > 0x7E})
     assert not stray, str(stray)
+
+
+def test_every_invisible_logic_source_is_escape_only():
+    """The rule behind the test above, generalized across every source that
+    handles invisible characters. The artifacts test caught one file after the
+    fact; this one holds the line for rwlib and the detector-corpus harness
+    together, so the next file that grows invisible-character logic is covered
+    before it ships a literal. corpus_io.py carried a literal NO-BREAK SPACE in
+    its extraction regex, which is the kind of drift this exists to stop.
+
+    `markdown.py` is the one exemption, on purpose: its regexes match visible
+    curly quotes and dashes and spell them as the characters themselves. For
+    that file the bar is the rule rather than pure ASCII, so any non-ASCII it
+    carries must be visible, never a format or space-separator codepoint.
+    """
+    roots = [
+        os.path.join(SCRIPTS, "rwlib"),
+        os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(SCRIPTS))),
+                     "scripts", "detector-corpus"),
+    ]
+    # Format, control, surrogate, private-use, and separator codepoints are the
+    # ones a reader cannot see. Visible punctuation and letters are not.
+    invisible = {"Cf", "Cc", "Cs", "Co", "Zs", "Zl", "Zp"}
+    exempt = {"markdown.py"}
+    offenders = []
+    for root in roots:
+        for dp, _, files in os.walk(root):
+            for name in sorted(files):
+                if not name.endswith(".py"):
+                    continue
+                path = os.path.join(dp, name)
+                with open(path, encoding="utf-8") as fh:
+                    source = fh.read()
+                for ch in source:
+                    cp, cat = ord(ch), unicodedata.category(ch)
+                    bad = (cp > 0x7E and cat in invisible) if name in exempt else (cp > 0x7E)
+                    if bad:
+                        offenders.append("U+%04X %s in %s" % (cp, cat, path))
+    assert not offenders, "\n".join(sorted(set(offenders)))
 
 
 # --------------------------------------------------------------------------

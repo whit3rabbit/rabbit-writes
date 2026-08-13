@@ -39,6 +39,9 @@ def main(argv):
     keyword = None
     if "-k" in argv:
         index = argv.index("-k")
+        if index + 1 >= len(argv):
+            print("-k needs a following keyword", file=sys.stderr)
+            return 2
         keyword = argv[index + 1]
         argv = argv[:index] + argv[index + 2:]
 
@@ -47,7 +50,7 @@ def main(argv):
         print("no test files matched %r" % argv, file=sys.stderr)
         return 2
 
-    passed, failed, errors = 0, [], []
+    passed, failed, errors, ran = 0, [], [], 0
     for filename in files:
         module_name = filename[:-3]
         print(module_name)
@@ -74,6 +77,7 @@ def main(argv):
                       % name)
                 errors.append("%s::%s" % (filename, name))
                 continue
+            ran += 1
             try:
                 fn()
             except AssertionError as exc:
@@ -93,6 +97,9 @@ def main(argv):
     print("%d passed, %d failed, %d errored" % (passed, len(failed), len(errors)))
     for name in failed + errors:
         print("  %s" % name)
+    if keyword is not None and ran == 0:
+        print("no tests matched keyword %r" % keyword, file=sys.stderr)
+        return 2
     return 1 if (failed or errors) else 0
 
 

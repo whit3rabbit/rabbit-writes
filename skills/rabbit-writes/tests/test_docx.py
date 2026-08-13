@@ -208,3 +208,20 @@ def test_is_docx_ignores_ordinary_files():
         assert not docx_text.is_docx(zip_path)
     finally:
         shutil.rmtree(scratch)
+
+
+def test_a_docm_is_routed_like_a_docx():
+    """A .docm is the macro-enabled twin of a .docx and carries the same
+    word/document.xml, where the hidden-run tricks live, so it is scanned the
+    same way. The extension routes it; the zip body would too."""
+    scratch = tempfile.mkdtemp()
+    try:
+        docm = os.path.join(scratch, "macro.docm")
+        with zipfile.ZipFile(docm, "w") as zf:
+            zf.writestr("word/document.xml",
+                        "<w:document xmlns:w=\"http://schemas.openxmlformats.org/"
+                        "wordprocessingml/2006/main\"><w:body><w:p/></w:body>"
+                        "</w:document>")
+        assert docx_text.is_docx(docm)
+    finally:
+        shutil.rmtree(scratch)

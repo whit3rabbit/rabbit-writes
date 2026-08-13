@@ -117,7 +117,32 @@ NUMBER_NOUN_RX = re.compile(r"\b(\d[\d,]*)\s+([A-Za-z][A-Za-z-]{3,20})\b")
 MEASURE_NOUNS = {"word", "line", "char", "character", "byte", "kilobyte", "megabyte", "second",
                  "minute", "hour", "day", "week", "month", "year", "percent", "token", "time",
                  "step", "point", "version", "item", "case", "example", "column", "row", "level",
-                 "page", "sentence", "paragraph", "commit", "star", "issue", "entrie", "entry"}
+                 "page", "sentence", "paragraph", "commit", "star", "issue", "entry"}
+
+
+def _singular(noun):
+    """A grouping key for a countable noun, so a plural and its singular
+    collapse together.
+
+    `rstrip("s")` was the key, and it split every regular plural from its
+    singular: "classes" became "classe" and "class" became "cla", since rstrip
+    takes every trailing s, so the same count reported two ways stopped being
+    flagged. This handles the regular English shapes a number-and-noun heading
+    reaches for. Irregulars (children, people) are left alone, which can only
+    ever cost a missed collision, never a false one.
+
+    -ies to -y is length-gated so a four-letter -ie-plus-s word (ties, pies)
+    falls through to the plain -s rule and keeps its real singular. The -es rule
+    only fires after a sibilant, so "cases" still drops one s to "case" and
+    stays a unit of measure rather than becoming "cas"."""
+    n = noun.lower()
+    if n.endswith("ies") and len(n) > 4:
+        return n[:-3] + "y"
+    if n.endswith(("sses", "shes", "ches", "xes", "zes")):
+        return n[:-2]
+    if n.endswith("s") and not n.endswith("ss"):
+        return n[:-1]
+    return n
 
 
 def finding(fid, label, priority, line, detail):
@@ -601,7 +626,7 @@ def check_media_and_claims(raw, scored, findings, stats):
     pairs = {}
     for text, line in prominent:
         for m in NUMBER_NOUN_RX.finditer(text):
-            noun = m.group(2).lower().rstrip("s")
+            noun = _singular(m.group(2))
             if noun in MEASURE_NOUNS or noun in {"the", "and", "for", "with", "from", "that", "this"}:
                 continue
             pairs.setdefault(noun, {}).setdefault(m.group(1).replace(",", ""), line)
@@ -933,8 +958,10 @@ def main():
         return 2
 
     if args.sarif:
+        sarif_uri = args.sarif_uri or args.file
+        sarif.warn_if_uri_drops(sarif_uri)
         print(json.dumps(sarif.build(
-            findings, args.sarif_uri or args.file, "rabbit-writes/readme-check",
+            findings, sarif_uri, "rabbit-writes/readme-check",
             tool_version=CORPUS.get("schema_version"),
             information_uri="https://github.com/whit3rabbit/rabbit-writes",
             extra_properties={"corpusRepos": CORPUS["n_repos"],

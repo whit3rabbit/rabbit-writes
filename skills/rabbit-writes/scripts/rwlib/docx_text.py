@@ -50,8 +50,13 @@ class DocxError(Exception):
 
 
 def is_docx(path):
-    """Cheap routing test: the extension, or a zip that holds a Word body."""
-    if path.lower().endswith(".docx"):
+    """Cheap routing test: the extension, or a zip that holds a Word body.
+
+    .docm is accepted alongside .docx: it is the macro-enabled twin and carries
+    the identical word/document.xml, which is where the hidden-run tricks live
+    in the wild. --apply-safe still refuses it the way it refuses .docx, because
+    neither is a text file the fixer can write back."""
+    if path.lower().endswith((".docx", ".docm")):
         return True
     try:
         with open(path, "rb") as fh:

@@ -137,6 +137,41 @@ def test_a_non_http_url_is_refused():
               str((url, why)))
 
 
+def test_a_runaway_response_is_refused_not_read_whole():
+    """`response.read()` into memory with no cap is an out-of-memory exit on a
+    broken or hostile archive URL. The cap turns it into a reported failure."""
+    import urllib.request
+
+    class RunawayHeaders:
+        def get_content_charset(self):
+            return "utf-8"
+
+        def get_content_type(self):
+            return "text/html"
+
+    class RunawayResponse:
+        headers = RunawayHeaders()
+
+        def read(self, n=None):
+            # Keep serving bytes forever; the cap has to be what stops this.
+            return b"x" * (n or fetch_samples._READ_CHUNK)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+    real = urllib.request.urlopen
+    try:
+        urllib.request.urlopen = lambda *a, **k: RunawayResponse()
+        text, err = fetch_samples.fetch("https://example.dev/x")
+        check("an oversized response is refused",
+              text is None and "cap" in (err or ""), str((text, err)))
+    finally:
+        urllib.request.urlopen = real
+
+
 def test_a_verified_sample_is_not_refetched_without_all():
     directory = tempfile.mkdtemp(prefix="rabbit-corpus-")
     try:
@@ -157,6 +192,39 @@ def test_the_manifest_validator_still_rejects_a_late_human():
     issues = corpus_io.problems({"samples": [entry]}, ("technical-blog",))
     check("a human sample after the cutoff is rejected",
           any("cutoff" in i for i in issues), str(issues))
+
+
+def test_problems_rejects_an_id_that_is_not_a_slug():
+    """An id is a filename inside texts/, so a slash, a `..`, or a space is a
+    path-traversal vector rather than a naming quirk. Slug-only, the same trust
+    boundary the URL-scheme check holds."""
+    for bad in ("../../etc/passwd", "a/b", "Upper", "has space"):
+        entry = sample(bad)
+        issues = corpus_io.problems({"samples": [entry]}, ("technical-blog",))
+        check("rejects id %r" % bad, any("slug" in i for i in issues), str(issues))
+    clean = corpus_io.problems({"samples": [sample("human-0001")]},
+                               ("technical-blog",))
+    check("a slug id raises no slug problem",
+          not any("slug" in i for i in clean), str(clean))
+
+
+def test_text_path_refuses_to_escape_the_texts_directory():
+    """Defense in depth behind the slug check: an id that reached text_path
+    without validation must not read or write outside the texts directory."""
+    directory = tempfile.mkdtemp(prefix="rabbit-corpus-")
+    try:
+        for bad in ("../../etc/passwd", "sub/x", "/abs"):
+            raised = False
+            try:
+                corpus_io.text_path({"id": bad}, texts_dir=directory)
+            except ValueError:
+                raised = True
+            check("refuses id %r" % bad, raised, "no ValueError raised")
+        legit = corpus_io.text_path({"id": "human-0001"}, texts_dir=directory)
+        check("a slug id resolves inside the texts dir",
+              legit == os.path.join(directory, "human-0001.txt"), legit)
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
 
 
 def test_wilson_does_not_collapse_on_zero():

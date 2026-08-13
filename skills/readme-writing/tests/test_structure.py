@@ -8,8 +8,8 @@ the shapes the corpus says they should.
 import shutil
 import tempfile
 
-from helpers import (bad_result, good_result, ids, run, run_code, sample,
-                     total, written)
+from helpers import (bad_result, check_module, good_result, ids, run,
+                     run_code, sample, total, written)
 
 
 def test_the_good_sample_raises_no_p0_and_no_p1():
@@ -279,3 +279,31 @@ def test_a_real_final_license_section_is_not_reported_as_out_of_place():
         shutil.rmtree(scratch, ignore_errors=True)
     assert "license-not-last" not in ids(result), str(ids(result))
     assert result["stats"]["license_words"] == 3, "got %s" % result["stats"]["license_words"]
+
+
+def test_singular_collides_a_plural_with_its_singular():
+    """The inconsistent-number check keys on the noun so a plural and a
+    singular of the same countable noun are compared. rstrip("s") split them:
+    "classes" and "class" landed in different buckets and a real conflict went
+    unflagged. "cases" has to stay "case" (a unit of measure), not "cas"."""
+    singular = check_module()._singular
+    assert singular("classes") == singular("class") == "class"
+    assert singular("boxes") == "box"
+    assert singular("entries") == "entry"
+    assert singular("cases") == "case"
+    assert singular("libraries") == "library"
+    assert singular("cats") == "cat"
+
+
+def test_a_singular_and_plural_with_different_numbers_is_flagged():
+    """The same count reported once as a plural and once as a singular is the
+    conflict the old rstrip key missed: "3 classes" and "1 class" used to land
+    in different buckets. Now they collide and the inconsistency is a P2."""
+    scratch = tempfile.mkdtemp()
+    try:
+        body = ("# proj\n\n## 3 classes of export\n\nprose here.\n\n"
+                "### backed by 1 class\n\nmore prose here.\n")
+        result = run(written(scratch, "README.md", body), "--no-voice")
+        assert "inconsistent-number" in ids(result), str(ids(result))
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)

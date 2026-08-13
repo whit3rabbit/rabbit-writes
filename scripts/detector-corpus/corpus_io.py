@@ -50,6 +50,14 @@ LABELS = ("human", "generated")
 PRE_GENERATION_CUTOFF = "2022-11-30"
 
 REQUIRED_FIELDS = ("id", "label", "register", "provenance", "sha256", "words")
+# A sample id is a filename inside texts/, so it is a slug: lowercase ascii,
+# digits, hyphens, and nothing else. Validated in problems() and enforced again
+# as a path-containment bound in text_path(), because an id is the one field a
+# manifest author types by hand and `../../x` would write outside the texts
+# directory. The scheme check in fetch_samples follows the same reasoning: the
+# manifest is trusted as code, and a trust boundary is checked everywhere it is
+# crossed, not only at the front door.
+ID_RX = re.compile(r"[a-z0-9][a-z0-9-]*")
 REQUIRED_HUMAN_PROVENANCE = ("source_url", "archive_url", "published", "why_credible")
 REQUIRED_GENERATED_PROVENANCE = ("model", "prompt", "generated")
 
@@ -130,7 +138,16 @@ def text_path(sample, texts_dir=None):
     # else keeps reading the old directory and every sample reports as missing.
     # That is not hypothetical: it silently emptied the first run of this
     # module's own test, which then passed by reporting an empty corpus.
-    return os.path.join(texts_dir or TEXTS_DIR, sample["id"] + ".txt")
+    base = texts_dir or TEXTS_DIR
+    path = os.path.join(base, sample["id"] + ".txt")
+    # Defense in depth alongside the slug check in problems(). An id that
+    # reached here without validation, an old manifest or a hand edit, must not
+    # read or write outside the texts directory. realpath collapses `..` and
+    # symlinks, so the file's real parent has to be the real base.
+    if os.path.realpath(os.path.dirname(path)) != os.path.realpath(base):
+        raise ValueError("sample id %r resolves outside the texts directory"
+                         % sample["id"])
+    return path
 
 
 def read_text(sample, texts_dir=None):
@@ -203,8 +220,11 @@ def extract_text(html):
     parser.feed(html)
     text = "".join(parser.parts)
     # Collapse horizontal runs, keep paragraph breaks. Done after extraction
-    # rather than during, so the block-element newlines above survive.
-    text = re.sub(r"[ \t ]+", " ", text)
+    # rather than during, so the block-element newlines above survive. The class
+    # includes \xa0 (NO-BREAK SPACE), written as an escape never a literal: a
+    # literal invisible is normalized to a plain space by some editors, which
+    # would silently move every committed hash without a visible diff.
+    text = re.sub(r"[ \t\xa0]+", " ", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
     return normalize(text)
 
@@ -226,6 +246,10 @@ def problems(manifest, registers=()):
         if sid in seen:
             out.append("%s appears twice" % sid)
         seen.add(sid)
+        if not ID_RX.fullmatch(sid):
+            out.append("%s is not a slug. An id is a filename in texts/, so it "
+                       "is lowercase ascii, digits, and hyphens only: anything "
+                       "else is a path-traversal vector" % sid)
         if sample["label"] not in LABELS:
             out.append("%s has label %r, not one of %s"
                        % (sid, sample["label"], ", ".join(LABELS)))

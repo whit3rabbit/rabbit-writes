@@ -43,6 +43,7 @@ changing anything a reader can see.
 Stdlib only, 3.8+.
 """
 
+import html
 import re
 
 from .findings import make, sort_key
@@ -128,12 +129,20 @@ DIRECTIVE_RX = re.compile(r"""(?imx)
 COMMENT_RX = re.compile(r"(?s)<!--(?P<hidden>.*?)-->")
 
 # The CSS properties that take an element out of the visual flow. `left:-NNNpx`
-# wants three digits or more so it cannot match an ordinary negative margin.
+# and `text-indent:-NNNpx` want three digits or more so they cannot match an
+# ordinary negative margin or indent. `overflow:hidden` is deliberately absent:
+# it is a layout workhorse in legitimate CSS, and a height or width of zero in
+# the same style attribute is already caught by the branch below, which covers
+# the one combination that is actually concealment.
 HIDING_CSS = (r"(?:display\s*:\s*none"
               r"|visibility\s*:\s*hidden"
               r"|opacity\s*:\s*0(?!\.\d*[1-9])"
               r"|font-size\s*:\s*0(?!\.\d*[1-9])"
               r"|(?:left|top)\s*:\s*-\d{3,}\s*px"
+              r"|text-indent\s*:\s*-\d{3,}\s*px"
+              r"|clip-path\s*:\s*inset\s*\(\s*100\s*%"
+              r"|clip\s*:\s*rect\s*\(\s*0\b"
+              r"|transform\s*:\s*scale\s*\(\s*0(?!\.\d*[1-9])"
               r"|(?:width|height)\s*:\s*0(?:px)?\s*[;\"'])")
 
 # The whole element, opening tag through closing tag, because the payload sits
@@ -320,7 +329,12 @@ def scan(raw):
         # attack counted twice.
         if any(lo <= start and end <= hi for lo, hi in claimed):
             continue
-        hit = DIRECTIVE_RX.search(body)
+        # Decode HTML entities before the directive test: a directive spelled
+        # inside a concealed span as `&#105;gnore all previous instructions` is
+        # one a reader's browser would execute and a raw-text regex would miss.
+        # The finding still quotes the raw span below, so the evidence shows the
+        # obfuscation rather than the decoded form.
+        hit = DIRECTIVE_RX.search(html.unescape(body))
         if hit:
             findings.append(make(
                 HIDDEN_DIRECTIVE_ID,

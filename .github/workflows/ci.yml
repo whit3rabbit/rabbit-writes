@@ -89,6 +89,23 @@ jobs:
             --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
           python skills/rabbit-writes/scripts/scan.py skills/voice-setup/SKILL.md \
             --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
+          # The files PROOF.md publishes zero P0/P1 for, re-checked every PR so a
+          # regression surfaces here rather than at the next hand-run of PROOF.
+          # No --voice-rules, because that is the mode PROOF publishes them in:
+          # its main table is no-voice, and two references carry voice P0s the
+          # no-voice table does not count. patterns.md is excluded on purpose, it
+          # quotes the banned marks in before/after examples and scores P0 by
+          # design.
+          for f in skills/rabbit-writes/PROOF.md \
+                   skills/rabbit-writes/references/checklist.md \
+                   skills/rabbit-writes/references/context.md \
+                   skills/rabbit-writes/references/craft.md \
+                   skills/rabbit-writes/references/false-positives.md \
+                   skills/rabbit-writes/references/injection.md \
+                   skills/rabbit-writes/references/voice.md \
+                   skills/rabbit-writes/voices/whit3rabbit.md; do
+            python skills/rabbit-writes/scripts/scan.py "$f" --check
+          done
 
       - name: labeled-corpus score (informational)
         # Never gates. It prints the state of the evidence on every run, which

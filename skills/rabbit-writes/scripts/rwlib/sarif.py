@@ -24,6 +24,9 @@ prose.
 Stdlib only, 3.9+.
 """
 
+import os
+import sys
+
 from . import findings as findings_mod
 
 SARIF_VERSION = "2.1.0"
@@ -57,6 +60,24 @@ def _message(f):
     """
     tail = f.get("excerpt") or f.get("match") or ""
     return "%s\n%s" % (f["label"], tail) if tail else f["label"]
+
+
+def warn_if_uri_drops(uri, out=None):
+    """Say on stderr when a SARIF uri GitHub cannot resolve is about to ship.
+
+    The upload succeeds and the results vanish, which is the failure build()'s
+    docstring names. A path relative to the repo root is the only shape GitHub
+    resolves to a file in the checkout, so an absolute path, the `stdin`
+    placeholder, or an empty value is warned about rather than silently lost.
+    The uri is not changed: the caller decides whether to fix it or ship the
+    report anyway."""
+    if out is None:
+        out = sys.stderr
+    if not uri or uri == "stdin" or os.path.isabs(uri):
+        print("rabbit-writes: SARIF uri %r will be dropped by GitHub. It has "
+              "to be a path relative to the repo root, and an absolute path or "
+              "the stdin placeholder is not. Pass --sarif-uri one." % uri,
+              file=out)
 
 
 def build(findings, uri, tool_name, tool_version=None, information_uri=None,

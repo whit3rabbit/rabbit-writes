@@ -1245,6 +1245,7 @@ def main():
 
     if args.sarif:
         uri = args.sarif_uri or args.file or "stdin"
+        sarif.warn_if_uri_drops(uri)
         print(json.dumps(sarif.build(
             findings, uri, "rabbit-writes/scan",
             tool_version=lexicon_mod.version(),

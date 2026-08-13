@@ -61,6 +61,12 @@ import corpus_io  # noqa: E402
 # archive nobody is paying for is a tool that gets the archive to block it.
 DELAY_SECONDS = 1.0
 TIMEOUT_SECONDS = 30
+# A response is read into memory, so it is capped. No corpus sample is anywhere
+# close, and the cap is what stops a broken or hostile archive URL from being an
+# out-of-memory exit rather than a reported failure. Generous on purpose: the
+# largest real page is kilobytes.
+MAX_BYTES = 8 * 1024 * 1024
+_READ_CHUNK = 64 * 1024
 # Some archives serve a redirect chain and a bare urllib request looks enough
 # like a scraper to get refused. Identifying the tool is the polite version of
 # lying about being a browser.
@@ -121,6 +127,22 @@ def fetchable(sample):
     return url, None
 
 
+def _read_bounded(response, cap):
+    """Read up to `cap` bytes, refusing more. Without a cap a single bad URL in
+    the manifest is an out-of-memory exit rather than a reported failure, and
+    the manifest is trusted as code but the URL it points at is not."""
+    chunks, total = [], 0
+    while True:
+        chunk = response.read(_READ_CHUNK)
+        if not chunk:
+            break
+        total += len(chunk)
+        if total > cap:
+            raise ValueError("response is larger than the %d-byte cap" % cap)
+        chunks.append(chunk)
+    return b"".join(chunks)
+
+
 def fetch(url, field=None):
     """(text, error).
 
@@ -132,7 +154,7 @@ def fetch(url, field=None):
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     try:
         with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as response:
-            raw = response.read()
+            raw = _read_bounded(response, MAX_BYTES)
             charset = response.headers.get_content_charset() or "utf-8"
             content_type = response.headers.get_content_type()
     except (urllib.error.URLError, OSError, ValueError) as exc:
@@ -289,6 +311,13 @@ def main():
 
     manifest = corpus_io.load()
     samples = manifest.get("samples", [])
+    bad_ids = sorted({s["id"] for s in samples
+                      if "id" in s and not corpus_io.ID_RX.fullmatch(s["id"])})
+    if bad_ids:
+        print("manifest has ids that are not slugs (lowercase ascii, digits, "
+              "hyphens), which is a path-traversal vector in texts/: %s"
+              % ", ".join(bad_ids), file=sys.stderr)
+        return 1
     if args.id:
         wanted = set(args.id)
         samples = [s for s in samples if s["id"] in wanted]
