@@ -245,19 +245,6 @@ def test_wilson_does_not_collapse_on_zero():
           corpus_io.wilson(0, 52)[2] < 0.07, str(corpus_io.wilson(0, 52)[2]))
 
 
-def main():
-    for name, fn in sorted(globals().items()):
-        if name.startswith("test_") and callable(fn):
-            print(name)
-            fn()
-    print("\n%d check(s) failed" % len(failures) if failures else "\nall checks passed")
-    return 1 if failures else 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
-
-
 # --------------------------------------------------------------------------
 # dataset-sourced samples
 # --------------------------------------------------------------------------
@@ -354,8 +341,15 @@ def test_a_viewer_response_is_read_as_json_not_as_html():
     class FakeResponse:
         headers = FakeHeaders()
 
-        def read(self):
-            return payload
+        def __init__(self):
+            self.rest = payload
+
+        def read(self, n=None):
+            # A stream, not one whole-body read: `fetch` reads through
+            # `_read_bounded` in chunks, and a fake that ignores `n` and returns
+            # the body forever would never terminate.
+            take, self.rest = self.rest[:n], self.rest[n:]
+            return take
 
         def __enter__(self):
             return self
@@ -374,3 +368,21 @@ def test_a_viewer_response_is_read_as_json_not_as_html():
               err2 is not None and "nope" in err2, str(err2))
     finally:
         urllib.request.urlopen = real
+
+
+# --------------------------------------------------------------------------
+# Runner. Stays at the bottom: main() collects tests off globals(), so anything
+# defined below it is invisible to a stdlib run and only pytest would find it.
+# Six tests sat under the guard that way.
+
+def main():
+    for name, fn in sorted(globals().items()):
+        if name.startswith("test_") and callable(fn):
+            print(name)
+            fn()
+    print("\n%d check(s) failed" % len(failures) if failures else "\nall checks passed")
+    return 1 if failures else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

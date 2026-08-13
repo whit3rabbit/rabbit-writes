@@ -20,12 +20,12 @@ Every number below was measured against a particular pattern catalogue, and the 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | `SKILL.md` | 2,899 | 0 | 0 | 0 | 0.70 | 0.73 | 0.0 |
-| `PROOF.md` | 5,461 | 0 | 0 | 0 | 0.59 | 0.73 | 0.0 |
+| `PROOF.md` | 5,526 | 0 | 0 | 0 | 0.59 | 0.73 | 0.0 |
 | `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.86 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 865 | 0 | 0 | **9** | 0.66 | 0.71 | 0.0 |
-| `references/context.md` | 567 | 0 | 0 | 0 | 0.75 | 0.81 | 0.0 |
-| `references/voice.md` | 1,047 | 0 | 0 | 0 | 0.77 | 0.73 | 0.0 |
+| `references/context.md` | 579 | 0 | 0 | 0 | 0.66 | 0.80 | 0.0 |
+| `references/voice.md` | 1,047 | 0 | 0 | 0 | 0.76 | 0.73 | 0.0 |
 | `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
 | `references/checklist.md` | 640 | 0 | 0 | 0 | 0.46 | 0.74 | 0.0 |
 | `voices/whit3rabbit.md` | 1,518 | 0 | 0 | **10** | 0.69 | 0.79 | 0.0 |
@@ -100,18 +100,18 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `../readme-writing/SKILL.md` | 0 | |
 | `PROOF.md` | 1 | serial-comma advisory |
 | `references/false-positives.md` | 1 | serial-comma advisory |
-| `references/voice.md` | 2 | one one-word sentence, one serial-comma advisory |
+| `references/voice.md` | 1 | serial-comma advisory |
+| `references/context.md` | 1 | serial-comma advisory |
 | `voices/whit3rabbit.md` | 4 | serial-comma advisories |
 | `../voice-setup/SKILL.md` | 4 | serial-comma advisories |
 | `SKILL.md` | 6 | serial-comma advisories |
-| `references/context.md` | 6 | 4 over-cap paragraphs, 1 one-word sentence, 1 advisory |
 | `references/patterns.md` | 25 | 10 em dashes, 7 semicolons, 2 one-word sentences, 6 advisories |
 
 The serial-comma rows are the `oxford_comma` mechanic, which reports at P2 and never at the voice default. It cannot tell a three-item list from a compound sentence, so it advises and says so in the finding. Counting advisories as defects would be the same error in the other direction.
 
 **`patterns.md` is the deliberate exception.** The engine is voice-agnostic. Forcing a general reference file to conform to whichever person happens to be active would be the wrong direction, because the engine serves every voice and so follows none of them. Its em dashes and semicolons sit in before and after examples of the patterns themselves, in a form the quoted-example exemption does not recognize. That is a fair thing to hold against the file and it is left visible.
 
-**Four of `context.md`'s six are the register profile block,** where each profile is one dense line of targets. A definition list is not a paragraph, and the paragraph-length rule reads it as one. Left as is, because rewriting a reference table into prose to satisfy a prose rule is the tail wagging the dog. See the parked false positive at the end of this file, which is the same rule reading the same shape wrong.
+**`context.md` used to carry six, and four of them were the voice persona block,** where each persona is one dense line of targets. A definition list is not a paragraph, and the paragraph-length rule reads it as one. Those four were parked for two releases on the grounds that rewriting a reference table into prose to satisfy a prose rule is the tail wagging the dog, which is still true and is not what unparked them. Each persona ended its line with the registers it suits, a trailing italic sentence that is a label rather than a claim, and moving it into the persona's own label takes all five under the cap without cutting a target or adding filler. The rule still reads a definition list as a paragraph, and that half is still parked at the end of this file.
 
 **An early run found nine semicolons in `whit3rabbit.md`, in a profile that bans semicolons.** They came from the source style guide, which used them while forbidding them. Fixed by splitting the sentences, which is what the rule asks for. This is the case the voice band exists to catch: a person's stated rules and their actual habits disagreeing, in the document that is supposed to define them.
 

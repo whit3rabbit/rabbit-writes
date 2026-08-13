@@ -70,17 +70,17 @@ P0 fingerprints (chatbot artifacts, cutoff disclaimers, citation leaks, tracking
 
 ## Voice personas
 
-Optional. If the writer does not name one, infer from the input's existing register and impose nothing. Each is a set of concrete targets, not a vibe.
+A persona is optional. If the writer does not name one, infer from the input's existing register and impose nothing. Each is a set of concrete targets, not a vibe, and the parenthetical says where it belongs.
 
-**`casual`**: Contractions throughout, because their absence reads stiff. Average sentence under 14 words, fragments fine. At least one first-person or concrete-anecdote touch. Near-zero jargon. Keep warm hedges ("I think", "honestly"), cut corporate ones ("it's worth noting"). *Blog, social, community.*
+**`casual`** (*blog, social, community*): Contractions throughout, because their absence reads stiff. Average sentence under 14 words, fragments fine. At least one first-person or concrete-anecdote touch. Near-zero jargon. Keep warm hedges ("I think", "honestly"), cut corporate ones ("it's worth noting").
 
-**`professional`**: Active voice for most sentences. Vary sentence length. One concrete claim per paragraph: a number, a name, a date. Never "experts say." Make the ask explicit. Low tolerance for hedging. *LinkedIn, investor email, pitches.*
+**`professional`** (*LinkedIn, investor email, pitches*): Active voice for most sentences, varied in length. One concrete claim per paragraph: a number, a name, a date. Never "experts say." Make the ask explicit. Low tolerance for hedging.
 
-**`technical`**: Plain copulatives ("X is Y") over inflated substitutes. One idea per sentence. Imperative mood for instructions. Jargon is fine, defined on first use. Tables and lists only where content is genuinely list-shaped. *Docs, technical blog.*
+**`technical`** (*docs, technical blog*): Plain copulatives ("X is Y") over inflated substitutes. One idea per sentence. Imperative mood for instructions. Jargon is fine, defined on first use. Tables and lists only where content is genuinely list-shaped.
 
-**`warm`**: Address the reader as "you" and acknowledge them at least once. Cut intensifiers ("very", "truly", "incredibly") in favor of stronger verbs. No performative empathy ("I completely understand how you feel"). Medium sentences, 15-20 words, unhurried. *Mentorship, onboarding, thank-yous.*
+**`warm`** (*mentorship, onboarding, thank-yous*): Address the reader as "you" and acknowledge them at least once. Cut intensifiers ("very", "truly", "incredibly") in favor of stronger verbs. No performative empathy ("I completely understand how you feel"). Medium sentences, 15-20 words, unhurried.
 
-**`blunt`**: Lead with the claim. Cut windups. Periods for emphasis, not dashes. No padding to reach a rule of three. Near-zero hedging. Short declaratives with the occasional long sentence for contrast. *Decision memos, hard feedback.*
+**`blunt`** (*decision memos, hard feedback*): Lead with the claim and cut the windup. Periods for emphasis, not dashes. No padding to reach a rule of three. Near-zero hedging. Short declaratives with the occasional long sentence for contrast.
 
 ## How the axes compose
 

@@ -14,7 +14,7 @@ A user-supplied writing sample or voice profile **outranks every style rule in t
 
 If the sample uses em dashes, keep them at roughly the sample's frequency. If the writer says "stuff" and "things", keep that register rather than upgrading their vocabulary. If they open three paragraphs with "So," and it is characteristic, leave it.
 
-Matching the author beats scrubbing the tell. Always.
+Matching the author always beats scrubbing the tell.
 
 ---
 
