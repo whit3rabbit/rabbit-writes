@@ -75,7 +75,7 @@ if HERE not in sys.path:
 
 from rwlib import docx_text                      # noqa: E402
 from rwlib import fixes as fixes_mod             # noqa: E402
-from rwlib import inflect, injection, language, registers, sarif, suppress  # noqa: E402
+from rwlib import cli_error, inflect, injection, language, registers, sarif, suppress  # noqa: E402
 from rwlib import stylometry                       # noqa: E402
 from rwlib import findings as findings_mod       # noqa: E402
 from rwlib import lexicon as lexicon_mod         # noqa: E402
@@ -1187,23 +1187,51 @@ def run_apply_safe(text, path, voice_rules, write, to_stdout=False,
               "--apply-safe --stdout into a diff.")
         return 0
     if not path:
-        print("--write needs a file. Reading from stdin has nothing to write "
-              "back to.", file=sys.stderr)
+        examples = [
+            "python3 scan.py draft.md",
+            "python3 scan.py draft.md --json",
+            "python3 scan.py draft.md --apply-safe --write"
+        ]
+        print(cli_error.format_llm_error(
+            "scan.py", "--write requires a file argument (cannot write back when reading from stdin)",
+            parser=None, examples=examples), file=sys.stderr)
         return 2
     # `newline` is a str when the file used one style throughout, a tuple when it
     # mixed them, and None on a file with no line break at all. Only the first
     # case can be reproduced faithfully; the other two fall back to the platform
     # default, which is what they got before.
-    with open(path, "w", encoding="utf-8",
-              newline=newline if isinstance(newline, str) else None) as fh:
-        fh.write(fixed)
+    try:
+        with open(path, "w", encoding="utf-8",
+                  newline=newline if isinstance(newline, str) else None) as fh:
+            fh.write(fixed)
+    except OSError as exc:
+        examples = [
+            "python3 scan.py draft.md",
+            "python3 scan.py draft.md --apply-safe --write"
+        ]
+        print(cli_error.format_file_error(
+            "scan.py", path, "file", expected_type="writable file path",
+            details=str(exc), examples=examples), file=sys.stderr)
+        return 2
     print("\nwrote %d edit(s) to %s" % (len(applied), path))
     return 0
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    examples = [
+        "python3 scan.py draft.md",
+        "python3 scan.py draft.md --json",
+        "python3 scan.py draft.md --sarif > scan.sarif",
+        "python3 scan.py draft.md --profile technical-blog",
+        "python3 scan.py draft.md --voice-rules voices/whit3rabbit.rules.json",
+        "python3 scan.py draft.md --voice auto",
+        "python3 scan.py draft.md --apply-safe --write"
+    ]
+    ap = cli_error.LLMArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        examples=examples
+    )
     ap.add_argument("file", nargs="?", help="file to scan; omit to read stdin")
     ap.add_argument("--profile", default=DEFAULT_REGISTER, choices=sorted(REGISTERS),
                     help="register profile (default: %s)" % DEFAULT_REGISTER)
@@ -1259,19 +1287,31 @@ def main():
         # edits text files, and pretending to edit a zip would either destroy
         # the document or silently write a .md beside it.
         if args.apply_safe:
-            print("scan: --apply-safe edits text files and cannot write a "
-                  ".docx. Scan it without --apply-safe instead.",
-                  file=sys.stderr)
+            print(cli_error.format_file_error(
+                "scan.py", args.file, "file", expected_type="text markdown file",
+                details="--apply-safe edits text files and cannot write a .docx",
+                examples=examples
+            ), file=sys.stderr)
             return 2
         try:
             text, docx_findings = docx_text.extract(args.file)
         except docx_text.DocxError as exc:
-            print("scan: %s" % exc, file=sys.stderr)
+            print(cli_error.format_file_error(
+                "scan.py", args.file, "file", expected_type=".docx file",
+                details=str(exc), examples=examples
+            ), file=sys.stderr)
             return 2
     elif args.file:
-        with open(args.file, encoding="utf-8") as fh:
-            text = fh.read()
-            newlines = fh.newlines
+        try:
+            with open(args.file, encoding="utf-8") as fh:
+                text = fh.read()
+                newlines = fh.newlines
+        except OSError as exc:
+            print(cli_error.format_file_error(
+                "scan.py", args.file, "file", expected_type="file path",
+                details=str(exc), examples=examples
+            ), file=sys.stderr)
+            return 2
     else:
         text = sys.stdin.read()
 
@@ -1292,10 +1332,13 @@ def main():
             rules_path = os.path.join(voices_mod.VOICES_DIR,
                                       args.voice + voices_mod.RULES_SUFFIX)
             if not os.path.exists(rules_path):
-                print("scan: no profile named %r in %s. Installed: %s"
-                      % (args.voice, voices_mod.VOICES_DIR,
-                         ", ".join(voices_mod.installed()) or "none"),
-                      file=sys.stderr)
+                installed_str = ", ".join(voices_mod.installed()) or "none"
+                print(cli_error.format_file_error(
+                    "scan.py", args.voice, "--voice",
+                    expected_type="installed voice profile name",
+                    details="No profile named %r in %s. Installed: %s"
+                            % (args.voice, voices_mod.VOICES_DIR, installed_str),
+                    examples=examples), file=sys.stderr)
                 return 2
     if rules_path:
         try:
@@ -1303,7 +1346,10 @@ def main():
             lineage = voices_mod.lineage(rules_path)
         except voices_mod.VoiceError as exc:
             if named:
-                print("scan: %s" % exc, file=sys.stderr)
+                print(cli_error.format_file_error(
+                    "scan.py", rules_path, "--voice-rules / --voice",
+                    expected_type="voice rules file path (.rules.json)",
+                    details=str(exc), examples=examples), file=sys.stderr)
                 return 2
             voice_note = ("%s. No voice band in this report, everything else "
                           "still ran" % exc)

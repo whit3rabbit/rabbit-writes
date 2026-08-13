@@ -9,7 +9,12 @@ writes to files, so a broken promise there is silent and destructive. These are
 the checks on the checks.
 """
 
-from helpers import run_verify, scan_module, verify_module
+import sys
+
+from helpers import SCRIPTS, run_verify, scan_module, verify_module
+
+sys.path.insert(0, SCRIPTS)
+from rwlib import corpus, fixes                                    # noqa: E402
 
 ORIGINAL = ("# Heading One\n\n"
             "Some prose that delves into the tapestry.\n\n"
@@ -262,3 +267,159 @@ def test_alt_text_stays_editable():
     edited = IMG_DOC.replace("![architecture]", "![architecture diagram]")
     result, code = run_verify(IMG_DOC, edited)
     assert code == 0, result["violations"]
+
+
+# --------------------------------------------------------------------------
+# facts: numbers, dates, quotations
+# --------------------------------------------------------------------------
+#
+# Guardrail 1 says never invent a number, a date or a quote, and until these it
+# was prose in SKILL.md with nothing behind it. Every other check here proves
+# the rewrite did not touch a code fence, and none of them noticed the sentence
+# that turned 3,200 into 3,000.
+#
+# The assertions come in pairs on purpose. A checker that never fires passes
+# every carve-out test in the file, so each "this reformat is allowed" case has
+# a "this corruption is caught" case beside it.
+
+PROSE = ("The build reads a manifest and writes a report. It runs from a "
+         "checkout with nothing installed, which is the whole bargain.\n\n")
+
+
+def test_a_changed_number_fails_and_names_both_halves():
+    """One lost and one added is the same fact moving. Printing only the loss
+    makes a reader go and find the other half themselves."""
+    before = PROSE + "We shipped 3,200 units in the first quarter.\n"
+    after = PROSE + "We shipped 3,000 units in the first quarter.\n"
+    result, code = run_verify(before, after)
+    assert code == 1, result
+    detail = [v["detail"] for v in result["violations"]
+              if v["kind"] == "number altered or removed"]
+    assert detail and "3200" in detail[0] and "3000" in detail[0], detail
+
+
+def test_reformatting_a_number_is_not_a_changed_number():
+    """A thousands separator, a percent spelling and a range spelling are all
+    formatting. This check exists for the edit that moved the value."""
+    before = PROSE + "It saved 1,200 hours, or 10-20% of the budget.\n"
+    after = PROSE + "It saved 1200 hours, or 10 to 20 percent of the budget.\n"
+    result, code = run_verify(before, after)
+    assert code == 0, result["violations"]
+
+
+def test_a_date_reformat_is_carved_out_and_a_moved_date_is_not():
+    """A `date_format: dmy` profile instructs the rewrite to move a date
+    between spellings, so a checker that failed that would be failing the edit
+    the skill asked for."""
+    before = PROSE + "We shipped on September 12, 2025 after two delays.\n"
+    same, code = run_verify(before, PROSE +
+                            "We shipped on 12 September 2025 after two delays.\n")
+    assert code == 0, same["violations"]
+    moved, code = run_verify(before, PROSE +
+                             "We shipped on 12 September 2024 after two delays.\n")
+    assert code == 1, moved
+    assert any(v["kind"] == "date altered or removed"
+               for v in moved["violations"]), moved["violations"]
+
+
+def test_a_quotation_survives_reflow_and_curling_but_not_rewording():
+    before = PROSE + 'She said "the rollback took four minutes" and left.\n'
+    reflowed, code = run_verify(
+        before, PROSE + 'She said "the rollback took   four\nminutes" and left.\n')
+    assert code == 0, reflowed["violations"]
+    reworded, code = run_verify(
+        before, PROSE + 'She said "the rollback took several minutes" and left.\n')
+    assert code == 1, reworded
+    assert any(v["kind"] == "quotation altered or removed"
+               for v in reworded["violations"]), reworded["violations"]
+
+
+def test_an_added_number_is_reported_and_never_fails():
+    """A rewrite that turns "the last two years" into "2024 and 2025" is
+    deriving a number the source carried, not inventing one. The asymmetry is a
+    decision, and this is where it is pinned."""
+    before = PROSE + "It happened over the last two years.\n"
+    after = PROSE + "It happened over 2024 and 2025.\n"
+    result, code = run_verify(before, after)
+    assert code == 0, result["violations"]
+    assert result["facts"]["numbers_added"], result["facts"]
+
+
+def test_allow_facts_reports_instead_of_failing():
+    before = PROSE + "We shipped 3,200 units.\n"
+    after = PROSE + "We shipped 3,000 units.\n"
+    result, code = run_verify(before, after, "--allow-facts")
+    assert code == 0, result["violations"]
+    assert any(c["kind"] == "number altered or removed"
+               for c in result["fact_changes"]), result["fact_changes"]
+
+
+def test_a_number_inside_a_code_fence_is_not_a_prose_fact():
+    """The fence is compared verbatim two checks above, which is the stricter
+    promise. Counting it here reports one broken promise twice."""
+    before = PROSE + "```\nPORT = 8080\n```\n"
+    result, _ = run_verify(before, before)
+    assert result["facts"]["numbers_after"] == 0, result["facts"]
+
+
+def test_an_html_character_reference_is_markup_and_not_a_number():
+    """`&#8203;` is a zero-width space, and stripping it is an instructed fix.
+    Read as a number, the fixer's own output failed verification with "8203 was
+    removed"."""
+    before = PROSE + "word&#8203;break here.\n"
+    after = PROSE + "wordbreak here.\n"
+    result, code = run_verify(before, after)
+    assert code == 0, result["violations"]
+
+
+def test_an_entity_delta_is_reported_and_never_fails():
+    """Report-only forever. A capitalized-run regex cannot tell a product name
+    from the first word of a sentence, and set-equality on it would fail every
+    rewrite that splits a sentence at a capital."""
+    before = PROSE + "The report covers Acme Corp and its Northwind division.\n"
+    after = PROSE + "The report covers its Northwind division.\n"
+    result, code = run_verify(before, after)
+    assert code == 0, result["violations"]
+    assert "Acme Corp" in result["facts"]["entities_lost"], result["facts"]
+
+
+# --------------------------------------------------------------------------
+# the same checks, over 100 real third-party documents
+# --------------------------------------------------------------------------
+#
+# CLAUDE.md requires a new detector to be calibrated against these before it is
+# wired to anything, and to assert the zero rather than report it: a false
+# positive here is a stranger's blocked commit, and worse than that, verify.py's
+# `ok` gates whether `scan.py --apply-safe --write` writes at all. A false
+# positive does not produce a noisy report, it silently refuses to write and
+# blames the fixer.
+
+def test_no_corpus_readme_loses_a_fact_against_itself():
+    """Identity. Any loss here is a non-idempotent canonicalizer, which is a bug
+    in the extractor rather than a false positive."""
+    verify = verify_module()
+    bad = []
+    for slug, path in corpus.readme_paths():
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+        result = verify.validate(text, text)
+        if not result["ok"]:
+            bad.append((slug, result["violations"][:2]))
+    assert not bad, bad
+
+
+def test_the_mechanical_fixer_never_costs_a_corpus_readme_a_fact():
+    """`scan.run_apply_safe` refuses to write when verify says not ok, so a
+    false positive here is a fixer that stops working and reports itself as the
+    problem. The fixer only strips hidden characters, tracking parameters and
+    single-word substitutions, none of which is a number."""
+    verify = verify_module()
+    bad = []
+    for slug, path in corpus.readme_paths():
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            text = fh.read()
+        fixed, applied, _ = fixes.apply(text, None)
+        result = verify.validate(text, fixed)
+        if not result["ok"]:
+            bad.append((slug, applied, result["violations"][:2]))
+    assert not bad, bad

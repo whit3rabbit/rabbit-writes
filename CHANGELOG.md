@@ -7,7 +7,97 @@ what the engine flags. The second, below, changes it in six places and says so.
 The 100-repo corpus regression, the calibration fixtures, and every published
 self-scan number were re-run after both.
 
+### The conversion is checkable now, and the rewrite is a plan
+
+- **`attain.py`: did the conversion land?** `verify.py` proves a rewrite broke
+  nothing and cannot tell a real conversion from eleven punctuation fixes,
+  because both pass every rule it has. That failure has a name now. Given the
+  two documents and a profile, this reports the distance both ways and each of
+  the six measures with its gap in the writer's own sample sd, signed, because
+  "10 sd under" and "10 sd over" call for opposite edits. Five verdicts, and
+  `flat` is the one it exists for: the distance barely moved and no measure
+  moved a full sd, which is the shallow conversion `SKILL.md` has named in prose
+  three times with nothing behind it. The exit contract is the new rule in one
+  line: **a number about a document never blocks, a number about an edit may.**
+  `voice-distance` still cannot fail `scan.py --check`, because that is what a
+  pre-commit hook runs in a stranger's repository. `attain.py --check` exits 1
+  on `flat` and `regressed`, never on `missed`, because a document that cannot
+  reach the target without inventing content is guardrail 1 working. No hook
+  ships for it and `validate.py` fails one that appears without being opt-in.
+- **A fingerprint carries the writer's envelope, not only their average.**
+  Schema 2 adds a `measures` block with min and max as well as mean and sd, and
+  the sentence-length distribution as deciles. `measure_voice.py` fills both
+  from the same samples, and its own table gained the range column, which is the
+  one to read: a mean with a wide envelope under it is a writer with two
+  registers, and the mean is nobody. The arithmetic lives in `stylometry.py` and
+  the measuring does not, because `scan.py` imports that module and a second
+  copy of `compute_stats` is the drift `rwlib` exists to end.
+- **`voice-caricature`: more characteristic than the writer's own samples.**
+  The overshoot `references/false-positives.md` warns about, wearing this
+  writer's clothes instead of a generic humanizer's. The obvious rule does not
+  work and the number is published: "any measure outside the sample min-max"
+  fires on 95.5% of held-out documents by the same writer at three samples. With
+  direction, magnitude in sample sd, an envelope pad and a two-measure minimum
+  it fires on 0.1% at three samples, 0.0% at four, and none of the 80 measurable
+  documents in the 100-README corpus. P2 forever, never fixable, and it still
+  fires on a document that actually is one.
+- **`signature_moves`, which is `banned_regex` pointed the other way.** A move
+  the writer makes on purpose, with a ceiling and optionally a floor, so "BLUF"
+  does not get installed on every paragraph. Capped at P2 whatever
+  `default_priority` says, and that is not negotiable: `voice-signature-underuse`
+  is the first finding in this engine that tells an editor to *add* something,
+  and an editor made to satisfy a P0 would insert the move until the check
+  passed, which is the tic `references/voice.md` warns about. Opt-in, P2, never
+  fixable are its three guards.
+- **`contrastive_pairs`.** The Taste Interviewer has always asked for a sentence
+  the writer would write and one they would refuse, and had nowhere to put the
+  answer, so both halves evaporated into adjectives. They go in the rules file
+  now, unenforced, beside `preferred_substitutions`, and a conversion is shown
+  them at the point it has to choose a sentence.
+- **`learn_edits.py` reads a correction instead of a memory.** Adjust mode ran
+  on recall, which is worst exactly when it matters. Given what the skill
+  produced and what the author turned it into, this proposes substitutions,
+  removals, opener shifts, mechanics answers and measure moves, each with its
+  count. Nothing is written, and nothing appears that did not repeat at least
+  twice: a word replaced once was wrong in that sentence rather than wrong in
+  general.
+- **The rewrite is a plan and then an execution.** `SKILL.md` splits a
+  conversion in two, because compliance drops as the number of simultaneous
+  instructions rises and deciding while writing is how a conversion quietly
+  becomes a word swap. `attain.py --plan` turns the stored sentence
+  distribution into a per-paragraph target: "five sentences, at least one under
+  9 words, at least one over 29, median around 16". A band, deliberately not a
+  sampled per-sentence script, which nobody hits and which manufactures a
+  cadence rather than restoring one. In `deslop` the counterpart is span
+  scoping: edit the flagged span plus one sentence of context and leave the rest
+  alone, because the model cannot smooth what it never touches. Both loops cap
+  at two passes.
+- **The reconstruction eval.** `scripts/voice-eval/` scores the whole pipeline
+  end to end with labels nobody had to write: deslop a piece the writer actually
+  wrote, convert it back, and measure how much of the distance the round trip
+  closed, with the original as the answer key. The corpus is empty and the
+  scorer runs in CI over synthetic triples with known answers, which is the same
+  bargain `scripts/detector-corpus/` already made.
+
 ### What the engine flags, changed on purpose
+
+- **Guardrail 1 has something behind it now.** `verify.py` compares numbers,
+  dates and quotations as multisets, so a paraphrase that turns 3,200 into 3,000
+  fails. Reformatting does not: a date compares as its ISO form so a
+  `date_format` conversion passes, a range is one token, a version is an
+  identifier, and `1,200` and `1200` are one number. Only the loss fails, and
+  the asymmetry is a decision: a rewrite that turns "the last two years" into
+  "2024 and 2025" is deriving a number the source carried. Entities are listed
+  and never fail, for every reason `false-positives.md` gives about a crude
+  signal. Calibrated over the 100-README corpus before it was wired in: 0 of 100
+  on identity, 0 of 100 through the mechanical fixer, 0 of 100 on each of eight
+  benign reformats, and caught in 65 of 65 when a prose number was corrupted.
+  Five of its carve-outs exist because that corpus produced a false positive
+  nobody would have guessed, and `PROOF.md` lists them.
+- **`contraction_rate` is one of the engine's stats.** It was computed in
+  `measure_voice.py` off a private regex, which was a second counter for a fact
+  `scan.py` needed, and the two spellings disagreed about whether a contraction
+  starts with a word character or a letter.
 
 - **A voice is a measurable target now, not only a list of refusals.**
   `measure_voice.py --name <voice> --write-fingerprint` writes
@@ -107,6 +197,26 @@ self-scan number were re-run after both.
 
 ### New tools
 
+- **`measure_voice.py --questions`, and the route it belongs to.** `voice-setup`
+  had two ways to build a profile from nothing and one sentence about doing
+  both, which is the one worth doing: a counter sees what somebody wrote and
+  never what they refused to write, and a person is an unreliable narrator of
+  their own prose who knows exactly what they will not publish. The two are
+  route 3 in `SKILL.md` now, and the mode is what makes the second half know
+  what the first half found. It prints an interview instead of the report, at
+  most ten questions, and asks only what the samples could not settle. Every
+  `forbid` it would have proposed is a silence rather than a refusal, so it
+  comes back as a question, and a writer who used em dashes in four pieces is
+  not asked about em dashes. **The questions and the counts print as two
+  blocks, in that order, and that is the whole design.** A count read out first
+  has told the author the answer, and what comes back is agreement rather than
+  evidence. `test_no_question_carries_its_own_count` pins it, the reserved
+  refusal questions survive the budget because this skill's own rule is to cut
+  from Structure and Tone and never from Hard nos, and every question trimmed to
+  hold the cap is named rather than dropped quietly. It refuses to interview
+  over a contaminated sample set, for one step past the reason the P0 gate
+  exists: ten answers about somebody else's prose are ten answers about
+  somebody else.
 - **`scan.py --voice auto`**, which resolves `.rabbit-voice`, then
   `voices/ACTIVE`, then a lone installed profile. The order lived only in
   `readme_check.py`, so the two checkers in one plugin could disagree about

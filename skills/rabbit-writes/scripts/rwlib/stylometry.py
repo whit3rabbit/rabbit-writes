@@ -44,6 +44,17 @@ The per-marker contributors are the half that makes it actionable. A bare
 distance tells a rewrite loop nothing. "additionally at 3.1 sd over the
 profile, so at 2.4 sd under" tells it which words to trade.
 
+Two blocks, not one. The markers answer "does this sound like them". The
+`measures` block answers "is it built the same way", and it carries min and max
+as well as a mean, because the writer's own envelope is what says a converted
+document has overshot into caricature. The sentence shape is the distribution
+behind `avg_sentence_words`, stored as deciles, and it is a rewrite target
+rather than a threshold: nothing in scan.py raises a finding off it.
+
+Neither of those is measured here. They come out of `scan.compute_stats`, and
+scan.py imports this module, so the caller passes the numbers in. That is the
+same inversion `distributions(..., split_sentences=None)` already uses.
+
 **Callers pass prose with the markup already stripped.** `scan.strip_for_stats`
 is that function, and both call sites in this plugin run it first. A fingerprint
 built over raw markdown and compared against stripped prose would be measuring
@@ -57,6 +68,7 @@ import json
 import math
 import os
 import re
+import statistics
 from collections import Counter
 
 try:
@@ -64,7 +76,7 @@ try:
 except ImportError:                     # run as a script: no package, but
     from voices import strip_rules_suffix   # rwlib/ is on sys.path
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 # The file that sits beside a profile's rules. scan.py looks for it there and
 # runs without one, which is the only sane default: a fingerprint costs the
@@ -407,10 +419,343 @@ def distributions(text, top=8, split_sentences=None):
 
 
 # --------------------------------------------------------------------------
+# the measures, and the shape behind the average
+# --------------------------------------------------------------------------
+#
+# A fingerprint's marker block answers "does this sound like them". These
+# answer "is it built the same way": the six stylometrics a profile's
+# `## Measured from samples` block already carries, plus the sentence-length
+# distribution the averages hide.
+#
+# **This module does not measure them.** Every one comes out of
+# `scan.compute_stats`, and `scan.py` imports this module, so the reverse edge
+# is a cycle. The caller passes the numbers in, which is the same inversion
+# `distributions(..., split_sentences=None)` already uses and for the same
+# reason: this is the one place a voice gets measured and it should stay usable
+# on a bare string.
+
+# Which measures a fingerprint carries, in the order a report prints them.
+# Moved here from measure_voice.py, which now keeps only the spelling each one
+# uses in voices/TEMPLATE.md. Editing this list changes what every stored
+# fingerprint means, the same as MARKER_WORDS, which is what SCHEMA_VERSION is
+# for.
+MEASURES = ("avg_sentence_words", "sentence_sd", "burstiness", "mattr",
+            "em_dashes_per_1k", "contraction_rate")
+
+# Deciles. Eleven boundaries once the min and the max are on the ends.
+#
+# Not the raw sorted lengths, which are exact and resamplable and also ship the
+# writer's prose shape verbatim in a file that travels with the plugin, which
+# is the argument that made exemplars opt-in. Not fixed histogram buckets,
+# which turn the bucket edges into a calibration constant and quantize
+# anything sampled back out. Eleven numbers mean the same thing at three
+# samples and at thirty.
+SHAPE_QUANTILES = 10
+
+# What counts as a short sentence and a long one. references/craft.md and
+# patterns.md section 52 both talk in these terms ("mix 3-8 word sentences with
+# 20+ word ones"), and the two shares are the facts deciles hide.
+SHORT_SENTENCE_WORDS = 8
+LONG_SENTENCE_WORDS = 30
+
+# How far off the profile mean a measure may sit before a gate calls it missed,
+# in sample sd. 1.5 rather than 2, because this compares a document against a
+# writer's own spread and not against a population.
+ATTAIN_TOLERANCE = 1.5
+
+# The sd floor for that comparison, as a fraction of the measure's own mean.
+# Relative only, with no absolute floor, because the six measures have six
+# different units and one number cannot floor them all. Where mean and sd are
+# both zero, the floor is zero too and the comparison says so rather than
+# dividing.
+ATTAIN_SD_FLOOR_FRACTION = 0.10
+
+
+# --------------------------------------------------------------------------
+# caricature
+# --------------------------------------------------------------------------
+#
+# A converted document whose stats sit outside the range of the writer's own
+# samples is more them than they are. That is the humanizer failure
+# references/false-positives.md warns about, wearing this profile's clothes: an
+# editor that applies every rule at maximum strictness installs a caricature.
+#
+# **The obvious rule does not work, and it was measured.** Leave-one-out over 13
+# documents by this repository's writer, rule "any measure outside the sample
+# min-max": it fires on 95.5% of held-out pairs at three samples and 90.7% at
+# four. Min and max over three samples are two order statistics with enormous
+# variance, and with three samples two of them define the envelope. That is a
+# constant, not a detector.
+#
+# Four qualifications bring it to 0.2% at three samples and 0.0% at four, and
+# each one is here because removing it puts the number back.
+
+# Corpus medians, measured 2026-08-13 over the 100 READMEs in
+# docs/readme-analysis. Hardcoded with the date rather than derived from
+# corpus_summary.json, the way scan.BANDS is: a corpus regeneration silently
+# flipping a detector's direction is worse than a stale constant.
+#
+# These pick a sign and nothing else. READMEs are not prose, their sentence
+# counts are inflated by list items, and none of these numbers is used as a
+# threshold. What they answer is "which side of normal does this writer sit on",
+# so that only the tail *away* from normal counts as exaggeration.
+CARICATURE_POPULATION = {
+    "avg_sentence_words": 22.5,
+    "burstiness": 1.14,
+    "mattr": 0.734,
+    "em_dashes_per_1k": 11.4,
+    "contraction_rate": 0.42,
+}
+
+# `sentence_sd` is deliberately absent. It is sd and `burstiness` is sd/mean, so
+# they are two spellings of one fact: over the 100-README corpus every single
+# co-fire was that pair and nothing else, which made a two-measure rule fire on
+# one. Keeping both would have meant the rule requiring two measures was
+# satisfied by one.
+CARICATURE_MEASURES = ("avg_sentence_words", "burstiness", "mattr",
+                       "em_dashes_per_1k", "contraction_rate")
+
+# A measure whose profile mean sits within this many sample sd of the population
+# value does not participate, because the direction of exaggeration is
+# undetermined. Direction alone takes the naive 95.5% to 65.6%.
+CARICATURE_DIRECTION_MIN_SD = 0.25
+
+# How far past the writer's own mean, in sample sd, before a measure counts.
+CARICATURE_Z = 2.0
+
+# How far past the envelope, as a multiple of the envelope's own width or one
+# sample sd, whichever is larger. Distance past min-max alone is not enough: the
+# envelope of three samples is two draws.
+CARICATURE_PAD = 1.0
+
+# How many measures have to fire together. `false-positives.md` says look for
+# clusters and never isolated hits, and this is that rule applied to
+# stylometrics.
+CARICATURE_MIN_MEASURES = 2
+
+# A two-sample envelope is one interval between two points, and the pad has
+# nothing to scale against.
+CARICATURE_MIN_SAMPLES = 3
+
+# 20 of the 100 corpus READMEs have under 25 prose sentences and 11 have under
+# 10. Burstiness over nine sentences is noise, so a word floor alone is not
+# enough here even though it is elsewhere.
+CARICATURE_MIN_SENTENCES = 25
+
+
+def caricature(fp, stats):
+    """Measures where this document out-writers the writer, or None.
+
+    Returns a dict at every verdict, so a caller can publish the measurement
+    whether or not it crossed: `{"exceeded": [...], "eligible": n, "skipped":
+    reason}`. `exceeded` empty means the document is inside the envelope or the
+    check did not apply, and `skipped` says which.
+
+    None only when the fingerprint carries no measures at all.
+    """
+    measures = (fp or {}).get("measures") or {}
+    if not measures:
+        return None
+    n_samples = fp.get("n_samples") or 0
+    if n_samples < CARICATURE_MIN_SAMPLES:
+        return {"exceeded": [], "eligible": 0,
+                "skipped": "%d samples, and an envelope needs %d"
+                           % (n_samples, CARICATURE_MIN_SAMPLES)}
+    if stats.get("word_count", 0) < RELIABLE_WORDS:
+        return {"exceeded": [], "eligible": 0,
+                "skipped": "under %d words" % RELIABLE_WORDS}
+    if stats.get("sentence_count", 0) < CARICATURE_MIN_SENTENCES:
+        return {"exceeded": [], "eligible": 0,
+                "skipped": "under %d sentences" % CARICATURE_MIN_SENTENCES}
+
+    exceeded, eligible = [], 0
+    for name in CARICATURE_MEASURES:
+        entry = measures.get(name)
+        value = stats.get(name)
+        population = CARICATURE_POPULATION.get(name)
+        if entry is None or value is None or population is None:
+            continue
+        sd = max(entry["sd"], ATTAIN_SD_FLOOR_FRACTION * abs(entry["mean"]))
+        if sd == 0:
+            # Mean and sd both zero. A writer who never uses an em dash makes
+            # any dash infinitely exaggerated, and `voice-em-dash` already owns
+            # that fact. Double-reporting it would be the two-checks-one-fact
+            # bug uncovered_image_srcs argues against.
+            continue
+        offset = entry["mean"] - population
+        if abs(offset) < CARICATURE_DIRECTION_MIN_SD * sd:
+            continue                    # direction undetermined
+        eligible += 1
+        high = offset > 0
+        edge = entry["max"] if high else entry["min"]
+        width = max(entry["max"] - entry["min"], sd)
+        past = (value - edge) if high else (edge - value)
+        if past < CARICATURE_PAD * width:
+            continue
+        if abs(value - entry["mean"]) / sd < CARICATURE_Z:
+            continue
+        exceeded.append({"measure": name, "value": round(value, 3),
+                         "sample_min": entry["min"], "sample_max": entry["max"],
+                         "direction": "above" if high else "below",
+                         "z": round((value - entry["mean"]) / sd, 2)})
+    if len(exceeded) < CARICATURE_MIN_MEASURES:
+        exceeded = []
+    return {"exceeded": exceeded, "eligible": eligible, "skipped": None}
+
+
+def _stdev(values):
+    """Sample standard deviation, or 0.0 for a single value.
+
+    Across samples, not within one. It answers "how consistent is this person
+    from piece to piece", which is the number that says whether one profile can
+    describe them at all or whether they have two registers somebody is about
+    to average into a third that is nobody.
+    """
+    return statistics.stdev(values) if len(values) > 1 else 0.0
+
+
+def measure_stats(sample_measures):
+    """{measure: {"mean", "sd", "min", "max", "n"}} over the samples.
+
+    `sample_measures` is one {measure: value or None} dict per sample, as
+    `scan.compute_stats` returns them. A None is dropped and lowers that
+    measure's n, which is why n is per measure rather than one number for the
+    file: `mattr` is None on any sample under the 100-word window, and a
+    fingerprint that reported n=4 for a measure taken from 3 samples would be
+    overstating its own base.
+
+    min and max are the point of this over a bare mean and sd. They are the
+    writer's own envelope, and a document outside it is more characteristic
+    than they are, which is the caricature this engine has to be able to see.
+    """
+    out = {}
+    for m in MEASURES:
+        values = [s.get(m) for s in sample_measures]
+        values = [float(v) for v in values if v is not None]
+        if not values:
+            continue
+        out[m] = {"mean": round(sum(values) / len(values), 3),
+                  "sd": round(_stdev(values), 3),
+                  "min": round(min(values), 3),
+                  "max": round(max(values), 3),
+                  "n": len(values)}
+    return out
+
+
+def sentence_shape(lengths_per_sample):
+    """The stored sentence-length distribution, or None with nothing to store.
+
+    `lengths_per_sample` is one list of per-sentence word counts per sample,
+    measured over the same stripped prose the markers were measured over. A
+    shape built over raw markdown and compared against stripped prose is
+    measuring the fences.
+
+    The quantile definition is pinned here on purpose: changing it moves every
+    stored file, so which one it is matters less than writing it down.
+    `statistics.quantiles(..., method="inclusive")` is available on the 3.9
+    floor and does not extrapolate past the observed data, which matters when
+    the data is three samples.
+    """
+    per_sample = [sorted(n for n in lengths if n > 0)
+                  for lengths in lengths_per_sample]
+    per_sample = [s for s in per_sample if s]
+    flat = sorted(n for s in per_sample for n in s)
+    if not flat:
+        return None
+    if len(flat) > 1:
+        cuts = statistics.quantiles(flat, n=SHAPE_QUANTILES, method="inclusive")
+    else:
+        cuts = [flat[0]] * (SHAPE_QUANTILES - 1)
+    return {
+        "n_sentences": len(flat),
+        # Integers, because word counts are. Never key a check off the first or
+        # the last of these: with three samples they are single sentences.
+        "quantiles": [flat[0]] + [int(round(c)) for c in cuts] + [flat[-1]],
+        "mean": round(sum(flat) / len(flat), 2),
+        "sd": round(_stdev(flat), 2),
+        "short_share": round(sum(1 for n in flat
+                                 if n <= SHORT_SENTENCE_WORDS) / len(flat), 3),
+        "long_share": round(sum(1 for n in flat
+                                if n >= LONG_SENTENCE_WORDS) / len(flat), 3),
+        # The consistency receipt. It says whether this is one shape or the
+        # average of two registers, which no aggregate can.
+        "per_sample_median": [int(statistics.median(s)) for s in per_sample],
+    }
+
+
+def shape_target(shape, n_sentences):
+    """What a paragraph of `n_sentences` should look like in this voice.
+
+    A band, never a script. "Five sentences, at least one under 9 words, at
+    least one over 29, median around 16" is a constraint a rewrite can hold and
+    check. A sampled list of exact per-sentence word counts is not: nobody hits
+    it, and chasing it manufactures the cadence references/false-positives.md
+    calls a new fingerprint rather than the absence of one.
+
+    Returns None when the fingerprint carries no shape.
+    """
+    if not shape or n_sentences < 1:
+        return None
+    q = shape["quantiles"]
+    return {
+        "sentences": n_sentences,
+        "short_at_least": min(n_sentences,
+                              int(round(shape["short_share"] * n_sentences))),
+        "long_at_least": min(n_sentences,
+                             int(round(shape["long_share"] * n_sentences))),
+        "short_under": SHORT_SENTENCE_WORDS + 1,
+        "long_over": LONG_SENTENCE_WORDS - 1,
+        "median": q[5],
+        "p10": q[1],
+        "p90": q[9],
+        "sd": shape["sd"],
+    }
+
+
+def measure_gaps(fp, measured, tolerance=ATTAIN_TOLERANCE):
+    """One document's stats against a fingerprint's measure block.
+
+    The single definition of "off the profile", so the attainment gate and the
+    caricature guard cannot disagree about what that means. Both directions of
+    the comparison are reported and neither is judged here: a verdict needs the
+    before document, which this does not have.
+
+    A measure the profile does not carry, or the document does not have, comes
+    back with `within: None`. That is not the same as passing, and every caller
+    has to say which it means.
+    """
+    profile = (fp or {}).get("measures") or {}
+    out = {}
+    for m in MEASURES:
+        entry = profile.get(m)
+        value = measured.get(m)
+        row = {"value": value, "profile": entry, "sd_used": None,
+               "sd_off": None, "within": None}
+        if entry is None or value is None:
+            out[m] = row
+            continue
+        sd_used = max(entry["sd"], ATTAIN_SD_FLOOR_FRACTION * abs(entry["mean"]))
+        row["sd_used"] = round(sd_used, 3)
+        gap = value - entry["mean"]
+        if sd_used == 0:
+            # Mean and sd both zero: a writer who never does the thing at all,
+            # em_dashes_per_1k being the case that actually happens. Any nonzero
+            # value is off, and sd_off stays null rather than reporting an
+            # infinity a report would have to special-case anyway.
+            row["within"] = gap == 0
+        else:
+            row["sd_off"] = round(gap / sd_used, 2)
+            row["within"] = abs(row["sd_off"]) <= tolerance
+        out[m] = row
+    return out
+
+
+# --------------------------------------------------------------------------
 # the fingerprint
 # --------------------------------------------------------------------------
 
-def fingerprint(sample_texts, voice=None, exemplars=False):
+def fingerprint(sample_texts, voice=None, exemplars=False,
+                sample_measures=None, sentence_lengths=None):
     """The stored fingerprint for a set of the writer's samples.
 
     Carries the calibration with it: each sample's leave-one-out distance to
@@ -423,6 +768,15 @@ def fingerprint(sample_texts, voice=None, exemplars=False):
     `exemplars=True` embeds the writer's own paragraphs, for conditioning a
     conversion. Opt-in, because it copies their prose into a file that then
     travels with the plugin.
+
+    `sample_measures` and `sentence_lengths` are the v2 half, one entry per
+    sample and in the same order. They come from the caller because they come
+    from `scan.compute_stats` and this module does not import scan.py. Both are
+    optional rather than required, so a caller with a bare string can still
+    build a fingerprint to measure a distance against, which is what this
+    module's own tests do. A missing block is announced on stderr rather than
+    raising, because it costs the attainment gate and not the distance, and
+    `validate.py` fails a committed fingerprint that has one.
     """
     if len(sample_texts) < 2:
         raise ValueError("a fingerprint needs at least 2 samples: "
@@ -464,7 +818,18 @@ def fingerprint(sample_texts, voice=None, exemplars=False):
             "mean": round(sum(self_distances) / len(self_distances), 3),
             "max": round(max(self_distances), 3),
         },
+        "measures": measure_stats(sample_measures) if sample_measures else {},
+        "sentence_shape": (sentence_shape(sentence_lengths)
+                           if sentence_lengths else None),
     }
+    # An empty measure block is not reported here, deliberately. Building a
+    # fingerprint without the numbers is the ordinary in-memory case: the
+    # reconstruction eval does it to get a baseline out of one document, and
+    # half the tests do it from bare strings. Warning on all of that trains a
+    # reader to ignore this module's stderr. The case that actually costs
+    # something is a *stored* fingerprint with no measures, because a later
+    # attainment check reads it and silently answers nothing, and
+    # rwlib/voice_check.py fails that outright.
     if exemplars:
         picked = []
         for text in sample_texts:
@@ -509,6 +874,10 @@ def distance(fp, text):
         verdict = "out_of_range"
 
     return {
+        # Echoed for the reason scan.py echoes the lexicon and register
+        # versions: a published measurement is only reproducible if the report
+        # says which marker list produced it.
+        "schema_version": SCHEMA_VERSION,
         "voice": fp.get("voice"),
         "delta": round(d, 3),
         "band": dict(fp["self_distance"]),

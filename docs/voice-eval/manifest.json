@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "_comment": "Reconstruction triples for scoring the conversion pipeline end to end. Empty on purpose: the harness exists, the writing has not been gathered. Each triple is one piece a writer actually wrote, the same piece deslopped into a neutral register, and that neutral text converted back through the skill. The original is the answer key, so the metric needs no human judgement. See README.md in this directory for the protocol, and PROOF.md for what the calibration rests on until then. Hash-only: the text lives in texts/, which git ignores.",
+  "triples": []
+}

@@ -15,21 +15,21 @@ Run it from `skills/rabbit-writes/`. It covers every row in the table below, inc
 
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 2, registers 1, measured 12 August 2026, seventh pass)
+## Result (v0.1.0, lexicon 2, registers 1, measured 13 August 2026, eighth pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 3,058 | 0 | 0 | 0 | 0.69 | 0.73 | 0.0 |
-| `PROOF.md` | 5,894 | 0 | 0 | 0 | 0.58 | 0.72 | 0.0 |
+| `SKILL.md` | 3,675 | 0 | 0 | 0 | 0.72 | 0.72 | 0.0 |
+| `PROOF.md` | 6,699 | 0 | 0 | 0 | 0.61 | 0.72 | 0.0 |
 | `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.86 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 865 | 0 | 0 | **9** | 0.66 | 0.71 | 0.0 |
 | `references/context.md` | 579 | 0 | 0 | 0 | 0.66 | 0.80 | 0.0 |
-| `references/voice.md` | 1,484 | 0 | 0 | 0 | 0.74 | 0.71 | 0.0 |
+| `references/voice.md` | 1,799 | 0 | 0 | 0 | 0.76 | 0.71 | 0.0 |
 | `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
-| `references/checklist.md` | 640 | 0 | 0 | 0 | 0.46 | 0.74 | 0.0 |
+| `references/checklist.md` | 748 | 0 | 0 | 0 | 0.49 | 0.73 | 0.0 |
 | `voices/whit3rabbit.md` | 1,518 | 0 | 0 | **10** | 0.69 | 0.79 | 0.0 |
-| `../voice-setup/SKILL.md` | 2,314 | 0 | 0 | 0 | 0.64 | 0.74 | 0.0 |
+| `../voice-setup/SKILL.md` | 3,064 | 0 | 0 | 0 | 0.62 | 0.73 | 0.0 |
 | `../readme-writing/SKILL.md` | 2,369 | 0 | 0 | 0 | 0.63 | 0.73 | 0.0 |
 
 Scores are with the self-reference exemption applied, the rule this skill states in prose: quoted examples, code, tables, and block quotes are exempt from flagging. `apply_exemptions()` in `scan.py` is that rule's executable form. Run with `--no-exempt` to see the raw numbers.
@@ -62,6 +62,10 @@ The concealment tables that landed beside the band were held to the same bar. Di
 Three directive families were cut or narrowed against that corpus before anything shipped. `instead of editing` is ordinary English. An unanchored agent-noun rule read `state model, output formats` and `In your agent, run it once per repo` as instructions. A bare `forget everything` matched "the three essentials (if you forget everything else)" in two of this plugin's own voice profiles. Each was measured, not guessed.
 
 **One design decision came out of review rather than measurement.** The safety band cannot be suppressed. Every other band answers to `rabbit-allow`, and that comment lives inside the document being scanned: whoever can plant a concealed instruction can plant the comment excusing it, and both arrive in the same file from the same hand. A suppression naming a safety id is refused and reported at P1 rather than silently ignored. `test_a_safety_p0_cannot_be_suppressed` holds it.
+
+The eighth pass moved four rows and no findings column. `SKILL.md`, `references/voice.md`, `references/checklist.md`, and `../voice-setup/SKILL.md` grew where the attainment gate, the caricature guard, the fact check, the plan-then-execute rule, and the samples-plus-interview route are documented. Every one of them still scores zero at every priority.
+
+It caught this document once on the way, which is the only reason worth publishing a self-scan at all. The paragraph introducing the reconstruction eval used "harness" twice and the engine reported a Tier-2 cluster, and the section on the fact-check carve-outs ran to six sentences against a five-sentence cap in the active voice. The prose was changed, not the rules.
 
 The fifth pass moved them for the same reason and not because the engine changed its mind about anything above. `voices/whit3rabbit.md` gained the Quick reference card and Anti-overfitting sections that `TEMPLATE.md` has always had and the worked example did not, which is 335 more words and three more list-label advisories. `references/voice.md`, `SKILL.md`, and `../voice-setup/SKILL.md` grew where blending, per-register mechanics, and `measure_voice.py` are now documented. Every P0 and P1 column is where it was.
 
@@ -99,16 +103,17 @@ Every file is listed this time. An earlier version of this table showed five, wh
 
 | File | Voice hits | What they are |
 |---|---:|---|
-| `references/checklist.md` | 0 | |
-| `references/craft.md` | 0 | |
-| `../readme-writing/SKILL.md` | 0 | |
-| `PROOF.md` | 1 | serial-comma advisory |
+| `references/craft.md` | 0 |  |
+| `references/injection.md` | 0 |  |
+| `../readme-writing/SKILL.md` | 0 |  |
+| `references/checklist.md` | 1 | serial-comma advisory |
 | `references/false-positives.md` | 1 | serial-comma advisory |
-| `references/voice.md` | 2 | serial-comma advisories |
 | `references/context.md` | 1 | serial-comma advisory |
+| `references/voice.md` | 2 | serial-comma advisories |
+| `PROOF.md` | 2 | serial-comma advisories |
 | `voices/whit3rabbit.md` | 4 | serial-comma advisories |
-| `../voice-setup/SKILL.md` | 5 | serial-comma advisories |
 | `SKILL.md` | 6 | serial-comma advisories |
+| `../voice-setup/SKILL.md` | 6 | serial-comma advisories |
 | `references/patterns.md` | 25 | 10 em dashes, 7 semicolons, 2 one-word sentences, 6 advisories |
 
 The serial-comma rows are the `oxford_comma` mechanic, which reports at P2 and never at the voice default. It cannot tell a three-item list from a compound sentence, so it advises and says so in the finding. Counting advisories as defects would be the same error in the other direction.
@@ -246,6 +251,62 @@ The last two fixtures measure a different thing: whether the inputs to a convers
 `needs-conversion.md` gained a section in the third review pass, for a reason worth naming. Fixing the heading measurement in item 32 took the fixture from 620 measured words to 596, four short of the 600-word floor where this engine calls a sample reliable, and a fixture whose whole job is to be long enough for the numbers to mean something failed that assertion on a rounding error. The prose was extended rather than the assertion relaxed.
 
 Neither fixture proves the skill chose a deep rewrite when it should have. Mode selection is prompt behaviour and no script in this repo can assert it. What they protect is the measurement the offer is built from, so the numbers a user sees before deciding are real.
+
+## The two detectors that came with the attainment gate
+
+Both were calibrated before they were wired to anything, which is this repository's rule for a new detector, and both zeros are asserted in a test rather than reported here.
+
+**`voice-caricature`, the overshoot check.** The obvious form of this rule does not work, and the number is the reason the four qualifications exist. Leave-one-out over 13 documents by this repository's writer that clear the reliability floor, rule "any of the six measures outside the sample min-max":
+
+| samples | fires on a held-out document by the same writer |
+|---|---:|
+| 3 | 95.5% of 2,860 pairs |
+| 4 | 90.7% of 6,435 pairs |
+
+That is a constant, not a detector. Min and max over three samples are two order statistics with enormous variance, and with three samples two of them define the envelope. With direction, a magnitude floor in sample sd, an envelope pad, and a two-measure minimum:
+
+| population | fires |
+|---|---:|
+| same-author leave-one-out, 3 samples | 2 of 2,860 (0.1%) |
+| same-author leave-one-out, 4 samples | 0 of 6,435 |
+| same-author leave-one-out, 6 samples | 0 of 12,012 |
+| 100 trending READMEs against a 4-sample profile | 0 of 80 measurable, 20 skipped |
+
+**Read that last row twice, because it is weaker than it looks.** As a false-positive rate it is zero. As exposure it is close to meaningless, because the guard only runs when a fingerprint resolved and a stranger's repository has none. What it answers is "if somebody pointed a profile at these, would it be a wall of findings", and the answer is no. The 20 skipped are documents under 25 prose sentences, where burstiness is noise, and they are reported as skipped rather than counted as clean.
+
+The base is 13 documents by one writer in one genre. That is thinner than the 100-README corpus and it should be read as thinner. What keeps the rule honest in the other direction is that it still fires: a document in this writer's register with the register turned up, sentences chopped to a quarter of their own shortest and contractions at twenty times their own rate, is reported, and `test_the_guard_still_fires_on_a_document_that_is_actually_a_caricature` pins that. A rule that never fires passes every restraint test ever written and is indistinguishable from no rule.
+
+**Fact preservation in `verify.py`.** Numbers, dates and quotations, compared as multisets after canonicalization. The corpus is 100 single documents and this check needs pairs, so it measures exposure and reformat-tolerance rather than a paired false-positive rate, and it says so.
+
+| measurement | result |
+|---|---|
+| raw numeric tokens in the corpus | 13,098 |
+| after blanking code, tables, quotes, URLs, paths and entities | 6,028 prose facts, median 26 per document |
+| plus 278 dates and 300 quotations | |
+| identity: `validate(text, text)` | 0 of 100 lose a fact |
+| null edit through `fixes.apply` | 0 of 100 |
+| eight benign reformats, applied outside quotations | 0 of 100 each |
+| one prose number corrupted | caught in 65 of 65 applicable documents |
+
+The eight reformats are the carve-outs stated as tests: strip thousands commas, percent sign to the spelled word, dash range to "10 to 20", add a `v` to a version, ISO date to spelled and back, straight quotes to curly, rewrap paragraphs, collapse runs of spaces. Each one is a rewrite this skill actually instructs, and each is one carve-out's regression test.
+
+Five of those carve-outs exist because the corpus produced a false positive nobody would have guessed:
+
+- a percent-encoded anchor link read `97%` out of `%AD%97%E5`
+- `$1,000` matched only its tail and reported a 0
+- a sentence-final number was dropped entirely, by a lookahead that refused a following full stop
+- a spaced em dash between two numbers read as a range and fragmented `1,237` on the way
+- an HTML attribute value read as somebody's quotation, in 55 of the 100 documents, which is the one that would have been noticed last
+
+Two limits, stated rather than papered over. Spelled numbers are not tracked at all, because "three" against "3" is a style edit a profile can legitimately require in either direction. And a paired corpus does not exist: `docs/voice-eval/` is where one would go, and it is empty.
+
+## The reconstruction eval
+
+`scripts/voice-eval/` scores the whole pipeline end to end with labels nobody had to write: take a piece the writer actually wrote, deslop it into a neutral register, convert it back, and measure how much of the distance the round trip closed. The original is the answer key, so no human judgement enters the metric.
+
+**The corpus is empty, and the harness is not**, which is the same arrangement `docs/detector-corpus/` has and for the same reason. Gathering real writing from a real person with their consent is the expensive half, and a scorer written afterwards gets written to fit whatever data turned up. `scripts/voice-eval/test_eval_harness.py` runs it over synthetic triples with known answers, in CI, so the day somebody populates the corpus the arithmetic is already known to work: a round trip that landed scores above 0.9, one that moved nothing scores near 0, and one that went backwards scores negative.
+
+Until then, the pipeline's end-to-end behaviour rests on the fixtures in `tests/`, which own their ground truth and are not real writing. That is the same disclaimer the section below makes about the detector corpus, and it is not a smaller one.
 
 ## What this does not prove
 

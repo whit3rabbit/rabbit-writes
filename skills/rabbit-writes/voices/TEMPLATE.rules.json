@@ -62,6 +62,31 @@
   "_required_when_note": "Advisory presence checks. Fires when none of any_of_rx matches. Keep these at P2: a fragment of a longer document legitimately has no greeting or sign-off.",
   "required_when": [],
 
+  "_signature_moves_note": "banned_regex pointed the other way: a move you make on purpose, with a ceiling and optionally a floor. Each entry needs id, label, rx, and at least one of max_allowed (absolute), max_per_1000w (rate), min_per_1000w (rate floor). Optional: note, applies_to_registers. Give both ceilings when you want both: a rate cap alone fires on a 200-word email that used the move twice, and a count cap alone lets a 6,000-word piece use it thirty times. Under-use is opt-in and only checked past 250 words, because a rate floor on a short document is measuring the length. Everything here is reported at P2 whatever default_priority says, and that is not negotiable: an editor made to satisfy a P0 would insert the move until the check passed, which is the tic references/voice.md warns about and the voice SKILL.md guardrail 2 forbids installing.",
+  "_signature_moves_example": [
+    {
+      "id": "sig-one-line-verdict",
+      "label": "One-line verdict paragraph",
+      "rx": "(?m)^[A-Z][^.!?\\n]{4,60}\\.\\s*$",
+      "max_allowed": 6,
+      "max_per_1000w": 3.0,
+      "min_per_1000w": 0.5,
+      "applies_to_registers": ["blog", "casual"],
+      "note": "The short verdict line after a long paragraph. Two or three a piece. More is a tic."
+    }
+  ],
+  "signature_moves": [],
+
   "_preferred_substitutions_note": "Not enforced. Shown to the editor as the replacement to reach for when a banned entry is hit.",
-  "preferred_substitutions": {}
+  "preferred_substitutions": {},
+
+  "_contrastive_pairs_note": "Not enforced, like preferred_substitutions, and read by the editor at conversion time. One sentence this writer would write and one they would refuse, in their own words, taken from the interview or the samples. A pair is worth ten adjectives: 'direct' describes a hundred writers and 'Also, the rollback worked' against 'Furthermore, the rollback was successful' describes one. Keep `rule` pointing at whichever section of the markdown the pair illustrates.",
+  "_contrastive_pairs_example": [
+    {
+      "rule": "connectors",
+      "would": "Also, the rollback worked.",
+      "would_never": "Furthermore, the rollback was successful."
+    }
+  ],
+  "contrastive_pairs": []
 }

@@ -41,8 +41,10 @@ import sys
 
 try:
     from .inflect import term_of
+    from .cli_error import LLMArgumentParser, format_file_error
 except ImportError:                 # run as a script: no package, but rwlib/ is
     from inflect import term_of     # on sys.path, because it holds this file
+    from cli_error import LLMArgumentParser, format_file_error
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 VOICES_DIR = os.path.join(os.path.dirname(os.path.dirname(HERE)), "voices")
@@ -513,8 +515,11 @@ def main(argv):
     stay in front of whoever ran it. The notes are the part worth reading: they
     name every place the two profiles wanted incompatible things.
     """
-    import argparse
-    ap = argparse.ArgumentParser(prog="voices.py", description=main.__doc__)
+    examples = [
+        "python3 rwlib/voices.py --blend profileA profileB",
+        "python3 rwlib/voices.py --blend profileA profileB --weight 0.7 --name blended_profile"
+    ]
+    ap = LLMArgumentParser(prog="voices.py", description=main.__doc__, examples=examples)
     ap.add_argument("--blend", nargs=2, metavar=("LEFT", "RIGHT"), required=True,
                     help="two profile names, or two paths to .rules.json files")
     ap.add_argument("--weight", type=float, default=0.5,
@@ -532,7 +537,11 @@ def main(argv):
                      voices_dir=args.voices_dir)
         rules, notes = blend(left, right, args.weight, args.name)
     except VoiceError as exc:
-        print("voices: %s" % exc, file=sys.stderr)
+        print(format_file_error(
+            "voices.py", str(args.blend), "--blend",
+            expected_type="two valid voice profile names or file paths",
+            details=str(exc), examples=examples
+        ), file=sys.stderr)
         return 2
 
     print(json.dumps(rules, indent=2))

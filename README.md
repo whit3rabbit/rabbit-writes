@@ -143,6 +143,8 @@ python3 skills/rabbit-writes/scripts/scan.py draft.md \
     --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json   # findings in three bands
 python3 skills/rabbit-writes/scripts/scan.py draft.md --voice auto         # resolve the profile instead
 python3 skills/rabbit-writes/scripts/verify.py original.md rewritten.md   # did the rewrite break a promise
+python3 skills/rabbit-writes/scripts/attain.py original.md rewritten.md \
+    --voice ada                                                          # did the conversion land
 python3 skills/rabbit-writes/scripts/scan.py draft.md --apply-safe        # the fixes with one right answer
 python3 skills/rabbit-writes/scripts/scan.py draft.md --sarif             # for a pull request annotation
 python3 skills/voice-setup/scripts/measure_voice.py a.md b.md c.md        # samples in, profile numbers out
@@ -333,8 +335,8 @@ rabbit-writes/
     rabbit-writes/
       SKILL.md
       references/           patterns, false-positives, context, voice, craft, checklist
-      scripts/              scan.py, verify.py, lexicon.json, registers.json
-        rwlib/              the shared engine: markdown spans, lexicon, voices, suppressions
+      scripts/              scan.py, verify.py, attain.py, lexicon.json, registers.json
+        rwlib/              the shared engine: markdown spans, lexicon, voices, facts, suppressions
       tests/                calibration fixtures and regression tests
       PROOF.md              the engine scanned with its own scanner
       voices/
@@ -347,6 +349,7 @@ rabbit-writes/
       SKILL.md
       scripts/              measure_voice.py, samples in and a profile starting point out
                             build_voice.py, scaffolds a profile and proves its rules fire
+                            learn_edits.py, reads your corrections back into the profile
     readme-writing/
       SKILL.md
       references/           patterns (the full catalog), checklist

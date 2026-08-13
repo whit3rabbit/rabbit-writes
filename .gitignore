@@ -86,3 +86,7 @@ CLAUDE.local.md
 # scripts/detector-corpus/score.py --verify refetches nothing and checks hashes,
 # so a claim in the manifest is checkable without this directory being public.
 docs/detector-corpus/texts/
+
+# Reconstruction eval texts. The manifest carries hashes, the prose belongs to
+# whoever wrote it, and it is not this repository's to publish.
+docs/voice-eval/texts/

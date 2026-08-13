@@ -157,7 +157,29 @@ voice-distance   Register distance 0.97, this writer's own samples sit under 0.6
 
 That is what a conversion pass reads. A bare distance says a document is wrong and not what to change.
 
-**Use it as the attainment check.** Measure before and after a conversion. `0.97 -> 0.58, in range` says the conversion landed. A pass that fixed eleven mechanical hits and moved the distance from 0.97 to 0.95 changed the punctuation and not the voice, which is the failure a rule-by-rule report cannot see and this number can.
+**Use it as the attainment check, and there is a script for that.** `attain.py` takes both documents and does the whole comparison:
+
+```bash
+python3 skills/rabbit-writes/scripts/attain.py before.md after.md --voice <name>
+```
+
+It reports the distance both ways and each of the six measures with its gap in the writer's own sample sd, signed, because "10 sd under the profile" and "10 sd over it" call for opposite edits. Five verdicts, and only two of them mean somebody did something wrong:
+
+| verdict | reading |
+|---|---|
+| `landed` | the register moved, not only the punctuation |
+| `partial` | some of it arrived. Each missed measure is a rewrite target |
+| `flat` | the distance barely moved and no measure moved a full sd. Mechanics fixed, register untouched |
+| `regressed` | something moved away from the profile |
+| `unpaired` | one document, so this says where it sits and not whether an edit landed |
+
+`flat` is what the script exists for: a pass that fixed eleven mechanical hits and moved the distance from 0.97 to 0.95 changed the punctuation and not the voice, and every rule passed, so no rule-by-rule report can see it. `--check` exits 1 on `flat` and `regressed` and never on `missed`, because a measure the document cannot reach without inventing content is guardrail 1 working rather than a defect.
+
+**And the other direction.** `voice-caricature` fires when a document is *more* characteristic than the writer's own samples: two measures past the range their own pieces cover, in the direction they already lean away from everybody else. That is the overshoot this file's own warning is about, wearing this writer's clothes instead of a generic humanizer's. It is P2, never enforced, and it means read the samples again and ask whether this is a piece they would write or the profile turned up.
+
+The naive form of that rule does not work and the number is worth knowing: "any measure outside the sample min-max" fires on 95.5% of held-out documents by the same writer at three samples. `rwlib/stylometry.py` carries the four qualifications that bring it to 0.1%, each with the measurement that put it there.
+
+**The shape targets, for the pass before the rewrite.** `attain.py --plan` turns the stored sentence distribution into a per-paragraph band: "five sentences, at least one under 9 words, at least one over 29, median around 16". That is a constraint a rewrite can hold and a later run can check, and it is the replacement for "vary your sentences", which is a weak instruction and survives every vocabulary fix because it is not a constraint at all. It is a band and never a script. A sampled list of exact per-sentence word counts is unhittable, and chasing one manufactures the cadence `references/false-positives.md` calls a new fingerprint rather than the absence of one.
 
 **Exemplars.** `--with-exemplars` embeds the writer's own paragraphs in the fingerprint, and `stylometry.nearest_exemplars` returns the three closest in register and shape to whatever is being rewritten. A profile describes and an exemplar demonstrates. Opt in, because it copies somebody's prose into a file that then travels with the plugin, so ask them first.
 

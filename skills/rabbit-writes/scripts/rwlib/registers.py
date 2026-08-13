@@ -269,11 +269,30 @@ def write_doc(doc_path=CONTEXT_MD, path=REGISTERS_PATH):
 
 
 def main(argv):
-    if "--write" in argv:
+    examples = [
+        "python3 rwlib/registers.py",
+        "python3 rwlib/registers.py --check",
+        "python3 rwlib/registers.py --write"
+    ]
+    try:
+        from .cli_error import LLMArgumentParser
+    except ImportError:
+        from cli_error import LLMArgumentParser
+
+    ap = LLMArgumentParser(
+        prog="registers.py",
+        description="Tolerance matrix inspector and references/context.md documentation updater.",
+        examples=examples
+    )
+    ap.add_argument("--write", action="store_true", help="update references/context.md table from registers.json")
+    ap.add_argument("--check", action="store_true", help="verify references/context.md table matches registers.json")
+    args = ap.parse_args(argv)
+
+    if args.write:
         changed = write_doc()
         print("context.md updated" if changed else "context.md already current")
         return 0
-    if "--check" in argv:
+    if args.check:
         if doc_table() == render_table():
             print("tolerance matrix in context.md matches registers.json")
             return 0

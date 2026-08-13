@@ -1,6 +1,6 @@
 ---
 name: voice-setup
-description: Build, measure, edit, or switch a personal writing voice profile for the rabbit-writes plugin. Use when the user wants to teach the system how they write, create their own writing style, set up or replace a voice, capture their tone, change whose voice is active, blend two voices, or convert their writing samples into a reusable style profile. Also use when a draft "doesn't sound like me" and the saved profile needs correcting.
+description: Build, measure, edit, or switch a personal writing voice profile for the rabbit-writes plugin. Three ways in, from writing samples, from an interview, or from both together, which is the one to recommend. Use when the user wants to teach the system how they write, create their own writing style, set up or replace a voice, capture their tone, analyze documents they wrote to extract a voice, be interviewed about their style, change whose voice is active, blend two voices, or convert their writing samples into a reusable style profile. Also use when a draft "doesn't sound like me" and the saved profile needs correcting.
 license: MIT
 metadata:
   version: "0.1.0"
@@ -31,9 +31,17 @@ Two other rules govern the whole process:
 
 **Measure before you believe.** People are unreliable narrators of their own prose. Someone who says "I write short" often averages 24 words a sentence. Where samples exist, the numbers win.
 
-## Five ways in
+## Pick a route
 
-Pick based on what the person has.
+Three ways to build a profile from nothing, and the third is the other two in order.
+
+| What they have | Route |
+|---|---|
+| Samples, and ten minutes | **3. Samples, then the interview.** The one to recommend. Each source covers the other's blind spot, and where they disagree the disagreement is the finding |
+| Samples, and no patience for questions | 2. From samples. Fastest, and it can only tell you what got written |
+| No samples | 1. The interview. Everything rests on self-report, so weight it hard toward refusals |
+
+The two sources fail in opposite directions, which is why running both is worth more than running either twice. A counter sees what a person wrote and never what they refused to write. A person is an unreliable narrator of their own prose and knows exactly what they will not publish.
 
 ### 1. Taste Interviewer protocol (no samples, 5-10 minutes)
 
@@ -60,10 +68,10 @@ Keep the interview to **10 high-signal questions max** covering the 7 core categ
 
 **Interview Rules:**
 - Ask in 2 concise batches (or 1 question at a time if the user prefers).
-- Push back on vague answers: *"Simple how? Give me a sentence you've written that captures this."*
+- Push back on vague answers, and ask for the pair: *"Simple how? Give me a sentence you'd write, and one you'd refuse to write."* **Keep both halves verbatim, in `contrastive_pairs` in the rules file.** They used to go into the markdown as prose and mostly evaporated into adjectives, which is the weakest thing a profile can hold. A pair is worth ten of them, and it is what a conversion is shown at the point it has to choose a sentence.
 - Call out contradictions when earlier and later answers clash.
 
-### 2. From samples (recommended & fastest)
+### 2. From samples (fastest)
 
 Point to 3 or 4 pieces written by the author (e.g. Substack posts like [Ruben Substack](https://ruben.substack.com/p/i-am-just-a-text-file), articles, past emails, or chat logs). This is the fastest method because it extracts mechanics automatically without manual typing:
 
@@ -94,15 +102,49 @@ That writes `voices/<voice>.fingerprint.json`, and `scan.py --voice <voice>` mea
 
 Add `--with-exemplars` to embed their own paragraphs for a later conversion to imitate. Ask first. It copies their prose into a file that travels with the plugin.
 
-Combine sample extraction with 3 quick questions about **Hard refusals** (what they refuse to write), since samples show what was written, not what was rejected.
+### 3. Samples, then the interview (the one to recommend)
 
-### 3. Adjust an existing profile
+Route 2 followed by route 1, except that the second half now knows what the first half found. Measure first, always, then ask only what the counting could not settle:
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/measure_voice.py \
+  sample1.md sample2.md sample3.md --questions
+```
+
+That prints an interview instead of the report. At most ten questions, built out of what these documents did and did not contain. Every `forbid` the script would otherwise have proposed is a silence rather than a refusal, so it comes back as a question. Anything the samples already settled is not asked at all: a writer who used em dashes in four pieces has answered that one, and asking anyway spends a question out of ten and teaches them the interview is not listening. What is left of the budget goes where no counter reaches, which is banned words, hard nos, red flags, the register they did not happen to hand over, and the three rules they would keep.
+
+It refuses to interview over a contaminated sample set, and exits 1 the way the report does. Ten answers given about somebody else's prose are ten answers about somebody else, and they anchor the profile before anybody has thought to check whose register it is.
+
+**Ask before you show the count.** The script prints the questions and the evidence as two blocks, in that order, and that is the whole reason it exists as a mode rather than a paragraph. "Zero semicolons in 4,100 words, do you ban them?" has already told them the answer, and what comes back is agreement rather than evidence. Ask, take the answer, then read them the count.
+
+**Then run the disagreements down.** This is the step neither route alone can reach. Put every answer back against its number and name each clash out loud. Somebody who says they write short and averages 24 words a sentence is not making a mistake you correct quietly. One of those is what they do and the other is what they are aiming at, and only they can say which is which.
+
+**Record both, separately.** The number goes under `## Measured from samples`, the stated rule goes in **Hard nos** or the rules file, and the profile says which lines came from which. A profile that silently picked one side of a disagreement is wrong in a way nobody reading it can see.
+
+**The last step checks itself.** Once their stated mechanics are in the rules file, `build_voice.py --check` fires every one of them and the inverse scan under **Validate it** runs the finished profile over their own samples. A stated ban that fires on their own writing is that disagreement surfacing a second time, mechanically, and it is not a bug in the scan.
+
+Keep both halves of a refusal verbatim. A sentence they would not write, beside the one they would, goes in `contrastive_pairs` and is worth ten adjectives about tone.
+
+## Maintaining a voice
+
+### Adjust an existing profile
 
 When a draft "doesn't sound like me," the profile is what missed, not the engine. Ask what specifically read wrong, find the rule that produced it, and change that rule. Then add the correction to the profile so the same miss does not repeat. Show the diff.
 
 Do not re-run the full interview. A working profile plus one correction beats a fresh profile every time.
 
-### 4. Blend
+**When they edited the output themselves, read the diff instead of their memory.** Asking runs on recall, and recall is worst exactly when it matters: a person who has just rewritten your draft can name the word they hated, and a week later they only remember that something felt off.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/learn_edits.py \
+  converted.md their-edit.md --voice <name>
+```
+
+It proposes substitutions they made repeatedly, words they took out and never put back, sentence openers that moved, punctuation the edit cleared out, and how their edit moved the six measures against the profile's own numbers. Every line carries its count. Nothing is written, for the same reason `measure_voice.py` writes nothing: a profile is a claim about somebody, and one edit is one edit. A change has to repeat at least twice before it appears at all, because a word replaced once was wrong in that sentence rather than wrong in general.
+
+A repeated substitution is also the best `contrastive_pairs` entry you will ever get. Keep both sentences verbatim, theirs and the one they replaced. A pair is worth ten adjectives: "direct" describes a hundred writers, and "Also, the rollback worked" against "Furthermore, the rollback was successful" describes one.
+
+### Blend
 
 "70% whit3rabbit, 30% dana." Half of this is a command:
 
@@ -117,7 +159,7 @@ Bans union, the stricter refusal wins whatever the weight says, and the lineage 
 
 The other half is yours. Interpolate the numeric dimensions (`0.7 × whit3rabbit.formality + 0.3 × dana.formality`) and take structural defaults from the higher-weighted profile, both by hand into a new `.md`. Nothing enforces those numbers, so no script can produce them. A blended rules file without the markdown enforces punctuation and describes nobody.
 
-### 5. Extend
+### Extend
 
 Blending mixes two whole people. The commoner ask is smaller: my voice, plus what this repo or this client does differently. That is `extends`, and it belongs in the rules file rather than in a new profile.
 

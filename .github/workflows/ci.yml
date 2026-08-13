@@ -80,6 +80,12 @@ jobs:
         # never run over a populated one.
         run: python scripts/detector-corpus/test_corpus_harness.py
 
+      - name: reconstruction eval harness
+        # The corpus is empty for the same reason the detector one is, and this
+        # is the same bargain: a scorer nobody has run is a scorer that does not
+        # work, so it runs here over synthetic triples with known answers.
+        run: python scripts/voice-eval/test_eval_harness.py
+
       - name: dogfood the scanner on the repo's own prose
         run: |
           python skills/readme-writing/scripts/readme_check.py README.md --check

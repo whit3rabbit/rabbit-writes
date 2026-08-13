@@ -23,7 +23,7 @@ import subprocess
 import sys
 import tempfile
 
-from helpers import ROOT, sample, written
+from helpers import ROOT, load_module, sample, written
 
 # ROOT is skills/rabbit-writes, so its parent is skills/. Walked rather than
 # spelled out from the repository root, the way every script here resolves a
@@ -58,6 +58,27 @@ def run(*paths, **kwargs):
                          capture_output=True, text=True)
     assert out.stdout, out.stderr
     return json.loads(out.stdout), out.returncode
+
+
+def run_text(*paths, **kwargs):
+    """The same, without --json, for the two blocks a person actually reads."""
+    extra = kwargs.pop("extra", ())
+    assert not kwargs, kwargs
+    out = subprocess.run([sys.executable, MEASURE, *paths, *extra],
+                         capture_output=True, text=True)
+    assert out.stdout, out.stderr
+    return out.stdout, out.returncode
+
+
+def measure_module():
+    """The script itself, for the constants a test should not restate.
+
+    `QUESTION_BUDGET` and `RESERVED` are decisions with reasons written beside
+    them over there. Copied here, a test would keep passing after somebody
+    changed the decision, which is the failure mode of every hand-synced
+    constant in this repository.
+    """
+    return load_module("rw_measure_voice", MEASURE)
 
 
 def scratch(files):
@@ -270,5 +291,159 @@ def test_the_distributions_carry_what_the_means_hide():
             assert key in dist, (key, sorted(dist))
         assert dist["closer"], dist
         assert "\n" not in dist["closer"], repr(dist["closer"])
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+# --------------------------------------------------------------------------
+# --questions: the route that measures first and then asks
+# --------------------------------------------------------------------------
+#
+# The mode exists because the two sources of evidence fail in opposite
+# directions. A counter sees only what was written and never what was refused,
+# and a person is an unreliable narrator of their own prose. The assertions
+# below are about keeping them independent long enough to disagree.
+
+
+def test_the_interview_stays_inside_its_budget():
+    """Ten is a cap rather than a target. The person who quits at question 40
+    leaves a worse profile than the one who answered ten and stayed."""
+    directory, paths = scratch({"a.md": BODY * 2, "b.md": OTHER_BODY * 2})
+    try:
+        result = run(*paths)[0]
+        assert result["questions"], result
+        assert len(result["questions"]) <= measure_module().QUESTION_BUDGET, \
+            [q["id"] for q in result["questions"]]
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_a_silence_is_asked_about_rather_than_banned():
+    """No semicolon in the samples is a silence, not a refusal. The whole
+    reason this mode exists is that the two are different and only the author
+    can tell you which one you are looking at."""
+    directory, paths = scratch({"a.md": BODY * 2})
+    try:
+        result = run(*paths)[0]
+        assert result["mechanics"]["semicolon"] == "forbid", result["mechanics"]
+        asked = {q["id"]: q for q in result["questions"]}
+        assert "semicolon" in asked, sorted(asked)
+        assert any(ch.isdigit() for ch in asked["semicolon"]["evidence"]), \
+            asked["semicolon"]
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_a_writer_who_uses_em_dashes_is_not_asked_about_them():
+    """The samples answered that one. Asking anyway spends a question out of
+    ten and teaches the author that the interview is not listening."""
+    # Escaped rather than literal. The mark is the entire point of the fixture,
+    # and any tool that rewrites punctuation turns a literal into a hyphen while
+    # the source line still looks correct.
+    dashy = BODY.replace("on a Tuesday.",
+                         "on a Tuesday \u2014 a bad day for it.")
+    directory, paths = scratch({"a.md": dashy * 4})
+    try:
+        result = run(*paths)[0]
+        assert result["mechanics"]["em_dash"] == "allow", result["mechanics"]
+        assert "em_dash" not in {q["id"] for q in result["questions"]}, \
+            result["questions"]
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_the_refusal_questions_survive_whatever_the_numbers_say():
+    """This skill's own rule: if the interview runs short, cut from Structure
+    and Tone, never from Hard nos. The budget binds on nearly every sample set,
+    so without a reserve the measured questions would crowd out the half of the
+    interview no counter can reach."""
+    module = measure_module()
+    directory, paths = scratch({"a.md": BODY * 2})
+    try:
+        asked = {q["id"] for q in run(*paths)[0]["questions"]}
+        assert module.RESERVED <= asked, sorted(module.RESERVED - asked)
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_no_question_carries_its_own_count():
+    """The anchoring rule, which is the mode's one real design decision. A
+    question asked as "you used zero semicolons, do you ban them?" has told the
+    author the answer, and what comes back is no longer independent evidence.
+    Counts live in the block underneath, printed after the answer."""
+    directory, paths = scratch({"a.md": BODY * 2, "b.md": OTHER_BODY * 2})
+    try:
+        for q in run(*paths)[0]["questions"]:
+            if q["source"] != "measured":
+                continue
+            assert q["evidence"], q
+            assert q["evidence"] not in q["question"], q
+            assert not any(ch.isdigit() for ch in q["question"]), q
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_a_trimmed_question_is_named_rather_than_dropped_quietly():
+    """A trim that reads as "these were the questions" is the same lie as a
+    rule that never fires. Every sample set overflows the budget, so this is
+    the common path and not an edge."""
+    directory, paths = scratch({"a.md": BODY * 2})
+    try:
+        result = run(*paths)[0]
+        assert result["questions_dropped"], result["questions"]
+        text = run_text(*paths, extra=("--questions",))[0]
+        for q in result["questions_dropped"]:
+            assert q["id"] in text, (q["id"], text)
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_the_evidence_block_comes_after_the_questions():
+    """Order is the enforcement. Nothing stops a reader scrolling, but a report
+    that prints the counts first has already anchored the interview before
+    anybody chose to look."""
+    directory, paths = scratch({"a.md": BODY * 2})
+    try:
+        text = run_text(*paths, extra=("--questions",))[0]
+        assert text.index("Ask these as written") < \
+            text.index("after they have answered"), text
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_a_contaminated_sample_set_gets_no_interview():
+    """Ten questions asked over prose that may not be theirs are ten answers
+    about somebody else, and they anchor the profile before anyone has thought
+    to check whose register it is."""
+    text, code = run_text(sample("ai-sample.md"), extra=("--questions",))
+    assert code == 1, text
+    assert "STOP." in text, text
+    assert "Ask these as written" not in text, text
+    assert run(sample("ai-sample.md"))[0]["questions"] == []
+
+
+def test_the_opener_question_skips_articles_and_still_fires_on_a_real_habit():
+    """"Opens 7 of 22 sentences with `the`" is a fact about English, not about
+    this writer, and a question spending one slot of ten on it comes back with
+    a shrug. Both directions are asserted here, because a skip list is one
+    typo away from suppressing the question entirely and a test that only
+    checked the article case would pass on that."""
+    # A writer with an actual opener habit. Every sentence starts with "But",
+    # which is the shape the question is for: a person can own it or disown it,
+    # and almost nobody can name it about themselves.
+    butty = "\n\n".join(["But the build reads a manifest and writes a report. "
+                         "But the rollback took four minutes and nobody "
+                         "noticed at all."] * 12)
+    directory, paths = scratch({"articles.md": BODY * 3, "habit.md": butty})
+    try:
+        articles = run(paths[0])[0]
+        assert articles["samples"][0]["distributions"]["sentence_openers"][0][
+            "word"] == "the", articles["samples"][0]["distributions"]
+        asked = {q["id"]: q for q in articles["questions"]}
+        assert "the" not in asked.get("opener", {}).get("evidence", ""), asked
+
+        habit = {q["id"]: q for q in run(paths[1])[0]["questions"]}
+        assert "opener" in habit, sorted(habit)
+        assert "but" in habit["opener"]["evidence"], habit["opener"]
     finally:
         shutil.rmtree(directory, ignore_errors=True)

@@ -102,16 +102,16 @@ def written(directory, name, body):
 
 
 def corpus_readmes():
-    """[(slug, path)] for the committed snapshot, or [] when it is not here."""
+    """[(slug, path)] for the committed snapshot, or [] when it is not here.
+
+    The glob itself lives in rwlib.corpus, because the engine suite needs the
+    same list now: CLAUDE.md requires every new detector to be calibrated
+    against these 100 real third-party documents, and two copies of the locator
+    is how two halves of one plugin end up disagreeing about what the corpus is.
+    """
     if "corpus" not in _CACHE:
-        found = []
-        if os.path.isdir(CORPUS_DIR):
-            for slug in sorted(os.listdir(CORPUS_DIR)):
-                hits = sorted(glob.glob(os.path.join(CORPUS_DIR, slug, "README.*")))
-                preferred = [h for h in hits if h.lower().endswith(".md")]
-                if preferred or hits:
-                    found.append((slug, (preferred or hits)[0]))
-        _CACHE["corpus"] = found
+        from rwlib import corpus as corpus_mod
+        _CACHE["corpus"] = corpus_mod.readme_paths()
     return _CACHE["corpus"]
 
 

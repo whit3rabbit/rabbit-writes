@@ -62,15 +62,17 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
 
+from rwlib import cli_error                                      # noqa: E402
+from rwlib import facts                                               # noqa: E402
 from rwlib import lexicon as lexicon_mod                              # noqa: E402
 from rwlib.artifacts import norm_url                                  # noqa: E402
 # QUOTED_RX is a re-export, not a caller: test_verify.py asserts it is the
 # same object scan.py holds. See the note in scan.py.
 from rwlib.markdown import (BLOCKQUOTE_RX, FENCE_RX, FRONTMATTER_RX,  # noqa: E402,F401
-                            HEADING_RX, HTML_IMG_RX, IMAGE_RX,
+                            HEADING_RX, HTML_IMG_RX, HTML_TAG_RX, IMAGE_RX,
                             INLINE_CODE_RX, PATH_RX, PROSE_DASH_RX, QUOTED_RX,
                             TABLE_ROW_RX, URL_RX, apply_exemptions, blank,
-                            context)
+                            blank_entities, context)
 
 LEXICON_PATH = lexicon_mod.LEXICON_PATH
 
@@ -141,6 +143,29 @@ def extract(text):
     # altered" and "file path altered", and a reader counting violations saw two
     # broken promises where there was one.
     unlinked = INLINE_CODE_RX.sub(blank, URL_RX.sub(blank, prose))
+    # The facts are read from a copy with every span that is already compared
+    # verbatim taken out of it, which is the argument extract() already makes
+    # for keeping PATH_RX out of URLs: a number inside a table is one broken
+    # promise, and reporting it twice shows a reader two problems where there
+    # is one. Measured over the 100-README corpus, that blanking takes 13,098
+    # raw numeric tokens down to 6,028 prose ones, so more than half of every
+    # number in a README is somewhere this check does not have to look.
+    #
+    # Entities are blanked too, the same as the voice check's semicolon counter
+    # does and for the same reason: `&#8203;` is markup, and the 8203 in it is
+    # not a number a reader reads. Stripping a zero-width space is an instructed
+    # fix, and without this the fixer's own output failed verification with "the
+    # number 8203 was removed".
+    #
+    # HTML tags go with them, and that one came off the corpus. An attribute
+    # value is double-quoted, so `alt="Claude Code running with Free Claude
+    # Code"` read as somebody's quotation and `style="width: 60%"` read as a
+    # percentage. 55 of the 100 corpus READMEs carried at least one. Alt text is
+    # already documented above as prose an editor may legitimately improve, so
+    # protecting it verbatim here would contradict the decision this file
+    # already made.
+    fact_text = blank_entities(HTML_TAG_RX.sub(blank, TABLE_ROW_RX.sub(
+        blank, BLOCKQUOTE_RX.sub(blank, FRONTMATTER_RX.sub(blank, unlinked)))))
     return {
         "fences": FENCE_RX.findall(text),
         "inline_code": INLINE_CODE_RX.findall(text),
@@ -152,6 +177,14 @@ def extract(text):
         "urls": URL_RX.findall(text),
         "paths": PATH_RX.findall(unlinked),
         "image_srcs": uncovered_image_srcs(prose),
+        "numbers": [canon for canon, _ in facts.numbers(fact_text)],
+        "dates": [iso for iso, _ in facts.dates(fact_text)],
+        "quotes": facts.quoted(fact_text),
+        # Report-only, forever. See facts.entities: a capitalized-run regex
+        # cannot tell a product name from the first word of a sentence, and
+        # set-equality on it would fail every rewrite that splits a sentence at
+        # a capital. It never reaches `ok`.
+        "entities": facts.entities(fact_text),
     }
 
 
@@ -213,10 +246,34 @@ def multiset_lost(before, after):
     return lost
 
 
-def validate(original, rewritten, allow_structure=False):
+def fact_delta(a, b):
+    """Both directions, per fact class, plus the report-only entity list.
+
+    Both directions because a number that changed *value* is one lost and one
+    added, and printing the pair is what turns "a number went missing" into
+    "3200 became 3000". A reader given only the loss has to go find the other
+    half themselves.
+
+    Only the loss is a violation, and the asymmetry is a decision rather than an
+    oversight. Guardrail 1 forbids inventing facts, which makes an added number
+    look like one, and in practice a rewrite that turns "the last two years"
+    into "2024 and 2025" is deriving a number the source already carried.
+    Reported, never failed.
+    """
+    out = {}
+    for key in ("numbers", "dates", "quotes", "entities"):
+        out["%s_before" % key] = len(a[key])
+        out["%s_after" % key] = len(b[key])
+        out["%s_lost" % key] = multiset_lost(a[key], b[key])[:8]
+        out["%s_added" % key] = multiset_lost(b[key], a[key])[:8]
+    return out
+
+
+def validate(original, rewritten, allow_structure=False, allow_facts=False):
     a, b = extract(original), extract(rewritten)
     violations = []
     structure_changes = []
+    fact_changes = []
 
     def check(key, name):
         lost = multiset_lost(a[key], b[key])
@@ -291,10 +348,42 @@ def validate(original, rewritten, allow_structure=False):
                            "detail": "%d -> %d: %s"
                                      % (a_t, b_t, ", ".join(added[:5]))})
 
+    # Facts. Guardrail 1 says never invent a number, a date or a quote, and
+    # until this it was prose in SKILL.md with nothing behind it: every check
+    # above proves the rewrite did not touch a code fence, and none of them
+    # noticed the sentence that turned 3,200 into 3,000.
+    #
+    # `--allow-facts` is the mirror of `--allow-structure`, and it exists for
+    # the same kind of profile: rwlib/facts.py canonicalizes a date so a
+    # `date_format` conversion passes, and it deliberately does not match a
+    # spelled number against a digit, so a profile that requires one or the
+    # other has an edit this cannot model. Default is hard, like everything
+    # else here.
+    facts_report = fact_delta(a, b)
+    fact_bucket = fact_changes if allow_facts else violations
+    for key, noun in (("numbers", "number"), ("dates", "date"),
+                      ("quotes", "quotation")):
+        lost = facts_report["%s_lost" % key]
+        added = facts_report["%s_added" % key]
+        for i, item in enumerate(lost[:5]):
+            # The other half of the pair, positionally, when there is one. A
+            # number that changed value shows up as one lost and one added, and
+            # naming both is the difference between "a number went missing" and
+            # "3200 became 3000".
+            became = (" (%s appeared)" % added[i]) if i < len(added) else ""
+            fact_bucket.append({
+                "kind": "%s altered or removed" % noun,
+                "detail": (re.sub(r"\s+", " ", str(item))[:90] + became)})
+        if len(lost) > 5:
+            fact_bucket.append({"kind": "%s altered or removed" % noun,
+                                "detail": "... and %d more" % (len(lost) - 5)})
+
     return {
         "ok": not violations,
         "violations": violations,
         "structure_changes": structure_changes,
+        "fact_changes": fact_changes,
+        "facts": facts_report,
         "tells_before": a_t,
         "tells_after": b_t,
         "em_dashes_before": a_em,
@@ -303,34 +392,71 @@ def validate(original, rewritten, allow_structure=False):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("original")
-    ap.add_argument("rewritten")
-    ap.add_argument("--json", action="store_true")
+    examples = [
+        "python3 verify.py original.md rewritten.md",
+        "python3 verify.py original.md rewritten.md --json",
+        "python3 verify.py original.md converted.md --allow-structure"
+    ]
+    ap = cli_error.LLMArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        examples=examples
+    )
+    ap.add_argument("original", help="path to original unedited markdown file")
+    ap.add_argument("rewritten", help="path to rewritten markdown file to verify against original")
+    ap.add_argument("--json", action="store_true", help="output machine-readable JSON result")
     ap.add_argument("--allow-structure", action="store_true",
                     help="report heading changes instead of failing on them. For a "
                          "voice conversion, which reorders sections by design. Every "
                          "other preservation check still applies")
+    ap.add_argument("--allow-facts", action="store_true",
+                    help="report a lost number, date or quotation instead of failing "
+                         "on it. Dates already compare as their ISO form and a range "
+                         "as one token, so a reformat passes without this. It is for "
+                         "a profile that spells numbers out, which no regex can model")
     args = ap.parse_args()
 
     try:
         with open(args.original, encoding="utf-8") as fh:
             original = fh.read()
+    except OSError as exc:
+        print(cli_error.format_file_error(
+            "verify.py", args.original, "original", expected_type="file path",
+            details=str(exc), examples=examples
+        ), file=sys.stderr)
+        return 2
+
+    try:
         with open(args.rewritten, encoding="utf-8") as fh:
             rewritten = fh.read()
     except OSError as exc:
-        print("verify: %s" % exc, file=sys.stderr)
+        print(cli_error.format_file_error(
+            "verify.py", args.rewritten, "rewritten", expected_type="file path",
+            details=str(exc), examples=examples
+        ), file=sys.stderr)
         return 2
 
-    result = validate(original, rewritten, allow_structure=args.allow_structure)
+    result = validate(original, rewritten, allow_structure=args.allow_structure,
+                      allow_facts=args.allow_facts)
 
     if args.json:
         print(json.dumps(result, indent=2))
     elif result["ok"]:
-        print("preservation OK  |  tells %d -> %d  |  em dashes %d -> %d"
+        f = result["facts"]
+        print("preservation OK  |  tells %d -> %d  |  em dashes %d -> %d\n"
+              "                 |  %d numbers, %d dates, %d quotations preserved"
               % (result["tells_before"], result["tells_after"],
-                 result["em_dashes_before"], result["em_dashes_after"]))
+                 result["em_dashes_before"], result["em_dashes_after"],
+                 f["numbers_after"], f["dates_after"], f["quotes_after"]))
+        for c in result["fact_changes"]:
+            print("  fact       %-28s %s" % (c["kind"], c["detail"]))
+        # Never a violation, and printed only when it moved. A capitalized-run
+        # regex cannot tell a product name from the first word of a sentence,
+        # so this is a list a person reads and not a verdict.
+        for direction in ("lost", "added"):
+            names = f["entities_%s" % direction]
+            if names:
+                print("  entities %-5s %s" % (direction, ", ".join(names[:8])))
         for c in result["structure_changes"]:
             print("  structure  %-28s %s" % (c["kind"], c["detail"]))
     else:

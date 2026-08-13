@@ -51,10 +51,15 @@ def test_every_invisible_logic_source_is_escape_only():
     that file the bar is the rule rather than pure ASCII, so any non-ASCII it
     carries must be visible, never a format or space-separator codepoint.
     """
+    repo = os.path.dirname(os.path.dirname(os.path.dirname(SCRIPTS)))
+    # Every root that holds character-handling logic, and the list is the whole
+    # reach of this rule: a directory added to the repository is not held to it
+    # until it is added here. `scripts/voice-eval/` shipped ASCII-only by hand
+    # and unenforced for exactly that reason.
     roots = [
         os.path.join(SCRIPTS, "rwlib"),
-        os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(SCRIPTS))),
-                     "scripts", "detector-corpus"),
+        os.path.join(repo, "scripts", "detector-corpus"),
+        os.path.join(repo, "scripts", "voice-eval"),
     ]
     # Format, control, surrogate, private-use, and separator codepoints are the
     # ones a reader cannot see. Visible punctuation and letters are not.

@@ -12,6 +12,7 @@ contamination check ends up skipped.
     python3 measure_voice.py sample1.md sample2.md sample3.md
     python3 measure_voice.py samples/*.md --json
     python3 measure_voice.py samples/*.md --name dana --write-fingerprint
+    python3 measure_voice.py samples/*.md --questions
 
 What comes out:
 
@@ -25,6 +26,19 @@ What comes out:
     if one opens half her sentences with "But"
   a voice fingerprint, with the band of the writer's own samples around it,
     which is what turns "does this sound like them" into a number
+  under --questions, an interview built out of all of the above
+
+`--questions` is the samples-plus-interview route, and it prints instead of the
+report rather than alongside it. Two blocks, in this order: the questions as
+they should be asked, then the counts behind them. A count read out first is a
+leading question, and the route exists because self-report and measurement are
+two pieces of evidence that are allowed to disagree. Show the numbers after the
+answers and the disagreement is visible; show them before and there is nothing
+left to disagree with.
+
+It asks only what the samples cannot settle. Every `forbid` suggestion below
+rests on a silence rather than a refusal, which is a question. A writer who
+used em dashes has already answered that one, so it is not asked again.
 
 The fingerprint is the one output that is a file rather than a paste. It goes
 beside the profile as `voices/<name>.fingerprint.json`, and `scan.py --voice`
@@ -50,7 +64,6 @@ Stdlib only, 3.9+.
 import argparse
 import importlib.util
 import json
-import math
 import os
 import re
 import sys
@@ -68,30 +81,111 @@ if RWLIB_PARENT not in sys.path:
     sys.path.insert(0, RWLIB_PARENT)
 # Where a written fingerprint lands, resolved the same way and for the same
 # reason. rwlib.voices owns the answer, so a moved voices/ directory moves this.
-from rwlib import stylometry, voices as voices_mod   # noqa: E402
+from rwlib import cli_error, stylometry, voices as voices_mod   # noqa: E402
 
-# Contractions are in the template's block and are not one of scan.py's stats,
-# so they are counted here. Apostrophe either way: a sample pasted out of Word
-# or Google Docs has curly ones, and a rate that silently reads zero on half the
-# samples is worse than not reporting it.
-CONTRACTION_RX = re.compile(
-    r"(?i)\b\w+['’](?:t|s|re|ve|ll|d|m)\b|\b(?:can['’]t|won['’]t)\b")
-
-# What the report and the pasteable block quote, in order. Second element is the
-# name the template's block uses, which is not always scan.py's key.
-MEASURES = (
-    ("avg_sentence_words", "avg_sentence_words"),
-    ("sentence_sd", "sentence_length_sd"),
-    ("burstiness", "burstiness"),
-    ("mattr", "mattr"),
-    ("em_dashes_per_1k", "em_dashes_per_1000w"),
-    ("contraction_rate", "contraction_rate"),
-)
+# Which measures exist, and in what order, is stylometry.MEASURES: they are the
+# block a fingerprint stores and a later attainment check reads. What survives
+# here is only the spelling each one uses in voices/TEMPLATE.md, which is not
+# always scan.py's key. Two of them differ.
+MEASURE_LABELS = {
+    "avg_sentence_words": "avg_sentence_words",
+    "sentence_sd": "sentence_length_sd",
+    "burstiness": "burstiness",
+    "mattr": "mattr",
+    "em_dashes_per_1k": "em_dashes_per_1000w",
+    "contraction_rate": "contraction_rate",
+}
 
 # Below this many words a sample's stylometry is noise. scan.py says so in its
 # own report; said here too, because a person handing over four short emails
 # deserves to be told the numbers are thin before they build a profile on them.
 THIN_SAMPLE_WORDS = 250
+
+# --------------------------------------------------------------------------
+# the interview, for the route that reads samples and then asks
+# --------------------------------------------------------------------------
+
+# The number SKILL.md commits to, and the reason it is a cap rather than a
+# target: the person who quits at question 40 leaves a worse profile than the
+# one who answered 10 and stayed engaged.
+QUESTION_BUDGET = 10
+
+# One question per mechanic the samples could not settle. None of these carries
+# its own count, and that is the rule the whole mode turns on: the count goes in
+# the block underneath, after the answer. Asked with the number attached, every
+# one of them becomes a leading question and the answer stops being evidence.
+MECHANIC_QUESTIONS = {
+    "em_dash": "Em dashes. Do you use them, and where would one be wrong?",
+    "semicolon": "Semicolons. Do you use them, and where never?",
+    "emoji": "Emoji. Ever, and in which register?",
+    "curly_quotes": "Curly quotes or straight ones. Do you care, and does the "
+                    "answer change with where it gets published?",
+    "one_word_sentence": "One-word sentences. A tool you reach for, or a tic "
+                         "you cut?",
+    "oxford_comma": "The comma before the final `and` in a list. Always, "
+                    "never, or by ear?",
+    "date_format": "How do you write a date?",
+}
+
+# The same, for the shapes a mean hides. These are the ones worth spending a
+# question on because the answer and the count so often disagree: almost nobody
+# can name the word they open sentences with.
+SHAPE_QUESTIONS = {
+    "closer": "How do you sign off? Give the exact words, and say which "
+              "register each one belongs to.",
+    "opener": "Which word do you catch yourself starting sentences with too "
+              "often?",
+    "hedges": "When you are not certain of something, what do you actually "
+              "write?",
+}
+
+# Asked in this order, and trimmed from the end, so the order is a ranking by
+# how likely the answer is to disagree with the count. The two marks people
+# hold opinions about lead. Then the sign-off, which SKILL.md is right to call
+# the line a profile most often gets wrong, and the opener, which almost nobody
+# can name about themselves and which the samples can. `emoji` sits low on
+# purpose: the count is nearly always zero, the answer is nearly always no, and
+# a question whose answer is known is a question wasted out of ten.
+DERIVED_ORDER = ("em_dash", "semicolon", "closer", "opener",
+                 "one_word_sentence", "hedges", "emoji", "oxford_comma",
+                 "curly_quotes", "date_format")
+
+# What no counter reaches, whatever the samples say. Samples are the record of
+# what got written, and a voice is mostly what did not.
+FIXED_QUESTIONS = (
+    ("belief", "What do you believe about your subject that most people in "
+               "your field do not?"),
+    ("banned-words", "Which specific words make you close a tab? Which cliches "
+                     "or corporate filler read as nails on a chalkboard?"),
+    ("hard-no", "What would embarrass you to publish under your name? Give me "
+                "one sentence you would refuse to write, and the one you would "
+                "write instead."),
+    ("red-flags", "What makes you spot an imitation of your writing straight "
+                  "away?"),
+    ("register-gap", "These samples are whichever registers you happened to "
+                     "hand over. Name one you also write in that is not here, "
+                     "and say what changes there."),
+    ("top-three", "If you could keep only three rules: your one belief, your "
+                  "one signature pattern, your one absolute refusal."),
+)
+
+# Never cut when the budget binds, implementing this skill's own rule: cut from
+# Structure and Tone, never from Hard nos. `register-gap` is in here because a
+# profile built from one register and silent about that is a profile that will
+# be wrong the first time they write an email.
+RESERVED = frozenset({"banned-words", "hard-no", "red-flags", "register-gap",
+                      "top-three"})
+
+# How dominant an opener has to be before it is worth a question. Below this it
+# is the subject of the piece rather than a habit.
+OPENER_SHARE = 0.12
+
+# Openers that are never worth the question. An article is about the noun after
+# it, so "opens 7 of 22 sentences with `the`" is a fact about English rather
+# than about this writer, and a question that spends one of ten on it comes
+# back with a shrug. The interesting openers are the ones a person could
+# plausibly own: `But`, `So`, `I`, `This`.
+OPENER_NOISE = frozenset({"the", "a", "an"})
 
 
 def load_scan():
@@ -104,48 +198,20 @@ def load_scan():
     return module
 
 
-def mean(values):
-    return sum(values) / len(values) if values else None
-
-
-def sd(values):
-    """Sample standard deviation, or 0.0 for a single value.
-
-    Across samples, not within one. It answers "how consistent is this person
-    from piece to piece", which is the number that tells you whether one profile
-    can describe them at all or whether they have two registers you are about to
-    average into a third that is nobody.
-    """
-    if len(values) < 2:
-        return 0.0
-    m = mean(values)
-    return math.sqrt(sum((v - m) ** 2 for v in values) / (len(values) - 1))
-
-
-def contraction_rate(scan, text):
-    """Contractions per 100 words of prose.
-
-    Measured over the same stripped copy scan.py measures its own stats on, so
-    `don't` inside a code fence is not counted as how this person talks.
-    """
-    prose = scan.strip_for_stats(text)
-    words = scan.tokenize(prose)
-    if not words:
-        return None
-    return 100.0 * len(CONTRACTION_RX.findall(prose)) / len(words)
-
-
-def measure_one(scan, path):
+def measure_one(scan, path, examples=None):
     """Everything one sample contributes, or None when it cannot be read."""
     try:
         with open(path, encoding="utf-8") as fh:
             text = fh.read()
     except OSError as exc:
-        print("measure_voice: %s" % exc, file=sys.stderr)
+        print(cli_error.format_file_error(
+            "measure_voice.py", path, "samples", expected_type="file path",
+            details=str(exc), examples=examples), file=sys.stderr)
         return None
 
+    # `contraction_rate` arrives in `stats` now. It used to be computed here off
+    # a local regex, which was a second counter for a fact scan.py also needed.
     findings, stats = scan.scan(text)
-    stats["contraction_rate"] = contraction_rate(scan, text)
     p0 = [f for f in findings if f["priority"] == "P0"]
     scored = scan.apply_exemptions(text)
 
@@ -161,6 +227,13 @@ def measure_one(scan, path):
         "reliability": scan.reliability(stats.get("word_count", 0)),
         "stats": stats,
         "prose": prose,
+        # The two halves of the v2 fingerprint block. stylometry.py owns the
+        # arithmetic and the stored shape, and this is where the numbers come
+        # from, because this is the side of the wall that has scan.py loaded.
+        "measures": {k: stats.get(k) for k in stylometry.MEASURES},
+        "sentence_lengths": [n for n in (len(scan.tokenize(s))
+                                         for s in scan.split_sentences(prose))
+                             if n],
         "distributions": stylometry.distributions(
             prose, split_sentences=scan.split_sentences),
         "p0": [{"id": f["id"], "label": f["label"], "line": f["line"]} for f in p0],
@@ -269,25 +342,30 @@ def suggest_mechanics(samples):
 
 
 def aggregate(samples):
-    """{measure: {"mean": x, "sd": y, "n": k}} across the samples."""
-    out = {}
-    for key, _ in MEASURES:
-        values = [s["stats"][key] for s in samples
-                  if s["stats"].get(key) is not None]
-        if values:
-            out[key] = {"mean": round(mean(values), 2),
-                        "sd": round(sd(values), 2),
-                        "n": len(values)}
-    return out
+    """{measure: {"mean", "sd", "min", "max", "n"}} across the samples.
+
+    One call, so the table this script prints and the block the fingerprint
+    stores are the same computation. They used to be two, and the report had no
+    min or max at all while claiming an outlier was visible rather than
+    averaged away.
+    """
+    return stylometry.measure_stats([s["measures"] for s in samples])
+
+
+def shown(value):
+    """Two decimals for a human. The stored block keeps three, because
+    `mattr` moves in the third and `avg_sentence_words` does not, and a table a
+    person reads should not print 14.233 words per sentence."""
+    return "-" if value is None else round(value, 2)
 
 
 def measured_block(agg):
     """The `Measured from samples` block out of voices/TEMPLATE.md, filled in."""
     lines = ["```"]
-    for key, label in MEASURES:
+    for key in stylometry.MEASURES:
         entry = agg.get(key)
-        lines.append("%-22s %s" % (label + ":",
-                                   "" if entry is None else entry["mean"]))
+        lines.append("%-22s %s" % (MEASURE_LABELS[key] + ":",
+                                   "" if entry is None else shown(entry["mean"])))
     lines.append("```")
     return "\n".join(lines)
 
@@ -306,8 +384,38 @@ def build_fingerprint(samples, name, exemplars=False):
     """
     if len(samples) < 2:
         return None
-    return stylometry.fingerprint([s["prose"] for s in samples], voice=name,
-                                  exemplars=exemplars)
+    return stylometry.fingerprint(
+        [s["prose"] for s in samples], voice=name, exemplars=exemplars,
+        sample_measures=[s["measures"] for s in samples],
+        sentence_lengths=[s["sentence_lengths"] for s in samples])
+
+
+def roll_up_distributions(samples):
+    """Every per-sample distribution summed into one set of counters.
+
+    One home for the summing. The report prints these and the interview asks
+    questions off them, and two loops would be two answers to "which word does
+    this person open sentences with", which is exactly the drift rwlib exists to
+    prevent one directory over.
+    """
+    rolled = {key: Counter() for key in
+              ("sentence_openers", "paragraph_openers", "connectors",
+               "contractions", "hedges", "intensifiers")}
+    for s in samples:
+        d = s["distributions"]
+        for entry in d["sentence_openers"]:
+            rolled["sentence_openers"][entry["word"]] += entry["n"]
+        for entry in d["paragraph_openers"]:
+            rolled["paragraph_openers"][entry["word"]] += entry["n"]
+        for group, body in d["connectors"].items():
+            rolled["connectors"][group] += round(body["per_1k"] * d["words"] / 1000.0)
+        for entry in d["contractions"]["inventory"]:
+            rolled["contractions"][entry["form"]] += entry["n"]
+        for entry in d["hedges"]["used"]:
+            rolled["hedges"][entry["term"]] += entry["n"]
+        for entry in d["intensifiers"]["used"]:
+            rolled["intensifiers"][entry["term"]] += entry["n"]
+    return rolled
 
 
 def distribution_report(samples):
@@ -320,27 +428,13 @@ def distribution_report(samples):
     is to make the question specific.
     """
     out = ["distributions (what the averages above hide)"]
-
-    openers = Counter()
-    para_openers = Counter()
-    connectors = Counter()
-    contractions = Counter()
-    hedges = Counter()
-    intensifiers = Counter()
-    for s in samples:
-        d = s["distributions"]
-        for entry in d["sentence_openers"]:
-            openers[entry["word"]] += entry["n"]
-        for entry in d["paragraph_openers"]:
-            para_openers[entry["word"]] += entry["n"]
-        for group, body in d["connectors"].items():
-            connectors[group] += round(body["per_1k"] * d["words"] / 1000.0)
-        for entry in d["contractions"]["inventory"]:
-            contractions[entry["form"]] += entry["n"]
-        for entry in d["hedges"]["used"]:
-            hedges[entry["term"]] += entry["n"]
-        for entry in d["intensifiers"]["used"]:
-            intensifiers[entry["term"]] += entry["n"]
+    rolled = roll_up_distributions(samples)
+    openers = rolled["sentence_openers"]
+    para_openers = rolled["paragraph_openers"]
+    connectors = rolled["connectors"]
+    contractions = rolled["contractions"]
+    hedges = rolled["hedges"]
+    intensifiers = rolled["intensifiers"]
 
     def line(label, counter, note=""):
         if not counter:
@@ -382,6 +476,25 @@ def fingerprint_report(fp, written_to=None):
     out.append("                         from another sample of theirs by this "
                "measure. Past 1.5x that,")
     out.append("                         it is a different register.")
+    shape = fp.get("sentence_shape")
+    if shape:
+        q = shape["quantiles"]
+        out.append("  sentence shape         %d sentences, p10 %d, median %d, "
+                   "p90 %d, sd %.1f"
+                   % (shape["n_sentences"], q[1], q[5], q[9], shape["sd"]))
+        out.append("                         %d%% under %d words, %d%% over %d. "
+                   "That is the rhythm a"
+                   % (round(100 * shape["short_share"]),
+                      stylometry.SHORT_SENTENCE_WORDS + 1,
+                      round(100 * shape["long_share"]),
+                      stylometry.LONG_SENTENCE_WORDS - 1))
+        out.append("                         conversion aims at, and it is a "
+                   "band rather than a script.")
+    if fp.get("measures"):
+        out.append("  measures               %d stored with their min and max, "
+                   "which is what an" % len(fp["measures"]))
+        out.append("                         attainment check compares a "
+                   "converted document against.")
     if fp["thin_samples"]:
         out.append("  note                   %d sample(s) under %d words, so the "
                    "band is wider than it"
@@ -404,6 +517,168 @@ def fingerprint_report(fp, written_to=None):
     return "\n".join(out)
 
 
+def derive_questions(samples, suggestions):
+    """(questions, dropped) for the samples-plus-interview route.
+
+    Only what these documents could not settle gets asked. A `forbid`
+    suggestion is a silence rather than a refusal, so it is a question. An
+    `allow` that came from observed use is not: a writer who put em dashes in
+    four pieces has answered that one already, and asking anyway spends a
+    question from a budget of ten and teaches them the interview is not
+    listening.
+
+    Every question carries its evidence in a separate key. The caller prints
+    the two in two blocks, in that order, and `_no_counts_in_the_asking` is the
+    test that keeps them apart.
+    """
+    mech = {key: (value, why) for key, value, why in suggestions}
+    asks = {}
+
+    def ask(qid, question, evidence):
+        asks[qid] = {"id": qid, "question": question, "evidence": evidence,
+                     "source": "measured"}
+
+    value, why = mech.get("em_dash", (None, ""))
+    if value in ("forbid", "limit"):
+        # `limit` too. A cap this script chose from four documents is a number
+        # nobody has agreed to, and it is about to start reporting findings.
+        ask("em_dash", MECHANIC_QUESTIONS["em_dash"], why)
+    for key in ("semicolon", "emoji", "curly_quotes", "one_word_sentence"):
+        value, why = mech.get(key, (None, ""))
+        if value == "forbid":
+            ask(key, MECHANIC_QUESTIONS[key], why)
+    value, why = mech.get("oxford_comma", (None, ""))
+    if value == "allow":
+        # "allow" here means the counts came out even, which is the one case
+        # where the samples genuinely have no answer in them.
+        ask("oxford_comma", MECHANIC_QUESTIONS["oxford_comma"], why)
+    value, why = mech.get("date_format", (None, ""))
+    if value == "any":
+        ask("date_format", MECHANIC_QUESTIONS["date_format"], why)
+
+    rolled = roll_up_distributions(samples)
+    closers = [s["distributions"]["closer"].strip() for s in samples]
+    closers = [c for c in closers if c]
+    if closers:
+        ask("closer", SHAPE_QUESTIONS["closer"],
+            "; ".join(c if len(c) <= 60 else c[:57] + "..." for c in closers))
+    openers = rolled["sentence_openers"]
+    # The share is against every sentence, including the ones opening on a word
+    # the question skips. Counting only the interesting openers would inflate
+    # the share of whichever one survived and turn a habit nobody has into a
+    # question asked with confidence.
+    sentences = sum(openers.values())
+    ranked = [(w, n) for w, n in openers.most_common()
+              if w not in OPENER_NOISE]
+    if sentences and ranked:
+        word, n = ranked[0]
+        if n / float(sentences) >= OPENER_SHARE:
+            ask("opener", SHAPE_QUESTIONS["opener"],
+                "opens %d of %d sentences with %r" % (n, sentences, word))
+    if rolled["hedges"]:
+        ask("hedges", SHAPE_QUESTIONS["hedges"],
+            ", ".join("%s %d" % (term, n)
+                      for term, n in rolled["hedges"].most_common(6)))
+
+    derived = [asks[qid] for qid in DERIVED_ORDER if qid in asks]
+    fixed = [{"id": qid, "question": question, "evidence": "",
+              "source": "fixed"} for qid, question in FIXED_QUESTIONS]
+    reserved = [q for q in fixed if q["id"] in RESERVED]
+    optional = [q for q in fixed if q["id"] not in RESERVED]
+
+    room = max(0, QUESTION_BUDGET - len(reserved))
+    candidates = derived + optional
+    # Named rather than silently truncated. A trim that reads as "these were
+    # the questions" is the same lie as a rule that never fires.
+    return candidates[:room] + reserved, candidates[room:]
+
+
+def contamination_block(contaminated):
+    """The STOP block, in one place, because both outputs end at it.
+
+    The report prints it under the numbers and `--questions` prints it instead
+    of an interview. Two copies would let one of them go stale, and the stale
+    one would be the half somebody acts on.
+    """
+    out = ["STOP. %d sample(s) carry a P0 fingerprint, which is evidence of "
+           "AI-assisted writing:" % len(contaminated)]
+    for s in contaminated:
+        for f in s["p0"]:
+            out.append("  %s:%s  %s" % (os.path.basename(s["path"]),
+                                        f["line"], f["label"]))
+    out.append("")
+    out.append("Ask the author before going further. A tell that reaches a "
+               "profile is reproduced on purpose, forever. If they confirm a "
+               "sample was assisted, drop it, rerun this, and record what you "
+               "dropped under `## Known contamination`.")
+    return "\n".join(out)
+
+
+def questions_report(samples, questions, dropped, contaminated):
+    """The interview, and then the counts, in that order and never the other.
+
+    An interview is refused outright on a contaminated sample set. Every other
+    output of this script is a suggestion somebody reads and corrects, and this
+    one is a conversation: run it on writing that may not be theirs and the
+    first ten answers are anchored to a register nobody chose before anyone has
+    thought to check.
+    """
+    if contaminated:
+        return "\n".join([
+            contamination_block(contaminated), "",
+            "No interview. Ask about the samples first: the answers to ten "
+            "questions asked over somebody else's prose are ten answers about "
+            "somebody else."])
+
+    out = ["interview: %d question(s) from %d sample(s)"
+           % (len(questions), len(samples)), ""]
+    out.append("Ask these as written, in two batches. Do not read the block "
+               "underneath until")
+    out.append("they have answered: a count read out first is a leading "
+               "question, and this route")
+    out.append("exists because what a person says and what they wrote are two "
+               "pieces of evidence")
+    out.append("that are allowed to disagree.")
+    out.append("")
+    for i, q in enumerate(questions, 1):
+        out.append("  %2d  %s" % (i, q["question"]))
+    out.append("")
+
+    measured = [q for q in questions if q["evidence"]]
+    if measured:
+        out.append("after they have answered, what the samples said")
+        for q in measured:
+            out.append("  %-20s %s" % (q["id"], q["evidence"]))
+        out.append("")
+        out.append("Where an answer and a count disagree, say so plainly and "
+                   "let them settle it. \"I")
+        out.append("write short\" against a 24-word average is not a "
+                   "correction to make quietly: one of")
+        out.append("the two is what they do and the other is what they want, "
+                   "and the profile should")
+        out.append("record which is which.")
+        out.append("")
+
+    if dropped:
+        out.append("%d question(s) cut to keep this at %d: %s. Ask them if "
+                   "they are still going."
+                   % (len(dropped), QUESTION_BUDGET,
+                      ", ".join(q["id"] for q in dropped)))
+        out.append("")
+
+    out.append("Keep the refusals verbatim, both halves. A sentence they would "
+               "not write, beside the")
+    out.append("one they would, goes in `contrastive_pairs` and is worth ten "
+               "adjectives about tone.")
+    out.append("Then: build_voice.py --scaffold, fill the markdown from these "
+               "answers, --check, and")
+    out.append("scan one of these samples against the finished profile. A "
+               "stated rule that fires on")
+    out.append("their own writing is the disagreement surfacing, not a bug in "
+               "the scan.")
+    return "\n".join(out)
+
+
 def report(samples, agg, suggestions, contaminated, fingerprint=None,
            fingerprint_path=None):
     out = ["voice measurement: %d sample(s)" % len(samples), ""]
@@ -419,8 +694,13 @@ def report(samples, agg, suggestions, contaminated, fingerprint=None,
                       ", ".join(sorted({f["id"] for f in s["p0"]}))))
     out.append("")
 
-    out.append("aggregate (mean across samples, spread between them)")
-    for key, label in MEASURES:
+    # The range column is the one the caricature guard reads later, and it is
+    # the one a person should read now: a mean with a wide envelope under it is
+    # a writer with two registers, and the mean is nobody.
+    out.append("aggregate (mean across samples, spread between them, and the "
+               "range they cover)")
+    for key in stylometry.MEASURES:
+        label = MEASURE_LABELS[key]
         entry = agg.get(key)
         if entry is None:
             out.append("  %-24s %-8s %s" % (label, "-", "not measurable here"))
@@ -428,8 +708,10 @@ def report(samples, agg, suggestions, contaminated, fingerprint=None,
         note = ""
         if entry["n"] < len(samples):
             note = "from %d of %d samples" % (entry["n"], len(samples))
-        out.append("  %-24s %-8s +/- %-6s %s"
-                   % (label, entry["mean"], entry["sd"], note))
+        out.append("  %-24s %-8s +/- %-7s %-14s %s"
+                   % (label, shown(entry["mean"]), shown(entry["sd"]),
+                      "%s to %s" % (shown(entry["min"]), shown(entry["max"])),
+                      note))
     out.append("")
 
     out.append("paste into the profile, under `## Measured from samples`")
@@ -466,17 +748,7 @@ def report(samples, agg, suggestions, contaminated, fingerprint=None,
 
     if contaminated:
         out.append("")
-        out.append("STOP. %d sample(s) carry a P0 fingerprint, which is evidence "
-                   "of AI-assisted writing:" % len(contaminated))
-        for s in contaminated:
-            for f in s["p0"]:
-                out.append("  %s:%s  %s" % (os.path.basename(s["path"]),
-                                            f["line"], f["label"]))
-        out.append("")
-        out.append("Ask the author before going further. A tell that reaches a "
-                   "profile is reproduced on purpose, forever. If they confirm a "
-                   "sample was assisted, drop it, rerun this, and record what "
-                   "you dropped under `## Known contamination`.")
+        out.append(contamination_block(contaminated))
 
     out.append("")
     out.append("Every suggestion above comes from these documents and nothing "
@@ -487,11 +759,25 @@ def report(samples, agg, suggestions, contaminated, fingerprint=None,
 
 
 def main():
-    ap = argparse.ArgumentParser(
+    examples = [
+        "python3 measure_voice.py sample1.md sample2.md sample3.md",
+        "python3 measure_voice.py samples/*.md --json",
+        "python3 measure_voice.py samples/*.md --name dana --write-fingerprint",
+        "python3 measure_voice.py samples/*.md --questions"
+    ]
+    ap = cli_error.LLMArgumentParser(
         description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        examples=examples
+    )
     ap.add_argument("samples", nargs="+", help="files this person wrote")
     ap.add_argument("--json", action="store_true", help="machine-readable output")
+    ap.add_argument("--questions", action="store_true",
+                    help="print an interview built from these samples instead "
+                         "of the report. Asks only what the samples could not "
+                         "settle, and holds every count back until after the "
+                         "answer, because a count read out first is a leading "
+                         "question")
     ap.add_argument("--name", metavar="VOICE",
                     help="the profile these samples belong to. Labels the "
                          "fingerprint, and names the file --write-fingerprint "
@@ -509,20 +795,29 @@ def main():
     args = ap.parse_args()
 
     if args.write_fingerprint and not args.name:
-        print("measure_voice: --write-fingerprint needs --name <voice>, which "
-              "decides the filename and labels the fingerprint", file=sys.stderr)
+        print(cli_error.format_llm_error(
+            "measure_voice.py",
+            "--write-fingerprint requires --name <voice> to specify the voice profile name and filename",
+            parser=ap, examples=examples
+        ), file=sys.stderr)
         return 2
 
     scan = load_scan()
-    samples = [s for s in (measure_one(scan, p) for p in args.samples) if s]
+    samples = [s for s in (measure_one(scan, p, examples) for p in args.samples) if s]
     if not samples:
-        print("measure_voice: no readable samples", file=sys.stderr)
+        print(cli_error.format_file_error(
+            "measure_voice.py", ", ".join(args.samples), "samples",
+            expected_type="one or more readable markdown file paths",
+            details="No readable sample files could be opened",
+            examples=examples
+        ), file=sys.stderr)
         return 2
 
     agg = aggregate(samples)
     suggestions = suggest_mechanics(samples)
     contaminated = [s for s in samples if s["p0"]]
     fingerprint = build_fingerprint(samples, args.name, args.with_exemplars)
+    questions, dropped = derive_questions(samples, suggestions)
 
     # Never written from contaminated samples. Every other output of this script
     # is a suggestion a person reads and confirms, and this one is a file a
@@ -536,21 +831,27 @@ def main():
         try:
             stylometry.save(fingerprint, written_to)
         except OSError as exc:
-            print("measure_voice: could not write %s: %s" % (written_to, exc),
-                  file=sys.stderr)
+            print(cli_error.format_file_error(
+                "measure_voice.py", written_to, "--write-fingerprint",
+                expected_type="writable fingerprint file path (.fingerprint.json)",
+                details=str(exc), examples=examples), file=sys.stderr)
             return 2
     elif args.write_fingerprint and not fingerprint:
-        print("measure_voice: a fingerprint needs at least 2 samples, and one "
-              "sample has no self-distance to calibrate against", file=sys.stderr)
+        print(cli_error.format_llm_error(
+            "measure_voice.py",
+            "A fingerprint needs at least 2 samples, and one sample has no self-distance to calibrate against",
+            parser=ap, examples=examples), file=sys.stderr)
     elif args.write_fingerprint and contaminated:
-        print("measure_voice: refused to write a fingerprint from samples that "
-              "carry a P0. See the report.", file=sys.stderr)
+        print(cli_error.format_llm_error(
+            "measure_voice.py",
+            "Refused to write a fingerprint from samples that carry a P0. See the report.",
+            parser=ap, examples=examples), file=sys.stderr)
 
     if args.json:
         print(json.dumps({
             "samples": [{"path": s["path"], "words": s["words"],
                          "reliability": s["reliability"], "p0": s["p0"],
-                         "marks": s["marks"],
+                         "marks": s["marks"], "measures": s["measures"],
                          "distributions": s["distributions"]} for s in samples],
             "aggregate": agg,
             "measured_block": measured_block(agg),
@@ -559,7 +860,14 @@ def main():
             "contaminated": [s["path"] for s in contaminated],
             "fingerprint": fingerprint,
             "fingerprint_written_to": written_to,
+            # Both, unconditionally. A caller reading JSON is not choosing
+            # between the two outputs the way a caller reading a terminal is,
+            # and the anchoring rule is about what gets said to a person.
+            "questions": [] if contaminated else questions,
+            "questions_dropped": [] if contaminated else dropped,
         }, indent=2))
+    elif args.questions:
+        print(questions_report(samples, questions, dropped, contaminated))
     else:
         print(report(samples, agg, suggestions, contaminated, fingerprint,
                      written_to))

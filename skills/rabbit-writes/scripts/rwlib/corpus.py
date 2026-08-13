@@ -23,6 +23,7 @@ Regenerate with:
 Stdlib only, 3.9+.
 """
 
+import glob
 import json
 import os
 
@@ -34,6 +35,7 @@ SUMMARY_PATH = os.path.join(PLUGIN_ROOT, "skills", "readme-writing", "scripts",
                             "corpus_summary.json")
 AGGREGATE_PATH = os.path.join(PLUGIN_ROOT, "docs", "readme-analysis",
                               "03_aggregate_summary.json")
+REPOS_DIR = os.path.join(PLUGIN_ROOT, "docs", "readme-analysis", "repos")
 
 # Bumped when `derive` changes which keys it emits or how it rounds them, so a
 # committed extract from an older shape fails the drift check loudly instead of
@@ -43,6 +45,32 @@ AGGREGATE_PATH = os.path.join(PLUGIN_ROOT, "docs", "readme-analysis",
 SCHEMA_VERSION = 2
 
 _CACHE = {}
+
+
+def readme_paths():
+    """[(slug, path)] for the committed 100-README snapshot, or [] when it is
+    not in this checkout.
+
+    Here rather than in a test helper because both test suites need it now: the
+    README suite has always used it, and the engine suite reaches for it the
+    moment a detector has to be calibrated against real third-party documents,
+    which `CLAUDE.md` requires of every new one. Two copies of the glob is how
+    two halves of one plugin end up disagreeing about what the corpus is.
+
+    Returns empty rather than raising. The snapshot is committed today and a
+    consumer that hard-failed without it would make the corpus a build
+    dependency, which it is not.
+    """
+    if "readme_paths" not in _CACHE:
+        found = []
+        if os.path.isdir(REPOS_DIR):
+            for slug in sorted(os.listdir(REPOS_DIR)):
+                hits = sorted(glob.glob(os.path.join(REPOS_DIR, slug, "README.*")))
+                preferred = [h for h in hits if h.lower().endswith(".md")]
+                if preferred or hits:
+                    found.append((slug, (preferred or hits)[0]))
+        _CACHE["readme_paths"] = found
+    return _CACHE["readme_paths"]
 
 
 def derive(aggregate):

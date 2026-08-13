@@ -54,7 +54,7 @@ SCAN_PATH = os.path.join(SKILLS, "rabbit-writes", "scripts", "scan.py")
 RWLIB_PARENT = os.path.dirname(SCAN_PATH)
 if RWLIB_PARENT not in sys.path:
     sys.path.insert(0, RWLIB_PARENT)
-from rwlib import inflect, voice_check, voices as voices_mod   # noqa: E402
+from rwlib import cli_error, inflect, voice_check, voices as voices_mod   # noqa: E402
 
 TEMPLATE_MD = os.path.join(voices_mod.VOICES_DIR, "TEMPLATE.md")
 TEMPLATE_RULES = os.path.join(voices_mod.VOICES_DIR, "TEMPLATE.rules.json")
@@ -158,6 +158,14 @@ def scaffold_markdown(name, template_path=TEMPLATE_MD):
     return "\n".join(lines).replace(voice_check.TEMPLATE_VOICE_NAME, name)
 
 
+BUILD_EXAMPLES = [
+    "python3 build_voice.py --scaffold --name dana",
+    "python3 build_voice.py --scaffold --name dana --out ~/writing/voices",
+    "python3 build_voice.py --check dana",
+    "python3 build_voice.py --check ~/writing/voices/dana.rules.json"
+]
+
+
 def do_scaffold(args):
     out_dir = os.path.abspath(args.out)
     md_path = os.path.join(out_dir, args.name + ".md")
@@ -165,17 +173,19 @@ def do_scaffold(args):
 
     existing = [p for p in (md_path, rules_path) if os.path.exists(p)]
     if existing and not args.force:
-        print("build_voice: %s already exist(s). Pass --force to overwrite, and "
-              "read them first: a profile is somebody's work."
-              % ", ".join(os.path.basename(p) for p in existing),
-              file=sys.stderr)
+        print(cli_error.format_file_error(
+            "build_voice.py", ", ".join(os.path.basename(p) for p in existing), "target files",
+            expected_type="non-existent file paths (or pass --force to overwrite)",
+            details="Target profile files already exist: %s" % ", ".join(existing),
+            examples=BUILD_EXAMPLES), file=sys.stderr)
         return 2
     if not os.path.isdir(out_dir):
         try:
             os.makedirs(out_dir)
         except OSError as exc:
-            print("build_voice: cannot create %s: %s" % (out_dir, exc),
-                  file=sys.stderr)
+            print(cli_error.format_file_error(
+                "build_voice.py", out_dir, "--out", expected_type="writable directory path",
+                details=str(exc), examples=BUILD_EXAMPLES), file=sys.stderr)
             return 2
 
     rules = scaffold_rules(args.name, args.priority)
@@ -187,8 +197,9 @@ def do_scaffold(args):
         with open(md_path, "w", encoding="utf-8") as fh:
             fh.write(markdown)
     except OSError as exc:
-        print("build_voice: cannot write into %s: %s" % (out_dir, exc),
-              file=sys.stderr)
+        print(cli_error.format_file_error(
+            "build_voice.py", out_dir, "output directory", expected_type="writable directory path",
+            details=str(exc), examples=BUILD_EXAMPLES), file=sys.stderr)
         return 2
 
     print("wrote %s" % md_path)
@@ -394,7 +405,11 @@ def resolve_target(target, voices_dir):
 def do_check(args):
     rules_path = resolve_target(args.check, args.voices_dir)
     if not os.path.exists(rules_path):
-        print("build_voice: no rules file at %s" % rules_path, file=sys.stderr)
+        print(cli_error.format_file_error(
+            "build_voice.py", rules_path, "--check",
+            expected_type="voice rules file path (.rules.json)",
+            details="No rules file found at %s" % rules_path,
+            examples=BUILD_EXAMPLES), file=sys.stderr)
         return 2
 
     name = voices_mod.strip_rules_suffix(os.path.basename(rules_path))
@@ -454,10 +469,12 @@ def do_activate(name, voices_dir):
     """ACTIVE names a profile in voices/, so it cannot point anywhere else."""
     rules_path = os.path.join(voices_dir, name + voices_mod.RULES_SUFFIX)
     if not os.path.exists(rules_path):
-        print("build_voice: not activating %r. voices/ACTIVE holds a name and "
-              "resolves it inside %s, and there is no %s.rules.json there. Pass "
-              "--voice-rules <path> at scan time instead."
-              % (name, voices_dir, name), file=sys.stderr)
+        print(cli_error.format_file_error(
+            "build_voice.py", rules_path, "--activate",
+            expected_type="voice profile name in voices/",
+            details="voices/ACTIVE holds a name and resolves inside %s, and there is no %s.rules.json there. Pass --voice-rules <path> at scan time instead."
+                    % (voices_dir, name),
+            examples=BUILD_EXAMPLES), file=sys.stderr)
         return 2
     active = os.path.join(voices_dir, "ACTIVE")
     previous = ""
@@ -468,7 +485,10 @@ def do_activate(name, voices_dir):
         with open(active, "w", encoding="utf-8") as fh:
             fh.write(name + "\n")
     except OSError as exc:
-        print("build_voice: cannot write %s: %s" % (active, exc), file=sys.stderr)
+        print(cli_error.format_file_error(
+            "build_voice.py", active, "ACTIVE file",
+            expected_type="writable file path",
+            details=str(exc), examples=BUILD_EXAMPLES), file=sys.stderr)
         return 2
     print("active voice is now %s%s"
           % (name, ", replacing %s" % previous if previous else ""))
@@ -476,9 +496,12 @@ def do_activate(name, voices_dir):
 
 
 def main():
-    ap = argparse.ArgumentParser(
+    examples = BUILD_EXAMPLES
+    ap = cli_error.LLMArgumentParser(
         description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        examples=examples
+    )
     mode = ap.add_mutually_exclusive_group(required=True)
     mode.add_argument("--scaffold", action="store_true",
                       help="write a new profile pair from the templates")
@@ -504,10 +527,16 @@ def main():
     args = ap.parse_args()
 
     if args.scaffold and not args.name:
-        print("build_voice: --scaffold needs --name <voice>", file=sys.stderr)
+        print(cli_error.format_llm_error(
+            "build_voice.py", "--scaffold requires --name <voice> to set the profile name",
+            parser=ap, examples=examples
+        ), file=sys.stderr)
         return 2
     if args.scaffold and args.name.startswith("TEMPLATE"):
-        print("build_voice: TEMPLATE is the form, not a person", file=sys.stderr)
+        print(cli_error.format_llm_error(
+            "build_voice.py", "--name TEMPLATE is invalid: TEMPLATE is the form name, not a person's profile name",
+            parser=ap, examples=examples
+        ), file=sys.stderr)
         return 2
 
     if args.scaffold:
@@ -526,7 +555,9 @@ def main():
         return do_activate(name, args.voices_dir)
     if code != 0 and args.activate:
         print("")
-        print("not activating: the profile did not check out.", file=sys.stderr)
+        print(cli_error.format_llm_error(
+            "build_voice.py", "Refused activation: the profile did not check out.",
+            parser=ap, examples=examples), file=sys.stderr)
     return code
 
 

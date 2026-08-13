@@ -29,6 +29,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(ROOT, "scripts")
 SCAN = os.path.join(SCRIPTS, "scan.py")
 VERIFY = os.path.join(SCRIPTS, "verify.py")
+ATTAIN = os.path.join(SCRIPTS, "attain.py")
 LEXICON = os.path.join(SCRIPTS, "lexicon.json")
 PATTERNS_MD = os.path.join(ROOT, "references", "patterns.md")
 CONTEXT_MD = os.path.join(ROOT, "references", "context.md")
@@ -188,3 +189,18 @@ def tier1_table_terms():
         cell = re.sub(r"\*\([^)]*\)\*", "", line.split("|")[1])
         terms += [t.strip().strip("`").lower() for t in re.split(r"[/,]", cell) if t.strip()]
     return terms
+
+
+def run_attain(*args):
+    """(parsed, exit code) from attain.py --json.
+
+    Beside run_verify because it is the same shape of thing: a script over two
+    documents whose exit code is a contract worth asserting rather than
+    assuming. Callers pass paths, since attain resolves a profile relative to
+    the document it was handed.
+    """
+    result = subprocess.run([sys.executable, ATTAIN, *args, "--json"],
+                            capture_output=True, text=True)
+    if not result.stdout:
+        return {"stderr": result.stderr}, result.returncode
+    return json.loads(result.stdout), result.returncode

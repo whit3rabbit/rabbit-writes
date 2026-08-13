@@ -61,6 +61,7 @@ RWLIB_PARENT = os.path.dirname(SCAN_PATH)
 if RWLIB_PARENT not in sys.path:
     sys.path.insert(0, RWLIB_PARENT)
 
+from rwlib import cli_error                        # noqa: E402
 from rwlib import corpus as corpus_mod            # noqa: E402
 from rwlib import findings as findings_mod        # noqa: E402
 from rwlib import language, sarif, suppress       # noqa: E402
@@ -921,9 +922,19 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("file", help="the README to check")
+    examples = [
+        "python3 readme_check.py README.md",
+        "python3 readme_check.py README.md --json",
+        "python3 readme_check.py README.md --check",
+        "python3 readme_check.py README.md --no-voice",
+        "python3 readme_check.py README.md --voice-rules path/to/dana.rules.json"
+    ]
+    ap = cli_error.LLMArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        examples=examples
+    )
+    ap.add_argument("file", help="the README file path to check")
     ap.add_argument("--json", action="store_true", help="machine-readable output")
     ap.add_argument("--sarif", action="store_true",
                     help="SARIF 2.1.0, for GitHub pull request annotations")
@@ -942,7 +953,10 @@ def main():
         with open(args.file, encoding="utf-8") as fh:
             raw = fh.read()
     except OSError as exc:
-        print("readme_check: %s" % exc, file=sys.stderr)
+        print(cli_error.format_file_error(
+            "readme_check.py", args.file, "file", expected_type="file path",
+            details=str(exc), examples=examples
+        ), file=sys.stderr)
         return 2
 
     try:
@@ -950,11 +964,11 @@ def main():
             raw, args.file, use_voice=not args.no_voice,
             voice_rules=args.voice_rules)
     except voices_mod.VoiceError as exc:
-        # Only reachable from an explicit --voice-rules. Same exit code and same
-        # reasoning as scan.py: a profile asked for by name and not read is an
-        # error, because the alternative is a clean voice band on a document
-        # nobody checked against it.
-        print("readme_check: %s" % exc, file=sys.stderr)
+        print(cli_error.format_file_error(
+            "readme_check.py", args.voice_rules or "voice profile", "--voice-rules",
+            expected_type="voice rules file path (.rules.json)",
+            details=str(exc), examples=examples
+        ), file=sys.stderr)
         return 2
 
     if args.sarif:

@@ -429,3 +429,199 @@ def test_a_failing_check_does_not_activate():
         assert not os.path.exists(os.path.join(tmp, "ACTIVE")), out
     finally:
         shutil.rmtree(tmp)
+
+
+# --------------------------------------------------------------------------
+# the fingerprint beside the pair
+# --------------------------------------------------------------------------
+#
+# check_fingerprint runs on the optional third file. The assertions here are
+# the negative ones for the same reason as everything above: a malformed
+# measure block is not a degraded measurement, it is one an attainment check
+# reads and silently answers nothing from, which reads exactly like a profile
+# somebody is honouring.
+
+GOOD_MEASURES = {
+    "avg_sentence_words": {"mean": 14.0, "sd": 2.0, "min": 12.0, "max": 16.0,
+                           "n": 3},
+}
+GOOD_SHAPE = {
+    "n_sentences": 30,
+    "quantiles": [4, 8, 10, 12, 13, 15, 17, 19, 21, 26, 34],
+    "mean": 15.0, "sd": 7.0, "short_share": 0.2, "long_share": 0.1,
+    "per_sample_median": [14, 15, 16],
+}
+
+
+def fingerprint_beside(tmp, name="dana", **overrides):
+    """Write a v2 fingerprint next to the profile and return the rules path."""
+    from rwlib import stylometry
+    rules_path = profile(tmp, {"voice": name, "banned_words": ["synergy"]},
+                         name=name)
+    body = {"schema_version": stylometry.SCHEMA_VERSION, "voice": name,
+            "n_samples": 3, "sample_words": [900, 950, 1000],
+            "thin_samples": 0, "markers": {},
+            "self_distance": {"per_sample": [0.5, 0.6, 0.4], "mean": 0.5,
+                              "max": 0.6},
+            "measures": dict(GOOD_MEASURES),
+            "sentence_shape": dict(GOOD_SHAPE)}
+    body.update(overrides)
+    with open(os.path.join(tmp, name + ".fingerprint.json"), "w",
+              encoding="utf-8") as fh:
+        json.dump(body, fh)
+    return rules_path
+
+
+def test_a_well_formed_fingerprint_passes_and_says_what_it_holds():
+    tmp = tempfile.mkdtemp()
+    try:
+        rules_path = fingerprint_beside(tmp)
+        voice_check = check_module()
+        results = voice_check.check_profile(rules_path)
+        assert not voice_check.failures(results), results
+        assert any("1 measures" in r["message"] and "30 sentences" in r["message"]
+                   for r in results), results
+    finally:
+        shutil.rmtree(tmp)
+
+
+def test_a_fingerprint_with_no_measure_block_fails():
+    """The half a later attainment check reads. Without it the check answers
+    nothing and says nothing, which is the orphan failure one file over."""
+    tmp = tempfile.mkdtemp()
+    try:
+        rules_path = fingerprint_beside(tmp, measures={})
+        assert any("no `measures` block" in m for m in messages(rules_path)), \
+            messages(rules_path)
+    finally:
+        shutil.rmtree(tmp)
+
+
+def test_a_fingerprint_with_the_numbers_in_the_wrong_slots_fails():
+    """The one check worth having beyond a key-shape test. A builder that swaps
+    min and max passes every other assertion here and produces an envelope
+    nothing can fall outside of."""
+    tmp = tempfile.mkdtemp()
+    try:
+        swapped = {"avg_sentence_words": {"mean": 14.0, "sd": 2.0, "min": 16.0,
+                                          "max": 12.0, "n": 3}}
+        rules_path = fingerprint_beside(tmp, measures=swapped)
+        assert any("not an envelope" in m for m in messages(rules_path)), \
+            messages(rules_path)
+    finally:
+        shutil.rmtree(tmp)
+
+
+def test_a_measure_this_engine_does_not_know_fails():
+    tmp = tempfile.mkdtemp()
+    try:
+        rules_path = fingerprint_beside(
+            tmp, measures={"vibes": {"mean": 1.0, "sd": 0.0, "min": 1.0,
+                                     "max": 1.0, "n": 3}})
+        assert any("different builder" in m for m in messages(rules_path)), \
+            messages(rules_path)
+    finally:
+        shutil.rmtree(tmp)
+
+
+def test_a_shape_with_the_wrong_number_of_boundaries_fails():
+    tmp = tempfile.mkdtemp()
+    try:
+        short = dict(GOOD_SHAPE, quantiles=[4, 8, 12])
+        rules_path = fingerprint_beside(tmp, sentence_shape=short)
+        assert any("quantiles" in m for m in messages(rules_path)), \
+            messages(rules_path)
+    finally:
+        shutil.rmtree(tmp)
+
+
+def test_a_shape_that_goes_backwards_fails():
+    tmp = tempfile.mkdtemp()
+    try:
+        backwards = dict(GOOD_SHAPE,
+                         quantiles=[4, 8, 10, 12, 13, 15, 17, 19, 9, 26, 34])
+        rules_path = fingerprint_beside(tmp, sentence_shape=backwards)
+        assert any("non-decreasing" in m for m in messages(rules_path)), \
+            messages(rules_path)
+    finally:
+        shutil.rmtree(tmp)
+
+
+def test_a_missing_shape_is_not_a_failure():
+    """The shape is a rewrite target and nothing raises a finding off it. A
+    profile measured before it existed still has a usable measure block."""
+    tmp = tempfile.mkdtemp()
+    try:
+        rules_path = fingerprint_beside(tmp, sentence_shape=None)
+        assert not messages(rules_path), messages(rules_path)
+    finally:
+        shutil.rmtree(tmp)
+
+
+# --------------------------------------------------------------------------
+# the two advisory keys
+# --------------------------------------------------------------------------
+
+def test_a_signature_move_with_no_threshold_fails():
+    """It compiles, it runs, it counts, and it can never report anything. That
+    is the silent no-op this whole checker exists for: in the file it reads
+    exactly like a rule somebody is honouring."""
+    tmp = tempfile.mkdtemp()
+    try:
+        rules_path = profile(tmp, {"voice": "dana", "signature_moves": [
+            {"id": "sig-x", "label": "X", "rx": "(?i)bottom line"}]})
+        assert any("sets none of" in m for m in messages(rules_path)), \
+            messages(rules_path)
+    finally:
+        shutil.rmtree(tmp)
+
+
+def test_a_signature_move_with_a_floor_above_its_cap_fails():
+    tmp = tempfile.mkdtemp()
+    try:
+        rules_path = profile(tmp, {"voice": "dana", "signature_moves": [
+            {"id": "sig-x", "label": "X", "rx": "(?i)bottom line",
+             "min_per_1000w": 4.0, "max_per_1000w": 2.0}]})
+        assert any("no document can satisfy both" in m
+                   for m in messages(rules_path)), messages(rules_path)
+    finally:
+        shutil.rmtree(tmp)
+
+
+def test_a_well_formed_signature_move_passes():
+    tmp = tempfile.mkdtemp()
+    try:
+        rules_path = profile(tmp, {"voice": "dana", "signature_moves": [
+            {"id": "sig-x", "label": "X", "rx": "(?i)bottom line",
+             "max_allowed": 3, "min_per_1000w": 0.5}]})
+        assert not messages(rules_path), messages(rules_path)
+    finally:
+        shutil.rmtree(tmp)
+
+
+def test_half_a_contrastive_pair_fails():
+    """A pair is worth ten adjectives and half a pair is an adjective."""
+    tmp = tempfile.mkdtemp()
+    try:
+        rules_path = profile(tmp, {"voice": "dana", "banned_words": ["synergy"],
+                                   "contrastive_pairs": [
+                                       {"rule": "connectors",
+                                        "would": "Also, it shipped."}]})
+        assert any("would_never" in m for m in messages(rules_path)), \
+            messages(rules_path)
+    finally:
+        shutil.rmtree(tmp)
+
+
+def test_a_whole_contrastive_pair_passes():
+    tmp = tempfile.mkdtemp()
+    try:
+        rules_path = profile(tmp, {"voice": "dana", "banned_words": ["synergy"],
+                                   "contrastive_pairs": [
+                                       {"rule": "connectors",
+                                        "would": "Also, it shipped.",
+                                        "would_never": "Furthermore, it was "
+                                                       "successfully shipped."}]})
+        assert not messages(rules_path), messages(rules_path)
+    finally:
+        shutil.rmtree(tmp)

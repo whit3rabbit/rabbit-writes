@@ -201,6 +201,45 @@ def check_rules(rules_path, voices_dir=None):
                                 "so it fires on every document" % (name, eid)))
         out += _register_scope(name, eid, entry, known_registers)
 
+    # Signature moves. Same two failures banned_regex has, plus the one that is
+    # particular to this key: an entry setting no threshold at all reads in the
+    # file as a rule somebody is honouring and does nothing, which is the
+    # silent-no-op failure this whole checker exists for.
+    SIGNATURE_THRESHOLDS = ("max_allowed", "max_per_1000w", "min_per_1000w")
+    for entry in rules.get("signature_moves", []):
+        eid = entry.get("id")
+        if not eid or "rx" not in entry:
+            out.append(_finding(FAIL, "%s: a signature_moves entry needs id and "
+                                "rx (%s)" % (name, json.dumps(entry)[:80])))
+            continue
+        try:
+            re.compile(entry["rx"])
+        except re.error as exc:
+            out.append(_finding(FAIL, "%s: signature move %s does not compile: "
+                                "%s" % (name, eid, exc)))
+        present = [k for k in SIGNATURE_THRESHOLDS if entry.get(k) is not None]
+        if not present:
+            out.append(_finding(FAIL, "%s: signature move %s sets none of %s, "
+                                "so it is measured and never reported. An entry "
+                                "that does nothing reads as a rule somebody is "
+                                "honouring" % (name, eid,
+                                               ", ".join(SIGNATURE_THRESHOLDS))))
+        floor, cap = entry.get("min_per_1000w"), entry.get("max_per_1000w")
+        if floor is not None and cap is not None and float(floor) >= float(cap):
+            out.append(_finding(FAIL, "%s: signature move %s has floor %s and "
+                                "cap %s, so no document can satisfy both"
+                                % (name, eid, floor, cap)))
+        out += _register_scope(name, eid, entry, known_registers)
+
+    # Contrastive pairs are advisory, like preferred_substitutions, and the only
+    # way to get one wrong is to write half of it.
+    for i, pair in enumerate(rules.get("contrastive_pairs", [])):
+        missing = [k for k in ("would", "would_never") if not pair.get(k)]
+        if missing:
+            out.append(_finding(FAIL, "%s: contrastive_pairs[%d] is missing %s. "
+                                "Half a pair is an adjective with extra steps"
+                                % (name, i, " and ".join(missing))))
+
     default = rules.get("default_priority", "P0")
     if default not in voices_mod.PRIORITY_ORDER:
         out.append(_finding(FAIL, "%s: default_priority is %r, not one of %s"
@@ -311,6 +350,79 @@ def check_markdown(rules_path):
     return out
 
 
+def _number(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _measure_problems(data):
+    """What is wrong with a fingerprint's v2 measure and shape blocks.
+
+    Returned as strings so the caller decides the level. Everything here is a
+    fail, because a malformed block is not a degraded measurement, it is one an
+    attainment check reads and silently answers nothing from.
+
+    The ordering check (`min <= mean <= max`) is the one worth having beyond a
+    key-shape test. A builder that put the right numbers in the wrong slots
+    passes every other check here and produces an envelope nothing can fall
+    outside of.
+    """
+    out = []
+    measures = data.get("measures")
+    if not isinstance(measures, dict) or not measures:
+        return ["carries no `measures` block, so an attainment check against it "
+                "answers nothing and says nothing. Rebuild it with "
+                "measure_voice.py, which has the numbers"]
+    n_samples = data.get("n_samples")
+    for key in sorted(measures):
+        if key not in stylometry_mod.MEASURES:
+            out.append("measures[%r] is not one stylometry.py knows, so it was "
+                       "written by a different builder" % key)
+            continue
+        entry = measures[key]
+        if not isinstance(entry, dict) or set(entry) != {"mean", "sd", "min",
+                                                         "max", "n"}:
+            out.append("measures[%r] is not {mean, sd, min, max, n}" % key)
+            continue
+        if not all(_number(entry[f]) for f in entry):
+            out.append("measures[%r] carries a non-numeric value" % key)
+            continue
+        if not entry["min"] <= entry["mean"] <= entry["max"]:
+            out.append("measures[%r] has min %s, mean %s, max %s, which is not "
+                       "an envelope: the numbers are in the wrong slots"
+                       % (key, entry["min"], entry["mean"], entry["max"]))
+        if entry["sd"] < 0:
+            out.append("measures[%r] has a negative sd" % key)
+        if not (1 <= entry["n"] <= (n_samples or entry["n"])):
+            out.append("measures[%r] claims n=%s over %s samples"
+                       % (key, entry["n"], n_samples))
+
+    shape = data.get("sentence_shape")
+    if shape is None:
+        return out
+    if not isinstance(shape, dict):
+        out.append("`sentence_shape` is present and is not an object")
+        return out
+    q = shape.get("quantiles")
+    want = stylometry_mod.SHAPE_QUANTILES + 1
+    if not isinstance(q, list) or len(q) != want or not all(_number(v) for v in q):
+        out.append("`sentence_shape.quantiles` is not %d numbers" % want)
+    elif any(b < a for a, b in zip(q, q[1:])):
+        out.append("`sentence_shape.quantiles` is not non-decreasing: %r" % (q,))
+    if not _number(shape.get("n_sentences")) or shape["n_sentences"] < 1:
+        out.append("`sentence_shape.n_sentences` is not a count")
+    for field in ("short_share", "long_share"):
+        value = shape.get(field)
+        if not _number(value) or not 0.0 <= value <= 1.0:
+            out.append("`sentence_shape.%s` is not a share" % field)
+    medians = shape.get("per_sample_median")
+    if not isinstance(medians, list) or (n_samples is not None
+                                         and len(medians) != n_samples):
+        out.append("`sentence_shape.per_sample_median` has %s entries for %s "
+                   "samples" % (len(medians) if isinstance(medians, list)
+                                else "no", n_samples))
+    return out
+
+
 def check_fingerprint(rules_path):
     """The optional third file, when there is one."""
     out = []
@@ -339,10 +451,20 @@ def check_fingerprint(rules_path):
                             "filename" % (name, stylometry_mod.FINGERPRINT_SUFFIX,
                                           data.get("voice"))))
     else:
-        band = data.get("self_distance", {})
-        out.append(_finding(NOTE, "%s has a fingerprint (%s samples, band max "
-                            "%s)" % (name, data.get("n_samples", "?"),
-                                     band.get("max", "?"))))
+        problems = _measure_problems(data)
+        for message in problems:
+            out.append(_finding(FAIL, "%s%s %s"
+                                % (name, stylometry_mod.FINGERPRINT_SUFFIX,
+                                   message)))
+        if not problems:
+            band = data.get("self_distance", {})
+            shape = data.get("sentence_shape") or {}
+            out.append(_finding(NOTE, "%s has a fingerprint (%s samples, band "
+                                "max %s, %d measures, %s sentences)"
+                                % (name, data.get("n_samples", "?"),
+                                   band.get("max", "?"),
+                                   len(data.get("measures") or {}),
+                                   shape.get("n_sentences", "no"))))
     return out
 
 
