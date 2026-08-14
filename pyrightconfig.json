@@ -1,0 +1,77 @@
+{
+  "include": [
+    "scripts",
+    "skills"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "scratch",
+    "docs"
+  ],
+  "pythonVersion": "3.9",
+  "typeCheckingMode": "off",
+  "extraPaths": [
+    "skills/rabbit-writes/scripts"
+  ],
+  "executionEnvironments": [
+    {
+      "root": "skills/rabbit-writes/scripts"
+    },
+    {
+      "root": "skills/rabbit-writes/tests",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
+      ]
+    },
+    {
+      "root": "skills/readme-writing/scripts",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
+      ]
+    },
+    {
+      "root": "skills/readme-writing/tests",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts",
+        "skills/readme-writing/scripts"
+      ]
+    },
+    {
+      "root": "skills/voice-setup/scripts",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
+      ]
+    },
+    {
+      "root": "skills/voice-setup/tests",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts",
+        "skills/voice-setup/scripts"
+      ]
+    },
+    {
+      "root": "scripts/detector-corpus",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
+      ]
+    },
+    {
+      "root": "scripts/readme-research",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
+      ]
+    },
+    {
+      "root": "scripts/voice-eval",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
+      ]
+    },
+    {
+      "root": "scripts",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
+      ]
+    }
+  ]
+}

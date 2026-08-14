@@ -724,6 +724,127 @@ def check_claude_md():
                  % checked)
 
 
+def python_dirs():
+    """Every directory in the tree that holds a .py file, repo-relative.
+
+    Posix separators, because these are compared against pyrightconfig.json,
+    which spells a path the one way on every platform. The Windows runner is in
+    the matrix precisely to catch a check that assumes otherwise.
+    """
+    out = set()
+    for top in ("scripts", "skills"):
+        for base, dirs, files in os.walk(os.path.join(ROOT, top)):
+            dirs[:] = [d for d in dirs if d != "__pycache__"]
+            if any(f.endswith(".py") for f in files):
+                out.add(os.path.relpath(base, ROOT).replace(os.sep, "/"))
+    return out
+
+
+def check_import_paths():
+    """pyrightconfig.json against the imports the scripts actually write.
+
+    rwlib is reached by inserting skills/rabbit-writes/scripts into sys.path,
+    which works at runtime and tells an editor nothing, so `from rwlib import
+    fixes` shows red in an IDE with nothing wrong with it. pyrightconfig.json
+    states the same path for a language server, and this check is what keeps the
+    two from drifting: a new script directory that imports rwlib is invisible to
+    the config until somebody adds an execution environment for it, and the only
+    symptom is red squiggles in one directory.
+
+    Nothing here runs an import. It is the search path a language server would
+    use, compared against the module names the files ask for.
+    """
+    rel_config = "pyrightconfig.json"
+    path = os.path.join(ROOT, rel_config)
+    if not os.path.exists(path):
+        fail("%s is missing, so rwlib resolves nowhere in an editor" % rel_config)
+        return
+    try:
+        with open(path, encoding="utf-8") as fh:
+            config = json.load(fh)
+    except ValueError as exc:
+        fail("%s does not parse: %s" % (rel_config, exc))
+        return
+
+    # pyright validates its own keys and warns on anything it does not know,
+    # including `$schema` and a `"//"` prose key, which is how the explanation
+    # this file used to carry came back as two warnings on every run. The
+    # explanation lives in CLAUDE.md now, and this list is what keeps somebody
+    # from re-adding it here. Keys pyright accepts and this repo does not use
+    # are simply absent, so adding one means adding it here too.
+    known_top = {"include", "exclude", "ignore", "defineConstant", "strict",
+                 "typeCheckingMode", "pythonVersion", "pythonPlatform",
+                 "venvPath", "venv", "extraPaths", "executionEnvironments",
+                 "typeshedPath", "stubPath", "useLibraryCodeForTypes"}
+    known_env = {"root", "extraPaths", "pythonVersion", "pythonPlatform"}
+    for key in sorted(set(config) - known_top):
+        fail("%s carries %r, which pyright reports as an unrecognized setting "
+             "on every run" % (rel_config, key))
+
+    envs = []
+    for env in config.get("executionEnvironments", []):
+        for key in sorted(set(env) - known_env):
+            fail("%s execution environment %r carries %r, which pyright reports "
+                 "as an unrecognized setting" % (rel_config, env.get("root"), key))
+        root = env.get("root")
+        if not root:
+            fail("%s has an execution environment with no root" % rel_config)
+            continue
+        search = [root] + list(env.get("extraPaths", []))
+        for entry in search:
+            if not os.path.isdir(os.path.join(ROOT, entry)):
+                fail("%s points at a missing directory: %s" % (rel_config, entry))
+        envs.append((root, search))
+    if not envs:
+        fail("%s declares no execution environments" % rel_config)
+        return
+
+    def search_paths(rel_dir):
+        """The paths a language server would resolve an import against.
+
+        Longest matching root wins, which is how pyright picks between nested
+        environments and why `scripts/voice-eval` is not served by `scripts`.
+        """
+        best = None
+        for root, search in envs:
+            if rel_dir == root or rel_dir.startswith(root + "/"):
+                if best is None or len(root) > len(best[0]):
+                    best = (root, search)
+        return None if best is None else best[1]
+
+    # Every local module the tree imports by a bare name, and where it lives.
+    # `helpers` is here for the same reason rwlib is: the tests reach a sibling
+    # through sys.path too, and it goes red in an editor the same way.
+    provides = {
+        "rwlib": lambda p: os.path.isdir(os.path.join(ROOT, p, "rwlib")),
+        "helpers": lambda p: os.path.exists(os.path.join(ROOT, p, "helpers.py")),
+    }
+    import_rx = re.compile(r"^[ \t]*(?:from|import)[ \t]+(%s)\b"
+                           % "|".join(sorted(provides)), re.M)
+
+    missing_env = sorted(d for d in python_dirs() if search_paths(d) is None)
+    for rel_dir in missing_env:
+        fail("%s has no execution environment for %s, so any import it resolves "
+             "through sys.path shows red in an editor" % (rel_config, rel_dir))
+
+    checked = 0
+    for rel_dir in sorted(python_dirs() - set(missing_env)):
+        search = search_paths(rel_dir)
+        for name in sorted(os.listdir(os.path.join(ROOT, rel_dir))):
+            if not name.endswith(".py"):
+                continue
+            with open(os.path.join(ROOT, rel_dir, name), encoding="utf-8") as fh:
+                text = fh.read()
+            checked += 1
+            for module in sorted(set(import_rx.findall(text))):
+                if not any(provides[module](p) for p in search):
+                    fail("%s imports %s and %s gives %s no path to it"
+                         % ("/".join((rel_dir, name)), module, rel_config,
+                            rel_dir))
+    notes.append("%d python file(s) resolve their local imports under %s"
+                 % (checked, rel_config))
+
+
 def check_scripts_compile():
     """A syntax error in a bundled script only surfaces when a skill runs it."""
     import ast
@@ -1092,6 +1213,7 @@ check_mode_contract()
 check_form_files()
 check_template_registers()
 check_claude_md()
+check_import_paths()
 check_scripts_compile()
 check_precommit_hooks()
 check_cross_references()

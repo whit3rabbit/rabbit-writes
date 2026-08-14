@@ -17,10 +17,17 @@ BUILD_VOICE = os.path.join(SCRIPTS_DIR, "build_voice.py")
 MEASURE_VOICE = os.path.join(SCRIPTS_DIR, "measure_voice.py")
 LEARN_EDITS = os.path.join(SCRIPTS_DIR, "learn_edits.py")
 
-RW_VOICES_DIR = os.path.abspath(os.path.join(SKILL_DIR, "..", "rabbit-writes", "voices"))
+RW_SKILL_DIR = os.path.abspath(os.path.join(SKILL_DIR, "..", "rabbit-writes"))
+RW_VOICES_DIR = os.path.join(RW_SKILL_DIR, "voices")
+ENGINE = os.path.join(RW_SKILL_DIR, "scripts")
 
-if SCRIPTS_DIR not in sys.path:
-    sys.path.insert(0, SCRIPTS_DIR)
+# The engine directory as well as this skill's own, so a test here can reach
+# rwlib the same way build_voice.py does. Without it the scripts under test can
+# import rwlib and the tests covering them cannot, which reads as rwlib being
+# private to one skill.
+for _path in (SCRIPTS_DIR, ENGINE):
+    if _path not in sys.path:
+        sys.path.insert(0, _path)
 
 
 def run_cmd(cmd, *args):
