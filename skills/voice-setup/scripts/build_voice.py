@@ -379,13 +379,41 @@ def live_fire(rules, scan):
             record(what, _fired(run(entry["example"], register),
                                 {"kind": "id", "value": eid}))
 
+    # A presence check fires on absence, so its probe is a document with the
+    # thing missing. What that document has to be depends on the gate. Without
+    # `when_rx` the rule applies to everything and any text lacking the closer
+    # triggers it. With one, scan.py skips the entry entirely until the gate
+    # matches, and no text this function can invent is known to match somebody
+    # else's regex. Reporting that as dead accuses a working rule, which is how
+    # the shipped profile's `missing-closer` came to be called dead by a probe
+    # that never opened like correspondence.
     for entry in rules.get("required_when", []):
         eid = entry.get("id", "required-when")
         what = "required_when %s" % eid
+        gate = entry.get("when_rx")
+        probe = entry.get("when_example")
+        if gate and probe is None:
+            unproven.append((None, what,
+                             "`when_rx` gates this rule and no `when_example` "
+                             "says what opens a document it applies to, so "
+                             "nothing here can build one. Add one: "
+                             "\"when_example\": \"a line that opens the gate\""))
+            continue
+        if probe is None:
+            probe = "This document does not contain the required element."
+        # A probe carrying the thing it is supposed to be missing proves
+        # nothing, and the rule is right to stay silent on it.
+        already = [rx for rx in entry.get("any_of_rx", []) if re.search(rx, probe)]
+        if already:
+            unproven.append((None, what,
+                             "the probe already satisfies %s, so a silent rule "
+                             "here is correct rather than dead. Write a "
+                             "when_example that opens the document without "
+                             "closing it." % already[0]))
+            continue
         scoped = entry.get("applies_to_registers") or [scan.DEFAULT_REGISTER]
-        dummy_text = "This document does not contain the required element."
         for register in scoped:
-            record(what, _fired(run(dummy_text, register),
+            record(what, _fired(run(probe, register),
                                 {"kind": "id", "value": eid}))
 
     results = [(ok, what,

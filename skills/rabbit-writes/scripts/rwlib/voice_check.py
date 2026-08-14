@@ -200,9 +200,32 @@ def check_rules(rules_path, voices_dir=None):
             except re.error as exc:
                 out.append(_finding(FAIL, "%s: required_when %s when_rx does "
                                     "not compile: %s" % (name, eid, exc)))
+                gate = None             # nothing below can use it
         if not entry.get("any_of_rx"):
             out.append(_finding(FAIL, "%s: required_when %s has no any_of_rx, "
                                 "so it fires on every document" % (name, eid)))
+        # The gate's worked example, and the same argument the banned_regex
+        # `example` makes one loop up. It carries a second failure that one
+        # cannot have: a presence check fires on absence, so an example that
+        # already satisfies the requirement leaves the rule correctly silent
+        # and proves nothing about whether it works.
+        example = entry.get("when_example")
+        if example is not None:
+            if gate and not re.search(gate, example):
+                out.append(_finding(FAIL, "%s: required_when %s when_example "
+                                    "%r does not match its own when_rx, so the "
+                                    "gate never opens on it"
+                                    % (name, eid, example)))
+            for pattern in entry.get("any_of_rx", []):
+                try:
+                    if re.search(pattern, example):
+                        out.append(_finding(
+                            FAIL, "%s: required_when %s when_example %r already "
+                            "satisfies %r, so the rule is right to stay silent "
+                            "on it and it proves nothing"
+                            % (name, eid, example, pattern)))
+                except re.error:
+                    pass                # already reported as not compiling
         out += _register_scope(name, eid, entry, known_registers)
 
     # Signature moves. Same two failures banned_regex has, plus the one that is

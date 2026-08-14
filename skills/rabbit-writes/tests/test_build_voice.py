@@ -215,6 +215,20 @@ def test_check_catches_every_shape_of_dead_rule():
         ("a presence check that fires on everything",
          {"voice": "dana", "required_when": [{"id": "closer", "label": "c"}]},
          "no any_of_rx"),
+        ("a gate example the gate never opens on",
+         {"voice": "dana",
+          "required_when": [{"id": "closer", "label": "c",
+                             "any_of_rx": ["(?im)^thanks,"],
+                             "when_rx": "(?im)^hi ",
+                             "when_example": "Dear Dana,"}]},
+         "does not match its own when_rx"),
+        ("a gate example that already carries the closer",
+         {"voice": "dana",
+          "required_when": [{"id": "closer", "label": "c",
+                             "any_of_rx": ["(?im)^thanks,"],
+                             "when_rx": "(?im)^hi ",
+                             "when_example": "Hi Dana,\n\nThanks,"}]},
+         "already satisfies"),
     ]
     tmp = tempfile.mkdtemp()
     try:
@@ -367,6 +381,57 @@ def test_live_fire_gives_each_regex_example_its_own_document():
                         "[A-Z][^.!?\\n]{4,60}[.!?]\\s*$",
                   "example": "Not three paragraphs."}]}
     assert fired(rules)["banned_regex cadence"] is False
+
+
+# A presence check gated by `when_rx`. scan.py skips the entry until the gate
+# matches, so all three of these are about the probe rather than about the rule.
+GATED = {"id": "closer", "label": "c",
+         "any_of_rx": ["(?im)^\\s*thanks,"], "when_rx": "(?im)^\\s*hi "}
+
+
+def test_a_gated_presence_check_without_an_example_is_unproven_rather_than_dead():
+    """No text this script invents is known to match somebody else's gate
+    regex, and calling a working rule dead teaches its author to delete it.
+    This is the case that reported the shipped profile's `missing-closer` as
+    dead: the probe was a plain sentence and the gate wanted correspondence."""
+    build = build_module()
+    results = build.live_fire({"voice": "dana", "required_when": [dict(GATED)]},
+                              build.load_scan())
+    assert [r for r in results if r[0] is None], results
+    assert not [r for r in results if r[0] is False], results
+
+
+def test_a_gated_presence_check_fires_on_its_when_example():
+    entry = dict(GATED,
+                 when_example="Hi Dana,\n\nThe deploy finished and it held.")
+    assert fired({"voice": "dana", "required_when": [entry]}) == \
+        {"required_when closer": True}
+
+
+def test_a_when_example_that_already_closes_proves_nothing():
+    """A presence check fires on absence, so a probe carrying the thing it is
+    meant to be missing leaves the rule correctly silent. Reporting that as
+    dead is the same false accusation from the other direction."""
+    entry = dict(GATED, when_example="Hi Dana,\n\nThanks,")
+    build = build_module()
+    results = build.live_fire({"voice": "dana", "required_when": [entry]},
+                              build.load_scan())
+    assert [r for r in results if r[0] is None], results
+    assert not [r for r in results if r[0] is False], results
+
+
+def test_the_shipped_profile_has_no_rule_that_does_not_fire():
+    """The structural pass says a profile is well formed. This is the half that
+    runs it, and the half nothing here covered: `--check whit3rabbit` reported
+    a dead rule while the whole suite stayed green."""
+    build = build_module()
+    with open(os.path.join(VOICES, "whit3rabbit.rules.json"),
+              encoding="utf-8") as fh:
+        rules = json.load(fh)
+    results = build.live_fire(rules, build.load_scan())
+    assert results
+    dead = [what for ok, what, _ in results if ok is False]
+    assert not dead, dead
 
 
 # --------------------------------------------------------------------------
