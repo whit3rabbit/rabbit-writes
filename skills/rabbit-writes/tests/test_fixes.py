@@ -448,4 +448,44 @@ def test_a_bidi_control_is_never_stripped():
 def test_an_entity_bidi_override_is_never_stripped():
     text = "Normal text &#8238;spelled as an entity.\n"
     fixed, _, _ = fixes.apply(text)
+    assert fixed == text
     assert "&#8238;" in fixed
+
+
+def test_phrase_substitution_does_not_splice_paragraphs():
+    """A banned phrase split across a paragraph break (blank line) must not be replaced."""
+    rules = {"preferred_substitutions": {"at the end of the day": "ultimately"}}
+    text = "Word at the end\n\nof the day paragraph."
+    fixed, applied, _ = fixes.apply(text, voice_rules=rules)
+    assert fixed == text, "Paragraph break was spliced!"
+    assert applied == []
+
+
+def test_overlapping_edits_emit_skip_record():
+    rules = {
+        "preferred_substitutions": {
+            "foo\u200bbar": "foobar",
+            "foo": "baz"
+        }
+    }
+    text = "Here is foo\u200bbar in text."
+    edits, skipped = fixes.plan(text, voice_rules=rules)
+    assert len(skipped) >= 1
+    assert any("overlaps" in s["note"] for s in skipped)
+
+
+def test_line_wrapped_quotation_fixes_pass_verify():
+    from helpers import run_verify
+    rules = {"preferred_substitutions": {"leverage": "use"}}
+    text = (
+        'The report states "This is a long quotation\n'
+        'that spans across a line break seamlessly."\n'
+        'We should leverage the platform here.\n'
+    )
+    fixed, applied, _ = fixes.apply(text, voice_rules=rules)
+    assert len(applied) == 1
+    result, code = run_verify(text, fixed)
+    assert code == 0, result
+
+
+

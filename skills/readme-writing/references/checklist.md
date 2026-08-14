@@ -41,3 +41,6 @@ Run through before delivering a draft, restructure, or audit. Every item is yes 
 
 24. For an audit: are findings ordered by impact (structural first, voice second, craft third), each pointing at a real line or section — not a generic list that could apply to any README?
 25. Did you run `python3 ${CLAUDE_PLUGIN_ROOT}/skills/readme-writing/scripts/readme_check.py <file>`, clear every P0, and either fix or consciously keep each P1?
+
+*(Note: An unclosed final code fence ` ``` ` at the end of a README is counted as 1 code block, but its body text is measured as prose. If a paragraph or claim finding points into code at the end of a file, check for an unclosed fence.)*
+

@@ -33,7 +33,7 @@ Order sections: **pitch → fastest path to running it → depth → community �
 4. **Community mechanics.** Support, FAQ, testing, changelog, contributing, credits. Comes late (contributing sits at avg. position 0.77) because it's for people who are already sold, not people deciding whether to be.
 5. **License.** Dead last (avg. position 0.93), and short. Median license section across the corpus is 13 words: name the license, link the file. Nobody reads legal text in a README.
 
-A table of contents is genuinely optional: 12% of the corpus has one under an explicit heading, 32% counting unlabelled anchor-link navigation, and either way it correlates with document length (spec-kit, RuView) rather than being a default courtesy. Add one past roughly 1,500 to 2,000 words, and skip it below that.
+A table of contents is genuinely optional: 12% of the corpus has one under an explicit heading, 32% counting unlabelled anchor-link navigation, and either way it correlates with document length (spec-kit, RuView) rather than being a default courtesy. Add one past roughly 2,500 words (optional above 1,500), and skip it below 1,500.
 
 ## Craft rules (apply within every section)
 

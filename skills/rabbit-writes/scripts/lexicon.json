@@ -248,7 +248,7 @@
       "label": "Confidence calibration",
       "band": "craft",
       "priority": "P1",
-      "rx": "(?i)\\b(it'?s worth noting|it is worth noting|worth mentioning|notably,|interestingly,|surprisingly,|importantly,|undoubtedly|without a doubt|make no mistake|the real question is|at the end of the day|the truth is,|fundamentally,|the heart of the matter)"
+      "rx": "(?i)\\b(it'?s worth noting|it is worth noting|worth mentioning|notably,|interestingly,|surprisingly,|importantly,|undoubtedly|without a doubt|make no mistake|the real question is|the truth is,|fundamentally,|the heart of the matter)"
     },
     {
       "id": "self-labeling",
@@ -396,7 +396,7 @@
       "label": "Emoji in heading",
       "band": "craft",
       "priority": "P2",
-      "rx": "(?m)^#{1,6}\\s*[\\U0001F300-\\U0001FAFF\\u2600-\\u27BF]"
+      "rx": "(?m)^#{1,6}.*[\\U0001F300-\\U0001FAFF\\u2600-\\u27BF]"
     },
     {
       "id": "curly-quote",

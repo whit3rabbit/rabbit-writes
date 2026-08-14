@@ -137,7 +137,7 @@ A profile may carry one fingerprint per register as well as a general one, as `v
 
 The distance line only exists when the profile has a fingerprint beside it, which not every profile does. It comes from `voice_distance` in the same JSON, and its `contributors` are the markers to name. Leave the line out rather than inventing it, and never state it as a verdict about who wrote the document. It measures register, and `references/voice.md` has the reading.
 
-Skip the question, and say which depth you chose and why, when the user already asked for a full rewrite, when the document is under about 150 words (the scan's own reliability floor, and the diff is cheap enough to just show), or when another skill called this one.
+Skip the question, and say which depth you chose and why, when the user already asked for a full rewrite, when the document is under about 120 words (the scan's own reliability floor, and the diff is cheap enough to just show), or when another skill called this one.
 
 ## Converting an existing document
 
@@ -223,7 +223,7 @@ Prefer `--voice` over spelling out a `--voice-rules` path. `auto` runs the same 
 
 Outside a plugin install `${CLAUDE_PLUGIN_ROOT}` is unset, which turns every path above into an absolute path that does not exist. If that happens, resolve `scripts/scan.py` relative to this file's own directory instead.
 
-The script owns what a script does better than you: hidden unicode, AI tracking parameters, chat-citation leaks, unfilled placeholders, em-dash rate, tiered vocabulary density, burstiness, type-token ratio, sentence-length variation, trigram repetition. It reports a reliability level, because under ~150 words the numbers mean little. Treat every hit as a candidate, not a verdict.
+The script owns what a script does better than you: hidden unicode, AI tracking parameters, chat-citation leaks, unfilled placeholders, em-dash rate, tiered vocabulary density, burstiness, type-token ratio, sentence-length variation, trigram repetition. It reports a reliability level, because under ~120 words the numbers mean little. Treat every hit as a candidate, not a verdict.
 
 It also reports a note when a document's letters are mostly non-ASCII. Every band and tier list here is calibrated on English, so on a Japanese or Arabic document the numbers describe the English parts and guess at the rest. Repeat that note in your report. Never present a stylometric number about non-English prose as a finding.
 

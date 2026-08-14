@@ -52,7 +52,7 @@ VOICES_DIR = os.path.join(os.path.dirname(os.path.dirname(HERE)), "voices")
 # Keys merged as an ordered union of scalars.
 LIST_UNION_KEYS = ("banned_words", "banned_phrases")
 # Keys merged by the "id" of each entry, child wins.
-LIST_BY_ID_KEYS = ("banned_regex", "required_when")
+LIST_BY_ID_KEYS = ("banned_regex", "required_when", "signature_moves")
 # Keys merged key by key, child wins.
 DICT_MERGE_KEYS = ("mechanics", "preferred_substitutions")
 # The same, one level deeper: {register: {mechanic: value}}. A shallow update
@@ -104,6 +104,20 @@ def _by_id(parent, child):
     return out
 
 
+def _contrastive_union(parent, child):
+    out = list(parent)
+    seen = {json.dumps(p, sort_keys=True) for p in out if isinstance(p, dict)}
+    for p in child:
+        if isinstance(p, dict):
+            key = json.dumps(p, sort_keys=True)
+            if key not in seen:
+                out.append(p)
+                seen.add(key)
+        elif p not in out:
+            out.append(p)
+    return out
+
+
 def merge(parent, child):
     """One level of inheritance. Order matters: parent first, then child."""
     out = dict(parent)
@@ -114,6 +128,8 @@ def merge(parent, child):
             out[key] = _union(parent.get(key, []), value)
         elif key in LIST_BY_ID_KEYS:
             out[key] = _by_id(parent.get(key, []), value)
+        elif key == "contrastive_pairs":
+            out[key] = _contrastive_union(parent.get(key, []), value)
         elif key in DICT_MERGE_KEYS:
             merged = dict(parent.get(key, {}))
             merged.update(value)
@@ -214,6 +230,7 @@ def strip_rules_suffix(path):
 # without a table of pairwise answers. Ordered strict-first.
 STRICTNESS = {
     "em_dash": ("forbid", "limit", "allow"),
+    "double_hyphen": ("forbid", "allow"),
     "semicolon": ("forbid", "allow"),
     "emoji": ("forbid", "allow"),
     "curly_quotes": ("forbid", "allow"),
@@ -370,11 +387,20 @@ def blend(left, right, weight=0.5, name=None):
                 scoped.setdefault(register, {}).update(keep)
     if scoped:
         out["mechanics_by_register"] = scoped
+    else:
+        out.pop("mechanics_by_register", None)
 
     subs = dict(lighter.get("preferred_substitutions", {}))
     subs.update(heavier.get("preferred_substitutions", {}))
     if subs:
         out["preferred_substitutions"] = subs
+
+    cp = _contrastive_union(lighter.get("contrastive_pairs", []),
+                            heavier.get("contrastive_pairs", []))
+    if cp:
+        out["contrastive_pairs"] = cp
+    else:
+        out.pop("contrastive_pairs", None)
 
     # The stricter default priority, for the same reason as everything else.
     priorities = [p for p in (left.get("default_priority"),
@@ -418,6 +444,31 @@ def _first_line(path):
         return ""
 
 
+def _find_rabbit_voice(start_dir):
+    """The nearest `.rabbit-voice` at or above `start_dir`, or None.
+
+    Bounded on purpose. A pin sits at the root of the repository it governs,
+    and a document three directories down is still that repository's. The walk
+    stops at the first directory holding a `.git` (that repository's root has
+    been reached and passed) and at `$HOME`, because a stray pin in a home
+    directory or above it would apply a stranger's `default_priority: P0` bans
+    to every unrelated checkout on the machine.
+    """
+    curr = os.path.abspath(start_dir)
+    home = os.path.abspath(os.path.expanduser("~"))
+    while True:
+        pin = os.path.join(curr, ".rabbit-voice")
+        if os.path.exists(pin):
+            return pin
+        if os.path.exists(os.path.join(curr, ".git")) or curr == home:
+            break
+        parent = os.path.dirname(curr)
+        if parent == curr:
+            break
+        curr = parent
+    return None
+
+
 def resolve(target_path=None, voices_dir=None):
     """(path_to_rules, voice_name, note). Which profile applies, and why.
 
@@ -440,24 +491,35 @@ def resolve(target_path=None, voices_dir=None):
     the working directory. Called with nothing, only the working directory and
     ACTIVE are consulted, which is what a scan of stdin gets.
 
+    Each of those two directories is searched *and every directory above it*,
+    up to the bound `_find_rabbit_voice` describes. A pin lives at a repo root
+    and the file being scanned usually does not, so the old exact-directory
+    match found the pin only when the two happened to coincide. The nearest pin
+    wins, and it is named in the note, because "which profile" and "who said
+    so" are one answer.
+
     This used to live in readme_check.py and scan.py had none of it, so the two
     checkers in one plugin disagreed about whose rules were in force. It is one
     fact about one installation, so it has one home.
     """
     voices_dir = voices_dir or VOICES_DIR
-    bases = []
+    start_dirs = []
     if target_path:
-        bases.append(os.path.dirname(os.path.abspath(target_path)))
-    bases.append(os.getcwd())
-    for base in bases:
-        pin = os.path.join(base, ".rabbit-voice")
-        if os.path.exists(pin):
-            name = _first_line(pin)
-            rules = os.path.join(voices_dir, name + RULES_SUFFIX)
-            if os.path.exists(rules):
-                return rules, name, "voice pinned by %s" % pin
-            return None, name, ("%s names %r but voices/%s.rules.json does not exist"
-                                % (pin, name, name))
+        start_dirs.append(os.path.dirname(os.path.abspath(target_path)))
+    start_dirs.append(os.getcwd())
+
+    # The first pin found decides, including when it names a profile that will
+    # not load: a pin somebody wrote and got wrong is a thing to report, not a
+    # reason to keep looking and silently apply a different person's rules.
+    pin = next((p for p in (_find_rabbit_voice(d) for d in start_dirs) if p),
+               None)
+    if pin:
+        name = _first_line(pin)
+        rules = os.path.join(voices_dir, name + RULES_SUFFIX)
+        if os.path.exists(rules):
+            return rules, name, "voice pinned by %s" % pin
+        return None, name, ("%s names %r but voices/%s.rules.json does not exist"
+                            % (pin, name, name))
 
     active = os.path.join(voices_dir, "ACTIVE")
     name = _first_line(active) if os.path.exists(active) else ""

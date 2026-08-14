@@ -12,20 +12,10 @@ import os
 import shutil
 import tempfile
 
-from helpers import check_module, ids, run, written
+from helpers import Repo, check_module, ids, run, written
 
 
 def repo_root():
-    """A throwaway directory that looks like a checkout: a `.git` marker so the
-    license walk stops here, and a LICENSE for it to find.
-
-    Only the tests that assert a clean result need it. Without the marker the
-    walk runs to the filesystem root and the answer depends on whoever ran the
-    suite, and without the file `license-file-missing` fires on a README that
-    has nothing wrong with it. Same reasoning as `Repo` in test_license_file.py,
-    which is where this pattern already lives for the tests that are about the
-    license check itself.
-    """
     path = tempfile.mkdtemp()
     os.mkdir(os.path.join(path, ".git"))
     with open(os.path.join(path, "LICENSE"), "w", encoding="utf-8") as fh:
@@ -204,3 +194,172 @@ def test_html_anchor_links_count_as_toc():
         assert result["stats"]["has_toc"] is True
     finally:
         shutil.rmtree(scratch, ignore_errors=True)
+
+
+CODE_FIRST_PITCH_README = """# Pipeline Tool
+
+```
++---------+     +---------+
+|  Input  | --> | Output  |
++---------+     +---------+
+```
+
+Pipeline Tool processes streams of binary records in real time.
+
+## Install
+
+```sh
+pip install pipeline
+```
+
+## License
+
+MIT.
+"""
+
+
+def test_pitch_scan_skips_initial_code_block():
+    """Fenced code blocks opening a README before prose description do not
+    corrupt the pitch scan."""
+    scratch = repo_root()
+    try:
+        path = written(scratch, "README.md", CODE_FIRST_PITCH_README)
+        result = run(path, "--no-voice")
+        assert result["stats"]["pitch_line"] == 9, result["stats"]["pitch_line"]
+        assert "no-pitch" not in ids(result)
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+SEMVER_AND_YEAR_README = """# Widget Project
+
+Widget formats files in bulk safely.
+
+## 1.2.0 Release
+
+Improvements in 2025 Roadmap.
+
+## 1.3.1 Release
+
+Plans for 2026 Roadmap.
+
+## Install
+
+```sh
+pip install widget
+```
+
+## License
+
+MIT.
+"""
+
+
+def test_semver_and_years_do_not_trigger_inconsistent_number():
+    """Semver segments and 4-digit year numbers do not trip inconsistent-number."""
+    scratch = repo_root()
+    try:
+        path = written(scratch, "README.md", SEMVER_AND_YEAR_README)
+        result = run(path, "--no-voice")
+        assert "inconsistent-number" not in ids(result), ids(result)
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+SCATTERED_ANCHORS_README = """# Small Project
+
+Small Project processes data easily.
+
+See details [above](#install) for prerequisites.
+
+## Install
+
+```sh
+pip install widget
+```
+
+Check out our [examples](#usage) for more details.
+
+## Usage
+
+```sh
+widget run
+```
+
+Refer to the [terms](#license) for rights.
+
+## License
+
+MIT.
+"""
+
+
+def test_scattered_anchors_do_not_count_as_toc():
+    """Scattered anchor links throughout a file do not count as a TOC."""
+    scratch = repo_root()
+    try:
+        path = written(scratch, "README.md", SCATTERED_ANCHORS_README)
+        result = run(path, "--no-voice")
+        assert result["stats"]["has_toc"] is False
+        assert "toc-unneeded" not in ids(result)
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+BACKTICK_CLAIM_README = """# Fast Converter
+
+Fast Converter converts image files quickly.
+
+Documenting the benchmark output string: `40% faster` than baseline.
+
+## Install
+
+```sh
+pip install converter
+```
+
+## License
+
+MIT.
+"""
+
+
+def test_claims_inside_inline_backticks_are_ignored():
+    """Claims written inside backticks are ignored when checking headline claims."""
+    scratch = repo_root()
+    try:
+        path = written(scratch, "README.md", BACKTICK_CLAIM_README)
+        result = run(path, "--no-voice")
+        assert "uncaveated-claim" not in ids(result), ids(result)
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+VAGUE_LINK_PUNCTUATION_README = """# Fast Converter
+
+Fast Converter converts image files quickly.
+
+Want to learn more? Check out our docs [read more?](https://example.com/docs).
+
+## Install
+
+```sh
+pip install converter
+```
+
+## License
+
+MIT.
+"""
+
+
+def test_vague_link_text_strips_punctuation():
+    """Vague link text with trailing question mark or ellipsis is detected."""
+    scratch = repo_root()
+    try:
+        path = written(scratch, "README.md", VAGUE_LINK_PUNCTUATION_README)
+        result = run(path, "--no-voice")
+        assert "vague-link-text" in ids(result), ids(result)
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+

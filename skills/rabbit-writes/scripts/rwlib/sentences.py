@@ -34,6 +34,12 @@ def split_sentences(text):
     text = text.replace(SENTENCE_SENTINEL, "")
     protected = ABBREV_RX.sub(
         lambda m: m.group(0).replace(".", SENTENCE_SENTINEL), text)
+    # Every single-capital-and-period is protected, not only the ones followed
+    # by another capital. Requiring a following capital splits "the U. of
+    # Texas" into two sentences, and it does not buy the case it looks like it
+    # would: "the grade was A. Then we left" is followed by a capital too, so
+    # it stays glued either way. Sentence lengths feed every stored
+    # fingerprint, so a change here is a fingerprint schema change.
     protected = re.sub(r"\b([A-Z])\.", r"\1" + SENTENCE_SENTINEL, protected)
     protected = re.sub(r"(?m)^\s*(\d+)\.", r"\1" + SENTENCE_SENTINEL, protected)
     parts = re.split(r"(?<=[.!?])[\s\n]+", protected)

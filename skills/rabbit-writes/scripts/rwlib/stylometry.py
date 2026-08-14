@@ -262,7 +262,7 @@ def paragraphs(text, min_words=EXEMPLAR_MIN_WORDS, max_words=EXEMPLAR_MAX_WORDS)
         if not body:
             continue
         lines = [ln.strip() for ln in body.splitlines() if ln.strip()]
-        if any(re.match(r"^(?:[-*+>#]|\d+[.)]\s|```|\|)", ln) for ln in lines):
+        if any(re.match(r"^(?:[-*+]\s|[>#]|\d+[.)]\s|```|\|)", ln) for ln in lines):
             continue
         n = len(_tokens(body))
         if min_words <= n <= max_words:

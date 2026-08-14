@@ -30,8 +30,10 @@ import sys
 
 try:
     from . import markdown as markdown_mod
+    from . import sections as sections_mod
 except ImportError:                     # run as a script: rwlib/ is on sys.path
     import markdown as markdown_mod
+    import sections as sections_mod
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCRIPTS = os.path.dirname(HERE)
@@ -151,13 +153,19 @@ def unimplemented_rules(path=REGISTERS_PATH):
 # that happens to appear inside a paragraph, or "Hi there, the incident
 # started at 3pm" in the middle of a technical-blog post would read as a
 # letter opener.
-_GREETING_RX = re.compile(r"(?im)^\s*(hi|hello|hey|dear)\b[^\n]{0,40}[,:]?\s*$")
+_GREETING_RX = re.compile(
+    r"(?im)^\s*(hi|hello|hey|dear|greetings|good (morning|afternoon|evening))"
+    r"\b[^\n]{0,40}[,:]?\s*$")
 _SIGNOFF_RX = re.compile(
-    r"(?im)^\s*(sincerely|regards|best regards|best|thanks|cheers|"
-    r"yours truly|yours sincerely)[,]?\s*$"
+    r"(?im)^\s*(sincerely|regards|best regards|best|thanks|thank you|cheers|"
+    r"yours|yours truly|yours sincerely)[,]?\s*$"
 )
 _HASHTAG_LINE_RX = re.compile(r"(?m)^(?:\s*#\w+\s*){2,}$")
-_DOCS_HEADINGS = ("prerequisites", "installation", "usage", "steps", "verification")
+# Which classify_heading categories count as documentation shape. The keyword
+# lists behind them live in rwlib.sections, which is the one home for what an
+# "installation" heading is: a literal list here drifted from it once already.
+_DOCS_CATEGORIES = frozenset({"installation", "usage", "api", "testing",
+                              "configuration", "architecture"})
 
 # The registers detect_register() will ever return other than the default.
 # Chat and technical-blog were both tried and dropped: neither has a signal
@@ -177,6 +185,11 @@ _DOCS_HEADINGS = ("prerequisites", "installation", "usage", "steps", "verificati
 # formality is a judgment call. Every register below instead has a marker
 # that has to be *present* to fire, verified against the same 100-README
 # corpus at zero false positives, which is what keeps this list short.
+#
+# There is deliberately no DEFAULT_REGISTER constant here. registers.json
+# owns that name and default_register() reads it; a literal beside these
+# would be a second home for it, and the one that was here said
+# "technical-blog" while the file said "blog".
 DETECTABLE_REGISTERS = ("docs", "linkedin", "formal")
 
 
@@ -185,12 +198,12 @@ def detect_register(text, path=None, registers_path=REGISTERS_PATH):
 
     references/forms/*.md already documents, for a human, which structural
     shape routes to which register. This reads the same short list of strong,
-    unambiguous signals mechanically: a run of Prerequisites/Installation/
-    Usage/Steps/Verification headings for docs (skipped for a file literally
-    named README.md, which routes to the separate readme-writing skill
-    instead), a trailing hashtag line for linkedin, and a greeting-then-
-    signoff shape for formal (covers both the email and letter forms, which
-    route to the same register).
+    unambiguous signals mechanically: a run of docs-shaped headings, as
+    rwlib.sections classifies them, for docs (skipped for a file named
+    README.*, which routes to the separate readme-writing skill instead), a
+    trailing hashtag line for linkedin, and a greeting-then-signoff shape for
+    formal (covers both the email and letter forms, which route to the same
+    register).
 
     Every other form -- chat, technical-blog, essay, substack, plain
     long-form prose -- has no structural tell that survives contact with a
@@ -204,23 +217,23 @@ def detect_register(text, path=None, registers_path=REGISTERS_PATH):
     """
     known = set(registers(registers_path))
     stripped_lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    word_count = len(text.split())
+    prose_words = len(markdown_mod.strip_for_stats(text).split())
     has_fence = bool(markdown_mod.FENCE_RX.search(text))
-    headings = [m.group(2).strip().lower()
+    headings = [m.group(2).strip()
                 for m in markdown_mod.HEADING_RX.finditer(text)]
 
     if "docs" in known:
-        doc_hits = sum(1 for h in _DOCS_HEADINGS
-                       if any(h in heading for heading in headings))
-        is_readme = path is not None and os.path.basename(path).lower() == "readme.md"
+        doc_hits = sum(1 for h in headings
+                       if sections_mod.classify_heading(h) in _DOCS_CATEGORIES)
+        is_readme = path is not None and os.path.basename(path).lower().startswith("readme.")
         if doc_hits >= 2 and not is_readme:
             return ("docs", "detected", ["%d docs-shaped headings" % doc_hits])
 
-    if "linkedin" in known and 100 <= word_count <= 350:
+    if "linkedin" in known and 50 <= prose_words <= 350:
         tail = "\n".join(stripped_lines[-2:])
         if _HASHTAG_LINE_RX.search(tail):
             return ("linkedin", "detected",
-                    ["%d words" % word_count, "hashtag line near the end"])
+                    ["%d words" % prose_words, "hashtag line near the end"])
 
     if "formal" in known:
         greeting = any(_GREETING_RX.match(ln) for ln in stripped_lines[:5])
@@ -408,6 +421,10 @@ def main(argv):
     ap.add_argument("--write", action="store_true", help="update references/context.md table from registers.json")
     ap.add_argument("--check", action="store_true", help="verify references/context.md table matches registers.json")
     args = ap.parse_args(argv)
+
+    if args.write and args.check:
+        print("error: --write and --check are mutually exclusive", file=sys.stderr)
+        return 2
 
     if args.write:
         changed = write_doc()

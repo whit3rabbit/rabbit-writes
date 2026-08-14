@@ -270,8 +270,14 @@ def plan(text, voice_rules=None):
     for term, replacement in sorted(subs.items(), key=lambda kv: -len(kv[0])):
         if not is_mechanical_substitution(replacement):
             continue
+        # The gap between the words of a multi-word term flexes across one line
+        # break and no further. A blank line is a paragraph boundary, and a
+        # term matched across one spliced two paragraphs into a sentence. The
+        # gap stays *mandatory*: made optional, "set up" matches "setup" and
+        # "log in" matches "login", and --apply-safe --write rewrites them.
         rx = re.compile(r"(?i)(?<![\w-])%s(?![\w-])"
-                        % re.escape(term).replace(r"\ ", r"\s+"))
+                        % re.escape(term).replace(
+                            r"\ ", r"(?:[ \t]+|[ \t]*\n[ \t]*)"))
         for m in rx.finditer(text):
             if not _free(mask, m.start(), m.end()):
                 continue
@@ -286,8 +292,13 @@ def plan(text, voice_rules=None):
     for edit in edits:
         # Two rules can land on the same span (a substituted term that also
         # contains a soft hyphen). First one wins, and the second is dropped
-        # rather than applied to a string that no longer exists.
+        # with a skip record rather than applied to a string that no longer exists.
         if edit[0] < last_end:
+            rec = edit[3]
+            skipped.append(_record(
+                rec["id"], text, edit[0], edit[1], rec["before"], rec["after"],
+                "edit dropped because its span overlaps an earlier applied edit"
+            ))
             continue
         deduped.append(edit)
         last_end = edit[1]

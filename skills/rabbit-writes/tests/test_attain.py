@@ -406,3 +406,23 @@ def test_the_distance_contributors_come_through_for_the_next_pass():
         assert result["distance"]["contributors_after"], result["distance"]
     finally:
         shutil.rmtree(d, ignore_errors=True)
+
+
+def test_stale_fingerprint_raises_exit_code_2_cleanly():
+    """A stale fingerprint schema causes attain.py to exit with code 2 without traceback."""
+    import subprocess
+    d = build_fixture()
+    try:
+        fp_path = os.path.join(d, "tester.fingerprint.json")
+        with open(fp_path, "w", encoding="utf-8") as fh:
+            json.dump({"schema_version": 999}, fh)
+        doc = written(d, "one.md", B_DOC)
+        res = subprocess.run([sys.executable, os.path.join(SCRIPTS, "attain.py"),
+                             doc, "--voice-rules", rules_of(d)],
+                            capture_output=True, text=True)
+        assert res.returncode == 2
+        assert "attain.py" in res.stderr
+        assert "Traceback" not in res.stderr
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+

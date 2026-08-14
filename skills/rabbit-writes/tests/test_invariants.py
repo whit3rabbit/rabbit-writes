@@ -266,5 +266,17 @@ def test_invariants():
     assert main([]) == 0, "%d invariant failure(s)" % len(failures)
 
 
+def test_rwlib_all_pinned():
+    """Ensure rwlib.__all__ includes all python files in rwlib/ directory."""
+    import rwlib
+    rwlib_dir = os.path.dirname(rwlib.__file__)
+    modules = sorted(
+        os.path.splitext(f)[0] for f in os.listdir(rwlib_dir)
+        if f.endswith(".py") and f != "__init__.py"
+    )
+    assert sorted(rwlib.__all__) == modules
+
+
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
+

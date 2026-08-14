@@ -43,7 +43,7 @@ Stdlib only, 3.9+.
 
 import re
 
-from .markdown import FENCE_RX, INLINE_CODE_RX, blank, line_of
+from .markdown import BLOCKQUOTE_RX, FENCE_RX, INLINE_CODE_RX, blank, line_of
 
 # `<!-- rabbit-allow: id[, id...] (reason) -->`. The payload is captured whole
 # and taken apart below, so a malformed one is reported rather than skipped: a
@@ -63,14 +63,14 @@ REFUSED_ID = "suppression-refused"
 
 
 def _scannable(text):
-    """The text with fences and inline code blanked.
+    """The text with fences, inline code, and blockquotes blanked.
 
-    A `rabbit-allow` comment inside a code fence is an example of the syntax,
-    which is what this module's own documentation contains, and honouring it
-    would let a document about suppressions suppress its own findings. Blanking
-    preserves length, so the reported line numbers still point at the original.
+    A `rabbit-allow` comment inside a code fence or blockquote is an example of
+    the syntax or quoted third-party text. Honouring it would let quoted text
+    suppress host document findings. Blanking preserves length, so line numbers
+    survive.
     """
-    return INLINE_CODE_RX.sub(blank, FENCE_RX.sub(blank, text))
+    return BLOCKQUOTE_RX.sub(blank, INLINE_CODE_RX.sub(blank, FENCE_RX.sub(blank, text)))
 
 
 def parse(text):

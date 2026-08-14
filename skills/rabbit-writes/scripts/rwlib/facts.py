@@ -64,10 +64,10 @@ _MONTH_ALT = "|".join(MONTH_NAMES)
 
 EN_DASH = "\u2013"
 EM_DASH = "\u2014"
+# The apostrophe only. The three quote marks that used to sit here went with
+# QUOTED_RX when it moved to rwlib.markdown, and a copy of them left behind is
+# a second home for the same fact.
 CURLY_APOSTROPHE = "\u2019"
-LEFT_DOUBLE = "\u201c"
-RIGHT_DOUBLE = "\u201d"
-LEFT_SINGLE = "\u2018"
 
 # Moved verbatim from scan.py, where `voice-date-format` still reads them
 # through the aliases there. Changing one of these changes a voice rule, so
@@ -136,27 +136,20 @@ ORDINAL_RX = re.compile(r"\b(\d+)(?:st|nd|rd|th)\b")
 #   is left is the full stop at the end of a sentence. Rejecting a bare `.`
 #   dropped every sentence-final number in the corpus.
 NUMBER_RX = re.compile(
-    r"(?<![\w.,-])(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)"
-    r"(?![\w,]|\.\d)")
+    r"(?:(?<=[\s(\[{])|^)-?(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)(?![\w,]|\.\d)"
+    r"|(?<![\w.,-])(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)(?![\w,]|\.\d)")
 
 # Quotations, straight or curly, at this many words or more. The floor is what
 # separates a quotation from a scare-quoted term: `"robust"` is a word the
 # rewrite may legitimately replace, and a four-word span is somebody's sentence.
 # 337 qualifying spans over the corpus, median 1 per document, 32 documents with
 # none.
+try:
+    from .markdown import QUOTED_RX
+except ImportError:
+    from markdown import QUOTED_RX
+
 QUOTED_MIN_WORDS = 4
-_QUOTE_PAIRS = (('"', '"'), (LEFT_DOUBLE, RIGHT_DOUBLE),
-                (LEFT_SINGLE, CURLY_APOSTROPHE))
-# A line break inside a quotation is allowed and a blank line is not. Markdown
-# prose is hard-wrapped as often as not, and a rewrite rewraps it: refusing any
-# newline meant a quotation that moved across a line boundary vanished from the
-# multiset and read as a quotation removed. A blank line still ends the span,
-# because an unclosed quote mark would otherwise swallow the rest of the
-# document up to the 400-character ceiling.
-QUOTED_RX = re.compile(
-    "|".join("%s((?:[^%s\\n]|\\n(?![ \\t]*\\n)){4,400})%s"
-             % (re.escape(a), re.escape(b), re.escape(b))
-             for a, b in _QUOTE_PAIRS))
 
 # A capitalized run, for the report-only entity list. Deliberately crude: it
 # feeds a list somebody reads and never a comparison anything fails on, so

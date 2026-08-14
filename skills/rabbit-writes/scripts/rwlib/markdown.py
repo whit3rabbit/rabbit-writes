@@ -31,8 +31,14 @@ from .artifacts import VS_RX as _VS_RX
 # --------------------------------------------------------------------------
 
 # The fence as one span, for blanking. Non-greedy to the next line that opens
-# with three backticks.
-FENCE_RX = re.compile(r"^```.*?^```", re.M | re.S)
+# with a run of the same fence character.
+#
+# Two self-contained alternatives rather than one alternation over both
+# characters. Written as `(?:`{3,}|~{3,})` at each end, an unterminated `~~~`
+# closes against the next ``` fence and everything between them -- ordinary
+# prose -- is blanked out of every counter in the engine.
+FENCE_RX = re.compile(
+    r"^[ \t]*(?:`{3,}.*?^[ \t]*`{3,}|~{3,}.*?^[ \t]*~{3,})", re.M | re.S)
 # The same fences taken apart, for the corpus study, which counts languages and
 # body lines. Two patterns because they answer two questions, not because
 # anybody forgot to merge them: this one does not anchor to the line start, so
@@ -57,9 +63,24 @@ LIST_ITEM_RX = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s")
 
 # Each quote pair has to close with its own kind. A single alternation over both
 # the opening and the closing marks lets one stray straight quote pair with a
-# curly one up to 200 characters later, and every word between them stops being
+# curly one up to 400 characters later, and every word between them stops being
 # scored.
-QUOTED_RX = re.compile("\"[^\"“”\n]{4,200}\"|“[^\"“”\n]{4,200}”")
+LEFT_DOUBLE = "“"
+RIGHT_DOUBLE = "”"
+LEFT_SINGLE = "‘"
+RIGHT_SINGLE = "’"
+
+_QUOTE_PAIRS = (('"', '"'), (LEFT_DOUBLE, RIGHT_DOUBLE), (LEFT_SINGLE, RIGHT_SINGLE))
+# A line break inside a quotation is allowed and a blank line is not. Markdown
+# prose is hard-wrapped as often as not, and a rewrite rewraps it: refusing any
+# newline meant a quotation that moved across a line boundary vanished from
+# facts.quoted's multiset and read as a quotation removed. A blank line still
+# ends the span, because an unclosed quote mark would otherwise swallow the
+# rest of the document up to the 400-character ceiling.
+QUOTED_RX = re.compile(
+    "|".join("%s((?:[^%s%s\\n]|\\n(?![ \\t]*\\n)){4,400})%s"
+             % (re.escape(a), re.escape(a), re.escape(b), re.escape(b))
+             for a, b in _QUOTE_PAIRS))
 CURLY_QUOTE_RX = re.compile("[“”‘’]")
 
 # --------------------------------------------------------------------------
@@ -342,3 +363,27 @@ def is_prose_block(block):
         return False
     listish = sum(1 for ln in lines if LIST_ITEM_RX.match(ln))
     return listish * 2 < len(lines)
+
+
+def strip_for_stats(text):
+    """Remove code and markup noise before measuring prose statistics.
+
+    Deleting rather than blanking, because nothing downstream of this takes an
+    offset from the result: it is counted, not located. `scan.strip_for_stats`
+    is the name the reference files use and it delegates here; the argument for
+    each line (why tables and headings go, why list items stay) is in its
+    docstring. `registers.detect_register` calls this directly, which is the
+    point of one copy: the word count that picks a register and the word count
+    the register is applied to are the same measurement.
+    """
+    out = FRONTMATTER_RX.sub("", text)
+    out = FENCE_RX.sub("", out)
+    out = INLINE_CODE_RX.sub("", out)
+    out = TABLE_ROW_RX.sub("", out)
+    out = URL_GREEDY_RX.sub("", out)
+    out = HEADING_LINE_RX.sub("", out)
+    out = BLOCKQUOTE_RX.sub("", out)
+    out = re.sub(r"[*_`]", "", out)
+    out = re.sub(r"(?m)^\s*>\s*", "", out)
+    return out
+

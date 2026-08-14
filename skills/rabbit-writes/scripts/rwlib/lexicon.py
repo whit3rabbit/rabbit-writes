@@ -11,6 +11,7 @@ output and into PROOF.md's header.
 Stdlib only, 3.9+.
 """
 
+import functools
 import json
 import os
 import re
@@ -18,6 +19,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LEXICON_PATH = os.path.join(os.path.dirname(HERE), "lexicon.json")
+
 
 # Findings the engine raises itself rather than from a catalogue pattern. A
 # register may name any of these in its skip or relax set, so anything checking
@@ -147,19 +149,11 @@ def phrase_regex(entries):
 REQUIRED_PATTERN_KEYS = ("id", "label", "band", "priority", "rx")
 
 
-def compiled_patterns(path=LEXICON_PATH, skip=()):
-    """[(entry, compiled_rx)] for every catalogue pattern that compiles.
-
-    A pattern that does not compile is reported to stderr and dropped rather
-    than raising: one bad regex in a user-edited lexicon should cost that one
-    rule, not the whole scan. An entry missing any of REQUIRED_PATTERN_KEYS is
-    the same failure and gets the same treatment. It used to raise KeyError and
-    take down every scan in the repository, which is how a hand-edit that
-    dropped one line from lexicon.json was discovered.
-    """
+@functools.lru_cache(maxsize=32)
+def _compiled_patterns_cached(path, skip_set):
     out = []
     for p in load(path).get("patterns", []):
-        if p.get("id") in skip:
+        if p.get("id") in skip_set:
             continue
         missing = [k for k in REQUIRED_PATTERN_KEYS if not p.get(k)]
         if missing:
@@ -172,3 +166,8 @@ def compiled_patterns(path=LEXICON_PATH, skip=()):
             print("lexicon: unusable pattern %s (%s)" % (p["id"], exc),
                   file=sys.stderr)
     return out
+
+
+def compiled_patterns(path=LEXICON_PATH, skip=()):
+    """[(entry, compiled_rx)] for every catalogue pattern that compiles."""
+    return _compiled_patterns_cached(path, frozenset(skip))

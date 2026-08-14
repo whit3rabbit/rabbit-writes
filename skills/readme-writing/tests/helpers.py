@@ -13,8 +13,12 @@ import glob
 import importlib.util
 import json
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
+import threading
+from concurrent.futures import ThreadPoolExecutor
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CHECK = os.path.join(ROOT, "scripts", "readme_check.py")
@@ -33,6 +37,7 @@ if ENGINE not in sys.path:
 EXPECTED_CORPUS_READMES = 100
 
 _CACHE = {}
+_CACHE_LOCK = threading.Lock()
 
 # Every checker run happens from here rather than from wherever the suite was
 # invoked. `resolve_voice` probes the working directory for a `.rabbit-voice`
@@ -43,17 +48,52 @@ _CACHE = {}
 NEUTRAL_CWD = SAMPLES
 
 
+class Repo(object):
+    """A throwaway directory with a `.git` in it, so the walk finds a root.
+
+    Without the marker the walk runs to the filesystem root and the answer
+    depends on whoever ran the suite.
+    """
+
+    def __init__(self, readme, license_name=None):
+        self.path = tempfile.mkdtemp(prefix="rabbit-license-")
+        os.mkdir(os.path.join(self.path, ".git"))
+        self.readme = os.path.join(self.path, "README.md")
+        with open(self.readme, "w", encoding="utf-8") as fh:
+            fh.write(readme)
+        if license_name:
+            with open(os.path.join(self.path, license_name), "w",
+                      encoding="utf-8") as fh:
+                fh.write("MIT License\n\nCopyright (c) 2026\n")
+
+    def sub(self, name, readme):
+        """A README one directory down, the `docs/README.md` case."""
+        directory = os.path.join(self.path, name)
+        os.makedirs(directory, exist_ok=True)
+        path = os.path.join(directory, "README.md")
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(readme)
+        return path
+
+    def close(self):
+        shutil.rmtree(self.path, ignore_errors=True)
+
+
 def run(path, *extra):
     """Parsed --json output. Raises on any exit code other than 0 or --check's 1."""
     key = ("run", path) + extra
-    if key not in _CACHE:
-        out = subprocess.run([sys.executable, CHECK, os.path.abspath(path),
-                              "--json", *extra],
-                             capture_output=True, text=True, cwd=NEUTRAL_CWD)
-        if out.returncode not in (0, 1):
-            raise SystemExit("readme_check failed on %s:\n%s" % (path, out.stderr))
-        _CACHE[key] = json.loads(out.stdout)
-    return _CACHE[key]
+    with _CACHE_LOCK:
+        if key in _CACHE:
+            return _CACHE[key]
+    out = subprocess.run([sys.executable, CHECK, os.path.abspath(path),
+                          "--json", *extra],
+                         capture_output=True, text=True, cwd=NEUTRAL_CWD)
+    if out.returncode not in (0, 1):
+        raise RuntimeError("readme_check failed on %s:\n%s" % (path, out.stderr))
+    res = json.loads(out.stdout)
+    with _CACHE_LOCK:
+        _CACHE[key] = res
+    return res
 
 
 def run_code(path, *extra):
@@ -65,12 +105,15 @@ def run_code(path, *extra):
 
 
 def check_module():
-    if "module" not in _CACHE:
-        spec = importlib.util.spec_from_file_location("rc_test", CHECK)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+    with _CACHE_LOCK:
+        if "module" in _CACHE:
+            return _CACHE["module"]
+    spec = importlib.util.spec_from_file_location("rc_test", CHECK)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    with _CACHE_LOCK:
         _CACHE["module"] = module
-    return _CACHE["module"]
+    return module
 
 
 def sample(name):
@@ -109,21 +152,30 @@ def corpus_readmes():
     against these 100 real third-party documents, and two copies of the locator
     is how two halves of one plugin end up disagreeing about what the corpus is.
     """
-    if "corpus" not in _CACHE:
+    with _CACHE_LOCK:
+        if "corpus" in _CACHE:
+            return _CACHE["corpus"]
+    try:
         from rwlib import corpus as corpus_mod
-        _CACHE["corpus"] = corpus_mod.readme_paths()
-    return _CACHE["corpus"]
-
-
-from concurrent.futures import ThreadPoolExecutor
+        res = corpus_mod.readme_paths()
+    except ImportError:
+        res = []
+    with _CACHE_LOCK:
+        _CACHE["corpus"] = res
+    return res
 
 
 def corpus_p0_slugs():
-    if "corpus_p0" not in _CACHE:
-        readmes = corpus_readmes()
-        workers = min(32, (os.cpu_count() or 2) * 4)
-        with ThreadPoolExecutor(max_workers=workers) as ex:
-            results = list(ex.map(lambda item: (item[0], run(item[1], "--no-voice")["counts"]["P0"]), readmes))
-        _CACHE["corpus_p0"] = [slug for slug, count in results if count]
-    return _CACHE["corpus_p0"]
+    with _CACHE_LOCK:
+        if "corpus_p0" in _CACHE:
+            return _CACHE["corpus_p0"]
+    readmes = corpus_readmes()
+    workers = min(32, (os.cpu_count() or 2) * 4)
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        results = list(ex.map(lambda item: (item[0], run(item[1], "--no-voice")["counts"]["P0"]), readmes))
+    res = [slug for slug, count in results if count]
+    with _CACHE_LOCK:
+        _CACHE["corpus_p0"] = res
+    return res
+
 

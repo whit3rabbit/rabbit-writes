@@ -71,7 +71,9 @@ import json
 import math
 import os
 import re
+import stat
 import sys
+import tempfile
 from collections import Counter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -83,7 +85,7 @@ if HERE not in sys.path:
 
 from rwlib import docx_text                      # noqa: E402
 from rwlib import fixes as fixes_mod             # noqa: E402
-from rwlib import cli_error, inflect, injection, language, registers, sarif, suppress  # noqa: E402
+from rwlib import cli_error, facts, inflect, injection, language, registers, sarif, suppress  # noqa: E402
 from rwlib import stylometry                       # noqa: E402
 from rwlib import findings as findings_mod       # noqa: E402
 from rwlib import lexicon as lexicon_mod         # noqa: E402
@@ -104,6 +106,7 @@ from rwlib.markdown import (BLOCKQUOTE_RX, CURLY_QUOTE_RX, FENCE_RX,  # noqa: E4
                             URL_GREEDY_RX, apply_exemptions, blank,
                             blank_entities, excerpt, invisible_entities,
                             is_prose_block, line_of)
+from rwlib.markdown import strip_for_stats as md_strip_for_stats  # noqa: E402
 from rwlib.sentences import (SENTENCE_SENTINEL, split_sentences,  # noqa: E402,F401
                              syllables, tokenize)
 
@@ -155,8 +158,6 @@ TABLE_RX = TABLE_ROW_RX
 # text preparation
 # --------------------------------------------------------------------------
 
-
-
 def strip_for_stats(text):
     """Remove code and markup noise before measuring prose statistics.
 
@@ -175,16 +176,14 @@ def strip_for_stats(text):
     does, and dropping them costs too much to be worth it: checklist.md falls
     from 666 measured words to 91, under the 120-word floor, which silences every
     stylometric flag on exactly the list-heavy documents most worth measuring.
-    A bullet is also prose a reader reads, which a `##` is not."""
-    out = FRONTMATTER_RX.sub("", text)
-    out = FENCE_RX.sub("", out)
-    out = INLINE_CODE_RX.sub("", out)
-    out = TABLE_RX.sub("", out)
-    out = URL_GREEDY_RX.sub("", out)
-    out = HEADING_LINE_RX.sub("", out)
-    out = BLOCKQUOTE_RX.sub("", out)
-    out = re.sub(r"[*_`>]", "", out)
-    return out
+    A bullet is also prose a reader reads, which a `##` is not.
+
+    The steps themselves live in rwlib.markdown, beside the patterns they run.
+    `registers.detect_register` measures a word count with the same function,
+    and a copy here would mean the register a document is scanned *as* and the
+    statistics it is scanned *with* could disagree about what counts as prose.
+    """
+    return md_strip_for_stats(text)
 
 
 # --------------------------------------------------------------------------
@@ -257,6 +256,8 @@ def compute_stats(raw_text):
     em = len(PROSE_DASH_RX.findall(prose))
     stats["em_dashes"] = em
     stats["em_dashes_per_1k"] = round(em / len(words) * 1000, 2)
+    contractions = len(stylometry.CONTRACTION_RX.findall(prose))
+    stats["contraction_rate"] = round(contractions / len(words) * 1000, 2)
 
     if paragraphs:
         plens = [len(split_sentences(p)) for p in paragraphs]
@@ -297,12 +298,20 @@ def find(text, rx, pattern_id, label, band, priority, findings, allowed=0):
             excerpt=excerpt(text, m.start(), m.end())))
 
 
-# Escaped, not literal. The last range is a bare variation selector (U+FE0F):
-# as a literal it is invisible, and an editor that drops it silently stops
-# this pattern matching the emoji presentation form.
+# Escaped, not literal. The variation selector (U+FE0F) is invisible as a
+# literal, and an editor that drops it silently stops this pattern matching the
+# emoji presentation form.
+#
+# Three alternatives, because an emoji is not only a character in one of the
+# pictographic blocks. A keycap is an ASCII digit plus U+FE0F plus U+20E3, and
+# the trademark and copyright signs become emoji the same way. The selector
+# alone is not an emoji and must not match on its own, which is what the
+# alternation buys over putting U+FE0F in the class.
 EMOJI_RX = re.compile(
     "[" "\U0001F300-\U0001FAFF" "\u2600-\u27BF" "\U0001F900-\U0001F9FF"
-    "\u2B00-\u2BFF" "\uFE0F" "]")
+    "\u2B00-\u2BFF" "]\uFE0F?"
+    "|[0-9#*]\uFE0F?\u20E3"
+    "|[\u00A9\u00AE\u2122]\uFE0F")
 # Two lookbehinds rather than one, because `re` fixes their width: with only the
 # one-space form, a two-space typist's emphatic fragments were never checked at
 # all, which is a rule that silently does not apply to whoever writes that way.
@@ -315,13 +324,9 @@ ONE_WORD_SENTENCE_RX = re.compile(
 # never the abbreviation for number.
 ONE_WORD_ABBREV_RX = re.compile(
     r"(Mr|Mrs|Ms|Dr|Prof|Sr|Jr|St|Inc|Ltd|Fig|Vol|Dept|Approx|Est)\.")
-US_DATE_RX = re.compile(
-    r"\b(January|February|March|April|May|June|July|August|September|"
-    r"October|November|December)\s+\d{1,2},?\s+\d{4}\b")
-DMY_DATE_RX = re.compile(
-    r"\b\d{1,2}\s+(January|February|March|April|May|June|July|August|"
-    r"September|October|November|December)\s+\d{4}\b")
-ISO_DATE_RX = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
+US_DATE_RX = facts.DATE_US_RX
+DMY_DATE_RX = facts.DATE_DMY_RX
+ISO_DATE_RX = facts.DATE_ISO_RX
 
 
 # Serial-comma candidates. OXFORD_MISSING_RX wants a comma, then a run with no
@@ -609,6 +614,56 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
                 entry.get("priority", "P2"), 1, "not found",
                 entry.get("note", "")))
 
+    # Signature moves. Ceiling and floor checks, reported at P2 always.
+    words = stats.get("word_count", 0)
+    for entry in rules.get("signature_moves", []):
+        if not in_register(entry, register):
+            continue
+        try:
+            rx = re.compile(entry["rx"])
+        except (re.error, KeyError) as exc:
+            print("voice-rules: bad signature move entry %s (%s)" % (entry.get("id"), exc),
+                  file=sys.stderr)
+            continue
+        hits = [m for m in rx.finditer(scored) if m.group(0).strip()]
+        count = len(hits)
+        rate = (count / words * 1000.0) if words > 0 else 0.0
+        label = entry.get("label", entry["id"])
+        note = entry.get("note", "")
+
+        max_allowed = entry.get("max_allowed")
+        if max_allowed is not None and count > int(max_allowed):
+            allowed = int(max_allowed)
+            label_msg = "%s (%d uses, cap %d)" % (label, count, allowed)
+            for m in hits[allowed:]:
+                findings.append(voice_finding(
+                    entry["id"], label_msg, "P2",
+                    line_of(scored, m.start()), m.group(0).strip()[:60],
+                    note or excerpt(scored, m.start(), m.end())))
+
+        max_per_1000w = entry.get("max_per_1000w")
+        if max_per_1000w is not None and rate > float(max_per_1000w):
+            cap_rate = float(max_per_1000w)
+            label_msg = "%s: rate %.1f/1k over cap %.1f" % (label, rate, cap_rate)
+            findings.append(voice_finding(
+                entry["id"], label_msg, "P2", 1,
+                "%d uses" % count,
+                note or "Signature move used more frequently than voice cap."))
+
+        # The floor needs a document long enough for a rate to mean anything,
+        # which is the same threshold every other rate in the engine uses. A
+        # literal here is a second copy of stylometry.RELIABLE_WORDS.
+        min_per_1000w = entry.get("min_per_1000w")
+        if (min_per_1000w is not None
+                and words >= stylometry.RELIABLE_WORDS
+                and rate < float(min_per_1000w)):
+            floor_rate = float(min_per_1000w)
+            label_msg = "%s: rate %.1f/1k below voice floor %.1f" % (label, rate, floor_rate)
+            findings.append(voice_finding(
+                entry["id"], label_msg, "P2", 1,
+                "%d uses" % count,
+                note or "Signature move under-used for document length."))
+
 
 def apply_voice_distance(raw_text, fingerprint, stats, findings):
     """How far this document sits from how the profile's owner writes.
@@ -676,7 +731,11 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
     profile = profile or DEFAULT_REGISTER
     lex = lexicon_mod.load()
     scored = apply_exemptions(raw_text) if exempt else raw_text
-    skip = PROFILE_SKIP.get(profile, set())
+    skip = set(PROFILE_SKIP.get(profile, set()))
+    if voice_rules:
+        mech = voice_mechanics(voice_rules, profile)
+        if mech.get("double_hyphen") == "allow":
+            skip.add("double-hyphen-dash")
     relax = PROFILE_RELAX.get(profile, {})
     findings = []
     stats = compute_stats(raw_text)
@@ -853,10 +912,11 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
 
     # Tier 3 fires only at density.
     wc = stats.get("word_count", 0)
-    if "tier3-density" not in skip and wc >= 120:
+    wc_scored = len(tokenize(scored))
+    if "tier3-density" not in skip and wc_scored >= 120:
         t3 = [w for w in lex["tier3"] if w.lower() not in exempt_words]
         hits = list(lexicon_mod.word_regex(t3).finditer(scored))
-        density = len(hits) / wc
+        density = len(hits) / wc_scored
         if density >= 0.02:
             findings.append(findings_mod.make(
                 "tier3-density",
@@ -968,6 +1028,7 @@ BAND_HEADERS = {
     "voice": "  voice (this writer's own rules)",
     "fingerprint": "  fingerprints (evidence about production)",
     "craft": "  craft (bad writing regardless of author)",
+    "structure": "  structure (document organization and headings)",
 }
 
 
@@ -1005,7 +1066,7 @@ def report(findings, stats, profile, exempt, voice_name=None, notes=()):
                       "P1": "P1  obvious machine smell",
                       "P2": "P2  polish"}
             out.append(titles[pri])
-            for band in ("safety", "voice", "fingerprint", "craft"):
+            for band in ("safety", "voice", "fingerprint", "craft", "structure"):
                 sub = [f for f in group if f["band"] == band]
                 if not sub:
                     continue
@@ -1073,7 +1134,7 @@ def report(findings, stats, profile, exempt, voice_name=None, notes=()):
 
 
 def json_payload(findings, stats, profile, exempt, voice_name, notes,
-                 voice_lineage=()):
+                 voice_lineage=(), register_detection=None):
     """The --json document. Versioned, because a consumer that pins the schema
     finds out at parse time when the shape moves rather than by rendering
     blanks, and because a published measurement is only reproducible if the
@@ -1090,6 +1151,7 @@ def json_payload(findings, stats, profile, exempt, voice_name, notes,
         "lexicon_version": lexicon_mod.version(),
         "registers_version": registers.version(),
         "profile": profile,
+        "register_detection": register_detection,
         "voice": voice_name,
         "voice_lineage": list(voice_lineage),
         "exempt_applied": exempt,
@@ -1146,6 +1208,8 @@ def run_apply_safe(text, path, voice_rules, write, to_stdout=False,
             print("        %s" % f["match"], file=stream)
         print("\nNothing in the safety band is fixable, and a `rabbit-allow` "
               "comment cannot clear it: see rwlib/injection.py.", file=stream)
+        if to_stdout:
+            print("Note: output was redirected with --stdout; your redirect target is now empty.", file=sys.stderr)
         return 1
 
     fixed, applied, skipped = fixes_mod.apply(text, voice_rules)
@@ -1220,10 +1284,26 @@ def run_apply_safe(text, path, voice_rules, write, to_stdout=False,
     # case can be reproduced faithfully; the other two fall back to the platform
     # default, which is what they got before.
     try:
-        with open(path, "w", encoding="utf-8",
-                  newline=newline if isinstance(newline, str) else None) as fh:
+        dir_name = os.path.dirname(os.path.abspath(path)) or "."
+        nl = newline if isinstance(newline, str) else None
+        tmp_fd, tmp_path = tempfile.mkstemp(dir=dir_name, prefix=".rw_tmp_")
+        with os.fdopen(tmp_fd, "w", encoding="utf-8", newline=nl) as fh:
             fh.write(fixed)
+        # mkstemp creates at 0600 and os.replace carries that onto the target,
+        # so a 0644 file in a repository comes back readable by nobody but its
+        # owner. Copy the original mode across first. Best effort: a platform
+        # that refuses chmod still gets the write, which is the point.
+        try:
+            os.chmod(tmp_path, stat.S_IMODE(os.stat(path).st_mode))
+        except OSError:
+            pass
+        os.replace(tmp_path, path)
     except OSError as exc:
+        if "tmp_path" in locals() and os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
         examples = [
             "python3 scan.py draft.md",
             "python3 scan.py draft.md --apply-safe --write"
@@ -1252,6 +1332,9 @@ def main():
         examples=examples
     )
     ap.add_argument("file", nargs="?", help="file to scan; omit to read stdin")
+    ap.add_argument("--version", action="version",
+                    version="scan.py (lexicon v%s, registers v%s)"
+                            % (lexicon_mod.version(), registers.version()))
     ap.add_argument("--profile", default=DEFAULT_REGISTER,
                     choices=sorted(REGISTERS) + ["auto"],
                     help="register profile (default: %s). 'auto' detects a "
@@ -1259,9 +1342,10 @@ def main():
                          "formal) from document structure and "
                          "falls back to %s otherwise; an explicit --profile "
                          "always wins over detection" % (DEFAULT_REGISTER, DEFAULT_REGISTER))
-    ap.add_argument("--json", action="store_true", help="machine-readable output")
-    ap.add_argument("--sarif", action="store_true",
-                    help="SARIF 2.1.0, for GitHub pull request annotations")
+    format_group = ap.add_mutually_exclusive_group()
+    format_group.add_argument("--json", action="store_true", help="machine-readable output")
+    format_group.add_argument("--sarif", action="store_true",
+                              help="SARIF 2.1.0, for GitHub pull request annotations")
     ap.add_argument("--sarif-uri", metavar="PATH",
                     help="the path to record in the SARIF output, relative to the "
                          "repository root. Defaults to the file argument")
@@ -1313,6 +1397,27 @@ def main():
             parser=ap, examples=examples), file=sys.stderr)
         return 2
 
+    if args.sarif_uri and not args.sarif:
+        print(cli_error.format_llm_error(
+            "scan.py",
+            "--sarif-uri only applies with --sarif, which is what produces the SARIF output.",
+            parser=ap, examples=examples), file=sys.stderr)
+        return 2
+
+    if args.apply_safe:
+        conflict = [flag for flag, on in (("--check", args.check),
+                                          ("--json", args.json),
+                                          ("--sarif", args.sarif)) if on]
+        if conflict:
+            print(cli_error.format_llm_error(
+                "scan.py",
+                "%s cannot be combined with --apply-safe: --apply-safe applies "
+                "mechanical fixes, and the other reports findings. Run the two "
+                "as separate commands."
+                % " and ".join(conflict),
+                parser=ap, examples=examples), file=sys.stderr)
+            return 2
+
     # `newlines` records the line endings the file actually used, so --write can
     # put them back. Reading stays universal: every regex in the engine is
     # written against "\n", and handing it a "\r" would move the scan's own
@@ -1354,13 +1459,14 @@ def main():
     else:
         text = sys.stdin.read()
 
-    register_note = None
+    register_note, register_detection = None, None
     if args.profile == "auto":
         # Detection is opt-in only: omitting --profile still means
         # DEFAULT_REGISTER, exactly as before this flag existed. 'auto' has to
         # be asked for by name, the same rule --voice auto already follows.
         detected, confidence, signals = registers.detect_register(text, path=args.file)
         args.profile = detected
+        register_detection = {"register": detected, "confidence": confidence, "signals": signals}
         register_note = ("register auto-detected as %r (%s)"
                          % (detected, ", ".join(signals) if signals else confidence))
 
@@ -1448,10 +1554,12 @@ def main():
             tool_version=lexicon_mod.version(),
             information_uri="https://github.com/whit3rabbit/rabbit-writes",
             extra_properties={"register": args.profile,
-                              "voice": voice_name}), indent=2))
+                              "voice": voice_name},
+            notes=notes), indent=2))
     elif args.json:
         print(json.dumps(json_payload(findings, stats, args.profile, exempt,
-                                      voice_name, notes, lineage), indent=2))
+                                      voice_name, notes, lineage,
+                                      register_detection=register_detection), indent=2))
     else:
         print(report(findings, stats, args.profile, exempt, voice_name, notes))
 

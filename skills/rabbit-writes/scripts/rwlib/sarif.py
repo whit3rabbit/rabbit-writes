@@ -81,7 +81,7 @@ def warn_if_uri_drops(uri, out=None):
 
 
 def build(findings, uri, tool_name, tool_version=None, information_uri=None,
-          extra_properties=None):
+          extra_properties=None, notes=None):
     """A SARIF log for one file's findings.
 
     `uri` must be relative to the repository root. GitHub silently drops results
@@ -122,24 +122,32 @@ def build(findings, uri, tool_name, tool_version=None, information_uri=None,
         })
 
     results = []
+    is_docx = uri.endswith(".docx")
     for f in findings:
-        results.append({
+        loc = {"artifactLocation": {"uri": uri}}
+        if not is_docx:
+            loc["region"] = {"startLine": max(1, int(f["line"]))}
+
+        res = {
             "ruleId": f["id"],
             "ruleIndex": rule_index[f["id"]],
             "level": LEVEL_BY_PRIORITY.get(f["priority"], "note"),
             "message": {"text": _message(f)},
             "locations": [{
-                "physicalLocation": {
-                    "artifactLocation": {"uri": uri},
-                    # No endLine and no columns. The engine reports the line a
-                    # match starts on and nothing narrower, and a region that
-                    # claims a column it did not measure would put the squiggle
-                    # under the wrong word.
-                    "region": {"startLine": max(1, int(f["line"]))},
-                },
+                "physicalLocation": loc,
             }],
             "properties": {"band": f["band"], "priority": f["priority"]},
-        })
+        }
+        if "suppressed" in f:
+            # `inSource`, not `external`. A rabbit-allow comment is persisted
+            # in the file the result points at, which is exactly what SARIF
+            # 2.1.0 means by the two kinds. `external` would tell a consumer to
+            # look for a suppression store that does not exist.
+            res["suppressions"] = [{
+                "kind": "inSource",
+                "justification": str(f["suppressed"])
+            }]
+        results.append(res)
 
     driver = {"name": tool_name, "rules": rules,
               "properties": {"findingSchemaVersion": findings_mod.SCHEMA_VERSION}}
@@ -150,5 +158,10 @@ def build(findings, uri, tool_name, tool_version=None, information_uri=None,
     if extra_properties:
         driver["properties"].update(extra_properties)
 
-    return {"$schema": SARIF_SCHEMA, "version": SARIF_VERSION,
-            "runs": [{"tool": {"driver": driver}, "results": results}]}
+    run = {"tool": {"driver": driver}, "results": results}
+    if notes:
+        notifications = [{"message": {"text": n}} for n in notes]
+        run["invocations"] = [{"executionSuccessful": True,
+                               "toolExecutionNotifications": notifications}]
+
+    return {"$schema": SARIF_SCHEMA, "version": SARIF_VERSION, "runs": [run]}

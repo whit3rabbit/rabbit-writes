@@ -149,7 +149,7 @@ def extract(path):
 
         stretch_kind, stretch = None, []
         for kind, text in parts + [(None, "")]:
-            if kind == stretch_kind and kind is not None:
+            if kind is not None and kind == stretch_kind:
                 stretch.append(text)
                 continue
             if stretch_kind is not None:

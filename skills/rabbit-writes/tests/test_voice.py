@@ -711,3 +711,42 @@ def test_a_blended_profile_loads_and_scans():
         assert found.count("voice-banned-word") >= 2, result["findings"]
     finally:
         shutil.rmtree(scratch, ignore_errors=True)
+
+
+def test_signature_moves_enforcement():
+    rules = {
+        "voice": "sig_test",
+        "default_priority": "P0",
+        "signature_moves": [
+            {
+                "id": "sig-short-verdict",
+                "label": "Short verdict",
+                "rx": "(?m)^Verdict:.*$",
+                "max_allowed": 1,
+                "note": "Max 1 verdict line"
+            }
+        ]
+    }
+    text = "Verdict: Good.\nVerdict: Bad.\nVerdict: Ugly.\n"
+    res, _ = scan_with_rules(text, rules)
+    findings = [f for f in res["findings"] if f["id"] == "sig-short-verdict"]
+    assert len(findings) == 2  # 3 uses with cap 1 -> 2 findings
+    assert all(f["priority"] == "P2" for f in findings)
+
+
+def test_blend_retains_signature_moves_and_contrastive_pairs():
+    v1 = {
+        "voice": "v1",
+        "signature_moves": [{"id": "sig1", "rx": "foo", "max_allowed": 1}],
+        "contrastive_pairs": [{"would": "A", "would_never": "B"}]
+    }
+    v2 = {
+        "voice": "v2",
+        "signature_moves": [{"id": "sig2", "rx": "bar", "max_allowed": 2}],
+        "contrastive_pairs": [{"would": "C", "would_never": "D"}]
+    }
+    blended, _ = voices.blend(v1, v2, 0.5)
+    sig_ids = {m["id"] for m in blended.get("signature_moves", [])}
+    assert sig_ids == {"sig1", "sig2"}
+    assert len(blended.get("contrastive_pairs", [])) == 2
+

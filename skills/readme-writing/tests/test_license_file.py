@@ -21,7 +21,7 @@ import os
 import shutil
 import tempfile
 
-from helpers import check_module, ids, run
+from helpers import Repo, check_module, ids, run
 
 LICENSED = """# widget
 
@@ -47,36 +47,6 @@ MIT. See LICENSE.
 
 UNLICENSED = LICENSED.replace("\n## License\n\nMIT. See LICENSE.\n", "")
 
-
-class Repo(object):
-    """A throwaway directory with a `.git` in it, so the walk finds a root.
-
-    Without the marker the walk runs to the filesystem root and the answer
-    depends on whoever ran the suite.
-    """
-
-    def __init__(self, readme, license_name=None):
-        self.path = tempfile.mkdtemp(prefix="rabbit-license-")
-        os.mkdir(os.path.join(self.path, ".git"))
-        self.readme = os.path.join(self.path, "README.md")
-        with open(self.readme, "w", encoding="utf-8") as fh:
-            fh.write(readme)
-        if license_name:
-            with open(os.path.join(self.path, license_name), "w",
-                      encoding="utf-8") as fh:
-                fh.write("MIT License\n\nCopyright (c) 2026\n")
-
-    def sub(self, name, readme):
-        """A README one directory down, the `docs/README.md` case."""
-        directory = os.path.join(self.path, name)
-        os.makedirs(directory, exist_ok=True)
-        path = os.path.join(directory, "README.md")
-        with open(path, "w", encoding="utf-8") as fh:
-            fh.write(readme)
-        return path
-
-    def close(self):
-        shutil.rmtree(self.path, ignore_errors=True)
 
 
 def test_a_license_section_with_no_file_anywhere_is_a_p1():

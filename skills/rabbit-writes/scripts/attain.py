@@ -443,6 +443,9 @@ def main():
     ap.add_argument("after", nargs="?",
                     help="the converted document. Omit to measure one document "
                          "with no before column")
+    ap.add_argument("--version", action="version",
+                    version="attain.py (schema v%d, registers v%s)"
+                            % (SCHEMA_VERSION, registers_mod.version()))
     group = ap.add_mutually_exclusive_group()
     group.add_argument("--voice", metavar="NAME",
                        help="profile to measure against. `auto` runs the same "
@@ -499,20 +502,26 @@ def main():
             expected_type="voice fingerprint file (.fingerprint.json)",
             details=str(exc), examples=examples), file=sys.stderr)
         return 2
+    fp_reg = fingerprint.get("register")
+    if fp_reg and fp_reg != args.profile:
+        print(cli_error.format_file_error(
+            "attain.py", fingerprint_path, "fingerprint",
+            expected_type="voice fingerprint file (.fingerprint.json)",
+            details="Fingerprint register %r does not match target register %r"
+                    % (fp_reg, args.profile),
+            examples=examples), file=sys.stderr)
+        return 2
 
     before_text = _read(args.before, "before", examples)
     after_text = _read(args.after, "after", examples) if args.after else None
 
-    # With one path, that path is the document being measured and there is no
-    # before column. Named `before` positionally so the two-path form reads in
-    # the order a person says it.
-    if after_text is None:
-        before, after = None, measure(before_text, fingerprint)
-    else:
-        before, after = (measure(before_text, fingerprint),
-                         measure(after_text, fingerprint))
-
     try:
+        if after_text is None:
+            before, after = None, measure(before_text, fingerprint)
+        else:
+            before, after = (measure(before_text, fingerprint),
+                             measure(after_text, fingerprint))
+
         result = compare(before, after, fingerprint, args.tolerance)
     except ValueError as exc:
         print(cli_error.format_llm_error(
@@ -529,6 +538,12 @@ def main():
     }
     shape = fingerprint.get("sentence_shape")
     if shape:
+        # Keyed off `before`, the measure, not off `before_text`, the string.
+        # With one path that path is the document being measured, and every
+        # other block in the result reports it under `after`. Reading the text
+        # instead put the same document under `before` here and left `after`
+        # null, so the report's shape row sat in a different column from its
+        # own distance row.
         result["sentence_shape"] = {
             "before": _percentiles(before_text) if before else None,
             "after": _percentiles(after_text if after_text is not None

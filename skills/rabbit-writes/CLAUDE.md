@@ -23,6 +23,15 @@ python3 skills/rabbit-writes/scripts/scan.py <file> --voice-rules skills/rabbit-
 # Check mode gate (exit code 1 on errors)
 python3 skills/rabbit-writes/scripts/scan.py <file> --check
 
+# Scan with auto-detected register profile
+python3 skills/rabbit-writes/scripts/scan.py <file> --profile auto
+
+# Apply mechanical safe fixes in-place
+python3 skills/rabbit-writes/scripts/scan.py <file> --apply-safe --write
+
+# Output findings in SARIF 2.1.0 format
+python3 skills/rabbit-writes/scripts/scan.py <file> --sarif
+
 # Post-edit integrity check (facts, dates, quotes, numbers). Two files: it
 # compares a rewrite against what it was rewritten from.
 python3 skills/rabbit-writes/scripts/verify.py <original> <rewritten>

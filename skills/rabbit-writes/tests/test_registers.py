@@ -425,6 +425,12 @@ def test_detect_register_calibrated_against_the_100_readme_corpus():
     every README here is expected to fall through to the default register,
     since none of them are docs (the README carve-out), linkedin, or
     email/letter shaped."""
+    if not README_CORPUS:
+        # Not pytest.skip: run.py is a stdlib runner so the suite works on a
+        # checkout with nothing installed, and importing pytest here fails it
+        # on exactly the layout this branch exists to tolerate.
+        print("    (docs/readme-analysis corpus absent, nothing to calibrate)")
+        return
     assert len(README_CORPUS) >= 90, (
         "expected the docs/readme-analysis corpus, found %d files"
         % len(README_CORPUS))
@@ -437,3 +443,9 @@ def test_detect_register_calibrated_against_the_100_readme_corpus():
         if register != default:
             misdetected.append("%s -> %s %s" % (readme, register, signals))
     assert not misdetected, "\n".join(misdetected)
+
+
+def test_write_and_check_mutually_exclusive():
+    code = registers.main(["--write", "--check"])
+    assert code == 2
+

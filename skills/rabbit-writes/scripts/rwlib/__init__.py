@@ -13,25 +13,34 @@ same way:
 
 Modules:
 
-    markdown    spans: fences, links, images, tables, quotes, dashes, badges.
-                Every blanking helper preserves length so offsets survive.
-    sentences   English sentence and word segmentation.
-    lexicon     the pattern catalogue, its version, and the two regex builders.
-    sections    what counts as an "installation" heading, for README work.
-    registers   the tolerance matrix, read from registers.json.
+    artifacts   artifact path resolution and normalization.
+    cli_error   formatted LLM error reporting.
     corpus      the README corpus figures, and the drift check against them.
+    docx_text   Word document visible text and hidden run extraction.
+    facts       preservation tracking for numbers, dates, ranges, and quotes.
     findings    the finding schema and its version.
-    injection   the safety band: concealed text, and text aimed at an agent.
-                Surfaces and quarantines. Nothing here is ever fixable.
-    voices      voice rules files, including `extends` inheritance.
-    language    the English-only scope check. Warns, never fails.
-    sarif       findings as SARIF 2.1.0, for PR annotations.
     fixes       the mechanically safe subset of edits, for scan.py --apply-safe.
+    inflect     inflection engine for word and phrase bans.
+    injection   the safety band: concealed text, and text aimed at an agent.
+    language    the English-only scope check. Warns, never fails.
+    lexicon     the pattern catalogue, its version, and the regex builders.
+    markdown    spans: fences, links, images, tables, quotes, dashes, badges.
+    registers   the tolerance matrix, read from registers.json.
+    sarif       findings as SARIF 2.1.0, for PR annotations.
+    sections    what counts as an "installation" heading, for README work.
+    sentences   English sentence and word segmentation.
+    stylometry  stylometric distance calculations and exemplars.
+    suppress    in-document finding suppression comment parser.
+    voice_check rule validator for voice profiles.
+    voices      voice rules files, including `extends` inheritance and blending.
 
 Nothing here decides what good writing is. That lives in the reference files,
 where a person can argue with it.
 """
 
-__all__ = ["markdown", "sentences", "lexicon", "sections", "registers",
-           "corpus", "findings", "voices", "language", "sarif", "fixes",
-           "injection"]
+__all__ = [
+    "artifacts", "cli_error", "corpus", "docx_text", "facts", "findings",
+    "fixes", "inflect", "injection", "language", "lexicon", "markdown",
+    "registers", "sarif", "sections", "sentences", "stylometry", "suppress",
+    "voice_check", "voices"
+]

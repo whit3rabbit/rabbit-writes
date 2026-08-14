@@ -8,9 +8,10 @@ add em dashes or leave a draft with more tells than it started with. Edit mode
 writes to files, so a broken promise there is silent and destructive. This is
 what checks them.
 
-Two of those checks are narrower than the promise, and both narrowings are
+Three of those checks are narrower than the promise, and those narrowings are
 measured rather than assumed. A file path is tracked only when it carries an
-extension, for the reason spelled out at PATH_RX.
+extension, for the reason spelled out at PATH_RX. Headings are ATX-only (`# Title`),
+matching `rwlib.markdown.HEADING_RX`.
 
 Image *sources* are checked, as of the pass that measured them. They used to be
 covered only incidentally, by URL_RX when the src is absolute and by PATH_RX
@@ -65,14 +66,15 @@ if HERE not in sys.path:
 from rwlib import cli_error                                      # noqa: E402
 from rwlib import facts                                               # noqa: E402
 from rwlib import lexicon as lexicon_mod                              # noqa: E402
+from rwlib import registers as registers_mod                          # noqa: E402
 from rwlib.artifacts import norm_url                                  # noqa: E402
 # QUOTED_RX is a re-export, not a caller: test_verify.py asserts it is the
 # same object scan.py holds. See the note in scan.py.
 from rwlib.markdown import (BLOCKQUOTE_RX, FENCE_RX, FRONTMATTER_RX,  # noqa: E402,F401
-                            HEADING_RX, HTML_IMG_RX, HTML_TAG_RX, IMAGE_RX,
-                            INLINE_CODE_RX, PATH_RX, PROSE_DASH_RX, QUOTED_RX,
-                            TABLE_ROW_RX, URL_RX, apply_exemptions, blank,
-                            blank_entities, context)
+                            HEADING_RX, HTML_IMG_RX,
+                            HTML_TAG_RX, IMAGE_RX, INLINE_CODE_RX, PATH_RX,
+                            PROSE_DASH_RX, QUOTED_RX, TABLE_ROW_RX, URL_RX,
+                            apply_exemptions, blank, blank_entities, context)
 
 LEXICON_PATH = lexicon_mod.LEXICON_PATH
 
@@ -90,37 +92,39 @@ FALLBACK_TELL_RX = [
 
 
 def load_tell_regexes():
-    """Count tells against lexicon.json rather than against a copy of it.
-
-    A hardcoded subset drifts the moment the lexicon grows, and it drifts
-    quietly: the counter keeps returning a number, it is just the wrong one,
-    and the check this script exists to run passes a rewrite that added tells
-    the lexicon knows about and this file did not."""
+    """Count tells against lexicon.json rather than against a copy of it."""
     try:
         lex = lexicon_mod.load()
     except (OSError, ValueError):
-        return FALLBACK_TELL_RX
-    out = [lexicon_mod.word_regex(lex["tier1"]),
-           lexicon_mod.phrase_regex(lex["tier1_phrases"])]
+        return [(rx, False) for rx in FALLBACK_TELL_RX]
+    out = [(lexicon_mod.word_regex(lex["tier1"]), False),
+           (lexicon_mod.phrase_regex(lex["tier1_phrases"]), False)]
     for p in lex["patterns"]:
-        if p.get("band") != "fingerprint":
-            continue
-        # P2 fingerprints are weak signals and this counter is a hard gate. The
-        # one that matters is curly-quote: paste a paragraph through Word,
-        # Google Docs, or macOS and the typography curls on its own. Counting
-        # that as a tell fails a correct rewrite for something the editor did,
-        # which is the false positive references/false-positives.md warns about
-        # and the opposite of what this script is for.
-        if p.get("priority") == "P2":
+        if p.get("band") != "fingerprint" or p.get("priority") == "P2":
             continue
         try:
-            out.append(re.compile(p["rx"]))
+            out.append((re.compile(p["rx"]), bool(p.get("scan_raw"))))
         except (re.error, KeyError):
             continue
     return out
 
 
 TELL_RX = load_tell_regexes()
+
+
+def _blank_group(match, group=1):
+    """The whole match with one group blanked, same length as it started.
+
+    `blank` takes out the whole span, which is wrong when only part of it is
+    the thing to hide. Written against the match's own offsets so the rest of
+    the span, whatever it holds, comes through byte for byte.
+    """
+    start, end = match.span(group)
+    if start < 0:
+        return match.group(0)
+    base = match.start()
+    whole = match.group(0)
+    return (whole[:start - base] + " " * (end - start) + whole[end - base:])
 
 
 def extract(text):
@@ -130,7 +134,8 @@ def extract(text):
     # and a piped line inside a fence is not a table row. Without this, moving a
     # code block that contains shell comments changes the heading count and
     # fails a conversion that touched no headings at all.
-    prose = FENCE_RX.sub(blank, text)
+    prose = FRONTMATTER_RX.sub(blank, text)
+    prose = FENCE_RX.sub(blank, prose)
     # A URL carries slashes and a dotted final segment, so PATH_RX matches
     # inside one (.../main/README.md). Left in, an edited URL is reported twice,
     # and the utm-stripping carve-out norm_url grants does not reach the second
@@ -142,7 +147,14 @@ def extract(text):
     # path check makes. Left in, one edit to one span reported both "inline code
     # altered" and "file path altered", and a reader counting violations saw two
     # broken promises where there was one.
-    unlinked = INLINE_CODE_RX.sub(blank, URL_RX.sub(blank, prose))
+    #
+    # Image alt text goes too, and the module docstring above says why with a
+    # number. Blanked in place rather than rebuilt from the groups: an image
+    # may carry a title (`![alt](src "title")`), and reconstructing the match
+    # as `![](src)` silently drops it and shortens the string, which is the one
+    # thing every blanking helper in rwlib.markdown promises not to do.
+    no_alt = IMAGE_RX.sub(_blank_group, prose)
+    unlinked = INLINE_CODE_RX.sub(blank, URL_RX.sub(blank, no_alt))
     # Tables, block quotes and frontmatter go the same way, and for the third
     # time the same argument: each is compared verbatim below, so a path inside
     # one is already a promise this function keeps. Left in, an edited path in a
@@ -156,6 +168,12 @@ def extract(text):
     # blanking tags here would open exactly the gap that function exists to
     # close: a relative `<img src="assets/logo.svg">` would be reported by
     # neither.
+    #
+    # Headings deliberately stay in, for the reason the argument above does not
+    # reach: `--allow-structure` moves the heading comparison to a reported list
+    # rather than a violation, so a heading is the one span here that is not
+    # always compared verbatim. Blanked, `## 10x faster` becoming `## 100x
+    # faster` under that flag was neither a structure failure nor a fact one.
     unquoted = TABLE_ROW_RX.sub(
         blank, BLOCKQUOTE_RX.sub(blank, FRONTMATTER_RX.sub(blank, unlinked)))
     # The facts are read from a copy with every span that is already compared
@@ -234,7 +252,11 @@ def tell_hits(text):
     """Every lexicon tell in the prose, as matched strings. Returned rather than
     counted so a failure can name what got added instead of only how many."""
     prose = apply_exemptions(text)
-    return [m.group(0).strip() for rx in TELL_RX for m in rx.finditer(prose)]
+    hits = []
+    for rx, scan_raw in TELL_RX:
+        target = text if scan_raw else prose
+        hits.extend(m.group(0).strip() for m in rx.finditer(target))
+    return hits
 
 
 def dash_hits(text):
@@ -418,6 +440,9 @@ def main():
     )
     ap.add_argument("original", help="path to original unedited markdown file")
     ap.add_argument("rewritten", help="path to rewritten markdown file to verify against original")
+    ap.add_argument("--version", action="version",
+                    version="verify.py (lexicon v%s, registers v%s)"
+                            % (lexicon_mod.version(), registers_mod.version()))
     ap.add_argument("--json", action="store_true", help="output machine-readable JSON result")
     ap.add_argument("--allow-structure", action="store_true",
                     help="report heading changes instead of failing on them. For a "

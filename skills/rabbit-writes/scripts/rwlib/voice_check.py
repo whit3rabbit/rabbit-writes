@@ -59,7 +59,11 @@ COPY_INSTRUCTION_RX = re.compile(r"(?m)^>\s*Copy this file to")
 # a sentence. Narrow on purpose. An HTML tag has no spaces in it and `<name>` is
 # caught by its own check above, so the length-and-a-space test is what
 # separates "the author has not filled this in" from markup somebody meant.
-GUIDANCE_RX = re.compile(r"<[A-Za-z][^<>]{18,}>", re.S)
+# `=` and a backtick are excluded because an attribute (`<span class="x y">`)
+# and a code span are the two spaced angle-bracket spans somebody meant. A
+# quote mark is not excluded: guidance prose is full of apostrophes, and
+# rejecting them missed `<the writer's own opening move>` entirely.
+GUIDANCE_RX = re.compile(r"<[A-Za-z][^<>=`]*\s[^<>=`]{17,}>", re.S)
 MEASURED_HEADING = "## Measured from samples"
 
 MD_SUFFIX = ".md"

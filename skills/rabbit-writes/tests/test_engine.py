@@ -151,8 +151,10 @@ def test_a_legitimate_dot_leader_survives_the_split():
 
 def test_emoji_rx_still_matches_the_presentation_selector():
     scan = scan_module()
-    assert scan.EMOJI_RX.search("\ufe0f")
-    assert scan.EMOJI_RX.search("\U0001F680")
+    m = scan.EMOJI_RX.search("\U0001F680\ufe0f")
+    assert m and m.group(0) == "\U0001F680\ufe0f"
+    assert not scan.EMOJI_RX.search("\ufe0f")
+
 
 
 # --------------------------------------------------------------------------

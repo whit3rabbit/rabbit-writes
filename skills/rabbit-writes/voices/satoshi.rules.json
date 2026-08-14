@@ -4,6 +4,7 @@
   "default_priority": "P0",
   "mechanics": {
     "em_dash": "forbid",
+    "double_hyphen": "allow",
     "semicolon": "allow",
     "emoji": "forbid",
     "curly_quotes": "allow",

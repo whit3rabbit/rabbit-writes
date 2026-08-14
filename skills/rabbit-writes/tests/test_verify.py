@@ -447,3 +447,30 @@ def test_the_mechanical_fixer_never_costs_a_corpus_readme_a_fact():
         if not result["ok"]:
             bad.append((slug, applied, result["violations"][:2]))
     assert not bad, bad
+
+
+def test_markdown_image_alt_text_is_not_fact_checked():
+    """Markdown image alt text edits containing numbers do not trigger a fact violation."""
+    verify = verify_module()
+    orig = "See ![v2.0 badge](https://img.shields.io/badge.svg) for info."
+    rewr = "See ![v2 badge](https://img.shields.io/badge.svg) for info."
+    result = verify.validate(orig, rewr)
+    assert result["ok"], result["violations"]
+
+
+def test_negative_number_fact_extracted():
+    """Negative numbers extract with minus sign so sign changes trigger fact violation."""
+    from rwlib import facts
+    nums = [c for c, _ in facts.numbers("The temperature dropped by -5 degrees.")]
+    assert "-5" in nums, nums
+
+
+def test_frontmatter_yaml_comment_is_not_heading():
+    """A YAML comment in frontmatter is not counted as a markdown heading."""
+    verify = verify_module()
+    text = "---\ntitle: doc\n# note: internal\n---\n\n# Real Heading\n"
+    ext = verify.extract(text)
+    headings = [h[1] for h in ext["headings"]]
+    assert "Real Heading" in headings
+    assert "note: internal" not in headings
+

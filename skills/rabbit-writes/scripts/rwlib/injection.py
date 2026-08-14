@@ -165,6 +165,12 @@ HIDING_CSS = (r"(?:display\s*:\s*none"
 # The whole element, opening tag through closing tag, because the payload sits
 # in the body and the hiding sits in the attribute. A regex that captured only
 # the style attribute would never see what it was hiding.
+#
+# The body is unbounded on purpose. A character ceiling here is an evasion the
+# attacker controls: pad the hidden element past the ceiling and the element
+# stops matching, which drops a P0 `injection-hidden-directive` to the P2 that
+# only sees the visible text. Nothing here nests a quantifier, so the
+# non-greedy run to the closing tag is linear and needs no ceiling.
 CONCEAL_ELEMENT_RX = re.compile(
     r"(?is)<(?P<tag>\w+)[^>]*style=[\"'][^\"']*" + HIDING_CSS +
     r"[^\"']*[\"'][^>]*>.*?</(?P=tag)\s*>")
