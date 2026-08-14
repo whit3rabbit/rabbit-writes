@@ -584,8 +584,22 @@ def _resolve_named(name, voices_dir):
                      % (name, candidate))
 
 
+def load_scan(caller_name="engine"):
+    rwlib_dir = os.path.dirname(os.path.abspath(__file__))
+    scripts_dir = os.path.dirname(rwlib_dir)
+    scan_path = os.path.join(scripts_dir, "scan.py")
+    if not os.path.exists(scan_path):
+        raise SystemExit("%s: cannot find %s. This script has to run "
+                         "from inside an installed plugin." % (caller_name, scan_path))
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("rw_scan", scan_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def main(argv):
-    """python3 rwlib/voices.py --blend a b [--weight 0.7] [--name ab]
+    """python3 rwlib/voices.py --blend a b [--weight 0.7] [--name ab] [--out path]
 
     Prints the blended rules file on stdout and the notes on stderr, so the
     result can be redirected into voices/<name>.rules.json while the conflicts
@@ -594,7 +608,7 @@ def main(argv):
     """
     examples = [
         "python3 rwlib/voices.py --blend profileA profileB",
-        "python3 rwlib/voices.py --blend profileA profileB --weight 0.7 --name blended_profile"
+        "python3 rwlib/voices.py --blend profileA profileB --weight 0.7 --name blended_profile --out voices/blended_profile.rules.json"
     ]
     ap = LLMArgumentParser(prog="voices.py", description=main.__doc__, examples=examples)
     ap.add_argument("--blend", nargs=2, metavar=("LEFT", "RIGHT"), required=True,
@@ -604,6 +618,7 @@ def main(argv):
                          "ties and nothing else: the stricter side wins "
                          "wherever one exists, whatever the weight says")
     ap.add_argument("--name", help="the blended profile's voice name")
+    ap.add_argument("--out", help="file path to write the blended profile JSON to atomically")
     ap.add_argument("--voices-dir", default=VOICES_DIR)
     args = ap.parse_args(argv)
 
@@ -621,7 +636,19 @@ def main(argv):
         ), file=sys.stderr)
         return 2
 
-    print(json.dumps(rules, indent=2))
+    content = json.dumps(rules, indent=2) + "\n"
+    if args.out:
+        out_path = os.path.abspath(args.out)
+        out_dir = os.path.dirname(out_path)
+        if out_dir and not os.path.exists(out_dir):
+            os.makedirs(out_dir, exist_ok=True)
+        tmp_path = out_path + ".tmp.%d" % os.getpid()
+        with open(tmp_path, "w", encoding="utf-8") as fh:
+            fh.write(content)
+        os.replace(tmp_path, out_path)
+    else:
+        print(content, end="")
+
     for note in notes:
         print("  note: %s" % note, file=sys.stderr)
     print("\nThe rules file is the regex-checkable half. Write the blended "
@@ -632,3 +659,4 @@ def main(argv):
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
+

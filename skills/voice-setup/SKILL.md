@@ -152,7 +152,7 @@ A repeated substitution is also the best `contrastive_pairs` entry you will ever
 VOICES=${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/rwlib/voices.py \
   --blend whit3rabbit dana --weight 0.7 --name whit3rabbit-dana \
-  > "$VOICES/whit3rabbit-dana.rules.json"
+  --out "$VOICES/whit3rabbit-dana.rules.json"
 ```
 
 Bans union, the stricter refusal wins whatever the weight says, and the lineage goes into the file as a `blend` key. Read the notes it prints on stderr: they name every place the two profiles wanted incompatible things, and those are the lines to confirm with whoever the blend is for.
@@ -190,7 +190,7 @@ Four questions, and none of them is guessable. Ask them together, in one turn.
    - Anywhere else survives the update, and nothing resolves it by name. Every scan needs `--voice-rules <path>`.
    Say both, recommend the plugin directory plus a copy somewhere safe, and let them pick.
 3. **The tier.** `default_priority` is `P0` unless they say otherwise, meaning a hit is a defect on the same tier as a chatbot artifact. Some people want their preferences at `P1`. Ask, and say which you set.
-4. **Whether to switch the active voice.** Never switch it without saying so, and never as a side effect of building a profile.
+4. **Whether to switch the active voice.** Never switch it without saying so, and never as a side effect of building a profile. Note that `--scaffold --activate` is explicitly refused by `build_voice.py` until the profile is filled in and passes `--check --activate`.
 
 Add a fifth when there are samples: whether to embed exemplars, which copies their prose into a file that travels with the plugin.
 

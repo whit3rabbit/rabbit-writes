@@ -57,7 +57,8 @@ SCAN_PATH = os.path.join(SKILLS, "rabbit-writes", "scripts", "scan.py")
 RWLIB_PARENT = os.path.dirname(SCAN_PATH)
 if RWLIB_PARENT not in sys.path:
     sys.path.insert(0, RWLIB_PARENT)
-from rwlib import cli_error, stylometry, voices as voices_mod   # noqa: E402
+from rwlib import cli_error, registers as registers_mod, stylometry, voices as voices_mod   # noqa: E402
+from rwlib.voices import load_scan                                       # noqa: E402
 
 # How many times a change has to repeat before it is worth proposing. Two rather
 # than one, and this is the whole difference between reading a diff and reading
@@ -74,16 +75,6 @@ WORD_RX = re.compile(r"[A-Za-z][A-Za-z'\-]*")
 # definition of a word that carries register rather than content, so it is what
 # gets excluded from the substitution and removal proposals.
 STOP = set(stylometry.MARKER_WORDS)
-
-
-def load_scan():
-    if not os.path.exists(SCAN_PATH):
-        raise SystemExit("learn_edits: cannot find %s. This script has to run "
-                         "from inside an installed plugin." % SCAN_PATH)
-    spec = importlib.util.spec_from_file_location("rw_scan", SCAN_PATH)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
 
 
 def _words(text):
@@ -164,8 +155,10 @@ def mechanic_changes(scan, before, after):
     loosening one on a single edit is how a ban quietly disappears.
     """
     out = []
+    sb = scan.apply_exemptions(before)
+    sa = scan.apply_exemptions(after)
     for key, label, count in MECHANIC_MARKS:
-        a, b = count(scan, before), count(scan, after)
+        a, b = count(scan, sb), count(scan, sa)
         if a >= MIN_REPEATS and b == 0:
             out.append((key, label, a, b))
     return out
@@ -178,7 +171,8 @@ def measure_moves(scan, before, after, fingerprint):
     list. Without a fingerprint it still reports the before and after, because
     "your edit doubled the contraction rate" is a fact about them either way.
     """
-    a, b = scan.compute_stats(before), scan.compute_stats(after)
+    a = scan.compute_stats(scan.strip_for_stats(before))
+    b = scan.compute_stats(scan.strip_for_stats(after))
     out = {}
     profile = (fingerprint or {}).get("measures") or {}
     for name in stylometry.MEASURES:
@@ -278,6 +272,7 @@ def main():
     examples = [
         "python3 learn_edits.py converted.md their-edit.md",
         "python3 learn_edits.py converted.md their-edit.md --voice whit3rabbit",
+        "python3 learn_edits.py converted.md their-edit.md --voice-rules path/to/dana.rules.json --register blog",
         "python3 learn_edits.py converted.md their-edit.md --json",
     ]
     ap = cli_error.LLMArgumentParser(
@@ -290,6 +285,11 @@ def main():
                     help="the profile these corrections are about. Only used to "
                          "find its fingerprint, so the measures can be reported "
                          "against the writer's own numbers")
+    ap.add_argument("--voice-rules", metavar="PATH",
+                    help="path to a voice rules file. Used to find its fingerprint")
+    ap.add_argument("--register", metavar="NAME",
+                    choices=sorted(registers_mod.registers()),
+                    help="the register these texts are written in")
     ap.add_argument("--json", action="store_true", help="machine-readable")
     args = ap.parse_args()
 
@@ -304,11 +304,16 @@ def main():
                 details=str(exc), examples=examples), file=sys.stderr)
             return 2
 
-    fingerprint = None
-    if args.voice:
+    rules_path = None
+    if args.voice_rules:
+        rules_path = os.path.abspath(args.voice_rules)
+    elif args.voice:
         rules_path = os.path.join(voices_mod.VOICES_DIR,
                                   args.voice + voices_mod.RULES_SUFFIX)
-        path = stylometry.path_for(rules_path)
+
+    fingerprint = None
+    if rules_path:
+        path = stylometry.path_for(rules_path, register=args.register)
         if path:
             try:
                 fingerprint = stylometry.load(path)
@@ -316,14 +321,17 @@ def main():
                 print("learn_edits: %s, so the measures are reported without a "
                       "profile to compare against" % exc, file=sys.stderr)
 
-    scan = load_scan()
+    scan = load_scan("learn_edits")
     found = proposals(scan, texts[0], texts[1], fingerprint)
+    voice_label = args.voice or (voices_mod.strip_rules_suffix(os.path.basename(args.voice_rules))
+                                 if args.voice_rules else None)
     if args.json:
-        print(json.dumps(dict(found, voice=args.voice), indent=2))
+        print(json.dumps(dict(found, voice=voice_label), indent=2))
     else:
-        print(report(found, args.voice))
+        print(report(found, voice_label))
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
+

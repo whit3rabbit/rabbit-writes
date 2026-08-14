@@ -83,6 +83,9 @@ if RWLIB_PARENT not in sys.path:
 # reason. rwlib.voices owns the answer, so a moved voices/ directory moves this.
 from rwlib import cli_error, registers as registers_mod, stylometry  # noqa: E402
 from rwlib import voices as voices_mod                               # noqa: E402
+from rwlib.voices import load_scan                                       # noqa: E402
+
+NAME_RX = re.compile(r"^[A-Za-z0-9_-]+$")
 
 # Which measures exist, and in what order, is stylometry.MEASURES: they are the
 # block a fingerprint stores and a later attainment check reads. What survives
@@ -96,11 +99,6 @@ MEASURE_LABELS = {
     "em_dashes_per_1k": "em_dashes_per_1000w",
     "contraction_rate": "contraction_rate",
 }
-
-# Below this many words a sample's stylometry is noise. scan.py says so in its
-# own report; said here too, because a person handing over four short emails
-# deserves to be told the numbers are thin before they build a profile on them.
-THIN_SAMPLE_WORDS = 250
 
 # --------------------------------------------------------------------------
 # the interview, for the route that reads samples and then asks
@@ -189,16 +187,6 @@ OPENER_SHARE = 0.12
 OPENER_NOISE = frozenset({"the", "a", "an"})
 
 
-def load_scan():
-    if not os.path.exists(SCAN_PATH):
-        raise SystemExit("measure_voice: cannot find %s. This script has to run "
-                         "from inside an installed plugin." % SCAN_PATH)
-    spec = importlib.util.spec_from_file_location("rw_scan", SCAN_PATH)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 def measure_one(scan, path, examples=None):
     """Everything one sample contributes, or None when it cannot be read."""
     try:
@@ -257,7 +245,7 @@ def count_marks(scan, raw_text, scored, stats):
         # habits this writer does not have and then suggest allowing them.
         "semicolons": len(re.findall(r";", scan.blank_entities(scored))),
         "emoji": len(scan.EMOJI_RX.findall(scored)),
-        "curly_quotes": len(scan.CURLY_QUOTE_RX.findall(raw_text)),
+        "curly_quotes": len(scan.CURLY_QUOTE_RX.findall(scored)),
         "one_word_sentences": len([
             m for m in scan.ONE_WORD_SENTENCE_RX.finditer(scored)
             if not scan.ONE_WORD_ABBREV_RX.fullmatch(m.group(0))]),
@@ -330,15 +318,22 @@ def suggest_mechanics(samples):
     dates = {"mdy": totals(samples, "date_us"),
              "dmy": totals(samples, "date_dmy"),
              "iso": totals(samples, "date_iso")}
-    top = max(dates, key=lambda k: dates[k])
-    if dates[top] == 0:
+    non_zero = {k: v for k, v in dates.items() if v > 0}
+    if not non_zero:
         # "0 dates" rather than "no dates", so every line in this block carries a
         # count. A suggestion whose evidence is a sentence reads as a judgement,
         # and the point of the column is that the reader can check it.
         add("date_format", "any", "0 dates in %d words" % words)
     else:
-        add("date_format", top, "%s" % ", ".join("%d %s" % (v, k)
-                                                 for k, v in sorted(dates.items()) if v))
+        max_val = max(dates.values())
+        max_keys = [k for k, v in dates.items() if v == max_val]
+        if len(max_keys) > 1:
+            add("date_format", "any", "%s: split sample evidence"
+                % ", ".join("%d %s" % (v, k) for k, v in sorted(dates.items()) if v > 0))
+        else:
+            top = max_keys[0]
+            add("date_format", top, "%s" % ", ".join("%d %s" % (v, k)
+                                                     for k, v in sorted(dates.items()) if v > 0))
     return out
 
 
@@ -365,7 +360,7 @@ def measured_block(agg):
     lines = ["```"]
     for key in stylometry.MEASURES:
         entry = agg.get(key)
-        lines.append("%-22s %s" % (MEASURE_LABELS[key] + ":",
+        lines.append("%-22s %s" % (MEASURE_LABELS.get(key, key) + ":",
                                    "" if entry is None else shown(entry["mean"])))
     lines.append("```")
     return "\n".join(lines)
@@ -707,7 +702,7 @@ def report(samples, agg, suggestions, contaminated, fingerprint=None,
     out.append("aggregate (mean across samples, spread between them, and the "
                "range they cover)")
     for key in stylometry.MEASURES:
-        label = MEASURE_LABELS[key]
+        label = MEASURE_LABELS.get(key, key)
         entry = agg.get(key)
         if entry is None:
             out.append("  %-24s %-8s %s" % (label, "-", "not measurable here"))
@@ -740,12 +735,12 @@ def report(samples, agg, suggestions, contaminated, fingerprint=None,
     out.append(mechanics_block(suggestions))
     out.append("")
 
-    thin = [s for s in samples if s["words"] < THIN_SAMPLE_WORDS]
+    thin = [s for s in samples if s["words"] < stylometry.RELIABLE_WORDS]
     if thin:
         out.append("note: %d sample(s) under %d words. Stylometry on a short "
                    "piece is noise, and a profile built on it will describe the "
                    "piece rather than the person: %s"
-                   % (len(thin), THIN_SAMPLE_WORDS,
+                   % (len(thin), stylometry.RELIABLE_WORDS,
                       ", ".join(os.path.basename(s["path"]) for s in thin)))
 
     if len(samples) < 3:
@@ -778,13 +773,14 @@ def main():
         examples=examples
     )
     ap.add_argument("samples", nargs="+", help="files this person wrote")
-    ap.add_argument("--json", action="store_true", help="machine-readable output")
-    ap.add_argument("--questions", action="store_true",
-                    help="print an interview built from these samples instead "
-                         "of the report. Asks only what the samples could not "
-                         "settle, and holds every count back until after the "
-                         "answer, because a count read out first is a leading "
-                         "question")
+    out_group = ap.add_mutually_exclusive_group()
+    out_group.add_argument("--json", action="store_true", help="machine-readable output")
+    out_group.add_argument("--questions", action="store_true",
+                           help="print an interview built from these samples instead "
+                                "of the report. Asks only what the samples could not "
+                                "settle, and holds every count back until after the "
+                                "answer, because a count read out first is a leading "
+                                "question")
     ap.add_argument("--name", metavar="VOICE",
                     help="the profile these samples belong to. Labels the "
                          "fingerprint, and names the file --write-fingerprint "
@@ -808,6 +804,14 @@ def main():
                     help=argparse.SUPPRESS)
     args = ap.parse_args()
 
+    if args.name and not NAME_RX.match(args.name):
+        print(cli_error.format_llm_error(
+            "measure_voice.py",
+            "--name %r is invalid: name must be a slug matching ^[A-Za-z0-9_-]+$" % args.name,
+            parser=ap, examples=examples
+        ), file=sys.stderr)
+        return 2
+
     if args.write_fingerprint and not args.name:
         print(cli_error.format_llm_error(
             "measure_voice.py",
@@ -816,7 +820,7 @@ def main():
         ), file=sys.stderr)
         return 2
 
-    scan = load_scan()
+    scan = load_scan("measure_voice")
     samples = [s for s in (measure_one(scan, p, examples) for p in args.samples) if s]
     if not samples:
         print(cli_error.format_file_error(
@@ -875,7 +879,7 @@ def main():
             "mechanics": {k: v for k, v, _ in suggestions},
             "mechanics_evidence": {k: w for k, _, w in suggestions if w},
             "contaminated": [s["path"] for s in contaminated],
-            "fingerprint": fingerprint,
+            "fingerprint": None if contaminated else fingerprint,
             "fingerprint_written_to": written_to,
             # Both, unconditionally. A caller reading JSON is not choosing
             # between the two outputs the way a caller reading a terminal is,
@@ -894,3 +898,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+

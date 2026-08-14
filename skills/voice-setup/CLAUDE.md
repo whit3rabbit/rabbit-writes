@@ -18,13 +18,13 @@ python3 skills/voice-setup/scripts/measure_voice.py sample1.md sample2.md --ques
 python3 skills/voice-setup/scripts/measure_voice.py sample1.md sample2.md --name <voice> --write-fingerprint
 
 # Scaffold a new voice profile
-python3 skills/voice-setup/scripts/build_voice.py --scaffold <name>
+python3 skills/voice-setup/scripts/build_voice.py --scaffold --name <name>
 
 # Check validity of a voice profile
 python3 skills/voice-setup/scripts/build_voice.py --check <name>
 
 # Activate a voice profile (sets skills/rabbit-writes/voices/ACTIVE)
-python3 skills/voice-setup/scripts/build_voice.py --activate <name>
+python3 skills/voice-setup/scripts/build_voice.py --check <name> --activate
 
 # Learn rules from a before/after editing diff pair
 python3 skills/voice-setup/scripts/learn_edits.py before.md after.md

@@ -39,9 +39,9 @@ Stdlib only, 3.9+.
 """
 
 import argparse
-import importlib.util
 import json
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -55,6 +55,9 @@ RWLIB_PARENT = os.path.dirname(SCAN_PATH)
 if RWLIB_PARENT not in sys.path:
     sys.path.insert(0, RWLIB_PARENT)
 from rwlib import cli_error, inflect, voice_check, voices as voices_mod   # noqa: E402
+from rwlib.voices import load_scan                                       # noqa: E402
+
+NAME_RX = re.compile(r"^[A-Za-z0-9_-]+$")
 
 TEMPLATE_MD = os.path.join(voices_mod.VOICES_DIR, "TEMPLATE.md")
 TEMPLATE_RULES = os.path.join(voices_mod.VOICES_DIR, "TEMPLATE.rules.json")
@@ -95,19 +98,19 @@ MECHANIC_PROBES = {
 }
 
 
-def load_scan():
-    if not os.path.exists(SCAN_PATH):
-        raise SystemExit("build_voice: cannot find %s. This script has to run "
-                         "from inside an installed plugin." % SCAN_PATH)
-    spec = importlib.util.spec_from_file_location("rw_scan", SCAN_PATH)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 # --------------------------------------------------------------------------
 # scaffold
 # --------------------------------------------------------------------------
+
+def _replace_template_name(obj, target_name):
+    if isinstance(obj, str):
+        return obj.replace(voice_check.TEMPLATE_VOICE_NAME, target_name)
+    elif isinstance(obj, dict):
+        return {k: _replace_template_name(v, target_name) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_replace_template_name(elem, target_name) for elem in obj]
+    return obj
+
 
 def scaffold_rules(name, priority, template_path=TEMPLATE_RULES):
     """The template's rules file with the template taken out of it."""
@@ -126,9 +129,7 @@ def scaffold_rules(name, priority, template_path=TEMPLATE_RULES):
         out[key] = value
     out["voice"] = name
     out["default_priority"] = priority
-    if isinstance(out.get("description"), str):
-        out["description"] = out["description"].replace(
-            voice_check.TEMPLATE_VOICE_NAME, name)
+    out = _replace_template_name(out, name)
     return out
 
 
@@ -308,11 +309,8 @@ def cap_probes(mech):
                     {"kind": "id", "value": "voice-sentence-length"}))
     if mech.get("em_dash") == "limit":
         cap = float(mech.get("max_em_dashes_per_1000w", 2))
-        # Enough dashes that the rate clears the cap whatever the cap is. Each
-        # line is 8 words and one dash, so the rate is 125 per 1000; a profile
-        # capping higher than that gets proportionally more lines.
-        n = max(3, int(cap / 100.0) + 3)
-        text = "\n\n".join(["A short line here \u2014 and a dash."] * n)
+        # Probe with text where em dash density (dashes per 1000 words) exceeds the cap.
+        text = "\n\n".join(["\u2014 word \u2014 word \u2014"] * 3)
         out.append(("mechanics.em_dash = limit (%.1f per 1000 words)" % cap,
                     text, {"kind": "id", "value": "voice-em-dash-rate"}))
     return out
@@ -322,8 +320,12 @@ def _fired(findings, expectation):
     if expectation["kind"] == "id":
         return any(f["id"] == expectation["value"] for f in findings)
     wanted = expectation["value"].lower()
-    return any(f["id"] == expectation["id"]
-               and wanted in str(f.get("match", "")).lower() for f in findings)
+    for f in findings:
+        if f["id"] == expectation["id"]:
+            match_str = str(f.get("match", "")).lower()
+            if match_str == wanted or re.search(r"\b" + re.escape(wanted) + r"\b", match_str):
+                return True
+    return False
 
 
 def live_fire(rules, scan):
@@ -378,9 +380,13 @@ def live_fire(rules, scan):
                                 {"kind": "id", "value": eid}))
 
     for entry in rules.get("required_when", []):
-        unproven.append((None, "required_when %s" % entry.get("id", "?"),
-                         "presence checks fire on absence and are not probed "
-                         "here. Read it against a real document."))
+        eid = entry.get("id", "required-when")
+        what = "required_when %s" % eid
+        scoped = entry.get("applies_to_registers") or [scan.DEFAULT_REGISTER]
+        dummy_text = "This document does not contain the required element."
+        for register in scoped:
+            record(what, _fired(run(dummy_text, register),
+                                {"kind": "id", "value": eid}))
 
     results = [(ok, what,
                 "" if ok else "put through scan.py and nothing was reported")
@@ -394,12 +400,18 @@ def live_fire(rules, scan):
 
 def resolve_target(target, voices_dir):
     """A profile name, or a path to its rules file."""
+    stem = target
+    if stem.endswith(voices_mod.RULES_SUFFIX):
+        stem = stem[:-len(voices_mod.RULES_SUFFIX)]
+    elif stem.endswith(".fingerprint.json"):
+        stem = stem[:-17]
+    elif stem.endswith(".md"):
+        stem = stem[:-3]
+
     if os.path.sep in target or target.endswith(".json"):
-        path = os.path.abspath(target)
-        if not path.endswith(voices_mod.RULES_SUFFIX):
-            path = voices_mod.strip_rules_suffix(path) + voices_mod.RULES_SUFFIX
+        path = os.path.abspath(stem + voices_mod.RULES_SUFFIX)
         return path
-    return os.path.join(voices_dir, target + voices_mod.RULES_SUFFIX)
+    return os.path.join(voices_dir, stem + voices_mod.RULES_SUFFIX)
 
 
 def do_check(args):
@@ -427,7 +439,7 @@ def do_check(args):
 
     unproven = []
     if not fails:
-        scan = load_scan()
+        scan = load_scan("build_voice")
         rules = voices_mod.load(rules_path, args.voices_dir)
         print("live fire: every rule below was put through scan.py")
         fired = live_fire(rules, scan)
@@ -526,6 +538,12 @@ def main():
                     help=argparse.SUPPRESS)
     args = ap.parse_args()
 
+    if args.name and not NAME_RX.match(args.name):
+        print(cli_error.format_llm_error(
+            "build_voice.py", "--name %r is invalid: name must be a slug matching ^[A-Za-z0-9_-]+$" % args.name,
+            parser=ap, examples=examples
+        ), file=sys.stderr)
+        return 2
     if args.scaffold and not args.name:
         print(cli_error.format_llm_error(
             "build_voice.py", "--scaffold requires --name <voice> to set the profile name",
@@ -549,8 +567,17 @@ def main():
 
     code = do_check(args)
     if code == 0 and args.activate:
-        name = voices_mod.strip_rules_suffix(
-            os.path.basename(resolve_target(args.check, args.voices_dir)))
+        checked_path = resolve_target(args.check, args.voices_dir)
+        expected_in_voices = os.path.join(args.voices_dir, os.path.basename(checked_path))
+        if os.path.abspath(checked_path) != os.path.abspath(expected_in_voices):
+            print("", file=sys.stderr)
+            print(cli_error.format_llm_error(
+                "build_voice.py",
+                "Refused activation: %s is outside voices/. voices/ACTIVE resolves names inside %s only. Pass --voice-rules <path> at scan time instead."
+                % (checked_path, args.voices_dir),
+                parser=ap, examples=examples), file=sys.stderr)
+            return 2
+        name = voices_mod.strip_rules_suffix(os.path.basename(checked_path))
         print("")
         return do_activate(name, args.voices_dir)
     if code != 0 and args.activate:
@@ -563,3 +590,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
