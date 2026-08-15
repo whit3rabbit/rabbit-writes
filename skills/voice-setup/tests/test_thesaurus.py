@@ -162,23 +162,22 @@ def test_thesaurus_data_shape():
 
     Checked here as well, because a broken family should fail the
     voice-setup suite even on a checkout where the repo validator does not
-    exist, which is what a loose copy of the three skills is.
+    exist, which is what a loose copy of the three skills is. The rules
+    themselves live in thesaurus_check.problems, the one home this test,
+    validate.py, and the research pipeline's merge script all read.
     """
+    import thesaurus_check
+
     with open(THESAURUS_PATH, encoding="utf-8") as fh:
         data = json.load(fh)
-    assert isinstance(data.get("version"), int)
-    seen_reach, seen_over = set(), set()
-    for family in data["families"]:
-        reach, over = family["reach"], family["overreach"]
-        assert fixes.is_mechanical_substitution(reach), reach
-        assert over, family
-        assert reach not in seen_reach
-        seen_reach.add(reach)
-        for term in over:
-            assert term != reach, family
-            assert term not in seen_reach, (term, family)
-            assert term not in seen_over, (term, family)
-            seen_over.add(term)
+    assert thesaurus_check.problems(data) == []
+    # And the checker still fires: a planted collision is caught, so a green
+    # run means the rules held rather than the function went quiet.
+    broken = {"version": 1, "families": [
+        {"reach": "get", "overreach": ["obtain"]},
+        {"reach": "keep", "overreach": ["obtain"]},
+    ]}
+    assert any("obtain" in p for p in thesaurus_check.problems(broken))
 
 
 def test_questions_route_asks_thesaurus_only_for_both():

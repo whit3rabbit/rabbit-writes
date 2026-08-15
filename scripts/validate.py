@@ -18,18 +18,20 @@ SKILLS = os.path.join(ROOT, "skills")
 VOICES = os.path.join(SKILLS, "rabbit-writes", "voices")
 ENGINE = os.path.join(SKILLS, "rabbit-writes", "scripts")
 SCAN = os.path.join(ENGINE, "scan.py")
-if ENGINE not in sys.path:
-    sys.path.insert(0, ENGINE)
+VOICE_SETUP_SCRIPTS = os.path.join(SKILLS, "voice-setup", "scripts")
+for _path in (ENGINE, VOICE_SETUP_SCRIPTS):
+    if _path not in sys.path:
+        sys.path.insert(0, _path)
 
 # Findings the engine raises itself rather than from a lexicon pattern. Imported
 # rather than restated: this list existed in three files, and a new synthetic
 # finding added to two of them made the third reject a register that named it.
-from rwlib import fixes as fixes_mod            # noqa: E402
 from rwlib import inflect                       # noqa: E402
 from rwlib import registers as registers_mod    # noqa: E402
 from rwlib import stylometry as stylometry_mod  # noqa: E402
 from rwlib import voice_check                   # noqa: E402
 from rwlib.lexicon import SYNTHETIC_FINDING_IDS  # noqa: E402
+import thesaurus_check                          # noqa: E402
 
 problems = []
 notes = []
@@ -1213,6 +1215,10 @@ def check_cli_error_handling():
         os.path.join(ROOT, "scripts", "detector-corpus", "score.py"),
         os.path.join(ROOT, "scripts", "detector-corpus", "fetch_samples.py"),
         os.path.join(ROOT, "scripts", "voice-eval", "reconstruct.py"),
+        os.path.join(ROOT, "scripts", "thesaurus-research", "01_fetch_datasets.py"),
+        os.path.join(ROOT, "scripts", "thesaurus-research", "02_generate_candidates.py"),
+        os.path.join(ROOT, "scripts", "thesaurus-research", "03_corpus_evidence.py"),
+        os.path.join(ROOT, "scripts", "thesaurus-research", "04_merge_accepted.py"),
     ]
     for script_path in cli_scripts:
         if not os.path.exists(script_path):
@@ -1229,12 +1235,10 @@ def check_thesaurus():
     """The reach-for families in voice-setup's thesaurus.json.
 
     Data somebody edits, so it drifts the way every other data file here does.
-    The shape rules exist because each one is a silent failure downstream: a
-    reach word that is not a mechanical substitution gets skipped by
-    fixes.py's `is_mechanical_substitution`, an overreach term in two families
-    produces two competing rewrites of one word, and a reach word that is also
-    somebody's overreach term rewrites toward a word the next family is
-    busy rewriting away.
+    The shape rules live in the skill's own `thesaurus_check.problems`, shared
+    with the research pipeline's merge script and the skill's tests, because
+    three restatements of one constraint set is how a merge script and a
+    validator come to disagree about what valid means.
     """
     try:
         data = json.loads(read("skills", "voice-setup", "scripts",
@@ -1242,50 +1246,11 @@ def check_thesaurus():
     except (OSError, ValueError) as exc:
         fail("thesaurus.json does not parse: %s" % exc)
         return
-    if not isinstance(data.get("version"), int):
-        fail("thesaurus.json has no integer version. measure_voice.py reports "
-             "it beside every proposal, so a family edit without a version "
-             "bump is a silent change to what a printed report claimed")
-    families = data.get("families")
-    if not isinstance(families, list) or not families:
-        fail("thesaurus.json has no families list")
-        return
-    seen_reach, seen_over = {}, {}
-    for i, family in enumerate(families):
-        reach = family.get("reach") if isinstance(family, dict) else None
-        over = family.get("overreach") if isinstance(family, dict) else None
-        if not reach or not fixes_mod.is_mechanical_substitution(reach):
-            fail("thesaurus family %d: reach %r is not a 1-3 word replacement "
-                 "shape, so fixes.py would never rewrite to it" % (i, reach))
-            continue
-        if reach in seen_reach:
-            fail("thesaurus family %d: reach %r already belongs to family %d, "
-                 "and two proposals would compete" % (i, reach, seen_reach[reach]))
-        seen_reach[reach] = i
-        if not isinstance(over, list) or not over:
-            fail("thesaurus family %d (reach %r): overreach must be a "
-                 "non-empty list" % (i, reach))
-            continue
-        for term in over:
-            if not isinstance(term, str) or not term.strip():
-                fail("thesaurus family %d (reach %r): overreach entry %r is "
-                     "not a term" % (i, reach, term))
-                continue
-            if term == reach:
-                fail("thesaurus family %d: %r is both the reach word and an "
-                     "overreach term, so the family rewrites toward the word "
-                     "it is rewriting away" % (i, term))
-            if term in seen_reach:
-                fail("thesaurus family %d: overreach term %r is family %d's "
-                     "reach word, so one family undoes another"
-                     % (i, term, seen_reach[term]))
-            if term in seen_over:
-                fail("thesaurus family %d: overreach term %r already belongs "
-                     "to family %d, and the two would propose different "
-                     "rewrites of one word" % (i, term, seen_over[term]))
-            seen_over[term] = i
+    for problem in thesaurus_check.problems(data):
+        fail(problem)
+    reaches, overs = thesaurus_check.totals(data)
     notes.append("thesaurus families: %d reach words, %d overreach terms"
-                 % (len(seen_reach), len(seen_over)))
+                 % (reaches, overs))
 
 
 check_manifests()

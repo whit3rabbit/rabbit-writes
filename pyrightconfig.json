@@ -68,6 +68,13 @@
       ]
     },
     {
+      "root": "scripts/thesaurus-research",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts",
+        "skills/voice-setup/scripts"
+      ]
+    },
+    {
       "root": "scripts",
       "extraPaths": [
         "skills/rabbit-writes/scripts"

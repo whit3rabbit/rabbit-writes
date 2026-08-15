@@ -91,6 +91,11 @@ docs/detector-corpus/texts/
 # whoever wrote it, and it is not this repository's to publish.
 docs/voice-eval/texts/
 
+# Thesaurus research raw datasets (WordNet 3.1 dict files, Norvig count_1w).
+# thesaurus_io.py commits each URL, SHA-256, and license, and
+# 01_fetch_datasets.py refetches and verifies, so nothing here needs git.
+docs/thesaurus-research/raw/
+
 # Scratch directory
 scratch/
 

@@ -86,6 +86,13 @@ jobs:
         # never run over a populated one.
         run: python scripts/detector-corpus/test_corpus_harness.py
 
+      - name: thesaurus research harness
+        # The network is stubbed and the WordNet and frequency files are
+        # synthetic string constants with known answers, so this proves the
+        # generate, calibrate, review, and merge stages without the 16MB of
+        # third-party data the .gitignore keeps out.
+        run: python scripts/thesaurus-research/test_thesaurus_harness.py
+
       - name: reconstruction eval harness
         # The corpus is empty for the same reason the detector one is, and this
         # is the same bargain: a scorer nobody has run is a scorer that does not
