@@ -221,7 +221,7 @@ repos:
 
 Scope `rabbit-scan` with `files`. Unscoped it runs on every markdown file in the repository, including the generated ones nobody wrote by hand.
 
-`readme-check` and `rabbit-scan` apply no voice profile, and neither does anything else until you name one: a semicolon that is a P0 in one person's profile is not a defect in anybody else's prose. Structure, fingerprints and craft are all still checked, which is the part that is evidence rather than taste.
+`readme-check` and `rabbit-scan` apply no voice profile, and neither does anything else until you name one: a semicolon that is a P0 in one person's profile is not a defect in anybody else's prose. Structure, fingerprints, and craft are all still checked, which is the part that is evidence rather than taste.
 
 The voice halves are separate hooks, `readme-check-voice` and `rabbit-scan-voice`, and they are worth enabling once `voice-setup` has written your profile or a `.rabbit-voice` file in your repository pins one. Both resolve the profile themselves, in the order `.rabbit-voice`, then the plugin's `voices/ACTIVE`, so a pin in your repository wins:
 
@@ -370,6 +370,8 @@ It also writes a **voice fingerprint**. Every voice rule is a refusal, and a dra
 
 `scan.py --voice` then reports how far a document is from that. P2, never a build failure, because sounding unlike yourself is sometimes the point. `skills/rabbit-writes/references/voice.md` has the reading.
 
+And once the profile exists, `audit_voice.py` turns it back on the corpus it came from: it exits 1 when one of your own rules fires on your own prose, suggests the fix with the measured number behind it, and reports (without judging) which samples sit outside the fingerprint band, whether the corpus holds two sentence registers, and which engine tells are false positives over you.
+
 **`readme-writing`**: drafts or audits a `README.md` against patterns measured from 100 real GitHub repos (section order, sentence length, badge and link conventions) instead of generic advice, in your voice rather than a generated open-source register. Ships `readme_check.py`, which checks structure, links, badges, claims, and the active voice in one pass. The full study is in `docs/README_WRITEUP.md`.
 
 ```
@@ -404,6 +406,7 @@ rabbit-writes/
       scripts/              measure_voice.py, samples in and a profile starting point out
                             build_voice.py, scaffolds a profile and proves its rules fire
                             learn_edits.py, reads your corrections back into the profile
+                            audit_voice.py, runs the finished profile over your own corpus
     readme-writing/
       SKILL.md
       references/           patterns (the full catalog), checklist

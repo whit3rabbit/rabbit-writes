@@ -16,6 +16,7 @@ SCRIPTS_DIR = os.path.join(SKILL_DIR, "scripts")
 BUILD_VOICE = os.path.join(SCRIPTS_DIR, "build_voice.py")
 MEASURE_VOICE = os.path.join(SCRIPTS_DIR, "measure_voice.py")
 LEARN_EDITS = os.path.join(SCRIPTS_DIR, "learn_edits.py")
+AUDIT_VOICE = os.path.join(SCRIPTS_DIR, "audit_voice.py")
 
 RW_SKILL_DIR = os.path.abspath(os.path.join(SKILL_DIR, "..", "rabbit-writes"))
 RW_VOICES_DIR = os.path.join(RW_SKILL_DIR, "voices")

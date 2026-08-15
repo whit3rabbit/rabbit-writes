@@ -143,6 +143,13 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/measure_voice.py \
 - `--register`: (OPTIONAL, choice) Register profile name.
 - `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON results.
 
+#### `audit_voice.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/audit_voice.py <voice> <sample1.md> [sample2.md ...] [options]`
+- `voice`: (REQUIRED, name or path) Profile name, or a path to any of its files.
+- `samples`: (REQUIRED, one or more file paths) Documents this writer actually wrote.
+- `--register`: (OPTIONAL, choice) Register to scan the samples as.
+- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON payload.
+
 
 That prints an interview instead of the report. At most ten questions, built out of what these documents did and did not contain. Every `forbid` the script would otherwise have proposed is a silence rather than a refusal, so it comes back as a question. Anything the samples already settled is not asked at all: a writer who used em dashes in four pieces has answered that one, and asking anyway spends a question out of ten and teaches them the interview is not listening.
 
@@ -285,7 +292,13 @@ Pass a path instead of a name when the files went somewhere else. It runs two pa
 
 Exit 1 on any failure. Read the `?` lines too: they are the rules nothing here can settle, and they stay the reader's job.
 
-**Then test the inverse.** Run the scan on one of the person's real samples. If their own writing trips their own rules, one of the two is wrong. Usually the rule is too broad. Fix it and note what you changed. No script does this half: it needs their writing.
+**Then test the inverse.** Run the profile over the person's own corpus, not one sample. If their own writing trips their own rules, one of the two is wrong. Usually the rule is too broad. Fix it and note what you changed.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/audit_voice.py <name> sample1.md sample2.md sample3.md
+```
+
+Exit 1 names every rule that fired on their own prose, with the count and the entry it came from, and suggests the fix with the measured number behind it. It also reports what it refuses to judge: per-sample distance from the fingerprint (with a scale-versus-register reading, because a corpus half the calibration size reads far whatever register it is in), the one-register-or-two shape receipt, and engine P0 tells as candidates for `## Known contamination`. Pass whole documents rather than chunks, because per-document caps and the reliability floor dilute over split files. For one document, the plain scan is still the quick form:
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py sample1.md --voice <name>
@@ -344,6 +357,13 @@ Then offer a live test: have them give you something real to draft, run it throu
 - `--voice-rules`: (OPTIONAL, file path) Path to `.rules.json` profile file.
 - `--register`: (OPTIONAL, choice: register name) Register in which texts were written.
 - `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON payload.
+
+### `audit_voice.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/audit_voice.py <voice> <sample1.md> [sample2.md ...] [options]`
+- `voice`: (REQUIRED, name or path) Profile name, or a path to any of the profile's files.
+- `samples`: (REQUIRED, one or more file paths) Documents this writer actually wrote, whole documents rather than chunks.
+- `--register`: (OPTIONAL, choice: register name) Register to scan the samples as (default: the scanner's default).
+- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON payload, with the exit code echoed inside it.
 
 ### `thesaurus_check.py`
 Internal validation helper for checking `thesaurus.json` data shape integrity.

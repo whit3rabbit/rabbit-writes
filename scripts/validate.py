@@ -854,7 +854,8 @@ def check_scripts_compile():
     for rel in ("rabbit-writes/scripts/scan.py", "rabbit-writes/scripts/verify.py",
                 "readme-writing/scripts/readme_check.py",
                 "voice-setup/scripts/measure_voice.py",
-                "voice-setup/scripts/build_voice.py"):
+                "voice-setup/scripts/build_voice.py",
+                "voice-setup/scripts/audit_voice.py"):
         path = os.path.join(SKILLS, rel)
         if not os.path.exists(path):
             continue
@@ -1210,6 +1211,7 @@ def check_cli_error_handling():
         os.path.join(SKILLS, "voice-setup", "scripts", "build_voice.py"),
         os.path.join(SKILLS, "voice-setup", "scripts", "learn_edits.py"),
         os.path.join(SKILLS, "voice-setup", "scripts", "measure_voice.py"),
+        os.path.join(SKILLS, "voice-setup", "scripts", "audit_voice.py"),
         os.path.join(ROOT, "scripts", "precommit.py"),
         os.path.join(ROOT, "scripts", "detector-corpus", "add_sample.py"),
         os.path.join(ROOT, "scripts", "detector-corpus", "score.py"),

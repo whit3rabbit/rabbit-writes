@@ -11,6 +11,50 @@ drifted from the data it describes. The 100-repo corpus regression, the
 calibration fixtures, and every published self-scan number were re-run after all
 three.
 
+### A corpus audit for finished profiles
+
+- **`audit_voice.py` scripts the inverse test.** `SKILL.md` used to say "no
+  script does this half: it needs their writing", and the half in question is
+  running a finished profile over the writer's own corpus to see which rules
+  fire on the prose they came from. One `scan()` call per sample supplies the
+  fire-backs, the engine's own P0 tells, the fingerprint distance, and the
+  numbers the suggestions are measured from. Exit 1 names every rule that fired,
+  attributed back to its entry (inherited entries say so, and say that a child
+  cannot drop a parent's ban), with the count and the fix on the line.
+- **Everything else it reports is deliberately not a judgment.** Per-sample
+  distance from the band, with the out-of-range reading checked against the
+  fingerprint's stored sample sizes first, because a corpus half the
+  calibration size reads far whatever register it is in and scale and register
+  suggest different fixes. A one-register-or-two receipt over per-sample
+  sentence medians, which needs no fingerprint and is printed without one.
+  Engine P0 patterns as candidates for `## Known contamination` at three hits
+  across two samples, cross-noted when the phrase is also a signature-move
+  subject, with the safety band excluded outright: that band is unsuppressible
+  by design, so a concealed injection is never a tell to record as somebody's
+  habit. And `stylometry.caricature`, calibrated in `PROOF.md` and previously
+  wired to nothing, gains its first caller.
+- **Two exemptions, both documented.** `voice-distance` is a measurement, not a
+  rule, and `voice-oxford-comma` is held at hard P2 by the engine on the ground
+  that no regex settles a serial comma: without the exemption the house profile
+  would fail its own audit on an advisory nobody can act on. Everything else
+  counts whatever its priority, because a stated rule the writer's own prose
+  breaks is a disagreement even when it enforces at P2.
+- **Every number a suggestion carries is measured with the engine's own
+  yardstick.** Over the exempted copy `scan()` already built, with
+  `is_prose_block` gating the paragraph cap and `stats["word_count"]` as the
+  denominator for a signature rate. Measured any other way a six-item bullet
+  list reads as one 24-sentence paragraph, and "raise the cap to 24" over a
+  document where the engine counted four is the rule turned off. The register
+  resolves before `stylometry.path_for` for the same reason: asked with
+  `None` it skips the register-scoped file, so a profile carrying only
+  `<name>.blog.fingerprint.json` reported no fingerprint here while `scan.py`
+  measured the same document against it.
+- **`test_audit_voice.py` joins the suite `run.py` already collects**,
+  seventeen zero-argument tests over synthetic corpora where the profile is
+  wrong in exactly one way. The repo validator compiles the new script and
+  checks its CLI error handling, and the root `CLAUDE.md` records where the
+  fact lives.
+
 ### A measured thesaurus in measure_voice.py
 
 - **`measure_voice.py` now measures vocabulary reach.** A versioned families
