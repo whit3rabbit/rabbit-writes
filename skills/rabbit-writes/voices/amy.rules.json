@@ -1,0 +1,128 @@
+{
+  "voice": "amy",
+  "description": "Mechanically checkable subset of voices/amy.md. Judgment rules stay in the markdown; only put a rule here if a regex can decide it.",
+  "default_priority": "P0",
+  "mechanics": {
+    "em_dash": "allow",
+    "semicolon": "allow",
+    "emoji": "forbid",
+    "curly_quotes": "allow",
+    "oxford_comma": "allow",
+    "one_word_sentence": "allow",
+    "date_format": "any"
+  },
+  "mechanics_by_register": {},
+  "banned_words": [
+    "synergy",
+    "synergies",
+    "webinar",
+    "mindset",
+    "influencer",
+    "unprecedented"
+  ],
+  "banned_phrases": [
+    "circle back",
+    "thought leader",
+    "touch base",
+    "at the end of the day",
+    "in today's fast-paced world",
+    "unlock your potential",
+    "live your best life",
+    "take it to the next level",
+    "delve into",
+    "journey of self-discovery"
+  ],
+  "banned_regex": [
+    {
+      "id": "motivational-poster",
+      "label": "Motivational-poster cadence",
+      "rx": "(?i)\\b(embrace the journey|trust the process|reach for the stars|the sky'?s the limit|be all that you can be|you are enough as you are)\\b",
+      "priority": "P0",
+      "example": "Embrace the journey and trust the process."
+    },
+    {
+      "id": "not-just-x-its-y",
+      "label": "AI contrast scaffolding",
+      "rx": "(?i)isn'?t just about .{0,40}\\bit'?s about\\b",
+      "priority": "P0",
+      "example": "This isn't just about forgiveness, it's about growth."
+    },
+    {
+      "id": "corporate-hype",
+      "label": "Corporate hype register",
+      "rx": "(?i)\\b(game[- ]?chang(ing|er)|cutting[- ]?edge|best[- ]?in[- ]?class|move the needle|value add|low[- ]?hanging fruit)\\b",
+      "priority": "P0",
+      "example": "The workshop was a total game changer for our team."
+    },
+    {
+      "id": "reader-as-diagnosis",
+      "label": "Therapist-speak diagnosing the reader",
+      "rx": "(?i)\\byou (may be (feeling|experiencing)|might be wondering|are probably (feeling|thinking|wondering))\\b",
+      "priority": "P0",
+      "example": "You may be feeling overwhelmed right now."
+    }
+  ],
+  "required_when": [],
+  "signature_moves": [
+    {
+      "id": "rhetorical-question-pivot",
+      "label": "Rhetorical questions as pivots",
+      "rx": "\\?",
+      "min_per_1000w": 1.0,
+      "max_per_1000w": 8.0,
+      "note": "Measured at 4.1 per 1k words in the samples. The floor is a quarter of that and the cap double: a conversion with none reads as a lecture, and one per sentence reads as a tic."
+    },
+    {
+      "id": "but-pivot",
+      "label": "Sentence starting with But",
+      "rx": "(?im)(?:^|[.!?]\\s+)But\\b",
+      "max_per_1000w": 5.0,
+      "note": "Measured at 2.3 per 1k in the samples. Cap only, no floor: But-starts are a tendency, and an editor installing them on purpose installs a tic."
+    }
+  ],
+  "preferred_substitutions": {
+    "facilitate": "help",
+    "utilize": "use",
+    "demonstrate": "show",
+    "commence": "start",
+    "purchase": "buy",
+    "obtain": "get",
+    "ascertain": "figure out",
+    "maintain": "keep",
+    "desire": "want",
+    "require": "need",
+    "individuals": "people",
+    "inform": "tell",
+    "conclude": "end",
+    "attempt": "try",
+    "communicate": "talk",
+    "difficult": "hard",
+    "erroneous": "wrong",
+    "apprehensive": "scared",
+    "suboptimal": "bad",
+    "numerous": "a lot",
+    "items": "stuff",
+    "genuinely": "really",
+    "furthermore": "and, or but",
+    "moreover": "and",
+    "additionally": "also"
+  },
+  "contrastive_pairs": [
+    {
+      "would": "Mercy is radical kindness, and it will not be convenient.",
+      "would_never": "In conclusion, mercy is a powerful tool for personal growth."
+    },
+    {
+      "would": "I have a big mouth and a soft heart, and I use both at the wrong times.",
+      "would_never": "I leverage my platform to empower others on their journey."
+    },
+    {
+      "would": "I am overwhelmed most days, and I pretend it is about the news.",
+      "would_never": "You may be feeling overwhelmed by the demands of modern life."
+    },
+    {
+      "would": "Rest is subversive. Nobody claps for it, and it saves you anyway.",
+      "would_never": "It's important to prioritize self-care in today's fast-paced world."
+    }
+  ]
+}
