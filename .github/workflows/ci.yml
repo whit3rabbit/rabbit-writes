@@ -1,6 +1,6 @@
 name: checks
 
-# The four commands CLAUDE.md lists, minus `claude plugin validate .`, which
+# The verify commands CLAUDE.md lists, minus `claude plugin validate .`, which
 # needs an authenticated CLI that CI has no way to provide. Run that one before
 # tagging a release.
 #
@@ -73,6 +73,12 @@ jobs:
 
       - name: readme structure, voice, and corpus regression
         run: python skills/readme-writing/tests/run.py
+
+      - name: voice-setup scaffolding, thesaurus, and edit-learning
+        # This suite covers the measured thesaurus, and it had never run in CI:
+        # every behavior test for the feature lived in a suite no automation
+        # executed.
+        run: python skills/voice-setup/tests/run.py
 
       - name: detector-corpus harness
         # The network is stubbed. This is the harness that will publish a

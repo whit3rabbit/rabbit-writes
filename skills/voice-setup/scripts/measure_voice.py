@@ -87,6 +87,18 @@ from rwlib.voices import load_scan                                       # noqa:
 
 NAME_RX = re.compile(r"^[A-Za-z0-9_-]+$")
 
+# The reach-for thesaurus: plain word a person actually writes, beside the
+# dressed-up synonyms an inflated draft reaches for instead. Data rather than
+# code because it is vocabulary somebody edits, and versioned for the same
+# reason the lexicon is. The families drive `preferred_substitutions`
+# proposals, which scan.py --apply-safe enforces, so a proposal here is not
+# documentation: it is an edit a later conversion makes.
+with open(os.path.join(HERE, "thesaurus.json"), encoding="utf-8") as _fh:
+    THESAURUS = json.load(_fh)
+THESAURUS_FAMILIES = THESAURUS["families"]
+THESAURUS_TERMS = [t for f in THESAURUS_FAMILIES
+                   for t in [f["reach"]] + f["overreach"]]
+
 # Which measures exist, and in what order, is stylometry.MEASURES: they are the
 # block a fingerprint stores and a later attainment check reads. What survives
 # here is only the spelling each one uses in voices/TEMPLATE.md, which is not
@@ -136,6 +148,8 @@ SHAPE_QUESTIONS = {
               "often?",
     "hedges": "When you are not certain of something, what do you actually "
               "write?",
+    "thesaurus": "When a draft offers the choice between a plain word and its "
+                 "dressed-up synonym, which one is you?",
 }
 
 # Asked in this order, and trimmed from the end, so the order is a ranking by
@@ -146,8 +160,8 @@ SHAPE_QUESTIONS = {
 # purpose: the count is nearly always zero, the answer is nearly always no, and
 # a question whose answer is known is a question wasted out of ten.
 DERIVED_ORDER = ("em_dash", "semicolon", "closer", "opener",
-                 "one_word_sentence", "hedges", "emoji", "oxford_comma",
-                 "curly_quotes", "date_format")
+                 "one_word_sentence", "hedges", "thesaurus", "emoji",
+                 "oxford_comma", "curly_quotes", "date_format")
 
 # What no counter reaches, whatever the samples say. Samples are the record of
 # what got written, and a voice is mostly what did not.
@@ -227,6 +241,7 @@ def measure_one(scan, path, examples=None):
             prose, split_sentences=scan.split_sentences),
         "p0": [{"id": f["id"], "label": f["label"], "line": f["line"]} for f in p0],
         "marks": count_marks(scan, text, scored, stats),
+        "thesaurus": count_thesaurus(scored),
     }
 
 
@@ -259,6 +274,137 @@ def count_marks(scan, raw_text, scored, stats):
 
 def totals(samples, key):
     return sum(s["marks"].get(key, 0) or 0 for s in samples)
+
+
+def term_rx(term):
+    """Word-boundary regex for a thesaurus term, regular inflections included.
+
+    `helped` is evidence of reaching for `help`, and `utilizes` of reaching
+    for `utilize`, so every word in the term takes the regular suffixes. The
+    irregulars are deliberately out: `got` does not attest `get`, which keeps
+    the counting conservative rather than clever, the same trade the rules
+    files make with their opt-in `inflect` flag.
+    """
+    parts = [re.escape(word) + r"(?:s|es|ed|d|ing)?"
+             for word in term.split()]
+    return re.compile(r"(?i)\b%s\b" % r" ".join(parts))
+
+
+def count_thesaurus(scored):
+    """Every thesaurus term's count, over the exemption-scored text.
+
+    Counted over `scored` rather than the raw text for the same reason the
+    semicolon count blanks entities first: a term inside a quoted example is
+    somebody else's word. Scripture quoting `require` is not this writer
+    reaching for it, and counting it would turn an attributed quotation into
+    an inverted-vocabulary note about the profile's owner.
+    """
+    return {term: len(term_rx(term).findall(scored))
+            for term in THESAURUS_TERMS}
+
+
+def suggest_substitutions(samples):
+    """(proposals, notes, family_counts) for `preferred_substitutions`.
+
+    A proposal needs both halves of its evidence: the plain word attested in
+    these samples, and the dressed-up synonym at zero. Either half missing
+    demotes the family to a note, because the two failure modes are the ones
+    this exists to catch. Both halves used is the maybe/perhaps case, where a
+    generic plain-English rule would ban a word the writer does use, and the
+    inverted case is a writer whose register genuinely runs the other way.
+    Nothing here is a refusal. `preferred_substitutions` rewrites one word to
+    another under --apply-safe, which is a stronger power than a ban and gets
+    treated like one.
+
+    `family_counts` is every family's reach-word count, including the ones
+    that produced no proposal, so the report's table can print the number
+    behind a row without parsing it back out of the evidence strings.
+    """
+    words = sum(s["words"] for s in samples) or 1
+    totals_map = Counter()
+    for s in samples:
+        for term, n in s["thesaurus"].items():
+            totals_map[term] += n
+    proposals, notes, family_counts = [], [], {}
+    for family in THESAURUS_FAMILIES:
+        reach, reach_n = family["reach"], totals_map[family["reach"]]
+        used_over = [(t, totals_map[t]) for t in family["overreach"]
+                     if totals_map[t] > 0]
+        if reach_n == 0 and not used_over:
+            # Neither side appears. Silence, not evidence, and the interview
+            # can ask about it if it wants to spend a question.
+            continue
+        if reach_n == 0:
+            notes.append({"kind": "inverted", "reach": reach, "reach_n": 0,
+                          "overreach": used_over})
+            continue
+        if used_over:
+            notes.append({"kind": "both", "reach": reach, "reach_n": reach_n,
+                          "overreach": used_over})
+            continue
+        family_counts[reach] = reach_n
+        for term in family["overreach"]:
+            proposals.append(
+                (term, reach, "%r %d times, %r 0 in %d words"
+                 % (reach, reach_n, term, words)))
+    return proposals, notes, family_counts
+
+
+def substitutions_block(proposals):
+    return json.dumps(
+        {"preferred_substitutions":
+         {term: reach for term, reach, _ in proposals}},
+        indent=2)
+
+
+def thesaurus_report(proposals, notes, family_counts):
+    """The reach-for section of the report.
+
+    Table first, paste block second, non-rules named as non-rules. A family
+    the samples use both halves of is printed as a warning rather than folded
+    into the block, because a substitution there would rewrite a word the
+    writer chose.
+    """
+    out = ["words to reach for (a measured thesaurus, version %d)"
+           % THESAURUS["version"]]
+    if not proposals:
+        out.append("  no family has its plain word attested and its dressed-up "
+                   "synonyms at zero,")
+        out.append("  so nothing here proposes a substitution. The samples are "
+                   "short, or this")
+        out.append("  writer genuinely runs formal. Either way, ask rather "
+                   "than assume.")
+    else:
+        out.append("  %-22s %8s   never appears in these samples"
+                   % ("reach for", "attested"))
+        for reach in family_counts:
+            fam = next(f for f in THESAURUS_FAMILIES if f["reach"] == reach)
+            out.append("  %-22s %8d   %s"
+                       % (reach, family_counts[reach],
+                          ", ".join(fam["overreach"])))
+        out.append("")
+        out.append("  proposed for the rules file. scan.py --apply-safe "
+                   "rewrites each key to its")
+        out.append("  value, so this block converts an inflated draft rather "
+                   "than just describing the")
+        out.append("  problem:")
+        for line in substitutions_block(proposals).splitlines():
+            out.append("  " + line)
+    if notes:
+        out.append("")
+        out.append("  not rules, printed so nobody paste-copies them:")
+        for note in notes:
+            if note["kind"] == "both":
+                out.append("    both halves used: %r %d vs %s"
+                           % (note["reach"], note["reach_n"],
+                              ", ".join("%r %d" % (t, n)
+                                        for t, n in note["overreach"])))
+            else:
+                out.append("    inverted: no %r at all, but %s did"
+                           % (note["reach"],
+                              ", ".join("%r %d" % (t, n)
+                                        for t, n in note["overreach"])))
+    return "\n".join(out)
 
 
 def suggest_mechanics(samples):
@@ -392,6 +538,39 @@ def build_fingerprint(samples, name, exemplars=False, register=None):
         register=register)
 
 
+# What the vocabulary line filters out beyond MARKER_WORDS. The marker list is
+# function words by design ("content words stay out: the fingerprint has to
+# survive a change of subject"), so the leftovers it never covered are the
+# contractions it stores in uncontracted form and a handful of near-content
+# words that rank high in any English prose whatever the subject.
+VOCAB_NOISE = frozenset({
+    "dont", "cant", "wont", "im", "ive", "youre", "thats", "were", "hes",
+    "shes", "theyre", "weve", "lets", "didnt", "wasnt", "wouldnt", "couldnt",
+    "doesnt", "isnt", "gonna", "wanna",
+    "like", "just", "really", "very", "even", "also", "still", "back",
+    "something", "anything", "everything", "nothing", "somebody",
+    "everybody", "anybody", "yeah", "okay",
+})
+
+
+def vocabulary(samples):
+    """The top content words, with counts, for the vocabulary line.
+
+    The load-bearing nouns and adjectives a profile's reader should reach
+    for, as opposed to the thesaurus section, which is about the words to
+    avoid. Stopwording is `stylometry.MARKER_SET` plus VOCAB_NOISE, the same
+    reuse learn_edits.py makes of it: one stopword list in the repo, and a
+    second copy here would drift from it.
+    """
+    stop = set(stylometry.MARKER_WORDS) | VOCAB_NOISE
+    counts = Counter()
+    for s in samples:
+        for tok in re.findall(r"[a-z']+", s["prose"].lower()):
+            if len(tok) >= 4 and tok.isalpha() and tok not in stop:
+                counts[tok] += 1
+    return counts
+
+
 def roll_up_distributions(samples):
     """Every per-sample distribution summed into one set of counters.
 
@@ -451,6 +630,7 @@ def distribution_report(samples):
     line("contractions used", contractions)
     line("hedges", hedges)
     line("intensifiers", intensifiers)
+    line("load-bearing words", vocabulary(samples))
     # No rate here. Each row is the commonest forms per sample summed, so the
     # counts are a shape rather than a total, and the aggregate table above
     # already carries the one contraction number that is exact.
@@ -519,7 +699,7 @@ def fingerprint_report(fp, written_to=None):
     return "\n".join(out)
 
 
-def derive_questions(samples, suggestions):
+def derive_questions(samples, suggestions, sub_notes=None):
     """(questions, dropped) for the samples-plus-interview route.
 
     Only what these documents could not settle gets asked. A `forbid`
@@ -581,6 +761,17 @@ def derive_questions(samples, suggestions):
         ask("hedges", SHAPE_QUESTIONS["hedges"],
             ", ".join("%s %d" % (term, n)
                       for term, n in rolled["hedges"].most_common(6)))
+    # Only the both-used families. A family with one side at zero has already
+    # been answered, and the count stays here in the evidence block: reading
+    # "maybe 29, perhaps 7" before the question is the leading question this
+    # whole mode exists to avoid.
+    both = [n for n in (sub_notes or []) if n["kind"] == "both"]
+    if both:
+        ask("thesaurus", SHAPE_QUESTIONS["thesaurus"],
+            "; ".join("%s %d vs %s" % (n["reach"], n["reach_n"],
+                                       ", ".join("%s %d" % (t, c)
+                                                 for t, c in n["overreach"]))
+                      for n in both[:4]))
 
     derived = [asks[qid] for qid in DERIVED_ORDER if qid in asks]
     fixed = [{"id": qid, "question": question, "evidence": "",
@@ -682,7 +873,8 @@ def questions_report(samples, questions, dropped, contaminated):
 
 
 def report(samples, agg, suggestions, contaminated, fingerprint=None,
-           fingerprint_path=None):
+           fingerprint_path=None, sub_proposals=None, sub_notes=None,
+           sub_family_counts=None):
     out = ["voice measurement: %d sample(s)" % len(samples), ""]
 
     out.append("  %-34s %7s  %-12s %s" % ("sample", "words", "reliability", "P0"))
@@ -734,6 +926,10 @@ def report(samples, agg, suggestions, contaminated, fingerprint=None,
     out.append("")
     out.append(mechanics_block(suggestions))
     out.append("")
+    if sub_proposals is not None:
+        out.append(thesaurus_report(sub_proposals, sub_notes or {},
+                                    sub_family_counts or {}))
+        out.append("")
 
     thin = [s for s in samples if s["words"] < stylometry.RELIABLE_WORDS]
     if thin:
@@ -833,10 +1029,13 @@ def main():
 
     agg = aggregate(samples)
     suggestions = suggest_mechanics(samples)
+    sub_proposals, sub_notes, sub_family_counts = suggest_substitutions(samples)
+    thesaurus_totals = {term: sum(s["thesaurus"].get(term, 0) for s in samples)
+                        for term in THESAURUS_TERMS}
     contaminated = [s for s in samples if s["p0"]]
     fingerprint = build_fingerprint(samples, args.name, args.with_exemplars,
                                     args.register)
-    questions, dropped = derive_questions(samples, suggestions)
+    questions, dropped = derive_questions(samples, suggestions, sub_notes)
 
     # Never written from contaminated samples. Every other output of this script
     # is a suggestion a person reads and confirms, and this one is a file a
@@ -878,6 +1077,13 @@ def main():
             "measured_block": measured_block(agg),
             "mechanics": {k: v for k, v, _ in suggestions},
             "mechanics_evidence": {k: w for k, _, w in suggestions if w},
+            "thesaurus_version": THESAURUS["version"],
+            "substitutions": {term: reach
+                              for term, reach, _ in sub_proposals},
+            "substitutions_evidence": {term: why
+                                       for term, _, why in sub_proposals},
+            "substitution_notes": sub_notes,
+            "thesaurus_totals": thesaurus_totals,
             "contaminated": [s["path"] for s in contaminated],
             "fingerprint": None if contaminated else fingerprint,
             "fingerprint_written_to": written_to,
@@ -891,7 +1097,8 @@ def main():
         print(questions_report(samples, questions, dropped, contaminated))
     else:
         print(report(samples, agg, suggestions, contaminated, fingerprint,
-                     written_to))
+                     written_to, sub_proposals, sub_notes,
+                     sub_family_counts))
 
     return 1 if contaminated else 0
 

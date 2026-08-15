@@ -16,12 +16,12 @@ Run it from `skills/rabbit-writes/`. It covers every row in the table below, inc
 
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 2, registers 2, measured 14 August 2026, eleventh pass)
+## Result (v0.1.0, lexicon 2, registers 2, measured 14 August 2026, twelfth pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | `SKILL.md` | 3,987 | 0 | 0 | 0 | 0.71 | 0.72 | 0.0 |
-| `PROOF.md` | 7,451 | 0 | 0 | **1** | 0.60 | 0.72 | 0.0 |
+| `PROOF.md` | 7,504 | 0 | 0 | **1** | 0.60 | 0.72 | 0.0 |
 | `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.86 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 883 | 0 | 0 | **9** | 0.65 | 0.71 | 0.0 |
@@ -39,7 +39,7 @@ Every number below was measured against a particular pattern catalogue, and the 
 | `references/forms/substack.md` | 601 | 0 | 0 | **6** | 0.75 | 0.69 | 0.0 |
 | `references/forms/technical-blog.md` | 426 | 0 | 0 | **6** | 0.74 | 0.72 | 0.0 |
 | `voices/whit3rabbit.md` | 1,558 | 0 | 0 | **10** | 0.69 | 0.78 | 0.0 |
-| `../voice-setup/SKILL.md` | 3,078 | 0 | 0 | 0 | 0.62 | 0.73 | 0.0 |
+| `../voice-setup/SKILL.md` | 3,379 | 0 | 0 | 0 | 0.64 | 0.72 | 0.0 |
 | `../readme-writing/SKILL.md` | 2,375 | 0 | 0 | 0 | 0.63 | 0.73 | 0.0 |
 
 **The nine `references/forms/` rows are new,** and every P2 in them is the same finding: a bold list label ending in a period, which is how `references/craft.md` has always written its own bullets and why it carries seven. The rule is skipped in the `docs` register and these rows are measured with no register at all, which is what the reproduce command above does.
@@ -80,6 +80,8 @@ Three directive families were cut or narrowed against that corpus before anythin
 The `forget` family took a second pass, in review rather than against the corpus, because the corpus never showed it: requiring one pronoun after the verb left `forget you|your|what`, which is `don't forget your API key` and `I'll never forget what happened`. In visible prose that is a P2 nuisance. In an HTML comment it is concealment plus a directive, so it is a P0 that halts `--apply-safe` on somebody's own maintainer note, and the safety band takes no suppression by design. It now matches the whole instruction shape, which also picked up `forget the above instructions`, an attack the pronoun version never saw. Corpus counts are unchanged: 0 P0, 4 P1, 0 P2.
 
 **One design decision came out of review rather than measurement.** The safety band cannot be suppressed. Every other band answers to `rabbit-allow`, and that comment lives inside the document being scanned: whoever can plant a concealed instruction can plant the comment excusing it, and both arrive in the same file from the same hand. A suppression naming a safety id is refused and reported at P1 rather than silently ignored. `test_a_safety_p0_cannot_be_suppressed` holds it.
+
+The twelfth pass moved one row and no findings column. `../voice-setup/SKILL.md` grew to 3,379 words where the measured thesaurus is now documented: the words-to-reach-for table, the proposals it prints, and the families file beside the script. Its burstiness and MATTR moved with the words, and the voice table below still carries its six serial-comma advisories.
 
 The eleventh pass moved four word counts and no findings column, and one of the four had been wrong before any document changed. `SKILL.md` published 3,806 against 3,860 measured at the time, a transposition nobody caught, and it has since grown to 3,987 where opt-in register auto-detection is documented. `references/injection.md` gained the sentence saying a quoted span in a report is data rather than an instruction, and it is the only row whose burstiness moved with its words. `../voice-setup/SKILL.md` gained the `--out` flag and the note that `--scaffold --activate` is refused until a profile passes its own check, and `../readme-writing/SKILL.md` lost ten words tightening the table-of-contents threshold. Every P0, P1, and P2 column is where it was.
 

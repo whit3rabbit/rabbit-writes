@@ -11,6 +11,31 @@ drifted from the data it describes. The 100-repo corpus regression, the
 calibration fixtures, and every published self-scan number were re-run after all
 three.
 
+### A measured thesaurus in measure_voice.py
+
+- **`measure_voice.py` now measures vocabulary reach.** A versioned families
+  file, `skills/voice-setup/scripts/thesaurus.json`, pairs each plain word with
+  the dressed-up synonyms a draft might reach past ("get" beside "obtain",
+  "acquire", "procure"). The report counts both halves over the samples and
+  proposes a `preferred_substitutions` entry only where the plain word is
+  attested and the synonym never appears. A family the samples use both halves
+  of prints as a non-rule and becomes one interview question, and a family the
+  writer runs the formal direction of prints as inverted. `--json` carries the
+  totals, the proposals, and the thesaurus version.
+- **The proposals are edits, not documentation.** `fixes.py` already applied
+  `preferred_substitutions` entries whose value is a mechanical replacement,
+  whole-word and case-insensitive, and `TEMPLATE.rules.json` still said the key
+  was "Not enforced". The note now says what actually happens, including the
+  part that matters when choosing keys: no part-of-speech awareness, so a
+  polysemous key rewrites every sense it matches. A round-trip test pins a
+  proposed block landing through `fixes.apply` and passing `verify.validate`.
+- **The family file has a shape check and a suite CI actually runs.**
+  `check_thesaurus` in `scripts/validate.py` holds the reach words to the same
+  mechanical-substitution bar as the fixer, refuses duplicate and cross-family
+  terms, and requires the integer `version` a report quotes.
+  `skills/voice-setup/tests/run.py` covers the proposal branches and had never
+  run in CI, which now runs it on every push.
+
 ### Eight defects, found in review
 
 - **`attain.py` called two different things a regression, and disagreed with

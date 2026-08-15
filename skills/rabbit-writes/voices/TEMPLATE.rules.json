@@ -78,10 +78,10 @@
   ],
   "signature_moves": [],
 
-  "_preferred_substitutions_note": "Not enforced. Shown to the editor as the replacement to reach for when a banned entry is hit.",
+  "_preferred_substitutions_note": "Enforced by scan.py --apply-safe: each key is rewritten to its value through fixes.py, whole-word and case-insensitive, with no part-of-speech awareness. Only a value that is itself a replacement (one to three words, not opening with an instruction verb like cut or rephrase) is applied. A key with more than one sense is rewritten in every sense it matches, so keys must be unambiguous words. 'utilize' to 'use' is safe and 'state' to 'say' turns 'state machine' into 'say machine'.",
   "preferred_substitutions": {},
 
-  "_contrastive_pairs_note": "Not enforced, like preferred_substitutions, and read by the editor at conversion time. One sentence this writer would write and one they would refuse, in their own words, taken from the interview or the samples. A pair is worth ten adjectives: 'direct' describes a hundred writers and 'Also, the rollback worked' against 'Furthermore, the rollback was successful' describes one. Keep `rule` pointing at whichever section of the markdown the pair illustrates.",
+  "_contrastive_pairs_note": "Not enforced, and read by the editor at conversion time. One sentence this writer would write and one they would refuse, in their own words, taken from the interview or the samples. A pair is worth ten adjectives: 'direct' describes a hundred writers and 'Also, the rollback worked' against 'Furthermore, the rollback was successful' describes one. Keep `rule` pointing at whichever section of the markdown the pair illustrates.",
   "_contrastive_pairs_example": [
     {
       "rule": "connectors",

@@ -8,6 +8,7 @@ Claude Code / Codex plugin. Three skills (`rabbit-writes`, `voice-setup`, `readm
 python3 scripts/validate.py                          # manifests, skills, voices, cross-refs, tripwires
 python3 skills/rabbit-writes/tests/run.py            # engine, voice, verifier, fixer, invariants
 python3 skills/readme-writing/tests/run.py           # structure, links, voice, 100-repo regression
+python3 skills/voice-setup/tests/run.py              # scaffolding, thesaurus, edit-learning
 python3 scripts/detector-corpus/test_corpus_harness.py   # the corpus harness, network stubbed
 python3 scripts/voice-eval/test_eval_harness.py          # the reconstruction scorer, over stubbed triples
 claude plugin validate .                             # marketplace manifest only, and it never reads $schema
