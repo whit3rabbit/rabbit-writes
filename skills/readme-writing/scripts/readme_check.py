@@ -53,13 +53,12 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 SKILL_ROOT = os.path.dirname(HERE)
 PLUGIN_ROOT = os.path.dirname(os.path.dirname(SKILL_ROOT))
-SCAN_PATH = os.path.join(PLUGIN_ROOT, "skills", "rabbit-writes", "scripts", "scan.py")
-VOICES_DIR = os.path.join(PLUGIN_ROOT, "skills", "rabbit-writes", "voices")
+SCAN_PATH = os.path.join(HERE, "scan.py") if os.path.exists(os.path.join(HERE, "scan.py")) else os.path.join(PLUGIN_ROOT, "skills", "rabbit-writes", "scripts", "scan.py")
 # rwlib lives beside scan.py. Resolved from SCAN_PATH rather than spelled out
-# again, so the two cannot end up pointing at different checkouts.
 RWLIB_PARENT = os.path.dirname(SCAN_PATH)
-if RWLIB_PARENT not in sys.path:
-    sys.path.insert(0, RWLIB_PARENT)
+for path in (HERE, RWLIB_PARENT):
+    if os.path.exists(os.path.join(path, "rwlib")) and path not in sys.path:
+        sys.path.insert(0, path)
 
 from rwlib import cli_error                        # noqa: E402
 from rwlib import corpus as corpus_mod            # noqa: E402
@@ -73,6 +72,12 @@ from rwlib.markdown import (BARE_URL_RX, FENCE_RX, HEADING_RX,  # noqa: E402
                             is_badge, is_prose_block, line_of, strip_images,
                             strip_wrapped_urls, word_count)
 from rwlib.sections import LATE_SECTIONS, classify_heading  # noqa: E402
+
+# Two up from wherever rwlib actually loaded, then voices/: the sibling engine's
+# directory in a plugin install, this skill's own vendored copy in a standalone
+# zip. A second spelling here pointed at the sibling unconditionally, so the
+# standalone bundle shipped voices it could never resolve.
+VOICES_DIR = voices_mod.VOICES_DIR
 
 # ---------------------------------------------------------------------------
 # corpus constants. Every number comes from docs/readme-analysis, reduced to the

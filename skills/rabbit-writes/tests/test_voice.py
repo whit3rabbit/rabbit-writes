@@ -104,6 +104,26 @@ def test_the_writers_own_register_passes_the_writers_own_rules():
         [f["label"] for f in result["findings"] if f["band"] == "voice"])
 
 
+def test_a_ban_quoted_in_a_code_span_never_fires_whatever_the_delimiter():
+    # The nested shape is the regression: CLAUDE.md quotes its own ban entry as
+    # (`` `synergy` ``), and the single-backtick span pattern paired the wrong
+    # marks there, blanking two space fragments and reporting the word as a P0.
+    spans = [
+        "`synergy`",
+        "``synergy``",
+        "(`` `synergy` ``)",
+        "```synergy```",
+    ]
+    for span in spans:
+        text = ("The ban entry that never fires is one pasted in with its "
+                "markdown still on it, %s, because the code span is blanked "
+                "before any rule runs.\n" % span)
+        result, _ = scan_text(text, "--voice-rules", WHIT3RABBIT_RULES)
+        hits = [f for f in result["findings"] if "synergy" in json.dumps(f)]
+        assert not hits, "%s leaked through %r" % (
+            [f["id"] for f in hits], span)
+
+
 def test_the_template_profile_is_inert():
     template = os.path.join(VOICES, "TEMPLATE.rules.json")
     if not os.path.exists(template):

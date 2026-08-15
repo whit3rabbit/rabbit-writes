@@ -43,21 +43,13 @@ import json
 import os
 import re
 import sys
-
 HERE = os.path.dirname(os.path.abspath(__file__))
-# scripts -> voice-setup -> skills. Walked rather than spelled out, so a skill
-# directory can be renamed without editing the scripts inside it.
-SKILLS = os.path.dirname(os.path.dirname(HERE))
-SCAN_PATH = os.path.join(SKILLS, "rabbit-writes", "scripts", "scan.py")
-# rwlib lives beside scan.py, resolved from it so the two cannot end up pointing
-# at different checkouts.
-RWLIB_PARENT = os.path.dirname(SCAN_PATH)
-if RWLIB_PARENT not in sys.path:
-    sys.path.insert(0, RWLIB_PARENT)
-from rwlib import cli_error, inflect, voice_check, voices as voices_mod   # noqa: E402
-from rwlib.voices import load_scan                                       # noqa: E402
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+import _bootstrap
+from _bootstrap import cli_error, inflect, voice_check, voices_mod, load_scan, NAME_RX, SKILLS_DIR
+scan = load_scan()
 
-NAME_RX = re.compile(r"^[A-Za-z0-9_-]+$")
 
 TEMPLATE_MD = os.path.join(voices_mod.VOICES_DIR, "TEMPLATE.md")
 TEMPLATE_RULES = os.path.join(voices_mod.VOICES_DIR, "TEMPLATE.rules.json")
@@ -112,25 +104,27 @@ def _replace_template_name(obj, target_name):
     return obj
 
 
+def _strip_underscore_keys(obj):
+    if isinstance(obj, dict):
+        return {k: _strip_underscore_keys(v) for k, v in obj.items() if not k.startswith("_")}
+    elif isinstance(obj, list):
+        return [_strip_underscore_keys(elem) for elem in obj]
+    return obj
+
+
 def scaffold_rules(name, priority, template_path=TEMPLATE_RULES):
     """The template's rules file with the template taken out of it."""
     with open(template_path, encoding="utf-8") as fh:
         data = json.load(fh)
 
-    out = {}
-    for key, value in data.items():
-        if key.startswith("_"):
-            continue
-        if key == "mechanics":
-            value = {k: v for k, v in value.items() if not k.startswith("_")}
-        if key == "banned_regex":
-            value = [e for e in value
-                     if e.get("id") != voice_check.EXAMPLE_RULE_ID]
-        out[key] = value
-    out["voice"] = name
-    out["default_priority"] = priority
-    out = _replace_template_name(out, name)
-    return out
+    data = _strip_underscore_keys(data)
+    if "banned_regex" in data:
+        data["banned_regex"] = [e for e in data["banned_regex"]
+                                if e.get("id") != voice_check.EXAMPLE_RULE_ID]
+    data["voice"] = name
+    data["default_priority"] = priority
+    data = _replace_template_name(data, name)
+    return data
 
 
 def scaffold_markdown(name, template_path=TEMPLATE_MD):
@@ -191,13 +185,23 @@ def do_scaffold(args):
 
     rules = scaffold_rules(args.name, args.priority)
     markdown = scaffold_markdown(args.name)
+    rules_tmp = rules_path + ".tmp.%d" % os.getpid()
+    md_tmp = md_path + ".tmp.%d" % os.getpid()
     try:
-        with open(rules_path, "w", encoding="utf-8") as fh:
+        with open(rules_tmp, "w", encoding="utf-8") as fh:
             json.dump(rules, fh, indent=2)
             fh.write("\n")
-        with open(md_path, "w", encoding="utf-8") as fh:
+        with open(md_tmp, "w", encoding="utf-8") as fh:
             fh.write(markdown)
+        os.replace(rules_tmp, rules_path)
+        os.replace(md_tmp, md_path)
     except OSError as exc:
+        for p in (rules_tmp, md_tmp):
+            if os.path.exists(p):
+                try:
+                    os.unlink(p)
+                except OSError:
+                    pass
         print(cli_error.format_file_error(
             "build_voice.py", out_dir, "output directory", expected_type="writable directory path",
             details=str(exc), examples=BUILD_EXAMPLES), file=sys.stderr)
@@ -309,8 +313,14 @@ def cap_probes(mech):
                     {"kind": "id", "value": "voice-sentence-length"}))
     if mech.get("em_dash") == "limit":
         cap = float(mech.get("max_em_dashes_per_1000w", 2))
-        # Probe with text where em dash density (dashes per 1000 words) exceeds the cap.
-        text = "\n\n".join(["\u2014 word \u2014 word \u2014"] * 3)
+        # Build probe text whose em dash rate per 1000 words strictly exceeds cap.
+        words_needed = 1000
+        dashes_needed = max(3, int(cap * words_needed / 1000.0) + 2)
+        filler_words = ["word"] * words_needed
+        for i in range(dashes_needed):
+            idx = (i * words_needed) // dashes_needed
+            filler_words[idx] = filler_words[idx] + " \u2014"
+        text = " ".join(filler_words)
         out.append(("mechanics.em_dash = limit (%.1f per 1000 words)" % cap,
                     text, {"kind": "id", "value": "voice-em-dash-rate"}))
     return out
@@ -436,10 +446,10 @@ def resolve_target(target, voices_dir):
     elif stem.endswith(".md"):
         stem = stem[:-3]
 
-    if os.path.sep in target or target.endswith(".json"):
-        path = os.path.abspath(stem + voices_mod.RULES_SUFFIX)
-        return path
-    return os.path.join(voices_dir, stem + voices_mod.RULES_SUFFIX)
+    has_sep = any(s in target for s in (os.sep, os.altsep) if s)
+    if has_sep:
+        return os.path.abspath(stem + voices_mod.RULES_SUFFIX)
+    return os.path.join(voices_dir, os.path.basename(stem) + voices_mod.RULES_SUFFIX)
 
 
 def do_check(args):
@@ -469,20 +479,39 @@ def do_check(args):
     if not fails:
         scan = load_scan("build_voice")
         rules = voices_mod.load(rules_path, args.voices_dir)
+        with open(rules_path, encoding="utf-8") as fh:
+            raw_rules = json.load(fh)
+        parent_name = raw_rules.get("extends")
         print("live fire: every rule below was put through scan.py")
         fired = live_fire(rules, scan)
         if not fired:
             print("  note  nothing mechanically enforced, nothing to fire")
         for ok, what, why in fired:
+            display_what = what
+            if parent_name:
+                is_child_rule = True
+                if what.startswith("banned_regex "):
+                    rid = what.split(" ", 1)[1]
+                    child_ids = {e.get("id") for e in raw_rules.get("banned_regex", [])}
+                    if rid not in child_ids:
+                        is_child_rule = False
+                elif what.startswith("banned word "):
+                    term = what.split(" ", 2)[-1].strip("'\"")
+                    child_words = {inflect.term_of(e) for e in raw_rules.get("banned_words", [])}
+                    if term not in child_words:
+                        is_child_rule = False
+                if not is_child_rule:
+                    display_what = "%s (inherited from %s)" % (what, parent_name)
+
             if ok is True:
-                print("  fires %s" % what)
+                print("  fires %s" % display_what)
             elif ok is None:
-                print("  ?     %s: %s" % (what, why))
-                unproven.append(what)
+                print("  ?     %s: %s" % (display_what, why))
+                unproven.append(display_what)
             else:
-                print("  DEAD  %s: %s" % (what, why))
+                print("  DEAD  %s: %s" % (display_what, why))
                 fails.append({"level": voice_check.FAIL,
-                              "message": "%s never fires" % what})
+                              "message": "%s never fires" % display_what})
         print("")
     else:
         print("live fire skipped: fix the structure first, or the probes "
@@ -521,10 +550,17 @@ def do_activate(name, voices_dir):
     if os.path.exists(active):
         with open(active, encoding="utf-8") as fh:
             previous = fh.read().strip()
+    active_tmp = active + ".tmp.%d" % os.getpid()
     try:
-        with open(active, "w", encoding="utf-8") as fh:
+        with open(active_tmp, "w", encoding="utf-8") as fh:
             fh.write(name + "\n")
+        os.replace(active_tmp, active)
     except OSError as exc:
+        if os.path.exists(active_tmp):
+            try:
+                os.unlink(active_tmp)
+            except OSError:
+                pass
         print(cli_error.format_file_error(
             "build_voice.py", active, "ACTIVE file",
             expected_type="writable file path",

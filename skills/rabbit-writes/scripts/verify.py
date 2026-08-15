@@ -200,7 +200,10 @@ def extract(text):
     fact_text = blank_entities(HTML_TAG_RX.sub(blank, unquoted))
     return {
         "fences": FENCE_RX.findall(text),
-        "inline_code": INLINE_CODE_RX.findall(text),
+        # finditer, not findall: the span pattern captures its backtick
+        # delimiter for the backreference, and findall would return that group
+        # instead of the span.
+        "inline_code": [m.group(0) for m in INLINE_CODE_RX.finditer(text)],
         "frontmatter": (FRONTMATTER_RX.search(text).group(1)
                         if FRONTMATTER_RX.search(text) else None),
         "tables": TABLE_ROW_RX.findall(prose),

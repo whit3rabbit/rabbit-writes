@@ -366,6 +366,7 @@ def distributions(text, top=8, split_sentences=None):
     counts = Counter(tokens)
     connectors = {
         group: {"per_1k": _rate(sum(counts[w] for w in members), words),
+                "n": sum(counts[w] for w in members),
                 "used": sorted(w for w in members if counts[w])}
         for group, members in CONNECTOR_GROUPS.items()
     }

@@ -22,13 +22,9 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-# scripts -> voice-setup -> skills. Walked rather than spelled out, so a skill
-# directory can be renamed without editing the scripts inside it.
-SKILLS = os.path.dirname(os.path.dirname(HERE))
-RWLIB_PARENT = os.path.join(SKILLS, "rabbit-writes", "scripts")
-if RWLIB_PARENT not in sys.path:
-    sys.path.insert(0, RWLIB_PARENT)
-
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+import _bootstrap
 from rwlib import fixes  # noqa: E402
 
 

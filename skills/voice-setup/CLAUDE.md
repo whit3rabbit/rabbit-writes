@@ -26,8 +26,8 @@ python3 skills/voice-setup/scripts/build_voice.py --check <name>
 # Activate a voice profile (sets skills/rabbit-writes/voices/ACTIVE)
 python3 skills/voice-setup/scripts/build_voice.py --check <name> --activate
 
-# Learn rules from a before/after editing diff pair
-python3 skills/voice-setup/scripts/learn_edits.py before.md after.md
+# Learn rules from a converted/edited diff pair
+python3 skills/voice-setup/scripts/learn_edits.py converted.md edited.md
 ```
 
 ## Structure & Architecture

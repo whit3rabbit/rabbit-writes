@@ -97,7 +97,7 @@ For one sample at a time, or to see the full finding list behind a P0, `scan.py 
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/measure_voice.py \
-  sample1.md sample2.md sample3.md --name <voice> --write-fingerprint
+  sample1.md sample2.md sample3.md --name <voice> --write-fingerprint --with-exemplars
 ```
 
 That writes `voices/<voice>.fingerprint.json`, and `scan.py --voice <voice>` measures every later document against it and reports the distance at P2. It is what turns "does this sound like them" into a number with a calibrated range, and `references/voice.md` in the `rabbit-writes` skill has the reading. Two samples is the floor and it is thin: the band is a single number and cannot say how much the person varies. Three or four is where it starts to mean something. It refuses to write from a contaminated sample, for the same reason the P0 gate exists, one step further: a suggestion gets confirmed by a person and a fingerprint does not.
@@ -312,3 +312,38 @@ Activation is refused when the check fails, and when the profile lives outside t
 Show the person their profile and say plainly what you inferred versus what they told you. Inferred rules are the ones most likely to be wrong, and they are the ones worth correcting on day one.
 
 Then offer a live test: have them give you something real to draft, run it through the new profile, and adjust from what they push back on. One round of that is worth more than another twenty interview questions.
+
+## Script CLI Arguments Reference
+
+### `measure_voice.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/measure_voice.py <sample1.md> [sample2.md ...] [options]`
+- `samples`: (REQUIRED, list of file paths) One or more markdown writing sample file paths.
+- `--questions`: (OPTIONAL, boolean flag) Output Taste Interviewer questions derived from sample measurements.
+- `--name`: (OPTIONAL, string slug) Profile name slug (`^[A-Za-z0-9_-]+$`).
+- `--write-fingerprint`: (OPTIONAL, boolean flag) Save fingerprint to `voices/<name>.fingerprint.json` (requires `--name`).
+- `--register`: (OPTIONAL, choice: register name) Register scope for fingerprint (`voices/<name>.<register>.fingerprint.json`).
+- `--with-exemplars`: (OPTIONAL, boolean flag) Embed author prose paragraphs in fingerprint for conversion conditioning.
+- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON payload.
+
+### `build_voice.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/build_voice.py --scaffold --name <voice> [options]`  
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/build_voice.py --check <voice|path> [options]`
+- `--scaffold`: (REQUIRED choice) Scaffold a new profile pair (`.rules.json` and `.md`) from templates (requires `--name`).
+- `--check`: (REQUIRED choice, string name or file path) Validate profile structure and live-fire rule execution.
+- `--name`: (REQUIRED with `--scaffold`, string slug) Profile name slug (`^[A-Za-z0-9_-]+$`).
+- `--out`: (OPTIONAL, directory path, default: `voices/`) Target directory for scaffolded files.
+- `--priority`: (OPTIONAL, choice: `P0`, `P1`, `P2`, default: `P0`) Default priority for rules file.
+- `--force`: (OPTIONAL, boolean flag) Overwrite existing profile files.
+- `--activate`: (OPTIONAL, boolean flag) Point `voices/ACTIVE` at profile after checking clean.
+
+### `learn_edits.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/learn_edits.py <converted.md> <edited.md> [options]`
+- `converted`: (REQUIRED, file path) Document produced by the skill before author edits.
+- `edited`: (REQUIRED, file path) Document edited by author.
+- `--voice`: (OPTIONAL, string name) Profile name (used to load fingerprint for comparison).
+- `--voice-rules`: (OPTIONAL, file path) Path to `.rules.json` profile file.
+- `--register`: (OPTIONAL, choice: register name) Register in which texts were written.
+- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON payload.
+
+### `thesaurus_check.py`
+Internal validation helper for checking `thesaurus.json` data shape integrity.

@@ -210,6 +210,21 @@ def test_questions_route_asks_thesaurus_only_for_both():
         assert not any(ch.isdigit() for ch in q["question"]), q
 
 
+def test_questions_route_no_digits_in_asking():
+    """No question in the interview contains numeric counts in its question text.
+
+    Counts are anchored to evidence and printed only after answers are given.
+    """
+    text = ("Here is a draft with em dashes — and semicolons; and words. "
+            "We helped team twice today.")
+    data = _json(text)
+    all_questions = data.get("questions", []) + data.get("questions_dropped", [])
+    assert len(all_questions) > 0
+    for q in all_questions:
+        digits = [ch for ch in q["question"] if ch.isdigit()]
+        assert not digits, "Question %r contains digits %r in question text" % (q["id"], digits)
+
+
 def test_substitutions_round_trip_through_fixes():
     """A proposed block is an edit, not documentation.
 

@@ -357,3 +357,40 @@ echo "dana" > ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices/ACTIVE
 **Anything else about profiles belongs to `voice-setup`:** creating one from an interview, deriving one from writing samples, blending two, adjusting one that missed, and the rule for what belongs in a profile versus in the engine. Invoke that skill rather than reproducing its procedure here.
 
 A team can keep several profiles in `voices/` and switch per task. A per-project override works too: if the working directory contains `.rabbit-voice`, read the voice name from there instead of from `voices/ACTIVE`.
+
+## Script CLI Arguments Reference
+
+### `scan.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py [file] [options]`
+- `file`: (OPTIONAL, file path) Markdown document file to scan. Omit to read text from stdin.
+- `--profile`: (OPTIONAL, choice `auto` or register name in `registers.json`, default: `DEFAULT`) Target register profile.
+- `--voice`: (OPTIONAL, choice `auto` or voice name in `voices/`) Voice profile name slug to resolve and apply.
+- `--voice-rules`: (OPTIONAL, file path) Path to a `.rules.json` voice rules file.
+- `--apply-safe`: (OPTIONAL, boolean flag) Apply mechanical fixes safely to document text.
+- `--write`: (OPTIONAL, boolean flag) Write mechanical fixes back to file in place (requires `--apply-safe`).
+- `--stdout`: (OPTIONAL, boolean flag) Print fixed document to stdout instead of findings report (requires `--apply-safe`).
+- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON findings payload.
+- `--sarif`: (OPTIONAL, boolean flag) Output SARIF 2.1.0 report for GitHub pull request annotations.
+- `--sarif-uri`: (OPTIONAL, file path / string) URI path to record in SARIF output (requires `--sarif`).
+- `--no-exempt`: (OPTIONAL, boolean flag) Disable exemption for quoted examples.
+- `--check`: (OPTIONAL, boolean flag) Exit 1 if any unsuppressed P0 finding is present.
+
+### `verify.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/verify.py <original.md> <rewritten.md> [options]`
+- `original`: (REQUIRED, file path) Pre-rewrite text file path.
+- `rewritten`: (REQUIRED, file path) Post-rewrite text file path.
+- `--allow-structure`: (OPTIONAL, boolean flag) Allow structural changes without failing.
+- `--allow-facts`: (OPTIONAL, boolean flag) Report fact changes instead of failing.
+- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON validation results.
+
+### `attain.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/attain.py <before.md> [after.md] [options]`
+- `before`: (REQUIRED, file path) Original document file path.
+- `after`: (OPTIONAL, file path) Converted document file path.
+- `--voice`: (OPTIONAL, string) Voice profile name in `voices/`.
+- `--voice-rules`: (OPTIONAL, file path) Path to a `.rules.json` voice rules file.
+- `--profile`: (OPTIONAL, choice: register name) Register name for fingerprint comparison.
+- `--tolerance`: (OPTIONAL, float, default: `1.0`) Tolerance threshold in sample standard deviations.
+- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON payload.
+- `--check`: (OPTIONAL, boolean flag) Exit 1 if verdict is `regressed` or `flat`.
+- `--plan`: (OPTIONAL, boolean flag) Output sentence-shape targets for conversion planning.

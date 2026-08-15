@@ -27,7 +27,7 @@ What it looks for, in the order it is worth acting on:
                   a diff carries, and it maps straight onto
                   `preferred_substitutions` and often onto `banned_words`.
   removals        a word or phrase they took out and never put back.
-  openers         sentence openers they cut, which is where a register lives
+  openers         sentence openers that moved (added or cut), which is where a register lives
                   and what no ban list reaches.
   mechanics       punctuation the edit removed entirely, which is a `mechanics`
                   answer rather than a word.
@@ -44,21 +44,17 @@ Stdlib only, 3.9+.
 
 import argparse
 import difflib
-import importlib.util
 import json
 import os
 import re
 import sys
 from collections import Counter
-
 HERE = os.path.dirname(os.path.abspath(__file__))
-SKILLS = os.path.dirname(os.path.dirname(HERE))
-SCAN_PATH = os.path.join(SKILLS, "rabbit-writes", "scripts", "scan.py")
-RWLIB_PARENT = os.path.dirname(SCAN_PATH)
-if RWLIB_PARENT not in sys.path:
-    sys.path.insert(0, RWLIB_PARENT)
-from rwlib import cli_error, registers as registers_mod, stylometry, voices as voices_mod   # noqa: E402
-from rwlib.voices import load_scan                                       # noqa: E402
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+import _bootstrap
+from _bootstrap import cli_error, inflect, voice_check, voices_mod, load_scan, SKILLS_DIR
+from rwlib import registers as registers_mod, stylometry
 
 # How many times a change has to repeat before it is worth proposing. Two rather
 # than one, and this is the whole difference between reading a diff and reading
@@ -109,14 +105,13 @@ def removals(before, after):
     for word, n in a.items():
         if word in STOP or len(word) < 4:
             continue
-        gone = n - b.get(word, 0)
-        if gone > 0 and b.get(word, 0) == 0:
-            out[word] = gone
+        if b.get(word, 0) == 0:
+            out[word] = n
     return out
 
 
 def opener_changes(scan, before, after):
-    """{opener: (before, after)} for sentence openers whose count moved.
+    """{opener: (before, after)} for sentence openers whose count moved (added or cut).
 
     Where a register lives, and the half no ban list reaches: two writers with
     the same average sentence length sound nothing alike if one opens on "But".

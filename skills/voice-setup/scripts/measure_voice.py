@@ -62,30 +62,19 @@ Stdlib only, 3.9+.
 """
 
 import argparse
-import importlib.util
 import json
 import os
 import re
 import sys
 from collections import Counter
-
 HERE = os.path.dirname(os.path.abspath(__file__))
-# scripts -> voice-setup -> skills. Walked rather than spelled out, so a skill
-# directory can be renamed without editing the scripts inside it.
-SKILLS = os.path.dirname(os.path.dirname(HERE))
-SCAN_PATH = os.path.join(SKILLS, "rabbit-writes", "scripts", "scan.py")
-# rwlib lives beside scan.py, resolved from it so the two cannot end up pointing
-# at different checkouts.
-RWLIB_PARENT = os.path.dirname(SCAN_PATH)
-if RWLIB_PARENT not in sys.path:
-    sys.path.insert(0, RWLIB_PARENT)
-# Where a written fingerprint lands, resolved the same way and for the same
-# reason. rwlib.voices owns the answer, so a moved voices/ directory moves this.
-from rwlib import cli_error, registers as registers_mod, stylometry  # noqa: E402
-from rwlib import voices as voices_mod                               # noqa: E402
-from rwlib.voices import load_scan                                       # noqa: E402
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+import _bootstrap
+from _bootstrap import cli_error, inflect, voice_check, voices_mod, load_scan, NAME_RX, SKILLS_DIR
+from rwlib import registers as registers_mod, stylometry
+scan = load_scan()
 
-NAME_RX = re.compile(r"^[A-Za-z0-9_-]+$")
 
 # The reach-for thesaurus: plain word a person actually writes, beside the
 # dressed-up synonyms an inflated draft reaches for instead. Data rather than
@@ -280,14 +269,12 @@ def term_rx(term):
     """Word-boundary regex for a thesaurus term, regular inflections included.
 
     `helped` is evidence of reaching for `help`, and `utilizes` of reaching
-    for `utilize`, so every word in the term takes the regular suffixes. The
-    irregulars are deliberately out: `got` does not attest `get`, which keeps
-    the counting conservative rather than clever, the same trade the rules
-    files make with their opt-in `inflect` flag.
+    for `utilize`. Multi-word phrases inflect non-article words (len > 2), joined by
+    whitespace wildcards `\\s+`.
     """
-    parts = [re.escape(word) + r"(?:s|es|ed|d|ing)?"
-             for word in term.split()]
-    return re.compile(r"(?i)\b%s\b" % r" ".join(parts))
+    words = term.split()
+    parts = [re.escape(w) + (r"(?:s|es|ed|d|ing)?" if len(w) > 2 else "") for w in words]
+    return re.compile(r"(?i)\b%s\b" % r"\s+".join(parts))
 
 
 def count_thesaurus(scored):
@@ -566,8 +553,9 @@ def vocabulary(samples):
     counts = Counter()
     for s in samples:
         for tok in re.findall(r"[a-z']+", s["prose"].lower()):
-            if len(tok) >= 4 and tok.isalpha() and tok not in stop:
-                counts[tok] += 1
+            clean_tok = tok.replace("'", "")
+            if len(clean_tok) >= 4 and clean_tok.isalpha() and clean_tok not in stop:
+                counts[clean_tok] += 1
     return counts
 
 
@@ -589,7 +577,7 @@ def roll_up_distributions(samples):
         for entry in d["paragraph_openers"]:
             rolled["paragraph_openers"][entry["word"]] += entry["n"]
         for group, body in d["connectors"].items():
-            rolled["connectors"][group] += round(body["per_1k"] * d["words"] / 1000.0)
+            rolled["connectors"][group] += body.get("n", round(body.get("per_1k", 0) * d["words"] / 1000.0))
         for entry in d["contractions"]["inventory"]:
             rolled["contractions"][entry["form"]] += entry["n"]
         for entry in d["hedges"]["used"]:
@@ -832,8 +820,11 @@ def questions_report(samples, questions, dropped, contaminated):
     out.append("exists because what a person says and what they wrote are two "
                "pieces of evidence")
     out.append("that are allowed to disagree.")
-    out.append("")
+    out.append("Batch 1:")
     for i, q in enumerate(questions, 1):
+        if i == 6:
+            out.append("")
+            out.append("Batch 2:")
         out.append("  %2d  %s" % (i, q["question"]))
     out.append("")
 
@@ -927,7 +918,7 @@ def report(samples, agg, suggestions, contaminated, fingerprint=None,
     out.append(mechanics_block(suggestions))
     out.append("")
     if sub_proposals is not None:
-        out.append(thesaurus_report(sub_proposals, sub_notes or {},
+        out.append(thesaurus_report(sub_proposals, sub_notes or [],
                                     sub_family_counts or {}))
         out.append("")
 

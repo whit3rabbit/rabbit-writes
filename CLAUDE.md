@@ -12,6 +12,8 @@ python3 skills/voice-setup/tests/run.py              # scaffolding, thesaurus, e
 python3 scripts/detector-corpus/test_corpus_harness.py   # the corpus harness, network stubbed
 python3 scripts/thesaurus-research/test_thesaurus_harness.py   # the thesaurus pipeline, over synthetic datasets
 python3 scripts/voice-eval/test_eval_harness.py          # the reconstruction scorer, over stubbed triples
+python3 scripts/package_skills.py                        # package 3 isolated skill zips into dist/ for Claude custom skills upload
+python3 scripts/test_package_skills.py                   # extract each zip outside the repo and run what it ships, then the same battery over a loose plugin-layout copy
 claude plugin validate .                             # marketplace manifest only, and it never reads $schema
 ```
 

@@ -116,6 +116,21 @@ What you lose is `docs/`, which sits at the repo root outside every skill folder
 
 </details>
 
+<details>
+<summary><b>claude.ai, as standalone skill uploads</b></summary>
+
+The custom-skill upload on claude.ai takes one skill per zip, so the plugin also packages as three isolated archives:
+
+```bash
+python3 scripts/package_skills.py
+```
+
+That writes `dist/rabbit-writes.zip`, `dist/voice-setup.zip`, and `dist/readme-writing.zip`. Upload the ones you want. Each stands alone: the two satellite skills carry their own copy of the engine (`scan.py`, `verify.py`, `rwlib/`, both data files), their own `voices/` snapshot, and a `SKILL.md` rewritten at package time so every path resolves inside the archive rather than through `${CLAUDE_PLUGIN_ROOT}`.
+
+The isolation is the tradeoff. Two uploaded skills cannot share voices: each carries its own `voices/` copy, and a profile built inside one never reaches another. The plugin install above is the integrated path, one engine and one voices directory for all three skills. `python3 scripts/test_package_skills.py` extracts each archive outside the repo and runs what it ships, which is what keeps the standalone claim true.
+
+</details>
+
 ## Run it
 
 You rarely need to name a skill. Each one triggers on a plain request, which is what the description field is for:

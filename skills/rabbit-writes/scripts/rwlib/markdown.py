@@ -44,7 +44,14 @@ FENCE_RX = re.compile(
 # anybody forgot to merge them: this one does not anchor to the line start, so
 # it must never be used for blanking.
 FENCE_PARTS_RX = re.compile(r"```(\w*)\n(.*?)```", re.S)
-INLINE_CODE_RX = re.compile(r"`[^`\n]+`")
+# A code span in CommonMark's shape: a run of N backticks opens, the next run
+# of exactly N closes, and shorter runs between them are content. The old
+# single-backtick pattern paired the wrong marks inside a doubled span, so a
+# ban entry quoted as (`` `word` ``) blanked two space fragments and left the
+# word itself exposed to the rule it was illustrating. Content still may not
+# cross a line break: an unpaired backtick must not blank a paragraph, the same
+# containment the quote pairs above insist on.
+INLINE_CODE_RX = re.compile(r"(?<!`)(`+)(?!`)(?:(?!\1)[^\n])+?\1(?!`)")
 FRONTMATTER_RX = re.compile(r"\A---\n(.*?)\n---\n", re.S)
 TABLE_ROW_RX = re.compile(r"(?m)^\s*\|.*\|\s*$")
 TABLE_SEP_RX = re.compile(r"(?m)^\|?[\s:|-]+\|[\s:|-]+\|?\s*$")
