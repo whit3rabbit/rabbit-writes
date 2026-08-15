@@ -111,6 +111,37 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/measure_voice.py \
   sample1.md sample2.md sample3.md --questions
 ```
 
+### Script CLI Arguments Reference
+
+#### `build_voice.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/build_voice.py (--scaffold | --check <VOICE>) [options]`
+- `--scaffold`: (MUTUALLY EXCLUSIVE REQUIRED, boolean flag) Write a new profile pair from templates.
+- `--check`: (MUTUALLY EXCLUSIVE REQUIRED, string/path) Validate one profile by name or rules file path.
+- `--name`: (REQUIRED with `--scaffold`, string slug) Profile name matching `^[A-Za-z0-9_-]+$`.
+- `--out`: (OPTIONAL, dir path) Output directory for scaffolded files (default: `voices/`).
+- `--priority`: (OPTIONAL, choice: `P0`, `P1`, `P2`) Default priority for generated rules file (default: `P0`).
+- `--force`: (OPTIONAL, boolean flag) Overwrite existing files if present.
+- `--activate`: (OPTIONAL, boolean flag) Point `voices/ACTIVE` at this profile after verification.
+
+#### `measure_voice.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/measure_voice.py <sample1.md> [sample2.md ...] [options]`
+- `samples`: (REQUIRED, list of file paths) Paths to sample markdown/text files.
+- `--name`: (OPTIONAL, string) Voice profile name.
+- `--write-fingerprint`: (OPTIONAL, boolean flag) Save fingerprint file to `voices/<name>.fingerprint.json`.
+- `--register`: (OPTIONAL, string) Scope fingerprint file to a specific register profile.
+- `--questions`: (OPTIONAL, boolean flag) Print tailored interview questions based on sample analysis.
+- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON results.
+
+#### `learn_edits.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/learn_edits.py <converted> <edited> [options]`
+- `converted`: (REQUIRED, file path) Path to draft produced by skill.
+- `edited`: (REQUIRED, file path) Path to version edited by author.
+- `--voice`: (OPTIONAL, string) Voice profile name.
+- `--voice-rules`: (OPTIONAL, file path) Path to `.rules.json` file.
+- `--register`: (OPTIONAL, choice) Register profile name.
+- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON results.
+
+
 That prints an interview instead of the report. At most ten questions, built out of what these documents did and did not contain. Every `forbid` the script would otherwise have proposed is a silence rather than a refusal, so it comes back as a question. Anything the samples already settled is not asked at all: a writer who used em dashes in four pieces has answered that one, and asking anyway spends a question out of ten and teaches them the interview is not listening. What is left of the budget goes where no counter reaches, which is banned words, hard nos, red flags, the register they did not happen to hand over, and the three rules they would keep.
 
 It refuses to interview over a contaminated sample set, and exits 1 the way the report does. Ten answers given about somebody else's prose are ten answers about somebody else, and they anchor the profile before anybody has thought to check whose register it is.

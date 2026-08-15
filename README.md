@@ -304,7 +304,9 @@ Taste is boundaries: roughly 80% of a working profile is **refusals** (what you 
 
 ### Case Study: Satoshi Nakamoto Voice Profile
 
-For a full empirical walkthrough of extracting and testing a voice profile from real-world writings (62k words across the Bitcoin whitepaper, cryptography mailing list emails, and forum posts), see [**`docs/SATOSHI_VOICE.md`**](docs/SATOSHI_VOICE.md). It documents the stylometric metrics (sentence distributions, 97.5% double-spacing after periods, British orthography), machine rules, 100% accurate oracle discrimination testing against contemporary cypherpunks, and cross-voice rewrites.
+For a full empirical walkthrough of extracting and testing a voice profile from real-world writings (62k words across the Bitcoin whitepaper, cryptography mailing list emails, and forum posts), see [**`docs/SATOSHI_VOICE.md`**](docs/SATOSHI_VOICE.md). It documents the stylometric metrics (sentence distributions, 97.5% double-spacing after periods, British orthography), machine rules, oracle discrimination testing against contemporary cypherpunks, and cross-voice rewrites.
+
+The oracle sorted all 15 benchmark documents correctly (6 authentic, 9 not), measured against this one profile's fingerprint rather than as a general authorship classifier.
 
 ### Switching Voices
 

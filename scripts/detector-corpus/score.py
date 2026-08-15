@@ -47,8 +47,10 @@ for path in (HERE, ENGINE):
 
 import corpus_io  # noqa: E402
 import scan  # noqa: E402
+from rwlib import cli_error  # noqa: E402
 from rwlib import lexicon as lexicon_mod  # noqa: E402
 from rwlib import registers  # noqa: E402
+
 
 BANDS = ("P0", "P1", "P2")
 
@@ -152,8 +154,18 @@ def report(buckets, threshold, present, missing, moved):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    examples = [
+        "python3 scripts/detector-corpus/score.py",
+        "python3 scripts/detector-corpus/score.py --verify",
+        "python3 scripts/detector-corpus/score.py --json",
+        "python3 scripts/detector-corpus/score.py --band P1"
+    ]
+    ap = cli_error.LLMArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        examples=examples
+    )
+
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--verify", action="store_true",
                     help="check hashes and stop, without scoring")

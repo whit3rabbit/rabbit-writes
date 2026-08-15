@@ -61,6 +61,7 @@ ENGINE = os.path.join(REPO_ROOT, "skills", "rabbit-writes", "scripts")
 if ENGINE not in sys.path:
     sys.path.insert(0, ENGINE)
 
+from rwlib import cli_error                                      # noqa: E402
 import scan as scan_mod                                          # noqa: E402
 from rwlib import stylometry                                     # noqa: E402
 
@@ -286,9 +287,16 @@ def report(rows):
 
 
 def main():
-    ap = argparse.ArgumentParser(
+    examples = [
+        "python3 scripts/voice-eval/reconstruct.py",
+        "python3 scripts/voice-eval/reconstruct.py --json",
+        "python3 scripts/voice-eval/reconstruct.py --verify"
+    ]
+    ap = cli_error.LLMArgumentParser(
         description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        examples=examples
+    )
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--verify", action="store_true",
                     help="check the stored hashes and score nothing")
@@ -300,8 +308,13 @@ def main():
     try:
         data = load_manifest(args.manifest)
     except CorpusError as exc:
-        print("reconstruct: %s" % exc, file=sys.stderr)
+        print(cli_error.format_file_error(
+            "reconstruct.py", args.manifest, "--manifest",
+            expected_type="manifest JSON file",
+            details=str(exc), examples=examples
+        ), file=sys.stderr)
         return 2
+
 
     if args.verify:
         moved = verify(data, args.texts)

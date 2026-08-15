@@ -514,7 +514,7 @@ The tell is symmetry: every item the same shape and length, none asserting anyth
 
 "Moreover", "Furthermore", "Additionally", "In today's [X]", "In an era where", "When it comes to", "In terms of", "That being said", "In other words" (when redundant), "Simply put."
 
-Restructure so the connection is obvious, or use "and", "also", "but". Piled up is the tell; one "however" is not.
+Restructure so the connection is obvious, or use "and", "also", "but". Piled up is the tell. One "however" is not.
 
 ## 57. Title case headings [C]
 

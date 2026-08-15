@@ -219,6 +219,43 @@ python3 $RW/verify.py before.md after.md               # did the edit break a pr
 python3 $RW/attain.py before.md after.md --voice dana  # did the conversion land
 ```
 
+### Script CLI Arguments Reference
+
+#### `scan.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py [file] [options]`
+- `file`: (OPTIONAL, file path) Path to input markdown/text file or `.docx`. If omitted, reads from `stdin`.
+- `--profile`: (OPTIONAL, choice: `auto`, `chat`, `docs`, `formal`, `informal`, `linkedin`, `technical-blog`) Apply register profile.
+- `--voice`: (OPTIONAL, string) Installed voice name or `auto`.
+- `--voice-rules`: (OPTIONAL, file path) File path to `.rules.json` profile.
+- `--json`: (OPTIONAL, boolean flag) Print JSON formatted results.
+- `--sarif`: (OPTIONAL, boolean flag) Print SARIF formatted results.
+- `--sarif-uri`: (OPTIONAL, string) URI for SARIF artifact.
+- `--check`: (OPTIONAL, boolean flag) Exit 1 if P0 finding present.
+- `--no-exempt`: (OPTIONAL, boolean flag) Do not exempt code/quoted spans from scoring.
+- `--apply-safe`: (OPTIONAL, boolean flag) Apply deterministic fixes.
+- `--write`: (OPTIONAL, boolean flag) In combination with `--apply-safe`, write fixes to file in place.
+- `--stdout`: (OPTIONAL, boolean flag) In combination with `--apply-safe`, print fixed content to stdout.
+
+#### `verify.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/verify.py <original> <rewritten> [options]`
+- `original`: (REQUIRED, file path) Path to original markdown file.
+- `rewritten`: (REQUIRED, file path) Path to rewritten markdown file.
+- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON results.
+- `--allow-structure`: (OPTIONAL, boolean flag) Report heading changes instead of failing.
+- `--allow-facts`: (OPTIONAL, boolean flag) Report lost numbers/dates/quotes instead of failing.
+
+#### `attain.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/attain.py [before] <after> [options]`
+- `before`: (OPTIONAL, file path) Path to document before edit.
+- `after`: (REQUIRED, file path) Path to document after edit.
+- `--voice`: (OPTIONAL, string) Installed voice name or `auto`.
+- `--voice-rules`: (OPTIONAL, file path) File path to `.rules.json`.
+- `--register`: (OPTIONAL, choice) Register profile name.
+- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON results.
+- `--check`: (OPTIONAL, boolean flag) Exit 1 on regression or flat conversion.
+- `--plan`: (OPTIONAL, boolean flag) Print target fingerprint shape.
+
+
 Prefer `--voice` over spelling out a `--voice-rules` path. `auto` runs the same resolution order the rest of the plugin uses, `.rabbit-voice` beside the document, then the working directory, then `voices/ACTIVE`, so a repo that pins its own house voice gets it without you knowing the path. Naming a profile and `--voice-rules` behave the same as each other: both exit 2 when the profile will not read, because scanning on without the rules that were asked for reports a clean voice band on a document nobody checked. `--voice auto` finding nothing is a note and still exits 0, since plenty of repos have no profile.
 
 Outside a plugin install `${CLAUDE_PLUGIN_ROOT}` is unset, which turns every path above into an absolute path that does not exist. If that happens, resolve `scripts/scan.py` relative to this file's own directory instead.

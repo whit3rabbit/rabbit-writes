@@ -51,10 +51,16 @@ import urllib.parse
 import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-if HERE not in sys.path:
-    sys.path.insert(0, HERE)
+REPO_ROOT = os.path.dirname(os.path.dirname(HERE))
+ENGINE = os.path.join(REPO_ROOT, "skills", "rabbit-writes", "scripts")
+for path in (HERE, ENGINE):
+    if path not in sys.path:
+        sys.path.insert(0, path)
+
 
 import corpus_io  # noqa: E402
+from rwlib import cli_error  # noqa: E402
+
 
 # Politeness, not rate limiting in any real sense. These fetches go to web
 # archives, one request per sample, a few dozen samples. A tool that hammers an
@@ -296,9 +302,17 @@ def report(rows, dry_run):
 
 
 def main():
-    ap = argparse.ArgumentParser(
+    examples = [
+        "python3 scripts/detector-corpus/fetch_samples.py",
+        "python3 scripts/detector-corpus/fetch_samples.py --all",
+        "python3 scripts/detector-corpus/fetch_samples.py --dry-run",
+        "python3 scripts/detector-corpus/fetch_samples.py --id human-0001"
+    ]
+    ap = cli_error.LLMArgumentParser(
         description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        examples=examples
+    )
     ap.add_argument("--all", action="store_true",
                     help="refetch every sample, including ones already "
                          "verified here, and check they still hash the same")
@@ -314,18 +328,25 @@ def main():
     bad_ids = sorted({s["id"] for s in samples
                       if "id" in s and not corpus_io.ID_RX.fullmatch(s["id"])})
     if bad_ids:
-        print("manifest has ids that are not slugs (lowercase ascii, digits, "
-              "hyphens), which is a path-traversal vector in texts/: %s"
-              % ", ".join(bad_ids), file=sys.stderr)
+        print(cli_error.format_llm_error(
+            "fetch_samples.py",
+            "manifest has ids that are not slugs (lowercase ascii, digits, hyphens), which is a path-traversal vector in texts/: %s"
+            % ", ".join(bad_ids),
+            parser=ap, examples=examples
+        ), file=sys.stderr)
         return 1
     if args.id:
         wanted = set(args.id)
         samples = [s for s in samples if s["id"] in wanted]
         unknown = wanted - {s["id"] for s in samples}
         if unknown:
-            print("no such sample: %s" % ", ".join(sorted(unknown)),
-                  file=sys.stderr)
+            print(cli_error.format_llm_error(
+                "fetch_samples.py",
+                "no such sample id(s): %s" % ", ".join(sorted(unknown)),
+                parser=ap, examples=examples
+            ), file=sys.stderr)
             return 1
+
 
     rows = []
     for index, sample in enumerate(samples):

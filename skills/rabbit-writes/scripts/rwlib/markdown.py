@@ -77,8 +77,19 @@ _QUOTE_PAIRS = (('"', '"'), (LEFT_DOUBLE, RIGHT_DOUBLE), (LEFT_SINGLE, RIGHT_SIN
 # facts.quoted's multiset and read as a quotation removed. A blank line still
 # ends the span, because an unclosed quote mark would otherwise swallow the
 # rest of the document up to the 400-character ceiling.
+#
+# There is no lower bound, and that is the load-bearing half. A straight quote
+# closes with the same character it opens with, so pairing is positional: skip
+# one well-formed pair and every quote after it on the paragraph pairs with the
+# wrong neighbour. A `{4,400}` floor did exactly that. `("No.")` holds three
+# characters, fell under the floor, and its *closing* quote then opened a
+# 220-character span that ran to the opening quote of the next real quotation
+# and ate it, which left `circle back"` scored as prose and raised a banned
+# phrase against a document that was only naming the phrase as an example.
+# Length is a judgement about a matched span, not about where one ends, so the
+# callers that want a floor apply their own: facts.quoted has QUOTED_MIN_WORDS.
 QUOTED_RX = re.compile(
-    "|".join("%s((?:[^%s%s\\n]|\\n(?![ \\t]*\\n)){4,400})%s"
+    "|".join("%s((?:[^%s%s\\n]|\\n(?![ \\t]*\\n)){0,400})%s"
              % (re.escape(a), re.escape(a), re.escape(b), re.escape(b))
              for a, b in _QUOTE_PAIRS))
 CURLY_QUOTE_RX = re.compile("[“”‘’]")

@@ -1198,6 +1198,32 @@ def check_cross_references():
                          % (os.path.relpath(path, ROOT), rel))
 
 
+def check_cli_error_handling():
+    cli_scripts = [
+        os.path.join(SKILLS, "rabbit-writes", "scripts", "scan.py"),
+        os.path.join(SKILLS, "rabbit-writes", "scripts", "verify.py"),
+        os.path.join(SKILLS, "rabbit-writes", "scripts", "attain.py"),
+        os.path.join(SKILLS, "readme-writing", "scripts", "readme_check.py"),
+        os.path.join(SKILLS, "voice-setup", "scripts", "build_voice.py"),
+        os.path.join(SKILLS, "voice-setup", "scripts", "learn_edits.py"),
+        os.path.join(SKILLS, "voice-setup", "scripts", "measure_voice.py"),
+        os.path.join(ROOT, "scripts", "precommit.py"),
+        os.path.join(ROOT, "scripts", "detector-corpus", "add_sample.py"),
+        os.path.join(ROOT, "scripts", "detector-corpus", "score.py"),
+        os.path.join(ROOT, "scripts", "detector-corpus", "fetch_samples.py"),
+        os.path.join(ROOT, "scripts", "voice-eval", "reconstruct.py"),
+    ]
+    for script_path in cli_scripts:
+        if not os.path.exists(script_path):
+            continue
+        rel = os.path.relpath(script_path, ROOT)
+        with open(script_path, encoding="utf-8") as fh:
+            content = fh.read()
+        if "LLMArgumentParser" not in content and "cli_error" not in content:
+            fail("%s does not use LLMArgumentParser or cli_error for LLM-friendly CLI error handling" % rel)
+    notes.append("%d CLI script(s) verified for LLM error handling" % len(cli_scripts))
+
+
 check_manifests()
 check_skills()
 check_voices()
@@ -1217,6 +1243,7 @@ check_import_paths()
 check_scripts_compile()
 check_precommit_hooks()
 check_cross_references()
+check_cli_error_handling()
 
 for note in notes:
     print("  %s" % note)
@@ -1228,3 +1255,4 @@ if problems:
     sys.exit(1)
 
 print("\nrepo valid")
+

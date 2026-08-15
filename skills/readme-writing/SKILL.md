@@ -103,6 +103,18 @@ Two things a voice profile does *not* import into a README, because they belong 
    python3 ${CLAUDE_PLUGIN_ROOT}/skills/readme-writing/scripts/readme_check.py README.md
    ```
 
+### Script CLI Arguments Reference
+
+#### `readme_check.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/readme-writing/scripts/readme_check.py <README.md> [options]`
+- `readme`: (REQUIRED, file path) Path to README markdown file to check.
+- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON results.
+- `--check`: (OPTIONAL, boolean flag) Exit 1 if P0 finding present.
+- `--no-voice`: (OPTIONAL, boolean flag) Disable active voice profile rules.
+- `--voice`: (OPTIONAL, string) Installed voice profile name or `auto`.
+- `--voice-rules`: (OPTIONAL, file path) Path to `.rules.json` profile file.
+
+
    Findings come back in four bands. `structure` is this skill's. `voice` is the writer's own rules, and a hit there is a defect rather than a suggestion. `fingerprint` and `craft` come from the `rabbit-writes` engine running at register `docs`.
 
    Fix P0s always. P1s need a reason to keep. P2s are judgment.

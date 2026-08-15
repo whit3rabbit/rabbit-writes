@@ -35,12 +35,20 @@ for _path in (HERE, ENGINE):
         sys.path.insert(0, _path)
 
 import corpus_io  # noqa: E402
-from rwlib import registers  # noqa: E402
+from rwlib import cli_error, registers  # noqa: E402
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    examples = [
+        "python3 scripts/detector-corpus/add_sample.py TEXT.txt --id human-0007 --label human --register technical-blog --source-url https://example.dev/posts/locking --archive-url https://web.archive.org/... --published 2019-03-04 --why-credible 'Wayback capture 2019-03-04'",
+        "python3 scripts/detector-corpus/add_sample.py OUT.txt --id gen-0007 --label generated --register technical-blog --model claude-sonnet-4-5 --generated 2026-08-11 --prompt 'Write a 700-word blog post...'"
+    ]
+    ap = cli_error.LLMArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        examples=examples
+    )
+
     ap.add_argument("file", help="the text to register")
     ap.add_argument("--id", required=True)
     ap.add_argument("--label", required=True, choices=corpus_io.LABELS)

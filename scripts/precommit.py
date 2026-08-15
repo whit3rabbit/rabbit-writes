@@ -117,16 +117,33 @@ def split_args(argv):
     return flags, argv[index:]
 
 
+ENGINE = os.path.join(ROOT, "skills", "rabbit-writes", "scripts")
+if ENGINE not in sys.path:
+    sys.path.insert(0, ENGINE)
+from rwlib import cli_error  # noqa: E402
+
+
 def main(argv):
+    examples = [
+        "python3 scripts/precommit.py scan -- draft.md",
+        "python3 scripts/precommit.py readme -- README.md",
+        "python3 scripts/precommit.py scan --voice auto -- draft1.md draft2.md",
+        "python3 scripts/precommit.py readme --check -- README.md",
+    ]
     if not argv or argv[0] not in CHECKERS:
-        print("usage: precommit.py {%s} [args] -- FILE..."
-              % "|".join(sorted(CHECKERS)), file=sys.stderr)
+        msg = f"Unknown or missing checker command {argv[0]!r}." if argv else "Checker command missing."
+        print(cli_error.format_llm_error(
+            "precommit.py",
+            f"{msg} Target checker must be one of: {', '.join(sorted(CHECKERS))}.",
+            examples=examples
+        ), file=sys.stderr)
         return 2
     checker = CHECKERS[argv[0]]
     flags, files = split_args(argv[1:])
     if not files:
         return 0
     flags = resolve_plugin_paths(flags)
+
 
     # Exit 1 is the checkers' "found a P0". Anything else non-zero is the
     # checker failing to run at all: 2 for a file it cannot open or a voice
