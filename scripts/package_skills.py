@@ -39,7 +39,7 @@ ENGINE_SCRIPTS_DIR = os.path.join(ENGINE_DIR, "scripts")
 DIST_DIR = os.path.join(ROOT, "dist")
 MAX_FILES = 200
 
-SKILL_NAMES = ["rabbit-writes", "voice-setup", "readme-writing"]
+SKILL_NAMES = ["rabbit-writes", "voice-setup", "readme-writing", "rabbit-reads"]
 
 PLUGIN_VAR = "${CLAUDE_PLUGIN_ROOT}"
 
@@ -97,12 +97,13 @@ IGNORE_FILES = {
     "PROOF.md",
 }
 
-# The shared "Paths." paragraph, present in all three SKILL.md files with one
+# The shared "Paths." paragraph, present in all four SKILL.md files with one
 # wording difference ("below means" in rabbit-writes, "means" elsewhere).
 _PATHS_OLD_TAIL = (
     "the directory holding this skill and its siblings (`rabbit-writes`, "
-    "`voice-setup`, `readme-writing`). Claude Code expands the variable. "
-    "On a host that doesn't, such as Codex, resolve it that way by hand."
+    "`voice-setup`, `readme-writing`, `rabbit-reads`). Claude Code expands "
+    "the variable. On a host that doesn't, such as Codex, resolve it that "
+    "way by hand."
 )
 _PATHS_NEW = (
     "**Paths.** Every path below is relative to this skill's own directory, "
@@ -161,7 +162,7 @@ SUBSTITUTIONS = {
                 "active-voice alignment and file pairing. Note the path: it sits "
                 "at the repository root rather than under `" + PLUGIN_VAR + "/skills/`, "
                 "so it only exists in a full-repo install and is absent when the "
-                "three skills were copied in loose. `build_voice.py --check` is "
+                "skills were copied in loose. `build_voice.py --check` is "
                 "the one that ships with the skill, which is why it is the step "
                 "above and not this one.",
                 "**Validate the whole install,** when there is one: the plugin "
@@ -219,6 +220,14 @@ SUBSTITUTIONS = {
                 "in the plugin repository, computed across 100 real READMEs from "
                 "currently-trending GitHub repos (methodology and the full "
                 "100-repo table are there).",
+            ),
+        ],
+    },
+    "rabbit-reads": {
+        "SKILL.md": [
+            (
+                "**Paths.** `" + PLUGIN_VAR + "/skills/` means " + _PATHS_OLD_TAIL,
+                _PATHS_NEW,
             ),
         ],
     },
@@ -436,7 +445,7 @@ def main():
         if not build_skill_zip(skill):
             success = False
     if success:
-        print("All 3 skills packaged as isolated, self-contained archives in dist/.")
+        print("All 4 skills packaged as isolated, self-contained archives in dist/.")
         return 0
     print("Packaging failed for one or more skills.", file=sys.stderr)
     return 1

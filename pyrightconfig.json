@@ -50,6 +50,19 @@
       ]
     },
     {
+      "root": "skills/rabbit-reads/scripts",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
+      ]
+    },
+    {
+      "root": "skills/rabbit-reads/tests",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts",
+        "skills/rabbit-reads/scripts"
+      ]
+    },
+    {
       "root": "scripts/detector-corpus",
       "extraPaths": [
         "skills/rabbit-writes/scripts"

@@ -10,7 +10,7 @@
     {
       "name": "rabbit-writes",
       "source": "./",
-      "description": "Write and edit in your own voice, not a chatbot's. Ships three skills: rabbit-writes (draft, convert, de-slop, or audit prose in the active voice, four modes over a shared detection and craft engine), voice-setup (build or swap a voice profile), and readme-writing (draft or audit a README.md against patterns measured from 100 real GitHub repos).",
+      "description": "Write and edit in your own voice, not a chatbot's. Ships four skills: rabbit-writes (draft, convert, de-slop, or audit prose in the active voice, four modes over a shared detection and craft engine), voice-setup (build or swap a voice profile), readme-writing (draft or audit a README.md against patterns measured from 100 real GitHub repos), and rabbit-reads (distill a book, paper, or thesis into per-concept cheatsheets with structure mapping and subagent fan-out).",
       "category": "productivity",
       "license": "MIT",
       "author": {
@@ -27,7 +27,9 @@
         "humanize",
         "ai-detection",
         "readme",
-        "documentation"
+        "documentation",
+        "notes",
+        "reading"
       ]
     }
   ]

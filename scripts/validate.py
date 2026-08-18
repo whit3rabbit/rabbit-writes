@@ -142,7 +142,7 @@ def check_skills():
         elif len(desc.group(1)) < 60:
             fail("skills/%s: description is too short to trigger reliably" % name)
         found.append(name)
-    for required in ("rabbit-writes", "voice-setup", "readme-writing"):
+    for required in ("rabbit-writes", "voice-setup", "readme-writing", "rabbit-reads"):
         if required not in found:
             fail("expected skill missing: %s" % required)
     notes.append("skills: %s" % ", ".join(found))
@@ -855,7 +855,10 @@ def check_scripts_compile():
                 "readme-writing/scripts/readme_check.py",
                 "voice-setup/scripts/measure_voice.py",
                 "voice-setup/scripts/build_voice.py",
-                "voice-setup/scripts/audit_voice.py"):
+                "voice-setup/scripts/audit_voice.py",
+                "rabbit-reads/scripts/extract_text.py",
+                "rabbit-reads/scripts/map_structure.py",
+                "rabbit-reads/scripts/check_notes.py"):
         path = os.path.join(SKILLS, rel)
         if not os.path.exists(path):
             continue
@@ -1212,6 +1215,9 @@ def check_cli_error_handling():
         os.path.join(SKILLS, "voice-setup", "scripts", "learn_edits.py"),
         os.path.join(SKILLS, "voice-setup", "scripts", "measure_voice.py"),
         os.path.join(SKILLS, "voice-setup", "scripts", "audit_voice.py"),
+        os.path.join(SKILLS, "rabbit-reads", "scripts", "extract_text.py"),
+        os.path.join(SKILLS, "rabbit-reads", "scripts", "map_structure.py"),
+        os.path.join(SKILLS, "rabbit-reads", "scripts", "check_notes.py"),
         os.path.join(ROOT, "scripts", "precommit.py"),
         os.path.join(ROOT, "scripts", "detector-corpus", "add_sample.py"),
         os.path.join(ROOT, "scripts", "detector-corpus", "score.py"),
@@ -1255,6 +1261,56 @@ def check_thesaurus():
                  % (reaches, overs))
 
 
+def check_book_type_files():
+    """The book types rabbit-reads routes on, in references/book-types/.
+
+    Data somebody edits, so it drifts the way every other data file here does.
+    check_notes.py parses the same header lines at runtime, which is why the
+    grammar is checked here rather than in the skill's tests alone: a header
+    that no longer parses strands every notes folder built on that type.
+    """
+    types_dir = os.path.join(SKILLS, "rabbit-reads", "references", "book-types")
+    if not os.path.isdir(types_dir):
+        fail("skills/rabbit-reads/references/book-types is missing")
+        return
+    names = sorted(n for n in os.listdir(types_dir) if n.endswith(".md"))
+    if not names:
+        fail("skills/rabbit-reads/references/book-types holds no type files")
+        return
+    headings = ["What counts", "Segmentation", "Concept grain", "Template",
+                "Kind markers", "Fan-out"]
+    for name in names:
+        text = read("skills", "rabbit-reads", "references", "book-types", name)
+        stem = name[:-3]
+        markers = re.search(r"(?m)^\*\*Kind markers:\*\* ([a-z, ]+)$", text)
+        if not markers or not markers.group(1).strip():
+            fail("%s.md has no Kind markers header line" % stem)
+        band = re.search(r"(?m)^\*\*Length band:\*\* (\d+)-(\d+)$", text)
+        if not band or int(band.group(1)) >= int(band.group(2)):
+            fail("%s.md has no usable Length band header line" % stem)
+        sections = re.search(r"(?m)^\*\*Template sections:\*\* (.+)$", text)
+        if not sections or not sections.group(1).strip():
+            fail("%s.md has no Template sections header line" % stem)
+        if not re.search(r"(?m)^\*\*Source line:\*\* .+$", text):
+            fail("%s.md has no Source line header line" % stem)
+        if sections:
+            declared = [s.strip() for s in sections.group(1).split(",")]
+            fence = re.search(r"## Template\s*\n\s*```[^\n]*\n(.*?)```", text, re.S)
+            if not fence:
+                fail("%s.md has no fenced template under ## Template" % stem)
+            else:
+                for section in declared:
+                    if not re.search(r"(?m)^## %s\s*$" % re.escape(section),
+                                     fence.group(1)):
+                        fail("%s.md template fence does not carry ## %s"
+                             % (stem, section))
+        pos = [text.find("\n## %s\n" % h) for h in headings]
+        if -1 in pos or pos != sorted(pos):
+            fail("%s.md is missing a heading or carries them out of order: %s"
+                 % (stem, ", ".join(headings)))
+    notes.append("book types: %d file(s) routing rabbit-reads" % len(names))
+
+
 check_manifests()
 check_skills()
 check_voices()
@@ -1270,6 +1326,7 @@ check_mode_contract()
 check_form_files()
 check_template_registers()
 check_thesaurus()
+check_book_type_files()
 check_claude_md()
 check_import_paths()
 check_scripts_compile()

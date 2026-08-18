@@ -71,6 +71,71 @@ README_SAMPLE = (
     "MIT\n"
 )
 
+# A book just long enough for map_structure.py to see two chapters past its
+# minimum block span, and nothing else it could mistake for a heading.
+READS_BOOK = (
+    "Test Book\n\n"
+    "Preface\n\n"
+    "A short front matter block so the mapper has something to classify.\n"
+    "It runs a few lines so the block span rule is satisfied.\n\n"
+    "Chapter 1. Alpha\n\n"
+    "The first chapter body sits here across several plain lines.\n"
+    "None of them look like headings, so only the line above maps.\n"
+    "A third line keeps the block past the minimum span.\n\n"
+    "Chapter 2. Beta\n\n"
+    "The second chapter body follows the same plain shape.\n"
+    "Two lines are enough once the chapter line itself is counted.\n"
+    "A third line closes the book.\n"
+)
+
+# Two docs conforming to the non-fiction book type, sized for the band
+# overrides the test passes rather than the shipped 40-70 band. The index
+# Source cell is the whole locator off each doc's own Source line, book and
+# all, because check_notes compares the two: a cell carrying only the chapter
+# is the drift that check exists to catch.
+READS_NOTES = {
+    "README.md": (
+        "# Reads Notes\n\n"
+        "| Doc | Source | Kind |\n|---|---|---|\n"
+        "| [alpha.md](alpha.md) | Test Book, ch. 1 | practice |\n"
+        "| [beta.md](beta.md) | Test Book, ch. 2 | practice |\n"
+    ),
+    "alpha.md": (
+        "# Alpha\n\n"
+        "Source: Test Book, ch. 1 (practice)\n\n"
+        "## What this is\n\n"
+        "The first concept.\n\n"
+        "## Practices\n\n"
+        "1. Do the first thing.\n"
+        "2. Do the second thing.\n"
+        "3. Do the third thing.\n\n"
+        "## Anti-patterns\n\n"
+        "- Doing none of the things.\n\n"
+        "## Tests\n\n"
+        "- Was the first thing done?\n"
+        "- Was the second thing done?\n\n"
+        "## See also\n\n"
+        "- beta.md\n"
+    ),
+    "beta.md": (
+        "# Beta\n\n"
+        "Source: Test Book, ch. 2 (practice)\n\n"
+        "## What this is\n\n"
+        "The second concept.\n\n"
+        "## Practices\n\n"
+        "1. Keep it plain.\n"
+        "2. Keep it short.\n"
+        "3. Keep it linked.\n\n"
+        "## Anti-patterns\n\n"
+        "- Keeping it ornate.\n\n"
+        "## Tests\n\n"
+        "- Is it plain?\n"
+        "- Is it short?\n\n"
+        "## See also\n\n"
+        "- alpha.md\n"
+    ),
+}
+
 failures = []
 _built = False
 _plugin_built = False
@@ -233,6 +298,56 @@ def test_readme_check_runs_and_finds_its_voices_dir():
           json.dumps(payload)[:300])
 
 
+def test_rabbit_reads_extracts_maps_and_checks_standalone():
+    ensure_built()
+    book = os.path.join(CWD, "reads-book.txt")
+    write(book, READS_BOOK)
+    scripts = installed("rabbit-reads", "scripts")
+
+    r = run([os.path.join(scripts, "extract_text.py"), book, "--stdout"])
+    check("extract_text.py runs from an extracted archive",
+          r.returncode == 0 and "Chapter 2. Beta" in r.stdout,
+          (r.stderr or r.stdout)[:300])
+
+    r = run([os.path.join(scripts, "map_structure.py"), book, "--json"])
+    check("map_structure.py maps two chapters standalone",
+          r.returncode == 0 and '"sections"' in r.stdout,
+          (r.stderr or r.stdout)[:300])
+
+    notes = os.path.join(CWD, "reads-notes")
+    os.makedirs(notes, exist_ok=True)
+    for name, text in READS_NOTES.items():
+        write(os.path.join(notes, name), text)
+    r = run([os.path.join(scripts, "check_notes.py"), notes,
+             "--book-type", "non-fiction",
+             "--min-lines", "8", "--max-lines", "60"])
+    check("check_notes.py passes a conforming folder standalone",
+          r.returncode == 0, (r.stderr or r.stdout)[:400])
+
+
+def test_plugin_layout_rabbit_reads_reaches_the_sibling_engine():
+    # The satellite carries no vendored rwlib of its own beyond what packaging
+    # vendors for every non-engine skill, so this run proves _bootstrap
+    # resolves the sibling engine from the loose-skills layout.
+    ensure_plugin_copy()
+    docx = os.path.join(CWD, "reads-sample.docx")
+    document = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<w:document xmlns:w="http://schemas.openxmlformats.org/'
+        'wordprocessingml/2006/main"><w:body>'
+        '<w:p><w:r><w:t>The plateau holds at dawn.</w:t></w:r></w:p>'
+        '<w:p><w:r><w:t>The second paragraph names the river.</w:t></w:r></w:p>'
+        '</w:body></w:document>'
+    )
+    with zipfile.ZipFile(docx, "w") as zf:
+        zf.writestr("word/document.xml", document)
+    r = run([plugin_path("rabbit-reads", "scripts", "extract_text.py"),
+             docx, "--stdout"])
+    check("plugin layout: extract_text.py reads a docx off the sibling engine",
+          r.returncode == 0 and "plateau holds at dawn" in r.stdout,
+          (r.stderr or r.stdout)[:300])
+
+
 def test_plugin_layout_scans_fixes_and_applies_a_voice():
     ensure_plugin_copy()
     sample = os.path.join(CWD, "plugin-sample.md")
@@ -279,6 +394,31 @@ def test_plugin_layout_sibling_engine_wins_over_a_vendored_copy():
         r = run(["-c", code])
         sibling = os.path.join("rabbit-writes", "scripts")
         check("plugin layout: the sibling engine wins over a vendored rwlib",
+              r.returncode == 0 and sibling in r.stdout,
+              (r.stderr or r.stdout)[:300])
+    finally:
+        shutil.rmtree(decoy, ignore_errors=True)
+
+
+def test_plugin_layout_rabbit_reads_sibling_engine_wins_over_a_vendored_copy():
+    # Same regression as the voice-setup version above, for rabbit-reads' own
+    # _bootstrap.py: HERE first, RWLIB_PARENT second in the sys.path insert
+    # loop, leaving the sibling engine at sys.path[0] when both carry an rwlib.
+    ensure_plugin_copy()
+    decoy = plugin_path("rabbit-reads", "scripts", "rwlib")
+    os.makedirs(decoy, exist_ok=True)
+    write(os.path.join(decoy, "__init__.py"), "")
+    code = (
+        "import sys\n"
+        "sys.path.insert(0, %r)\n"
+        "import _bootstrap\n"
+        "from rwlib import cli_error\n"
+        "print(cli_error.__file__)\n" % plugin_path("rabbit-reads", "scripts"))
+    try:
+        r = run(["-c", code])
+        sibling = os.path.join("rabbit-writes", "scripts")
+        check("plugin layout: rabbit-reads' sibling engine wins over a "
+              "vendored rwlib",
               r.returncode == 0 and sibling in r.stdout,
               (r.stderr or r.stdout)[:300])
     finally:

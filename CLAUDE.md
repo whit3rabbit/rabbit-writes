@@ -1,6 +1,6 @@
 # rabbit-writes
 
-Claude Code / Codex plugin. Three skills (`rabbit-writes`, `voice-setup`, `readme-writing`) over one prose engine in `skills/rabbit-writes/{references,scripts}`.
+Claude Code / Codex plugin. Four skills (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`) over one prose engine in `skills/rabbit-writes/{references,scripts}`, with `rabbit-reads` verifying the notes it writes through the engine's scanner.
 
 ## Verify before shipping
 
@@ -9,10 +9,11 @@ python3 scripts/validate.py                          # manifests, skills, voices
 python3 skills/rabbit-writes/tests/run.py            # engine, voice, verifier, fixer, invariants
 python3 skills/readme-writing/tests/run.py           # structure, links, voice, 100-repo regression
 python3 skills/voice-setup/tests/run.py              # scaffolding, thesaurus, edit-learning
+python3 skills/rabbit-reads/tests/run.py             # extraction, structure mapping, notes battery
 python3 scripts/detector-corpus/test_corpus_harness.py   # the corpus harness, network stubbed
 python3 scripts/thesaurus-research/test_thesaurus_harness.py   # the thesaurus pipeline, over synthetic datasets
 python3 scripts/voice-eval/test_eval_harness.py          # the reconstruction scorer, over stubbed triples
-python3 scripts/package_skills.py                        # package 3 isolated skill zips into dist/ for Claude custom skills upload
+python3 scripts/package_skills.py                        # package 4 isolated skill zips into dist/ for Claude custom skills upload
 python3 scripts/test_package_skills.py                   # extract each zip outside the repo and run what it ships, then the same battery over a loose plugin-layout copy
 claude plugin validate .                             # marketplace manifest only, and it never reads $schema
 ```
@@ -55,6 +56,7 @@ One home per fact. These four moved there and the old copies are gone, so adding
 - **Where `rwlib` is, for something that is not Python.** `pyrightconfig.json` at the root, one execution environment per directory holding a `.py`, each one naming `skills/rabbit-writes/scripts`. Nothing is installed, so a language server has no way to find a package a script puts on `sys.path` at runtime, and `from rwlib import fixes` in a test reads as an unresolved import with nothing wrong with it. `check_import_paths` in `scripts/validate.py` is what keeps the two statements of the same fact together: it reads the bare-name imports out of every file and fails when the config gives that file's directory no path to `rwlib` or to its sibling `helpers`, which is the drift a new script directory causes and whose only symptom is red squiggles in one folder. Local resolution stays the mechanism. `.vscode/` and `.idea/` are gitignored and an editor-specific settings file would not survive a clone. Two things the file cannot say for itself. `typeCheckingMode` is `off` because resolving `rwlib` is what unblocked inference on everything downstream of it: measured over the tree, `off` is 0 errors and 2 warnings, `basic` is 93, `standard` is 95, and 95 inference complaints about untyped stdlib scripts is a type checker nobody adopted rather than a bug list. Unresolved imports are still reported at `off`, so pyright keeps checking the one thing the file exists for. And there is no comment in it and no `$schema`, because pyright validates its own keys and reported both as unrecognized settings on every run, which is what the key list in `check_import_paths` now holds.
 
 - **What makes hidden text an attack.** `rwlib/injection.py`, in the two-axis rule: concealment and a directive in the same span is P0, either one alone is a band lower. `references/injection.md` is the prose form and the only other copy. The band is never fixable (no id in `fixes.py`, and `--apply-safe` refuses the whole run on a safety P0) and never suppressible (`suppress.apply` refuses the `safety` band outright, because a `rabbit-allow` comment lives inside the document an attacker controls). Both refusals are asserted, in `test_fixes.py` and `test_suppress.py`.
+- **What a book type segments on, its template sections, its kind markers, and its free-form files.** `skills/rabbit-reads/references/book-types/`, one file per type, parsed by both `check_notes.py` and `scripts/validate.py`, so a new type is a new file there and not a code change.
 
 ## Gotchas
 

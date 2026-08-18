@@ -14,7 +14,7 @@ name: checks
 #
 # `shell: bash` for every step, so one `run:` block works on all three runners.
 # Windows defaults to pwsh, where a trailing `\` is not a line continuation and
-# the dogfood block below silently becomes four broken commands.
+# the dogfood block below silently becomes five broken commands.
 
 on:
   push:
@@ -80,6 +80,9 @@ jobs:
         # executed.
         run: python skills/voice-setup/tests/run.py
 
+      - name: rabbit-reads extraction, structure mapping, and notes battery
+        run: python skills/rabbit-reads/tests/run.py
+
       - name: detector-corpus harness
         # The network is stubbed. This is the harness that will publish a
         # false-positive rate the day somebody populates the corpus, and it had
@@ -107,6 +110,8 @@ jobs:
           python skills/rabbit-writes/scripts/scan.py skills/readme-writing/SKILL.md \
             --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
           python skills/rabbit-writes/scripts/scan.py skills/voice-setup/SKILL.md \
+            --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
+          python skills/rabbit-writes/scripts/scan.py skills/rabbit-reads/SKILL.md \
             --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
           # The files PROOF.md publishes zero P0/P1 for, re-checked every PR so a
           # regression surfaces here rather than at the next hand-run of PROOF.

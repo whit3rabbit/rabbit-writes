@@ -11,6 +11,30 @@ drifted from the data it describes. The 100-repo corpus regression, the
 calibration fixtures, and every published self-scan number were re-run after all
 three.
 
+### A fourth skill, rabbit-reads
+
+- **`rabbit-reads` distills a book, paper, or thesis into per-concept
+  cheatsheets.** A run writes a `<book-slug>-notes/` folder of 40-70 line
+  markdown documents plus a README index. The source's structure is mapped to
+  section line ranges first, the concept set comes from that map, and the
+  writing fans out to subagents.
+- **Three scripts, and the book types are data.** `extract_text.py` normalizes
+  the source to plain text, `map_structure.py` maps that text to section line
+  ranges, and `check_notes.py` verifies the finished notes mechanically and can
+  run the `rabbit-writes` scanner over them. The book types (non-fiction,
+  fiction, arxiv paper, thesis) are data files in `references/book-types/`, one
+  per type, parsed by both `check_notes.py` and `scripts/validate.py`, so a new
+  type is a new file there and not a code change.
+- **The formats it accepts: pdf, docx, doc, rtf, html, odt, epub, md, and
+  txt.** pdf through poppler's `pdftotext`, docx through the plugin's own docx
+  reader, doc/rtf/html/odt through macOS `textutil`, and the rest read
+  directly. Every route writes its plain text under `scratch/`, and the
+  intermediates stay there.
+- **The notes paraphrase the source and never quote it.** A committed note
+  that reproduces passages of somebody's book republishes them, and a
+  normalized copy of the whole text is the same problem larger, so nothing
+  derived from the source lands in a tracked path.
+
 ### A corpus audit for finished profiles
 
 - **`audit_voice.py` scripts the inverse test.** `SKILL.md` used to say "no

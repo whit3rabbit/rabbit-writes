@@ -8,7 +8,7 @@ Write and edit in **your** voice, not a chatbot's.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-[Install](#install) • [Run it](#run-it) • [Voice Setup](#first-thing-to-do-make-it-sound-like-you) • [What's in it](#whats-in-it) • [Three Bands](#three-bands-never-conflated) • [What It Will Not Do](#what-it-will-not-do) • [Verify Rewrite](#verify-a-rewrite) • [README Skill](#write-a-readme-with-it) • [Tests](#tests) • [Where This Came From](#where-this-came-from) • [Contributing](#contributing-a-voice) • [License](#license)
+[Install](#install) • [Run it](#run-it) • [Voice Setup](#first-thing-to-do-make-it-sound-like-you) • [What's in it](#whats-in-it) • [Three Bands](#three-bands-never-conflated) • [What It Will Not Do](#what-it-will-not-do) • [Verify Rewrite](#verify-a-rewrite) • [README Skill](#write-a-readme-with-it) • [Reading Notes](#distill-reading-notes-with-it) • [Tests](#tests) • [Where This Came From](#where-this-came-from) • [Contributing](#contributing-a-voice) • [License](#license)
 
 </div>
 
@@ -37,7 +37,7 @@ codex plugin marketplace add whit3rabbit/rabbit-writes
 codex plugin add rabbit-writes@rabbit-writes
 ```
 
-In Claude Code, `/reload-plugins` applies the install without a restart. In Codex, restart. Then confirm the three skills loaded: `claude plugin list | grep rabbit-writes`, or `/skills` in Codex.
+In Claude Code, `/reload-plugins` applies the install without a restart. In Codex, restart. Then confirm the four skills loaded: `claude plugin list | grep rabbit-writes`, or `/skills` in Codex.
 
 Python 3.9+ with the standard library, and only if you want the scripts. Nothing to build.
 
@@ -92,7 +92,7 @@ git clone https://github.com/whit3rabbit/rabbit-writes
 ln -s "$PWD/rabbit-writes" ~/.claude/skills/rabbit-writes
 ```
 
-The `.claude-plugin/` manifests come along with it, so that loads as `rabbit-writes@skills-dir` rather than as three loose skills, and `${CLAUDE_PLUGIN_ROOT}` still resolves. It picks up edits without a reinstall. Don't run both installs at once: two copies of the same three skills means every request matches twice.
+The `.claude-plugin/` manifests come along with it, so that loads as `rabbit-writes@skills-dir` rather than as four loose skills, and `${CLAUDE_PLUGIN_ROOT}` still resolves. It picks up edits without a reinstall. Don't run both installs at once: two copies of the same four skills means every request matches twice.
 
 </details>
 
@@ -105,12 +105,12 @@ Codex scans `~/.agents/skills/` for user-level skills and `.agents/skills/` at a
 git clone https://github.com/whit3rabbit/rabbit-writes
 cd rabbit-writes
 mkdir -p ~/.agents/skills
-for s in rabbit-writes voice-setup readme-writing; do
+for s in rabbit-writes voice-setup readme-writing rabbit-reads; do
   ln -s "$PWD/skills/$s" ~/.agents/skills/$s
 done
 ```
 
-Symlink all three. They call each other: `readme-writing` runs the `rabbit-writes` scanner against the active voice, and both read the profiles under `rabbit-writes/voices/`. `scripts/readme_check.py` resolves its siblings by walking up from its own path, so that layout works.
+Symlink all four. They call each other: `readme-writing` runs the `rabbit-writes` scanner against the active voice, and both read the profiles under `rabbit-writes/voices/`. `scripts/readme_check.py` resolves its siblings by walking up from its own path, so that layout works.
 
 What you lose is `docs/`, which sits at the repo root outside every skill folder. The study behind `readme-writing` is then only in the clone. Nothing breaks, `references/patterns.md` carries the same numbers.
 
@@ -119,15 +119,15 @@ What you lose is `docs/`, which sits at the repo root outside every skill folder
 <details>
 <summary><b>claude.ai, as standalone skill uploads</b></summary>
 
-The custom-skill upload on claude.ai takes one skill per zip, so the plugin also packages as three isolated archives:
+The custom-skill upload on claude.ai takes one skill per zip, so the plugin also packages as four isolated archives:
 
 ```bash
 python3 scripts/package_skills.py
 ```
 
-That writes `dist/rabbit-writes.zip`, `dist/voice-setup.zip`, and `dist/readme-writing.zip`. Upload the ones you want. Each stands alone: the two satellite skills carry their own copy of the engine (`scan.py`, `verify.py`, `rwlib/`, both data files), their own `voices/` snapshot, and a `SKILL.md` rewritten at package time so every path resolves inside the archive rather than through `${CLAUDE_PLUGIN_ROOT}`.
+That writes `dist/rabbit-writes.zip`, `dist/voice-setup.zip`, `dist/readme-writing.zip`, and `dist/rabbit-reads.zip`. Upload the ones you want. Each stands alone: the three satellite skills carry their own copy of the engine (`scan.py`, `verify.py`, `rwlib/`, both data files), their own `voices/` snapshot, and a `SKILL.md` rewritten at package time so every path resolves inside the archive rather than through `${CLAUDE_PLUGIN_ROOT}`.
 
-The isolation is the tradeoff. Two uploaded skills cannot share voices: each carries its own `voices/` copy, and a profile built inside one never reaches another. The plugin install above is the integrated path, one engine and one voices directory for all three skills. `python3 scripts/test_package_skills.py` extracts each archive outside the repo and runs what it ships, which is what keeps the standalone claim true.
+The isolation is the tradeoff. Two uploaded skills cannot share voices: each carries its own `voices/` copy, and a profile built inside one never reaches another. The plugin install above is the integrated path, one engine and one voices directory for all four skills. `python3 scripts/test_package_skills.py` extracts each archive outside the repo and runs what it ships, which is what keeps the standalone claim true.
 
 </details>
 
@@ -140,14 +140,16 @@ write a note to the team about the cert outage # -> rabbit-writes, in your voice
 does this draft sound like a chatbot?          # -> rabbit-writes, detect mode
 set up my writing voice from these 3 posts     # -> voice-setup, sample mode
 my README is a mess, fix the section order     # -> readme-writing, audit mode
+turn this PDF into a concept doc set           # -> rabbit-reads, distill mode
 ```
 
-The explicit forms are there for when you want to force one. The `rabbit-writes:` prefix is the plugin namespace and comes from the install. In Codex the same three are `$rabbit-writes`, `$voice-setup`, and `$readme-writing`.
+The explicit forms are there for when you want to force one. The `rabbit-writes:` prefix is the plugin namespace and comes from the install. In Codex the same four are `$rabbit-writes`, `$voice-setup`, `$readme-writing`, and `$rabbit-reads`.
 
 ```
 /rabbit-writes:rabbit-writes    # draft, convert, de-slop, or audit prose. four modes, one skill
 /rabbit-writes:voice-setup      # build, measure, edit, blend, or switch a voice profile
 /rabbit-writes:readme-writing   # draft or audit a README against the 100-repo study
+/rabbit-writes:rabbit-reads     # distill a book, paper, or thesis into per-concept cheatsheets
 ```
 
 The scripts run from a shell, not from a skill. Stdlib only, Python 3.9+:
@@ -356,7 +358,7 @@ You can switch between installed profiles (`whit3rabbit`, `satoshi`, or your own
 
 ## What's in it
 
-Three skills.
+Four skills.
 
 **`rabbit-writes`**: the writing skill, and the engine it runs on. Four modes, listed above.
 
@@ -373,6 +375,8 @@ It also writes a **voice fingerprint**. Every voice rule is a refusal, and a dra
 And once the profile exists, `audit_voice.py` turns it back on the corpus it came from: it exits 1 when one of your own rules fires on your own prose, suggests the fix with the measured number behind it, and reports (without judging) which samples sit outside the fingerprint band, whether the corpus holds two sentence registers, and which engine tells are false positives over you.
 
 **`readme-writing`**: drafts or audits a `README.md` against patterns measured from 100 real GitHub repos (section order, sentence length, badge and link conventions) instead of generic advice, in your voice rather than a generated open-source register. Ships `readme_check.py`, which checks structure, links, badges, claims, and the active voice in one pass. The full study is in `docs/README_WRITEUP.md`.
+
+**`rabbit-reads`**: distills a book, paper, or thesis into per-concept cheatsheets, a `<book-slug>-notes/` folder of 40-70 line markdown documents plus a README index. The source arrives as pdf, docx, doc, rtf, html, odt, epub, md, or txt, and `extract_text.py` normalizes it to plain text under `scratch/`, where the intermediates stay. `map_structure.py` maps the source's structure to section line ranges, the concept set comes from that map, and subagents write the individual documents. The notes paraphrase the source and never quote it. `check_notes.py` verifies the finished set mechanically and can run the `rabbit-writes` scanner over it, and the book types (non-fiction, fiction, arxiv paper, thesis) are data files under `references/book-types/`, so adding one is a new file there rather than a code change.
 
 ```
 rabbit-writes/
@@ -412,6 +416,13 @@ rabbit-writes/
       references/           patterns (the full catalog), checklist
       scripts/              readme_check.py, the structural + voice linter
       tests/                calibration fixtures and a 100-repo regression
+    rabbit-reads/
+      SKILL.md
+      CLAUDE.md
+      references/book-types/  one data file per type: non-fiction, fiction, arxiv paper, thesis
+      fanout-prompt.md
+      scripts/              _bootstrap.py, extract_text.py, map_structure.py, check_notes.py
+      tests/                extraction, structure, and notes checks
 ```
 
 ## Three bands, never conflated
@@ -495,12 +506,40 @@ The highest-impact single fix in an audit: whatever sits between the top of the 
 
 Heading classification is keyword-based and sentence splitting is a regex, so read the numbers as directionally right, not exact. `docs/README_WRITEUP.md` has the methodology, the ranked table, and its own limitations section. `docs/readme-analysis/` has the raw per-repo data.
 
+## Distill reading notes with it
+
+`rabbit-reads` breaks down long documents—books, research papers, or theses—into modular, per-concept cheatsheets with a `README.md` index instead of chapter-by-chapter summaries.
+
+```
+/rabbit-writes:rabbit-reads        # or just: "turn this PDF into a doc set", "extract practices from this book"
+```
+
+Three modes, picked from what you ask for:
+
+| Mode | Trigger | Delivers |
+|---|---|---|
+| **distill** | new source (PDF, EPUB, DOCX, Markdown, etc.) | a `<book-slug>-notes/` folder of 40–70 line concept docs and a README index |
+| **extend** | existing notes folder needs more coverage | new concept docs matching the existing template and an updated index |
+| **verify** | "check these notes" or unverified folder | structural, template, and voice checks via `check_notes.py` |
+
+The structural rule: **cut by concept, not by chapter.** A single concept can span multiple chapters, and one file per chapter produces low-density summaries rather than actionable reference docs.
+
+Each concept doc follows a structured template tailored to the book type (`non-fiction`, `fiction`, `arxiv-paper`, or `thesis`):
+- Concept statement
+- Numbered imperative practices
+- Anti-patterns to avoid
+- Structural tests or verification steps
+- "See also" cross-links to sibling concept docs
+
+Intermediates are normalized to plain text under a gitignored `scratch/` directory, subagents generate the docs in parallel, and notes strictly paraphrase the source without verbatim copying.
+
 ## Tests
 
 ```bash
 python3 scripts/validate.py                        # manifests, skills, voices, cross-refs, tripwires
 python3 skills/rabbit-writes/tests/run.py          # engine, voice, verifier, fixer, invariants
 python3 skills/readme-writing/tests/run.py         # structure, links, voice, 100-repo regression
+python3 skills/rabbit-reads/tests/run.py           # extraction, structure mapping, notes battery
 ```
 
 `run.py` needs nothing installed, which is the same promise the scripts make. `pytest` collects the same files if you have it, and `run.py -k <substring>` selects by name.

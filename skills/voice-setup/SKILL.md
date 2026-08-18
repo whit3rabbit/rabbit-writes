@@ -15,7 +15,7 @@ Turn one person's way of writing into two files a machine can apply:
 
 Both live in `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices/`. They are plain text under version control, so a voice is editable, diffable, and shareable.
 
-**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
+**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
 
 ## The principle
 
@@ -310,7 +310,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py sample1.md --
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate.py
 ```
 
-Same structural checks over every installed profile, plus active-voice alignment and file pairing. Note the path: it sits at the repository root rather than under `${CLAUDE_PLUGIN_ROOT}/skills/`, so it only exists in a full-repo install and is absent when the three skills were copied in loose. `build_voice.py --check` is the one that ships with the skill, which is why it is the step above and not this one.
+Same structural checks over every installed profile, plus active-voice alignment and file pairing. Note the path: it sits at the repository root rather than under `${CLAUDE_PLUGIN_ROOT}/skills/`, so it only exists in a full-repo install and is absent when the skills were copied in loose. `build_voice.py --check` is the one that ships with the skill, which is why it is the step above and not this one.
 
 **Activate it:**
 

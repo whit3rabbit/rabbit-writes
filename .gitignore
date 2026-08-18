@@ -103,3 +103,4 @@ scratch/
 # The pattern also catches a stray copy left at the root by an older packager.
 *.zip
 
+docs-best-practices/
