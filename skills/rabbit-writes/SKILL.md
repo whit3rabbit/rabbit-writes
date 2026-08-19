@@ -323,10 +323,37 @@ Load only what the mode needs.
 | `references/false-positives.md` | Any time you are about to flag something. What is not a tell, and what to protect |
 | `references/injection.md` | Whenever the safety band reports anything. The two axes, the vectors, and what the band does not promise |
 | `references/context.md` | When the register is unclear from the document, or a rule looks wrong for the register it landed in. Register profiles and the tolerance matrix |
-| `references/forms/<form>.md` | Whenever the document is a form: email, letter, chat, essay, newsletter, LinkedIn post. Its slots, its length bands, its own tells, and which register it sits on |
+| `references/forms/<form>.md` | Whenever the document is one of the forms below. Its slots, its length bands, its own tells, and which register it sits on |
 | `references/voice.md` | Whenever a sample, a profile, or a named persona is in play |
 | `references/checklist.md` | Always, at the end |
 | `PROOF.md` | When someone asks what a finding costs in practice, or disputes a rate. The measured self-scan and the corpus numbers behind the calibration |
+
+### The forms
+
+Read one, and only when the document is that form. The register is what the scan runs under.
+
+| Form | Register | It is this one when |
+|---|---|---|
+| `chat` | `chat` | a message in a thread, answered in a line or two |
+| `email` | `formal` | addressed to a person, expecting a reply |
+| `letter` | `formal` | correspondence that will be printed, filed, or signed |
+| `memo` | `formal` | addressed to a group, announcing or asking for a decision, on the record |
+| `executive-summary` | `formal` | the page in front of a longer document, for a reader who stops there |
+| `technical-report` | `formal` | commissioned, answering a question, with the method shown |
+| `proposal` | `formal` | asking a named reader to approve something |
+| `whitepaper` | `formal` | published by an organization to argue a position with evidence |
+| `essay` | `formal` | arguing, where the order of the sections is the argument |
+| `blog` | `blog` | a public post, found rather than delivered. The default when nothing else fits |
+| `substack` | `informal` | delivered to subscribers |
+| `case-study` | `blog` | one situation recounted in enough detail to judge whether it transfers |
+| `linkedin` | `linkedin` | a social post with hashtags |
+| `technical-blog` | `technical-blog` | about code or a system, public, for someone who will act on it |
+| `docs` | `docs` | reference or instruction, read while blocked on something |
+| `incident-report` | `docs` | the internal record of one failure, with severity, timeline, and owners |
+| `security-advisory` | `docs` | a published notice that a version has a flaw, for a triaging reader |
+| `pentest-report` | `docs` | the deliverable from an authorized assessment |
+
+`README.md` is none of these. It belongs to the `readme-writing` skill.
 
 ## Output shapes
 

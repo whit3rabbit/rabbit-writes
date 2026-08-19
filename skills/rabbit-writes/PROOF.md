@@ -16,13 +16,13 @@ Run it from `skills/rabbit-writes/`. It covers every row in the table below, inc
 
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 2, registers 2, measured 14 August 2026, twelfth pass)
+## Result (v0.1.0, lexicon 2, registers 2, measured 18 August 2026, thirteenth pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 3,987 | 0 | 0 | 0 | 0.71 | 0.72 | 0.0 |
-| `PROOF.md` | 7,504 | 0 | 0 | **1** | 0.60 | 0.72 | 0.0 |
-| `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.86 | 0.77 | 1.8 |
+| `SKILL.md` | 4,397 | 0 | 0 | 0 | 0.72 | 0.71 | 0.0 |
+| `PROOF.md` | 7,679 | 0 | 0 | **1** | 0.59 | 0.72 | 0.0 |
+| `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.87 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 883 | 0 | 0 | **9** | 0.65 | 0.71 | 0.0 |
 | `references/context.md` | 689 | 0 | 0 | 0 | 0.65 | 0.79 | 0.0 |
@@ -30,19 +30,30 @@ Every number below was measured against a particular pattern catalogue, and the 
 | `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
 | `references/checklist.md` | 748 | 0 | 0 | 0 | 0.49 | 0.73 | 0.0 |
 | `references/forms/blog.md` | 400 | 0 | 0 | **4** | 0.81 | 0.71 | 0.0 |
+| `references/forms/case-study.md` | 498 | 0 | 0 | **8** | 0.70 | 0.70 | 0.0 |
 | `references/forms/chat.md` | 489 | 0 | 0 | **4** | 0.82 | 0.70 | 0.0 |
 | `references/forms/docs.md` | 547 | 0 | 0 | **6** | 0.66 | 0.70 | 0.0 |
 | `references/forms/email.md` | 590 | 0 | 0 | **5** | 0.76 | 0.69 | 0.0 |
 | `references/forms/essay.md` | 520 | 0 | 0 | **5** | 0.86 | 0.67 | 0.0 |
+| `references/forms/executive-summary.md` | 465 | 0 | 0 | **5** | 0.57 | 0.64 | 0.0 |
+| `references/forms/incident-report.md` | 619 | 0 | 0 | **9** | 0.74 | 0.75 | 0.0 |
 | `references/forms/letter.md` | 521 | 0 | 0 | **8** | 0.91 | 0.71 | 0.0 |
 | `references/forms/linkedin.md` | 570 | 0 | 0 | **7** | 0.75 | 0.71 | 0.0 |
+| `references/forms/memo.md` | 477 | 0 | 0 | **5** | 0.63 | 0.69 | 0.0 |
+| `references/forms/pentest-report.md` | 677 | 0 | 0 | **8** | 0.65 | 0.74 | 0.0 |
+| `references/forms/proposal.md` | 553 | 0 | 0 | **8** | 0.70 | 0.70 | 0.0 |
+| `references/forms/security-advisory.md` | 613 | 0 | 0 | **10** | 0.78 | 0.74 | 0.0 |
 | `references/forms/substack.md` | 601 | 0 | 0 | **6** | 0.75 | 0.69 | 0.0 |
-| `references/forms/technical-blog.md` | 426 | 0 | 0 | **6** | 0.74 | 0.72 | 0.0 |
+| `references/forms/technical-blog.md` | 461 | 0 | 0 | **6** | 0.71 | 0.72 | 0.0 |
+| `references/forms/technical-report.md` | 567 | 0 | 0 | **9** | 0.77 | 0.69 | 0.0 |
+| `references/forms/whitepaper.md` | 508 | 0 | 0 | **8** | 0.82 | 0.73 | 0.0 |
 | `voices/whit3rabbit.md` | 1,558 | 0 | 0 | **10** | 0.69 | 0.78 | 0.0 |
-| `../voice-setup/SKILL.md` | 3,379 | 0 | 0 | 0 | 0.64 | 0.72 | 0.0 |
-| `../readme-writing/SKILL.md` | 2,375 | 0 | 0 | 0 | 0.63 | 0.73 | 0.0 |
+| `../voice-setup/SKILL.md` | 3,686 | 0 | 0 | 0 | 0.65 | 0.72 | 0.0 |
+| `../readme-writing/SKILL.md` | 2,432 | 0 | 0 | 0 | 0.63 | 0.73 | 0.0 |
 
-**The nine `references/forms/` rows are new,** and every P2 in them is the same finding: a bold list label ending in a period, which is how `references/craft.md` has always written its own bullets and why it carries seven. The rule is skipped in the `docs` register and these rows are measured with no register at all, which is what the reproduce command above does.
+**Every P2 in the `references/forms/` rows is the same finding:** a bold list label ending in a period, which is how `references/craft.md` has always written its own bullets and why it carries seven. The rule is skipped in the `docs` register and these rows are measured with no register at all, which is what the reproduce command above does.
+
+**Nine forms were added in this pass** (`memo`, `executive-summary`, `technical-report`, `proposal`, `whitepaper`, `case-study`, `incident-report`, `security-advisory`, `pentest-report`), and all nine land at 0 P0 and 0 P1 on the first measurement. Three older rows moved without anybody editing them for style, which is what a stale table looks like: the two satellite `SKILL.md` word counts and `references/patterns.md`'s burstiness had drifted since the twelfth pass.
 
 Two findings in those files were real and were fixed rather than published. `forms/docs.md` raised a significance-inflation P0 on a phrase it was naming to describe a tolerance, and it now names it in a code span, which is what the quoted-example exemption is for. `forms/substack.md` raised a self-labeling P1 on a sentence announcing that the point it had just made was the important one.
 
@@ -143,20 +154,29 @@ Every file is listed this time. An earlier version of this table showed five, wh
 |---|---:|---|
 | `references/craft.md` | 0 |  |
 | `references/injection.md` | 0 |  |
+| `references/forms/case-study.md` | 0 |  |
 | `references/forms/docs.md` | 0 |  |
 | `references/forms/essay.md` | 0 |  |
+| `references/forms/incident-report.md` | 0 |  |
+| `references/forms/memo.md` | 0 |  |
+| `references/forms/proposal.md` | 0 |  |
+| `references/forms/security-advisory.md` | 0 |  |
 | `references/forms/substack.md` | 0 |  |
+| `references/forms/technical-report.md` | 0 |  |
+| `references/forms/whitepaper.md` | 0 |  |
 | `../readme-writing/SKILL.md` | 0 |  |
 | `references/checklist.md` | 1 | serial-comma advisory |
 | `references/false-positives.md` | 1 | serial-comma advisory |
 | `references/forms/blog.md` | 1 | serial-comma advisory |
 | `references/forms/chat.md` | 1 | serial-comma advisory |
 | `references/forms/email.md` | 1 | serial-comma advisory |
+| `references/forms/executive-summary.md` | 1 | serial-comma advisory |
 | `references/forms/letter.md` | 1 | serial-comma advisory |
 | `references/forms/linkedin.md` | 1 | serial-comma advisory |
 | `references/forms/technical-blog.md` | 1 | serial-comma advisory |
 | `references/voice.md` | 2 | serial-comma advisories |
 | `PROOF.md` | 2 | serial-comma advisories |
+| `references/forms/pentest-report.md` | 2 | serial-comma advisories |
 | `references/context.md` | 3 | serial-comma advisories |
 | `voices/whit3rabbit.md` | 4 | serial-comma advisories |
 | `SKILL.md` | 6 | serial-comma advisories |

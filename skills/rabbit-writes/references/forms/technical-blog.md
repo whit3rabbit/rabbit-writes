@@ -6,6 +6,8 @@ A form file supplies slots. Only the voice may fill them. Every quoted phrase in
 
 A post whose subject is code, architecture, or a system, written for someone who will act on it. A genre column rather than a rung on the formality spine: what it relaxes has nothing to do with how formal the writing is and everything to do with the fact that technical vocabulary carries real meaning here.
 
+The incident-writeup band below is the public one: narrative, for readers outside the organization, with the internal detail removed. `forms/incident-report.md` is the internal record of the same event, the one carrying severity, owners, and action items.
+
 ## Slots
 
 - **Title.** The thing built, broken, or measured.
