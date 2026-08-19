@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "_version_note": "Bumped whenever a word, a phrase, or a pattern changes, so a published measurement can name the catalogue that produced it. scan.py --json echoes it, PROOF.md's header quotes it, and scripts/validate.py fails when the two disagree. Numbers measured against one version mean nothing against another.",
   "_comment": "Tiered vocabulary and pattern regexes for scan.py. Edit freely; scan.py reads this at runtime. Word entries are matched case-insensitively on word boundaries and cover the listed inflections.",
 
@@ -155,7 +155,8 @@
       "label": "Vague attribution",
       "band": "fingerprint",
       "priority": "P0",
-      "rx": "(?i)\\b(experts (believe|agree|say|argue)|studies (show|suggest|indicate)|research (shows|suggests|indicates)|industry (reports|leaders)|observers have|many argue|it is widely (regarded|believed|considered)|some critics argue|analysts agree|independent testing confirms|third-?party benchmarks show)"
+      "rx": "(?i)\\b(experts (believe|agree|say|argue)|studies (show|suggest|indicate)|research (shows|suggests|indicates)|industry (reports|leaders)|observers have|many argue|it is widely (regarded|believed|considered)|some critics argue|analysts agree|independent testing confirms|third-?party benchmarks show)(?![^.!?]{0,240}?(\\[\\d|\\((?-i:[A-Z])[a-z]+[^)\\n]{0,40}?\\b(19|20)\\d\\d))",
+      "_rx_note": "The trailing lookahead is the one narrowing, and it is scoped to the sentence rather than to a character window. `studies show` with a source named after it is an attribution, not a vague one, so the rule stands down when a citation marker arrives before the sentence ends. Measured over the 19-paper academic corpus, the marker sits 55 to 170 characters past the phrase and never inside 40, which is why a fixed short window suppresses nothing. Two marker shapes, because the plugin ships both kinds of citation style: a numeric bracket (`[16,83]`) and an author-year parenthesis (`(Smith et al., 2020)`). The author-year half needs a real surname, `(?-i:[A-Z])[a-z]+`, with the case sensitivity restored against this pattern's global `(?i)`, or `(Q1 2024 data)` reads as a source. Sentence scope is `[^.!?]`, so a decimal or an `e.g.` ends the window early and the rule keeps reporting, which is the safe direction for a P0."
     },
     {
       "id": "significance-inflation",

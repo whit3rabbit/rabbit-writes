@@ -6,7 +6,7 @@
     "PLOS One",
     "PLOS Sustainability and Transformation"
   ],
-  "lexicon_version": 2,
+  "lexicon_version": 4,
   "measured_at": "2026-08-18",
   "papers": 19,
   "registers": {
@@ -158,13 +158,12 @@
         }
       },
       "vague-attribution": {
-        "docs": 6,
-        "hits": 13,
+        "docs": 3,
+        "hits": 4,
         "terms": {
-          "research indicates": 3,
-          "research shows": 1,
-          "research suggests": 5,
-          "studies show": 4
+          "research indicates": 1,
+          "research suggests": 2,
+          "studies show": 1
         }
       }
     },
@@ -333,13 +332,12 @@
         }
       },
       "vague-attribution": {
-        "docs": 6,
-        "hits": 13,
+        "docs": 3,
+        "hits": 4,
         "terms": {
-          "research indicates": 3,
-          "research shows": 1,
-          "research suggests": 5,
-          "studies show": 4
+          "research indicates": 1,
+          "research suggests": 2,
+          "studies show": 1
         }
       }
     },
@@ -419,13 +417,12 @@
         }
       },
       "vague-attribution": {
-        "docs": 6,
-        "hits": 13,
+        "docs": 3,
+        "hits": 4,
         "terms": {
-          "research indicates": 3,
-          "research shows": 1,
-          "research suggests": 5,
-          "studies show": 4
+          "research indicates": 1,
+          "research suggests": 2,
+          "studies show": 1
         }
       }
     },
@@ -580,13 +577,12 @@
         }
       },
       "vague-attribution": {
-        "docs": 6,
-        "hits": 13,
+        "docs": 3,
+        "hits": 4,
         "terms": {
-          "research indicates": 3,
-          "research shows": 1,
-          "research suggests": 5,
-          "studies show": 4
+          "research indicates": 1,
+          "research suggests": 2,
+          "studies show": 1
         }
       }
     },
@@ -755,13 +751,12 @@
         }
       },
       "vague-attribution": {
-        "docs": 6,
-        "hits": 13,
+        "docs": 3,
+        "hits": 4,
         "terms": {
-          "research indicates": 3,
-          "research shows": 1,
-          "research suggests": 5,
-          "studies show": 4
+          "research indicates": 1,
+          "research suggests": 2,
+          "studies show": 1
         }
       }
     },
@@ -930,13 +925,12 @@
         }
       },
       "vague-attribution": {
-        "docs": 6,
-        "hits": 13,
+        "docs": 3,
+        "hits": 4,
         "terms": {
-          "research indicates": 3,
-          "research shows": 1,
-          "research suggests": 5,
-          "studies show": 4
+          "research indicates": 1,
+          "research suggests": 2,
+          "studies show": 1
         }
       }
     },
@@ -1088,13 +1082,12 @@
         }
       },
       "vague-attribution": {
-        "docs": 6,
-        "hits": 13,
+        "docs": 3,
+        "hits": 4,
         "terms": {
-          "research indicates": 3,
-          "research shows": 1,
-          "research suggests": 5,
-          "studies show": 4
+          "research indicates": 1,
+          "research suggests": 2,
+          "studies show": 1
         }
       }
     },
@@ -1264,13 +1257,12 @@
         }
       },
       "vague-attribution": {
-        "docs": 6,
-        "hits": 13,
+        "docs": 3,
+        "hits": 4,
         "terms": {
-          "research indicates": 3,
-          "research shows": 1,
-          "research suggests": 5,
-          "studies show": 4
+          "research indicates": 1,
+          "research suggests": 2,
+          "studies show": 1
         }
       }
     }

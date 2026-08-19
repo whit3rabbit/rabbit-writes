@@ -16,12 +16,12 @@ Run it from `skills/rabbit-writes/`. It covers every row in the table below, inc
 
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 3, registers 3, measured 18 August 2026, thirteenth pass)
+## Result (v0.1.0, lexicon 4, registers 3, measured 19 August 2026, fourteenth pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | `SKILL.md` | 4,744 | 0 | 0 | 0 | 0.71 | 0.71 | 0.0 |
-| `PROOF.md` | 8,381 | 0 | 0 | **1** | 0.59 | 0.72 | 0.0 |
+| `PROOF.md` | 8,540 | 0 | 0 | **1** | 0.58 | 0.72 | 0.0 |
 | `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.87 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 883 | 0 | 0 | **9** | 0.65 | 0.71 | 0.0 |
@@ -168,7 +168,7 @@ It is a published number rather than a test, deliberately. A corpus sweep costs 
 | `uniformity` | 13/19 | 0/19 |
 | `tier2-cluster` | 11/19 | 7/19 |
 | `clarity` | 14/19 | 14/19 |
-| `vague-attribution` | 6/19 | 6/19 |
+| `vague-attribution` | 3/19 | 3/19 |
 
 **The cells that are not in the matrix are the interesting half.** Five were expected to need tolerances and were dropped because the corpus said they fire on at most one paper in nineteen: `uniform-paragraphs`, `em-dash-rate`, `rhetorical-question`, `signposting`, and `hedge-stack`. `tier3-density` is the sharpest case. A synthetic paper written to test the register fired it on `significant` and `effective`, which is why both words were on the draft exemption list, and no real paper fires that rule at all: it needs 2% of every word in the document and nothing reaches it. Two words were exempted on the strength of a sample that did not exist.
 
@@ -187,7 +187,16 @@ Three, because zero false positives is the bar every other entry in `DETECTABLE_
 
 The first version of the recall column read 19 of 19, and it was measuring nothing: it ran against `docs/academic-corpus/texts/`, whose headings this repository's own extractor writes. The numbers above are against the papers' real JATS section titles, refetched for the purpose. That is also where the heading vocabulary came from, which is why `methods` matches methodology and materials and methodology, and why a leading section number is stripped before anything is matched.
 
-**One known false positive, published rather than fixed.** `vague-attribution` is a fingerprint P0 and fires on `research suggests` and `studies show` in 6 of the 19 papers, 13 hits. In a paper those phrases carry a citation the engine cannot see. A fingerprint P0 is never skipped or relaxed in any register (`test_no_p0_fingerprint_is_skipped_or_relaxed_anywhere` enforces it), so the academic column cannot and does not muffle it. That means `scan.py --check` fails on roughly a third of real research papers, which is a rate this file states rather than a problem the register was allowed to hide.
+**The false positive that was fixed in the rule rather than in the matrix.** `vague-attribution` is a fingerprint P0 and fired on `research suggests` and `studies show` in 6 of the 19 papers, 13 hits. In a paper those phrases usually carry a citation the engine could not see. A relaxed academic cell was the wrong fix and the suite said so: a fingerprint P0 is never skipped or relaxed in any register, and `test_no_p0_fingerprint_is_skipped_or_relaxed_anywhere` rejected the cell immediately. Narrowing the rule is the fix that is allowed, so in lexicon 4 the pattern stands down when a citation marker arrives before the sentence ends.
+
+| | Papers | Hits |
+|---|---:|---:|
+| lexicon 3 | 6/19 | 13 |
+| lexicon 4 | 3/19 | 4 |
+
+**The window is the sentence, and a character count would not have worked.** Over the corpus the marker sits 55 to 170 characters past the phrase and never inside 40, so the obvious narrowing (a short fixed window) suppresses none of the 13. Both marker shapes are matched (a numeric bracket and an author-year parenthesis) because the plugin ships citation styles of both kinds. The author-year half requires a capitalised surname, or `(Q1 2024 data)` reads as a source.
+
+**The 4 that remain are correct, and they are why this is not a mute.** Three papers use one of these phrases with nothing cited anywhere in the sentence, which is the thing the rule exists to catch. `scan.py --check` still fails on those three, and the 100-README corpus is unmoved at 0 P0 before and after: the one raw hit there is a table cell quoting the pattern as an example, and the quoted-example exemption was already blanking it.
 
 ## The voice band, applied to ourselves
 
@@ -225,7 +234,7 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `references/forms/literature-review.md` | 1 | serial-comma advisory |
 | `references/forms/technical-blog.md` | 1 | serial-comma advisory |
 | `references/voice.md` | 2 | serial-comma advisories |
-| `PROOF.md` | 2 | serial-comma advisories |
+| `PROOF.md` | 3 | serial-comma advisories |
 | `references/citations/ieee.md` | 2 | serial-comma advisories |
 | `references/citations/mla9.md` | 2 | serial-comma advisories |
 | `references/forms/abstract.md` | 2 | serial-comma advisories |

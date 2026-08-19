@@ -460,3 +460,50 @@ def test_a_lead_in_followed_by_many_bullets_is_a_list():
     from rwlib.markdown import is_prose_block
     mixed = "A lead-in sentence.\n" + "".join("- item %d\n" % i for i in range(8))
     assert not is_prose_block(mixed)
+
+
+def test_vague_attribution_stands_down_when_a_citation_follows():
+    """`studies show` with a source named after it is an attribution rather than
+    a vague one. The lookahead is scoped to the sentence and not to a character
+    window, because over the 19-paper academic corpus the citation marker sits
+    55 to 170 characters past the phrase and never inside 40. Both marker shapes
+    are covered, since the plugin ships numeric and author-year citation styles.
+    """
+    import scan as scan_mod
+    cases = [
+        # (text, should the finding fire)
+        ("Studies show that engagement improves outcomes.", True),
+        ("Experts believe it plays a crucial role in the result.", True),
+        ("Research suggests adoption doubled (Q1 2024 data) last year.", True),
+        ("Studies show that engagement improves outcomes. See [12].", True),
+        ("Studies show a correlation between attendance and health [22,41].", False),
+        ("Research suggests designing programmes around coaches [16,83].", False),
+        ("Studies show that engagement improves outcomes (Smith, 2020).", False),
+        ("Studies show that engagement improves outcomes (Smith and Jones 2020).", False),
+        ("Studies show that engagement improves outcomes (Smith et al., 2020).", False),
+    ]
+    for text, should_fire in cases:
+        ids = {f["id"] for f in scan_mod.scan(text)[0]}
+        fired = "vague-attribution" in ids
+        assert fired == should_fire, "%r fired=%s" % (text, fired)
+
+
+def test_vague_attribution_still_reports_the_uncited_papers_in_the_corpus():
+    """The narrowing is a narrowing and not a mute. The corpus texts are
+    gitignored, so this pins the committed measurement they produced: three of
+    the nineteen papers use one of these phrases with no citation in the
+    sentence, and those three are still a P0 in every register. No existence
+    guard, deliberately. `summary.json` is committed beside these tests and a
+    test that skips itself when its evidence goes missing reads exactly like one
+    that passes."""
+    import json
+    import os
+    summary = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__))))),
+        "docs", "academic-corpus", "summary.json")
+    data = json.load(open(summary, encoding="utf-8"))
+    for register, findings in data["registers"].items():
+        cell = findings.get("vague-attribution")
+        assert cell, "no vague-attribution row for %s" % register
+        assert cell["docs"] == 3, "%s: %d docs" % (register, cell["docs"])
+        assert cell["hits"] == 4, "%s: %d hits" % (register, cell["hits"])
