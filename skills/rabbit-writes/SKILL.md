@@ -189,7 +189,7 @@ Read `voice-caricature` the same way and in the other direction. It fires when t
 
 **1. Frame it.** Who is this for, and where does it land? If unclear and the user is present, ask that one question. Always hold the default frame: *write for a smart non-expert who has not seen the thing you are describing.*
 
-**2. Set the register, which is also the form.** Infer it, or take it from the user. The set is a formality spine, `chat` to `informal` to `blog` (the default) to `formal`, plus three genre columns, `technical-blog`, `docs`, and `linkedin`, and it decides which general rules apply at full strength. `references/context.md` has the signals and the tolerance matrix, and `references/forms/` has what the document's own shape asks for. Most profiles also define their own register axis, on the clock versus off, and the profile's version wins where both apply.
+**2. Set the register, which is also the form.** Infer it, or take it from the user. The set is a formality spine, `chat` to `informal` to `blog` (the default) to `formal`, plus four genre columns, `technical-blog`, `docs`, `linkedin`, and `academic`, and it decides which general rules apply at full strength. `references/context.md` has the signals and the tolerance matrix, and `references/forms/` has what the document's own shape asks for. Most profiles also define their own register axis, on the clock versus off, and the profile's version wins where both apply.
 
 `scan.py --profile auto` mechanizes this inference for the handful of forms with a structural tell strong enough to trust unattended: docs (Prerequisites/Installation/Usage/Steps/Verification headings, skipped for a file named README.md), linkedin (a trailing hashtag line), and formal by way of email or letter shape (a greeting, then a signoff). It is opt-in, has to be named, and falls back to `blog` rather than guess when nothing matches. Chat and technical-blog were both tried against real documents and dropped: chat's only candidate signal (short, no headings, no greeting) fired on a plain blog paragraph, and technical-blog's (fenced code plus a number with a unit) misdetected most of the 100-README calibration corpus. Everything past that four-register set is still a judgment call, the same as before this flag existed.
 
@@ -224,7 +224,7 @@ python3 $RW/attain.py before.md after.md --voice dana  # did the conversion land
 #### `scan.py`
 `python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py [file] [options]`
 - `file`: (OPTIONAL, file path) Path to input markdown/text file or `.docx`. If omitted, reads from `stdin`.
-- `--profile`: (OPTIONAL, choice: `auto`, `chat`, `docs`, `formal`, `informal`, `linkedin`, `technical-blog`) Apply register profile.
+- `--profile`: (OPTIONAL, choice: `auto`, `academic`, `chat`, `docs`, `formal`, `informal`, `linkedin`, `technical-blog`) Apply register profile.
 - `--voice`: (OPTIONAL, string) Installed voice name or `auto`.
 - `--voice-rules`: (OPTIONAL, file path) File path to `.rules.json` profile.
 - `--json`: (OPTIONAL, boolean flag) Print JSON formatted results.
@@ -353,6 +353,10 @@ Read one, and only when the document is that form. The register is what the scan
 | `incident-report` | `docs` | the internal record of one failure, with severity, timeline, and owners |
 | `security-advisory` | `docs` | a published notice that a version has a flaw, for a triaging reader |
 | `pentest-report` | `docs` | the deliverable from an authorized assessment |
+| `research-paper` | `academic` | original work reported in IMRaD, for a reader judging whether the conclusion follows |
+| `abstract` | `academic` | the paper in one paragraph, for the many who read nothing else |
+| `literature-review` | `academic` | a synthesis of what a body of work establishes and has not tried |
+| `thesis-chapter` | `academic` | one chapter of a longer work, with a chapter before and after it |
 
 `README.md` is none of these. It belongs to the `readme-writing` skill.
 

@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "_version_note": "Bumped whenever a word, a phrase, or a pattern changes, so a published measurement can name the catalogue that produced it. scan.py --json echoes it, PROOF.md's header quotes it, and scripts/validate.py fails when the two disagree. Numbers measured against one version mean nothing against another.",
   "_comment": "Tiered vocabulary and pattern regexes for scan.py. Edit freely; scan.py reads this at runtime. Word entries are matched case-insensitively on word boundaries and cover the listed inflections.",
 
@@ -89,6 +89,11 @@
     "ecosystems", "leverage", "leverages", "leveraged", "leveraging",
     "facilitate", "facilitates", "underpin", "underpins",
     "streamline", "streamlines", "scalable", "scalability", "dynamic"
+  ],
+
+  "_academic_exempt_note": "Added to technical_exempt, never instead of it, for the register whose partial cells name it. Three words, and the list is short because it was cut down by measurement rather than assembled by intuition: see docs/academic-corpus/. Each survivor carries a technical sense in a paper that it does not carry in a blog post, which is the test. `paradigm` is Kuhn's and the experimental psychologist's. `transformation` is the statistician's. Rejected despite firing: `holistic`, 11 hits in fewer than two of nineteen papers, which is one author's habit rather than a register fact; `crucial`, in six papers and still an intensifier that means the same thing everywhere; `significant` and `effective`, which were on the list because a synthetic sample fired tier3-density on them and no real paper fires that rule at all.",
+  "academic_exempt": [
+    "paradigm", "paradigms", "transformation"
   ],
 
   "patterns": [

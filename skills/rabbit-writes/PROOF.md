@@ -16,19 +16,20 @@ Run it from `skills/rabbit-writes/`. It covers every row in the table below, inc
 
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 2, registers 2, measured 18 August 2026, thirteenth pass)
+## Result (v0.1.0, lexicon 3, registers 3, measured 18 August 2026, thirteenth pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | `SKILL.md` | 4,659 | 0 | 0 | 0 | 0.71 | 0.71 | 0.0 |
-| `PROOF.md` | 7,845 | 0 | 0 | **1** | 0.59 | 0.72 | 0.0 |
+| `PROOF.md` | 8,215 | 0 | 0 | **1** | 0.59 | 0.72 | 0.0 |
 | `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.87 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 883 | 0 | 0 | **9** | 0.65 | 0.71 | 0.0 |
-| `references/context.md` | 689 | 0 | 0 | 0 | 0.65 | 0.79 | 0.0 |
+| `references/context.md` | 720 | 0 | 0 | 0 | 0.68 | 0.78 | 0.0 |
 | `references/voice.md` | 1,799 | 0 | 0 | 0 | 0.76 | 0.71 | 0.0 |
 | `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
 | `references/checklist.md` | 748 | 0 | 0 | 0 | 0.49 | 0.73 | 0.0 |
+| `references/forms/abstract.md` | 571 | 0 | 0 | **5** | 0.70 | 0.71 | 0.0 |
 | `references/forms/blog.md` | 400 | 0 | 0 | **4** | 0.81 | 0.71 | 0.0 |
 | `references/forms/case-study.md` | 498 | 0 | 0 | **8** | 0.70 | 0.70 | 0.0 |
 | `references/forms/chat.md` | 489 | 0 | 0 | **4** | 0.82 | 0.70 | 0.0 |
@@ -39,13 +40,16 @@ Every number below was measured against a particular pattern catalogue, and the 
 | `references/forms/incident-report.md` | 619 | 0 | 0 | **9** | 0.74 | 0.75 | 0.0 |
 | `references/forms/letter.md` | 521 | 0 | 0 | **8** | 0.91 | 0.71 | 0.0 |
 | `references/forms/linkedin.md` | 570 | 0 | 0 | **7** | 0.75 | 0.71 | 0.0 |
+| `references/forms/literature-review.md` | 680 | 0 | 0 | **9** | 0.70 | 0.70 | 0.0 |
 | `references/forms/memo.md` | 477 | 0 | 0 | **5** | 0.63 | 0.69 | 0.0 |
 | `references/forms/pentest-report.md` | 677 | 0 | 0 | **8** | 0.65 | 0.74 | 0.0 |
 | `references/forms/proposal.md` | 553 | 0 | 0 | **8** | 0.70 | 0.70 | 0.0 |
+| `references/forms/research-paper.md` | 781 | 0 | 0 | **9** | 0.73 | 0.71 | 0.0 |
 | `references/forms/security-advisory.md` | 613 | 0 | 0 | **10** | 0.78 | 0.74 | 0.0 |
 | `references/forms/substack.md` | 601 | 0 | 0 | **6** | 0.75 | 0.69 | 0.0 |
 | `references/forms/technical-blog.md` | 461 | 0 | 0 | **6** | 0.71 | 0.72 | 0.0 |
 | `references/forms/technical-report.md` | 567 | 0 | 0 | **9** | 0.77 | 0.69 | 0.0 |
+| `references/forms/thesis-chapter.md` | 620 | 0 | 0 | **7** | 0.74 | 0.69 | 0.0 |
 | `references/forms/whitepaper.md` | 508 | 0 | 0 | **8** | 0.82 | 0.73 | 0.0 |
 | `references/citations/apa7.md` | 719 | 0 | 0 | 0 | 0.65 | 0.67 | 0.0 |
 | `references/citations/chicago17.md` | 690 | 0 | 0 | 0 | 0.69 | 0.67 | 0.0 |
@@ -57,7 +61,7 @@ Every number below was measured against a particular pattern catalogue, and the 
 
 **Every P2 in the `references/forms/` rows is the same finding:** a bold list label ending in a period, which is how `references/craft.md` has always written its own bullets and why it carries seven. The rule is skipped in the `docs` register and these rows are measured with no register at all, which is what the reproduce command above does.
 
-**Nine forms were added in this pass** (`memo`, `executive-summary`, `technical-report`, `proposal`, `whitepaper`, `case-study`, `incident-report`, `security-advisory`, `pentest-report`), and all nine land at 0 P0 and 0 P1 on the first measurement. Three older rows moved without anybody editing them for style, which is what a stale table looks like: the two satellite `SKILL.md` word counts and `references/patterns.md`'s burstiness had drifted since the twelfth pass.
+**Thirteen forms were added in this pass,** nine business and security ones (`memo`, `executive-summary`, `technical-report`, `proposal`, `whitepaper`, `case-study`, `incident-report`, `security-advisory`, `pentest-report`) and four academic ones (`research-paper`, `abstract`, `literature-review`, `thesis-chapter`). All thirteen land at 0 P0 and 0 P1 on the first measurement. Three older rows moved without anybody editing them for style, which is what a stale table looks like: the two satellite `SKILL.md` word counts and `references/patterns.md`'s burstiness had drifted since the twelfth pass.
 
 **The four `references/citations/` rows score zero across all three priorities,** which is worth a sentence because they are the only files in this plugin that ship literal strings on purpose. A reference-entry pattern is a mechanical format with no voice in it, and every one of them is a fenced code span, so `apply_exemptions` blanks it before any rule runs. That is the correct outcome and it is also the reason these rows prove less than the others: the engine is scoring the prose around the formats, not the formats.
 
@@ -150,7 +154,29 @@ That was half right. `CLAUDE.md` states the repo's prose convention as no em das
 
 Zero P0s is the number that matters, for the same reason it matters in the safety table above: `--check` is what the `rabbit-scan` pre-commit hook runs in a stranger's repository. A README is a `docs` document and nobody would scan one under `informal` on purpose, so this measures the column against ordinary prose rather than against its own genre.
 
-It is a published number rather than a test, deliberately. A corpus sweep costs about a second per document per register in process, so asserting this for every register would add several minutes to a suite that already runs about 2:20 for weaker coverage than the per-cell tests give. `tests/test_registers.py` exercises all 49 cells in the matrix instead: every skip cell has to silence a document that fires without it, and every relaxed cell has to stay silent at its allowance and report past it. That is the property `curly-quote` violated, checked on every cell rather than sampled.
+It is a published number rather than a test, deliberately. A corpus sweep costs about a second per document per register in process, so asserting this for every register would add several minutes to a suite that already runs about 2:20 for weaker coverage than the per-cell tests give. `tests/test_registers.py` exercises every cell in the matrix instead: every skip cell has to silence a document that fires without it, and every relaxed cell has to stay silent at its allowance and report past it. That is the property `curly-quote` violated, checked on every cell rather than sampled.
+
+## The academic register, and the five cells the corpus rejected
+
+`academic` is the second column added rather than renamed, and it is the first one calibrated against a corpus assembled for the purpose: 19 open-access PLOS papers, 72,704 words, six subject facets, all CC BY 4.0. `docs/academic-corpus/README.md` has the method and `docs/academic-corpus/summary.json` has the full table. Every number here is per document rather than per hit, because that distinction is what set the exemption list.
+
+| Finding | `formal` | `academic` |
+|---|---:|---:|
+| `tier1` | 17/19 | 9/19 |
+| `trigram-repetition` | 17/19 | 0/19 |
+| `confidence-calibration` | 14/19 | 2/19 |
+| `uniformity` | 13/19 | 0/19 |
+| `tier2-cluster` | 11/19 | 7/19 |
+| `clarity` | 14/19 | 14/19 |
+| `vague-attribution` | 6/19 | 6/19 |
+
+**The cells that are not in the matrix are the interesting half.** Five were expected to need tolerances and were dropped because the corpus said they fire on at most one paper in nineteen: `uniform-paragraphs`, `em-dash-rate`, `rhetorical-question`, `signposting`, and `hedge-stack`. `tier3-density` is the sharpest case. A synthetic paper written to test the register fired it on `significant` and `effective`, which is why both words were on the draft exemption list, and no real paper fires that rule at all: it needs 2% of every word in the document and nothing reaches it. Two words were exempted on the strength of a sample that did not exist.
+
+**The exemption list is three words because a document count disagreed with a hit count.** `holistic` raised 11 tier-1 hits and appears in fewer than two of the nineteen papers, which is one author's habit and not a fact about the register. `crucial` is in six papers and was still rejected, because it means the same thing in every register and is an intensifier rather than a term. What survived is `paradigm`, `paradigms`, and `transformation`, each carrying a sense in a paper that it does not carry in a blog post.
+
+**`clarity` is unchanged on purpose.** `utilize`, `in terms of`, and `it is important to note that` fire on 14 of the 19 papers, and academic writing being full of them is a fact about academic writing rather than a reason to stop reporting it. Academic style guides say the same.
+
+**One known false positive, published rather than fixed.** `vague-attribution` is a fingerprint P0 and fires on `research suggests` and `studies show` in 6 of the 19 papers, 13 hits. In a paper those phrases carry a citation the engine cannot see. A fingerprint P0 is never skipped or relaxed in any register (`test_no_p0_fingerprint_is_skipped_or_relaxed_anywhere` enforces it), so the academic column cannot and does not muffle it. That means `scan.py --check` fails on roughly a third of real research papers, which is a rate this file states rather than a problem the register was allowed to hide.
 
 ## The voice band, applied to ourselves
 
@@ -168,9 +194,11 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `references/forms/incident-report.md` | 0 |  |
 | `references/forms/memo.md` | 0 |  |
 | `references/forms/proposal.md` | 0 |  |
+| `references/forms/research-paper.md` | 0 |  |
 | `references/forms/security-advisory.md` | 0 |  |
 | `references/forms/substack.md` | 0 |  |
 | `references/forms/technical-report.md` | 0 |  |
+| `references/forms/thesis-chapter.md` | 0 |  |
 | `references/forms/whitepaper.md` | 0 |  |
 | `../readme-writing/SKILL.md` | 0 |  |
 | `references/checklist.md` | 1 | serial-comma advisory |
@@ -183,11 +211,13 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `references/forms/executive-summary.md` | 1 | serial-comma advisory |
 | `references/forms/letter.md` | 1 | serial-comma advisory |
 | `references/forms/linkedin.md` | 1 | serial-comma advisory |
+| `references/forms/literature-review.md` | 1 | serial-comma advisory |
 | `references/forms/technical-blog.md` | 1 | serial-comma advisory |
 | `references/voice.md` | 2 | serial-comma advisories |
 | `PROOF.md` | 2 | serial-comma advisories |
 | `references/citations/ieee.md` | 2 | serial-comma advisories |
 | `references/citations/mla9.md` | 2 | serial-comma advisories |
+| `references/forms/abstract.md` | 2 | serial-comma advisories |
 | `references/forms/pentest-report.md` | 2 | serial-comma advisories |
 | `references/context.md` | 3 | serial-comma advisories |
 | `voices/whit3rabbit.md` | 4 | serial-comma advisories |

@@ -37,7 +37,7 @@ def test_the_matrix_is_not_empty():
     which is how the previous version of this suite passed for a while."""
     data = registers.load()
     assert len(data["rules"]) >= 25, "got %d rules" % len(data["rules"])
-    assert len(registers.registers()) == 7, str(registers.registers())
+    assert len(registers.registers()) == 8, str(registers.registers())
 
 
 def test_the_spine_is_a_ladder_of_real_registers():
@@ -52,13 +52,16 @@ def test_the_spine_is_a_ladder_of_real_registers():
 
 def test_every_register_is_on_the_spine_or_is_a_genre_column():
     """No third category, and no register in neither. `technical-blog`, `docs`,
-    and `linkedin` sit outside the ladder because each carries tolerances no
-    formality band captures, which is a different thing from being stricter or
-    looser than a rung."""
+    `linkedin`, and `academic` sit outside the ladder because each carries
+    tolerances no formality band captures, which is a different thing from
+    being stricter or looser than a rung. `academic` is the clearest case:
+    it is not more formal than `formal`, it is a register where `paradigm` is
+    a term and even sentence lengths are the genre."""
     assert (set(registers.spine()) | set(registers.genre_registers())
             == set(registers.registers()))
     assert not set(registers.spine()) & set(registers.genre_registers())
-    assert registers.genre_registers() == ("technical-blog", "docs", "linkedin")
+    assert registers.genre_registers() == ("technical-blog", "docs",
+                                           "linkedin", "academic")
 
 
 def test_context_md_matches_the_data_file():
@@ -198,6 +201,21 @@ TRIGGERS = {
     "tier2-cluster": ("Harness and streamline the work.", " ", "", 0),
     "tier3-density": ("The result was significant and innovative.", " ", FILLER, 0),
     "transition-stack": ("Moreover, it works.", "\n\n", "", 0),
+    # Both of the next two fire once per document off a stylometric band rather
+    # than per hit, which is why neither has a relaxed cell anywhere and why
+    # both take a floor: three repetitions is under the 120-word gate, and a
+    # trigger that cannot reach the gate raises nothing in any register.
+    #
+    # One unit does both jobs, deliberately. An identical sentence repeated has
+    # zero sentence-length spread and total trigram repetition, so it is the
+    # shortest thing that trips both bands, and the two entries stay separate
+    # because the tests key on the id.
+    "trigram-repetition": (
+        "The same phrasing appears again in this sentence right here.",
+        " ", "", 22),
+    "uniformity": (
+        "The same phrasing appears again in this sentence right here.",
+        " ", "", 22),
     # No filler here, deliberately. This rule fires on paragraphs being the same
     # length as each other, so a filler paragraph of a different length is the
     # one thing that stops it, and the word count has to come from the units.
@@ -291,6 +309,72 @@ def test_every_relaxed_cell_honours_its_allowance_and_still_fires_past_it():
                     "cell is a skip rather than a tolerance"
                     % (register, finding_id, 3, allowance))
     assert not failures, "\n".join(failures)
+
+
+# --------------------------------------------------------------------------
+# the per-register vocabulary exemption
+# --------------------------------------------------------------------------
+
+def test_a_partial_cell_may_name_its_own_exemption_list():
+    """`technical_exempt` is the base for every partial cell and a cell may add
+    one list on top. Without the per-cell list there is one shared exemption,
+    and putting `paradigm` in it would exempt the word in a tech blog, where a
+    new paradigm for observability is exactly the tier-1 usage it exists to
+    catch."""
+    exempt = registers.vocab_exempt_registers()
+    assert exempt["academic"] == "academic_exempt", str(exempt)
+    assert exempt["technical-blog"] is None, str(exempt)
+    # scan.py asks `profile in ...`, which reads the keys either way.
+    assert "docs" in exempt
+
+
+def test_the_academic_list_applies_and_only_there():
+    """The measured claim, asserted rather than published. `paradigm` is Kuhn's
+    in a paper and a buzzword in a post, and one register drops it."""
+    text = ("The dominant paradigm in this area rests on an assumption nobody "
+            "has tested. Two competing paradigms make the same prediction.\n")
+    assert hits_for(text, "blog", "tier1"), "the probe raises nothing at all"
+    assert hits_for(text, "technical-blog", "tier1"), (
+        "technical-blog stopped flagging paradigm, so the word was added to "
+        "the shared list rather than to the academic one")
+    assert not hits_for(text, "academic", "tier1"), (
+        "academic still flags paradigm, so the exempt key is not being read")
+
+
+def test_the_shared_technical_list_still_applies_under_academic():
+    """A named list adds to `technical_exempt`, it does not replace it. Replaced,
+    `robust` would come back at P1 on every paper in the corpus."""
+    text = "The robust and comprehensive design held up under load.\n"
+    assert hits_for(text, "blog", "tier1"), "the probe raises nothing at all"
+    assert not hits_for(text, "academic", "tier1")
+
+
+def test_academic_still_flags_the_words_that_are_not_terms_of_art():
+    """The exemption is three words wide, not a switch.
+
+    Each of these was a candidate and each was rejected by the corpus, on a
+    different ground. `holistic` raised 11 hits in fewer than two of nineteen
+    papers, which is one author's habit rather than a register fact. `crucial`
+    is in six papers and is still an intensifier that means the same thing
+    everywhere. `underscore` is inflation in a paper too. `delve` is the
+    control: if it stopped firing, the exemption is not a list any more.
+    """
+    # `crucial` is tier 2, which fires on a cluster of two in one paragraph
+    # rather than on a single hit, so its probe carries two. One occurrence
+    # staying silent is the rule working and says nothing about the exemption.
+    probes = [
+        ("delve", "We delve into the question at some length in this section."),
+        ("holistic", "The holistic framing is what the authors settle on."),
+        ("crucial", "The crucial step is the one the reviewers asked about, "
+                    "and the sampling frame is crucial for the same reason."),
+        ("underscore", "These results underscore what the earlier work found."),
+    ]
+    silent = []
+    for word, sentence in probes:
+        if not hits_for(sentence + "\n", "academic", "tier1") \
+                and not hits_for(sentence + "\n", "academic", "tier2-cluster"):
+            silent.append(word)
+    assert not silent, "academic stopped flagging: %s" % ", ".join(silent)
 
 
 def test_a_p0_only_cell_on_a_p0_finding_is_rejected():

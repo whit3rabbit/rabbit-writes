@@ -871,8 +871,16 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
     # 3. Vocabulary, tiered. Tier 1 always flags. Clarity edits are reported in
     #    their own band and never counted toward the AI-vocabulary signal, so a
     #    wordiness fix can never look like authorship evidence.
+    # `technical_exempt` is the base for every partial cell. A register may name
+    # one further list, which is added to it: `academic` drops `paradigm` while
+    # `technical-blog` keeps flagging it, and putting those words in the shared
+    # list instead would have exempted them in a tech blog, where a new paradigm
+    # for observability is exactly the tier-1 usage the list exists to catch.
     technical = profile in VOCAB_EXEMPT_PROFILES
     exempt_words = set(w.lower() for w in lex["technical_exempt"]) if technical else set()
+    extra = VOCAB_EXEMPT_PROFILES.get(profile) if technical else None
+    if extra:
+        exempt_words |= set(w.lower() for w in lex[extra])
 
     if "tier1" not in skip:
         t1 = [w for w in lex["tier1"] if w.lower() not in exempt_words]

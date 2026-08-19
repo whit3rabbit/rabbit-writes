@@ -31,9 +31,17 @@ import sys
 try:
     from . import markdown as markdown_mod
     from . import sections as sections_mod
-except ImportError:                     # run as a script: rwlib/ is on sys.path
-    import markdown as markdown_mod
-    import sections as sections_mod
+except ImportError:
+    # Run as a script, so there is no parent package and the relative imports
+    # above cannot resolve. The fix is to put the directory *above* rwlib on
+    # the path and import the package properly, not to put rwlib itself there:
+    # `import markdown` succeeds and then markdown.py's own `from .artifacts`
+    # fails with the same error one level down, which is what --write and
+    # --check did for two releases. Nothing caught it because validate.py calls
+    # doc_table() through an import and never runs the CLI.
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from rwlib import markdown as markdown_mod
+    from rwlib import sections as sections_mod
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCRIPTS = os.path.dirname(HERE)
@@ -129,14 +137,39 @@ def relax_table(path=REGISTERS_PATH):
 
 
 def vocab_exempt_registers(path=REGISTERS_PATH):
-    """Registers where the vocabulary tiers drop the technical words.
+    """{register: extra exemption list name or None} for every partial cell.
 
     This is what a `partial` cell means, and it is why those registers take no
     hit allowance on the vocabulary rows: an allowance would let a second
     `delve` through, and the named exemption list does not.
+
+    `technical_exempt` is the base for every partial cell and always applies.
+    A cell may name one further list with `exempt`, which is added to it, and
+    that is how `academic` drops `paradigm` while `technical-blog` keeps
+    flagging it. Adding those two words to `technical_exempt` instead would
+    have exempted them in a tech blog, where a new paradigm for observability
+    is precisely the tier-1 usage the list exists to catch.
+
+    A dict rather than a set, and `scan.py` still asks `profile in ...`, which
+    reads the keys. The membership test is the same question it always was.
     """
-    return {register for rule, register, cell in _cells(path)
-            if cell["mode"] == "partial"}
+    out = {}
+    for rule, register, cell in _cells(path):
+        if cell["mode"] == "partial":
+            out.setdefault(register, cell.get("exempt"))
+    return out
+
+
+def _lexicon_lists():
+    """Top-level lexicon keys holding a word list, for the `exempt` check.
+
+    Imported here rather than at module scope for the reason `priorities()`
+    gives: this module is imported by the lexicon's own consumers and a
+    top-level import would close the loop.
+    """
+    from . import lexicon
+    data = lexicon.load(lexicon.LEXICON_PATH)
+    return {k for k, v in data.items() if isinstance(v, list)}
 
 
 def unimplemented_rules(path=REGISTERS_PATH):
@@ -321,6 +354,19 @@ def problems(known_ids, path=REGISTERS_PATH, id_priorities=None):
                 out.append("%s says partial, which only means something for a "
                            "vocabulary rule (%s)"
                            % (where, ", ".join(data["vocabulary_rules"])))
+            if mode != "partial" and "exempt" in cell:
+                out.append("%s names an exempt list but is not partial, so "
+                           "nothing reads it" % where)
+            if mode == "partial" and cell.get("exempt"):
+                # A named list nothing defines is a register that silently
+                # keeps flagging the words its cell claims to exempt.
+                if cell["exempt"] not in _lexicon_lists():
+                    out.append("%s names exempt list %r, which lexicon.json "
+                               "does not carry" % (where, cell["exempt"]))
+                elif cell["exempt"] == "technical_exempt":
+                    out.append("%s names technical_exempt, which every partial "
+                               "cell already gets. Drop the key rather than "
+                               "restating the default" % where)
             # skip_table folds p0-only in with skip, on the stated grounds that
             # every id it names is P1 or P2. Nothing used to check that, so a
             # p0-only cell on a P0 id would have read in the docs as "the P0s
@@ -330,6 +376,22 @@ def problems(known_ids, path=REGISTERS_PATH, id_priorities=None):
                 out.append("%s says p0-only, but %r is itself a P0. That cell "
                            "suppresses the finding outright, which is the "
                            "opposite of what it says" % (where, rule["id"]))
+
+    # One register cannot want two different exemption lists: scan.py resolves
+    # one per profile, so a second would apply to some vocabulary rules and not
+    # others with nothing saying which. Outside the cell loop on purpose: it is
+    # a fact about a register rather than about a cell.
+    per_register = {}
+    for rule, register, cell in _cells(path):
+        if cell["mode"] == "partial":
+            per_register.setdefault(register, set()).add(cell.get("exempt"))
+    for register, names in sorted(per_register.items()):
+        if len(names) > 1:
+            out.append("register %r names %d different exempt lists across its "
+                       "partial cells (%s). scan.py resolves one per profile"
+                       % (register, len(names),
+                          ", ".join(sorted(str(n) for n in names))))
+
     relaxed = relax_table(path)
     for register, ids in skip_table(path).items():
         overlap = sorted(ids & set(relaxed.get(register, {})))

@@ -6,11 +6,11 @@ Two independent axes. **Register** sets how strict to be. **Voice** sets how the
 
 ## Register profiles
 
-The set is a formality spine plus three genre columns.
+The set is a formality spine plus four genre columns.
 
 **The spine,** loosest first: `chat`, `informal`, `blog`, `formal`. This is the axis a document form maps onto. `references/forms/` holds one file per form, and each names the rung it sits on.
 
-**The genre columns,** `technical-blog`, `docs`, and `linkedin`, sit outside the spine because each carries tolerances no formality band captures: the vocabulary exemption below, parameter lists, hashtags and bold hooks. A genre column is not stricter or looser than a rung. It is a different kind of document.
+**The genre columns,** `technical-blog`, `docs`, `linkedin`, and `academic`, sit outside the spine because each carries tolerances no formality band captures: the vocabulary exemptions below, parameter lists, hashtags and bold hooks, and the even sentence lengths a research paper genuinely has. A genre column is not stricter or looser than a rung. It is a different kind of document. `academic` is the clearest case, since it is not more formal than `formal`, it is a register where `paradigm` is a term of art.
 
 The split is data, in `scripts/registers.json` under `spine`, so a rung that names nothing fails the build rather than reading as a claim this page makes.
 
@@ -33,36 +33,38 @@ If the inference feels wrong, say which register you picked and why. The user ca
 
 Rules not listed apply at full strength everywhere.
 
-| Rule | chat | informal | blog | formal | technical-blog | docs | linkedin |
-|---|---|---|---|---|---|---|---|
-| Em dashes | skip | strict | strict | strict | strict | relaxed | relaxed (2/post) |
-| Bold overuse | skip | strict | strict | strict | strict | relaxed | relaxed (hooks OK) |
-| Emoji in headers | skip | strict | strict | strict | strict | skip | relaxed (1-2, end of line) |
-| Excessive bullets | skip | strict | strict | strict | relaxed | skip | skip |
-| Hedging | skip | strict | strict | strict | relaxed ("may" is accurate) | relaxed | strict |
-| Tier-1 vocabulary | P0 only | strict | strict | strict | **partial**, see below | **partial**, see below | strict |
-| Promotional language | skip | strict | strict | **extra strict** | strict | strict | relaxed (some sell expected) |
-| Significance inflation | skip | strict | strict | **extra strict** | strict | relaxed | strict |
-| Copula avoidance | skip | relaxed | strict | strict | relaxed | skip | skip |
-| Uniform paragraph length | skip | strict | strict | strict | strict | skip | skip |
-| Numbered-list inflation | skip | strict | strict | strict | relaxed | skip | relaxed |
-| Rhetorical questions | skip | relaxed (1 hook) | strict | strict | strict | skip | relaxed (1 hook) |
-| Transition phrases | skip | strict | strict | strict | strict | relaxed | skip |
-| Generic conclusions | skip | strict | strict | **extra strict** | strict | skip | skip |
-| Hashtag stuffing | skip | strict | strict | **extra strict** | strict | skip | strict |
-| Bullet-NP lists | skip | strict | strict | strict | relaxed | relaxed (parameter lists) | strict |
-| Subjectless fragments | skip | relaxed (the register) | strict | strict | relaxed | skip | relaxed (the register) |
-| Boilerplate clusters | skip | strict | strict | **extra strict** | strict | relaxed | strict |
-| Future-narrative closers | skip | strict | strict | **extra strict** | strict | skip | strict |
-| Social endorsement closers | relaxed (1 in a DM) | relaxed (1 subscribe line) | strict | strict | strict | skip | strict |
-| Wall-of-text replies | strict | skip | skip | skip | skip | skip | strict |
-| Curly quotes | relaxed | skip | skip | skip | relaxed (plain-text contexts) | relaxed | skip |
-| Tier-2 clusters | skip | strict | strict | strict | **partial**, see below | **partial**, see below | strict |
-| Tier-3 density | skip | strict | strict | strict | **partial**, see below | **partial**, see below | skip |
-| Confidence calibration | skip | strict | strict | strict | strict | strict | strict |
-| Signposting | skip | strict | strict | strict | strict | strict | strict |
-| Diff-anchored writing | strict | strict | strict | strict | skip | skip | strict |
-| List-label periods | strict | strict | strict | strict | strict | skip | strict |
+| Rule | chat | informal | blog | formal | technical-blog | docs | linkedin | academic |
+|---|---|---|---|---|---|---|---|---|
+| Em dashes | skip | strict | strict | strict | strict | relaxed | relaxed (2/post) | strict |
+| Bold overuse | skip | strict | strict | strict | strict | relaxed | relaxed (hooks OK) | strict |
+| Emoji in headers | skip | strict | strict | strict | strict | skip | relaxed (1-2, end of line) | strict |
+| Excessive bullets | skip | strict | strict | strict | relaxed | skip | skip | strict |
+| Hedging | skip | strict | strict | strict | relaxed ("may" is accurate) | relaxed | strict | strict |
+| Tier-1 vocabulary | P0 only | strict | strict | strict | **partial**, see below | **partial**, see below | strict | **partial**, see below |
+| Promotional language | skip | strict | strict | **extra strict** | strict | strict | relaxed (some sell expected) | **extra strict** |
+| Significance inflation | skip | strict | strict | **extra strict** | strict | relaxed | strict | **extra strict** |
+| Copula avoidance | skip | relaxed | strict | strict | relaxed | skip | skip | strict |
+| Uniform paragraph length | skip | strict | strict | strict | strict | skip | skip | strict |
+| Numbered-list inflation | skip | strict | strict | strict | relaxed | skip | relaxed | strict |
+| Rhetorical questions | skip | relaxed (1 hook) | strict | strict | strict | skip | relaxed (1 hook) | strict |
+| Transition phrases | skip | strict | strict | strict | strict | relaxed | skip | strict |
+| Generic conclusions | skip | strict | strict | **extra strict** | strict | skip | skip | **extra strict** |
+| Hashtag stuffing | skip | strict | strict | **extra strict** | strict | skip | strict | strict |
+| Bullet-NP lists | skip | strict | strict | strict | relaxed | relaxed (parameter lists) | strict | strict |
+| Subjectless fragments | skip | relaxed (the register) | strict | strict | relaxed | skip | relaxed (the register) | strict |
+| Boilerplate clusters | skip | strict | strict | **extra strict** | strict | relaxed | strict | **extra strict** |
+| Future-narrative closers | skip | strict | strict | **extra strict** | strict | skip | strict | **extra strict** |
+| Social endorsement closers | relaxed (1 in a DM) | relaxed (1 subscribe line) | strict | strict | strict | skip | strict | strict |
+| Wall-of-text replies | strict | skip | skip | skip | skip | skip | strict | strict |
+| Curly quotes | relaxed | skip | skip | skip | relaxed (plain-text contexts) | relaxed | skip | skip |
+| Tier-2 clusters | skip | strict | strict | strict | **partial**, see below | **partial**, see below | strict | **partial**, see below |
+| Tier-3 density | skip | strict | strict | strict | **partial**, see below | **partial**, see below | skip | **partial**, see below |
+| Confidence calibration | skip | strict | strict | strict | strict | strict | strict | relaxed (14/19 papers) |
+| Signposting | skip | strict | strict | strict | strict | strict | strict | strict |
+| Diff-anchored writing | strict | strict | strict | strict | skip | skip | strict | strict |
+| List-label periods | strict | strict | strict | strict | strict | skip | strict | strict |
+| Low burstiness | strict | strict | strict | strict | strict | strict | strict | skip |
+| Trigram repetition | strict | strict | strict | strict | strict | strict | strict | skip |
 
 **Extra strict** means flag borderline instances. In a `formal` document, an investor email or a letter, one "thriving ecosystem" undermines the message.
 

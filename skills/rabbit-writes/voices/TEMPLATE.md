@@ -119,8 +119,8 @@ the slot stays plain, which is a real answer.>
 | `blog` | | | |
 | `formal` | | | |
 
-<The genre columns, `technical-blog`, `docs`, and `linkedin`, take a row only if
-you write them differently. Most people do not need all seven.>
+<The genre columns take a row only if you write them differently.
+`scripts/registers.json` names them and most people do not need them all.>
 
 The enforceable half of this section goes in `<name>.rules.json`, in two keys
 that already exist: `mechanics_by_register` for a mechanic that moves by
