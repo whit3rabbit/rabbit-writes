@@ -19,7 +19,7 @@ import os
 
 from helpers import ROOT, lexicon, scan_module, scan_text
 
-from rwlib import injection, registers
+from rwlib import injection, registers, sections
 from rwlib.lexicon import SYNTHETIC_FINDING_IDS
 
 
@@ -408,6 +408,24 @@ DOCS_SAMPLE = (
     "## Installation\n\nRun pip install.\n\n## Usage\n\nRun the script.\n"
 )
 
+# Numbered headings on purpose: about half the corpus papers number theirs, and
+# an unnumbered fixture would pass a detector that cannot read a real one.
+ACADEMIC_SAMPLE = (
+    "# Rate limiting and credential stuffing\n\n"
+    "## Abstract\n\nWe measured four services over eleven months.\n\n"
+    "## 1. Introduction\n\nCredential stuffing is a standing problem.\n\n"
+    "## 2. Materials and methods\n\nEach service logged attempts.\n\n"
+    "## 3. Results\n\nTakeovers fell by 41 percent.\n\n"
+    "## 4. Discussion\n\nThe effect is smaller than prior work reports.\n"
+)
+
+# Two categories, not three. This is the shape of the one README in the
+# 100-document corpus that a threshold of two would have misclassified.
+NEAR_MISS_README_SAMPLE = (
+    "# toolkit\n\nA small CLI.\n\n## Installation\n\nRun pip install.\n\n"
+    "## Test Results\n\nAll green.\n\n## Limitations\n\nNo Windows support.\n"
+)
+
 LINKEDIN_SAMPLE = (
     ("Excited to share our latest release. " * 20)
     + "\n\n#buildinpublic #python #opensource\n"
@@ -443,6 +461,47 @@ def test_detect_register_carves_out_readme_from_docs():
         DOCS_SAMPLE, path="README.md")
     assert register == registers.default_register(), (register, signals)
     assert confidence == "default"
+
+
+def test_detect_register_finds_an_imrad_paper():
+    register, confidence, signals = registers.detect_register(ACADEMIC_SAMPLE)
+    assert register == "academic", (register, signals)
+    assert confidence == "detected"
+    assert any("IMRaD" in s for s in signals), signals
+
+
+def test_two_imrad_categories_are_not_enough():
+    """The threshold is three because two misclassifies a real README. This
+    fixture is the shape of the one document in the 100-README corpus that a
+    threshold of two would have called a paper: Test Results plus Limitations."""
+    register, _confidence, _signals = registers.detect_register(
+        NEAR_MISS_README_SAMPLE, path="README.md")
+    assert register != "academic", register
+    assert registers.IMRAD_HEADINGS_REQUIRED == 3
+
+
+def test_a_numbered_heading_still_reads_as_its_category():
+    """About half the corpus papers number their sections. A detector that
+    could not strip the number would catch the unnumbered half only."""
+    plain = sections.imrad_categories(["Materials and methods", "Results"])
+    numbered = sections.imrad_categories(["2. Materials and methods", "3 Results"])
+    assert plain == numbered == {"methods", "results"}, (plain, numbered)
+
+
+def test_the_imrad_vocabulary_covers_what_real_papers_call_things():
+    """Taken from the corpus rather than from a style guide. Every variant here
+    is a heading one of the 19 papers actually used."""
+    cases = [
+        (["Method"], {"methods"}),
+        (["Methodology"], {"methods"}),
+        (["Materials and methodology"], {"methods"}),
+        (["Result"], {"results"}),
+        (["Analysis and results"], {"results"}),
+        (["Results and discussion"], {"results", "discussion"}),
+        (["Conclusions"], set()),
+    ]
+    for headings, expected in cases:
+        assert sections.imrad_categories(headings) == expected, headings
 
 
 def test_detect_register_finds_a_linkedin_shaped_post():

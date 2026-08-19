@@ -57,6 +57,40 @@ LATE_SECTIONS = frozenset({"contributing", "changelog", "credits", "faq",
                            "testing", "roadmap", "license"})
 
 
+# The IMRaD categories, for detecting a research paper by its own shape. Kept
+# apart from SECTION_KEYWORDS rather than folded into it, because these answer a
+# different question: that table says what a README section is for, and this one
+# says whether a document is a paper at all. Folding them in would give
+# `classify_heading` two meanings and would put "Results" in a table whose
+# consumers are all README checkers.
+#
+# Matched with word boundaries after a leading section number is stripped, since
+# real papers number their headings about half the time ("2. Materials and
+# methods"). Measured against the 19-paper corpus for the vocabulary: methods
+# appears as method, methods, methodology, materials and methods, and materials
+# and methodology; results appears as result, results, results and discussion,
+# and analysis and results.
+IMRAD_NUMBER_RX = re.compile(r"^\s*\d+(\.\d+)*[.)]?\s+")
+IMRAD_CATEGORIES = (
+    ("abstract", re.compile(r"(?i)\babstract\b")),
+    ("methods", re.compile(r"(?i)\b(methods?|methodology|methodologies)\b")),
+    ("results", re.compile(r"(?i)\bresults?\b")),
+    ("discussion", re.compile(r"(?i)\bdiscussion\b")),
+    ("limitations", re.compile(r"(?i)\blimitations\b")),
+)
+
+
+def imrad_categories(headings):
+    """Which IMRaD categories a document's headings cover, as a set."""
+    out = set()
+    for heading in headings:
+        stripped = IMRAD_NUMBER_RX.sub("", heading.strip())
+        for name, rx in IMRAD_CATEGORIES:
+            if rx.search(stripped):
+                out.add(name)
+    return out
+
+
 def classify_heading(text):
     t = re.sub(r"[^\w\s'-]", " ", text.strip().lower().lstrip("#").strip())
     # Padded, so a keyword can ask for a whole word by writing its own spaces

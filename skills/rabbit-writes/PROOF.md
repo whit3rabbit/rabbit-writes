@@ -20,8 +20,8 @@ Every number below was measured against a particular pattern catalogue, and the 
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 4,659 | 0 | 0 | 0 | 0.71 | 0.71 | 0.0 |
-| `PROOF.md` | 8,215 | 0 | 0 | **1** | 0.59 | 0.72 | 0.0 |
+| `SKILL.md` | 4,744 | 0 | 0 | 0 | 0.71 | 0.71 | 0.0 |
+| `PROOF.md` | 8,381 | 0 | 0 | **1** | 0.59 | 0.72 | 0.0 |
 | `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.87 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 883 | 0 | 0 | **9** | 0.65 | 0.71 | 0.0 |
@@ -175,6 +175,17 @@ It is a published number rather than a test, deliberately. A corpus sweep costs 
 **The exemption list is three words because a document count disagreed with a hit count.** `holistic` raised 11 tier-1 hits and appears in fewer than two of the nineteen papers, which is one author's habit and not a fact about the register. `crucial` is in six papers and was still rejected, because it means the same thing in every register and is an intensifier rather than a term. What survived is `paradigm`, `paradigms`, and `transformation`, each carrying a sense in a paper that it does not carry in a blog post.
 
 **`clarity` is unchanged on purpose.** `utilize`, `in terms of`, and `it is important to note that` fire on 14 of the 19 papers, and academic writing being full of them is a fact about academic writing rather than a reason to stop reporting it. Academic style guides say the same.
+
+**Detection, and the measurement that was circular the first time.** `--profile auto` now returns `academic` when a document's headings cover three distinct IMRaD categories. Threshold and vocabulary both come from the corpus.
+
+| Threshold | README false positives | Papers detected |
+|---|---:|---:|
+| 2 categories | 1/100 | 18/19 |
+| 3 categories | 0/100 | 17/19 |
+
+Three, because zero false positives is the bar every other entry in `DETECTABLE_REGISTERS` cleared and the one document at two is a README with `Test Results` and `Limitations` in it. The two papers missed at three are a computer-science paper using Method and Experiments and a humanities paper whose middle sections are named after its argument. Both fall through to the default register, which is what an unclassified document has always done.
+
+The first version of the recall column read 19 of 19, and it was measuring nothing: it ran against `docs/academic-corpus/texts/`, whose headings this repository's own extractor writes. The numbers above are against the papers' real JATS section titles, refetched for the purpose. That is also where the heading vocabulary came from, which is why `methods` matches methodology and materials and methodology, and why a leading section number is stripped before anything is matched.
 
 **One known false positive, published rather than fixed.** `vague-attribution` is a fingerprint P0 and fires on `research suggests` and `studies show` in 6 of the 19 papers, 13 hits. In a paper those phrases carry a citation the engine cannot see. A fingerprint P0 is never skipped or relaxed in any register (`test_no_p0_fingerprint_is_skipped_or_relaxed_anywhere` enforces it), so the academic column cannot and does not muffle it. That means `scan.py --check` fails on roughly a third of real research papers, which is a rate this file states rather than a problem the register was allowed to hide.
 

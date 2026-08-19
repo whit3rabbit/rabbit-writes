@@ -223,7 +223,23 @@ _DOCS_CATEGORIES = frozenset({"installation", "usage", "api", "testing",
 # owns that name and default_register() reads it; a literal beside these
 # would be a second home for it, and the one that was here said
 # "technical-blog" while the file said "blog".
-DETECTABLE_REGISTERS = ("docs", "linkedin", "formal")
+DETECTABLE_REGISTERS = ("academic", "docs", "linkedin", "formal")
+
+# How many distinct IMRaD categories a document's headings must cover before it
+# reads as a research paper. Three, and the number is measured rather than
+# chosen: against the 100-README corpus, three produces 0 false positives and
+# two produces one, a README carrying "Test Results" and "Limitations". Against
+# the 19-paper corpus's real JATS section titles (not the extracted files, whose
+# headings this repository's own pipeline wrote), three catches 17 and two
+# catches 18.
+#
+# So one paper in ten is missed, and the two it misses are worth naming: a CS
+# paper using Method and Experiments, and a humanities paper whose middle
+# sections are named after its argument. Both fall through to the default
+# register, which is what an unclassified document has always done. Trading
+# them for a stranger's README misclassified as a paper is the trade every
+# other entry in this list already made.
+IMRAD_HEADINGS_REQUIRED = 3
 
 
 def detect_register(text, path=None, registers_path=REGISTERS_PATH):
@@ -254,6 +270,15 @@ def detect_register(text, path=None, registers_path=REGISTERS_PATH):
     has_fence = bool(markdown_mod.FENCE_RX.search(text))
     headings = [m.group(2).strip()
                 for m in markdown_mod.HEADING_RX.finditer(text)]
+
+    # Academic first, because its bar is the highest of the four: three distinct
+    # IMRaD categories present, against two docs-shaped headings. A paper that
+    # also happens to carry an Installation section is still a paper.
+    if "academic" in known:
+        imrad = sections_mod.imrad_categories(headings)
+        if len(imrad) >= IMRAD_HEADINGS_REQUIRED:
+            return ("academic", "detected",
+                    ["IMRaD sections: %s" % ", ".join(sorted(imrad))])
 
     if "docs" in known:
         doc_hits = sum(1 for h in headings
