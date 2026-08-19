@@ -91,6 +91,12 @@ docs/detector-corpus/texts/
 # whoever wrote it, and it is not this repository's to publish.
 docs/voice-eval/texts/
 
+# Academic calibration corpus texts. The manifest commits a DOI, a license, a
+# source URL, and a SHA-256 per paper, and 01_fetch_corpus.py refetches and
+# verifies. CC BY would permit redistributing 20 papers. It does not oblige it,
+# and hashes travel better than 800KB of somebody else's prose.
+docs/academic-corpus/texts/
+
 # Thesaurus research raw datasets (WordNet 3.1 dict files, Norvig count_1w).
 # thesaurus_io.py commits each URL, SHA-256, and license, and
 # 01_fetch_datasets.py refetches and verifies, so nothing here needs git.

@@ -88,6 +88,12 @@
       ]
     },
     {
+      "root": "scripts/academic-research",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
+      ]
+    },
+    {
       "root": "scripts",
       "extraPaths": [
         "skills/rabbit-writes/scripts"

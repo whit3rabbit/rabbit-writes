@@ -61,6 +61,7 @@ def test_every_invisible_logic_source_is_escape_only():
         os.path.join(repo, "scripts", "detector-corpus"),
         os.path.join(repo, "scripts", "voice-eval"),
         os.path.join(repo, "scripts", "thesaurus-research"),
+        os.path.join(repo, "scripts", "academic-research"),
         os.path.join(repo, "skills", "rabbit-reads", "scripts"),
     ]
     # Format, control, surrogate, private-use, and separator codepoints are the

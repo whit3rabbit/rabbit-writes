@@ -1,0 +1,308 @@
+{
+  "latest_published": "2026-08-18",
+  "papers": [
+    {
+      "doi": "10.1371/journal.pcbi.1014595",
+      "journal": "PLOS Computational Biology",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 246,
+        "discussion": 1211,
+        "introduction": 800,
+        "results": 3141
+      },
+      "sha256": "3a5a10f690fabf92ab8400c182542aafadea22c78d2ab9ff3f7174fdc0b052d8",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pcbi.1014595&type=manuscript",
+      "subject": "Computer and information sciences",
+      "words": 5406
+    },
+    {
+      "doi": "10.1371/journal.pgph.0005998",
+      "journal": "PLOS Global Public Health",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 226,
+        "discussion": 1479,
+        "introduction": 820,
+        "results": 770
+      },
+      "sha256": "58ab54d6699fa8732a015e2cc6c71419e6d2590c5866d9e0aedab079c2bf117e",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pgph.0005998&type=manuscript",
+      "subject": "Biology and life sciences",
+      "words": 3303
+    },
+    {
+      "doi": "10.1371/journal.pgph.0006035",
+      "journal": "PLOS Global Public Health",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 291,
+        "discussion": 1806,
+        "introduction": 798,
+        "results": 4615
+      },
+      "sha256": "a20b27f0e7e97d3fa1aa3ad2d7f0d2a74f299cc5c234299da5e9613145cc748c",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pgph.0006035&type=manuscript",
+      "subject": "Medicine and health sciences",
+      "words": 7518
+    },
+    {
+      "doi": "10.1371/journal.pgph.0007059",
+      "journal": "PLOS Global Public Health",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 300,
+        "discussion": 1607,
+        "introduction": 444,
+        "results": 1173
+      },
+      "sha256": "44c6f18fb149c87089809c927b1bbb39954349d3c072527d569e4f392de59076",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pgph.0007059&type=manuscript",
+      "subject": "Biology and life sciences",
+      "words": 3532
+    },
+    {
+      "doi": "10.1371/journal.pgph.0007104",
+      "journal": "PLOS Global Public Health",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 262,
+        "discussion": 1850,
+        "introduction": 603,
+        "results": 1171
+      },
+      "sha256": "ac961b58bc61ae02a079ead1c09955f7ab6cf4ea14082af1a9bf64741a4ddb4a",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pgph.0007104&type=manuscript",
+      "subject": "Biology and life sciences",
+      "words": 3894
+    },
+    {
+      "doi": "10.1371/journal.pmen.0000690",
+      "journal": "PLOS Mental Health",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-17",
+      "sections": {
+        "abstract": 207,
+        "discussion": 977,
+        "introduction": 601,
+        "results": 476
+      },
+      "sha256": "998c64f70e642f47d0a6d41b343aa0f479ed6faea9d3d198e098078d9e3c2f7b",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pmen.0000690&type=manuscript",
+      "subject": "Ecology and environmental sciences",
+      "words": 2269
+    },
+    {
+      "doi": "10.1371/journal.pone.0351822",
+      "journal": "PLOS One",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-17",
+      "sections": {
+        "abstract": 244,
+        "discussion": 710,
+        "introduction": 800,
+        "results": 719
+      },
+      "sha256": "bfd2f87866607bfd0c0f1c0db9d40b9b2f1ff5b55c0cb2ad528ff17d45744940",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0351822&type=manuscript",
+      "subject": "Ecology and environmental sciences",
+      "words": 2481
+    },
+    {
+      "doi": "10.1371/journal.pone.0351932",
+      "journal": "PLOS One",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 297,
+        "discussion": 2116,
+        "introduction": 302,
+        "results": 649
+      },
+      "sha256": "4b893bf262a35e59bcfff40b7c4137b13f7b61079cd9c5a66c966f639d0ce303",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0351932&type=manuscript",
+      "subject": "Social sciences",
+      "words": 3372
+    },
+    {
+      "doi": "10.1371/journal.pone.0353565",
+      "journal": "PLOS One",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 272,
+        "discussion": 274,
+        "introduction": 855,
+        "results": 1150
+      },
+      "sha256": "d0ddd61b74362b08a1cd7c8235f228735aab537ff0f3d306d0bf0bc0eb97cef4",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0353565&type=manuscript",
+      "subject": "Computer and information sciences",
+      "words": 2559
+    },
+    {
+      "doi": "10.1371/journal.pone.0354270",
+      "journal": "PLOS One",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 225,
+        "discussion": 1288,
+        "introduction": 615,
+        "results": 428
+      },
+      "sha256": "5d49267e4465f8e4ab2a7b1c0d6529be536eae65469a2465df8bbcf4c7b46ce0",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0354270&type=manuscript",
+      "subject": "Ecology and environmental sciences",
+      "words": 2564
+    },
+    {
+      "doi": "10.1371/journal.pone.0355292",
+      "journal": "PLOS One",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 250,
+        "discussion": 119,
+        "introduction": 1560
+      },
+      "sha256": "3a6fbfa445c1f9a6fac1236388fc754d2b66ebd909d17e3d8b22ca28d44cdfc9",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0355292&type=manuscript",
+      "subject": "Computer and information sciences",
+      "words": 1935
+    },
+    {
+      "doi": "10.1371/journal.pone.0355402",
+      "journal": "PLOS One",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 271,
+        "discussion": 2117,
+        "introduction": 435,
+        "results": 466
+      },
+      "sha256": "14f0bf7fd25b8249e9afb618978f6cc26fc77bc76232d8137ed430124dd319b7",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0355402&type=manuscript",
+      "subject": "Social sciences",
+      "words": 3297
+    },
+    {
+      "doi": "10.1371/journal.pone.0355724",
+      "journal": "PLOS One",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 305,
+        "discussion": 1860,
+        "introduction": 1049,
+        "results": 1768
+      },
+      "sha256": "705b2f1ba2f733a050306464f24175b3ea8807386efcd94844052a7f354f4081",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0355724&type=manuscript",
+      "subject": "Medicine and health sciences",
+      "words": 4990
+    },
+    {
+      "doi": "10.1371/journal.pone.0356171",
+      "journal": "PLOS One",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 229,
+        "discussion": 3027,
+        "introduction": 935,
+        "results": 2591
+      },
+      "sha256": "801572b974c65ecc25628c3b520e12c5c0aa8721074d1522f34823de44acd004",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0356171&type=manuscript",
+      "subject": "Physical sciences",
+      "words": 6790
+    },
+    {
+      "doi": "10.1371/journal.pone.0356246",
+      "journal": "PLOS One",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 145,
+        "discussion": 548,
+        "introduction": 303,
+        "results": 551
+      },
+      "sha256": "207746d4b3be1751c4f0b51af3e357407cd133763350bca1c9bd0fad82de12c9",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0356246&type=manuscript",
+      "subject": "Medicine and health sciences",
+      "words": 1555
+    },
+    {
+      "doi": "10.1371/journal.pone.0356380",
+      "journal": "PLOS One",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 300,
+        "discussion": 918,
+        "introduction": 683,
+        "results": 699
+      },
+      "sha256": "649d3a80495795d7d967f16a256fd475a7c269b01256d1743d63cf047e37e0a4",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0356380&type=manuscript",
+      "subject": "Medicine and health sciences",
+      "words": 2608
+    },
+    {
+      "doi": "10.1371/journal.pone.0356539",
+      "journal": "PLOS One",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 191,
+        "discussion": 1419,
+        "introduction": 784,
+        "results": 428
+      },
+      "sha256": "11fb0a483da8e969daae755f39c022a2dbf77b58cf4bfbc47947dfb851ae8850",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0356539&type=manuscript",
+      "subject": "Social sciences",
+      "words": 2830
+    },
+    {
+      "doi": "10.1371/journal.pone.0356559",
+      "journal": "PLOS One",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 233,
+        "discussion": 1125,
+        "introduction": 1914,
+        "results": 3100
+      },
+      "sha256": "2e0197e7941473b126effa6f12364917943e11893b8eb8f6ec0d02f6c7fd0761",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0356559&type=manuscript",
+      "subject": "Computer and information sciences",
+      "words": 6380
+    },
+    {
+      "doi": "10.1371/journal.pstr.0000267",
+      "journal": "PLOS Sustainability and Transformation",
+      "license": "http://creativecommons.org/licenses/by/4.0/",
+      "published": "2026-08-18",
+      "sections": {
+        "abstract": 193,
+        "introduction": 707,
+        "results": 4515
+      },
+      "sha256": "50d1d8ad765cca1b91223379bbf28300b33ddb02bfc4c2e11e1f6a27a8d4e21e",
+      "source_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pstr.0000267&type=manuscript",
+      "subject": "Ecology and environmental sciences",
+      "words": 5421
+    }
+  ],
+  "source": "PLOS search API, one query per subject facet"
+}
