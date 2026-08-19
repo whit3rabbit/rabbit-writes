@@ -1052,6 +1052,28 @@ FORM_TELLS_RX = re.compile(r"(?ms)^## Tells$(.*?)(?=^## |\Z)")
 # file from naming the thing it is about.
 FORM_QUOTE_RX = re.compile(r'"[^"\n]{2,}"')
 
+# The citation layer, held to the same shape for the same reason. A style file
+# is the one place a literal string is correct, because a reference entry is a
+# mechanical format with no voice in it, and that makes the location rule more
+# necessary rather than less.
+CITATION_GUARDRAIL = ("A citation file supplies formats. "
+                      "Only the source supplies facts.")
+CITATION_HEADINGS = ("## In-text", "## Reference entries", "## Tells",
+                     "## What this style does not decide",
+                     "## What the mechanical layer sees here")
+CITATION_APPLIES_RX = re.compile(r"(?m)^\*\*Applies to:\*\*\s+\S")
+# The leading cell of a reference-entry table row, which is the source type.
+CITATION_ROW_RX = re.compile(r"(?m)^\|\s*`([a-z0-9-]+)`\s*\|")
+# A `<placeholder>` slot. Its presence is what separates a quoted title inside
+# a reference pattern (legal outside Tells) from an example sentence (never).
+CITATION_SLOT_RX = re.compile(r"<[^<>\n]+>")
+# Every style covers all of these, so picking a style is never also picking
+# which source types the writer is allowed to cite. `standard` carries RFCs,
+# ISO, and NIST, which is the row security writing reaches for.
+CITATION_SOURCE_TYPES = ("journal-article", "book", "book-chapter",
+                         "conference-paper", "preprint", "web-page", "dataset",
+                         "software", "standard", "report", "thesis")
+
 
 def check_form_files():
     """A form file supplies slots, and only the voice may fill them.
@@ -1132,6 +1154,85 @@ def check_form_files():
                  % (len(files), len(routed), len(known)))
 
 
+def check_citation_files():
+    """A citation file supplies formats, and every style covers the same sources.
+
+    Two properties, and the second is the one prose cannot hold. A citation
+    style file is the one place in this plugin where shipping a literal string
+    is correct, because a reference entry is a mechanical format and carries no
+    voice. That makes the form guardrail's location rule more necessary here
+    rather than less: the moment a style file also carries an example sentence,
+    the plugin ships one way of introducing a source, which is the genre-level
+    fingerprint check_form_files exists to prevent.
+
+    So quoted phrases live under `## Tells`, where the heading already says the
+    phrases in it are the ones to avoid, with one carve-out the form checker
+    does not need. MLA and Chicago quote the titles of shorter works inside
+    their reference patterns, so a quoted span outside Tells is legal when it
+    contains a `<...>` placeholder token and not otherwise. That distinguishes
+    a slot from a sentence without reading either.
+
+    The second property is coverage. A writer picks a style and then needs a
+    row for whatever they are citing, and a style file missing the `dataset`
+    row sends them to invent one. Requiring the same source-type set across all
+    four means adding a source type is a change to every style at once, which
+    is the point: an uneven set is how one style silently becomes the only
+    usable one.
+    """
+    cite_dir = os.path.join(SKILLS, "rabbit-writes", "references", "citations")
+    if not os.path.isdir(cite_dir):
+        fail("skills/rabbit-writes/references/citations/ is missing, so a "
+             "document that cites sources has no format to follow and the "
+             "reference entries get improvised per draft")
+        return
+    files = sorted(f for f in os.listdir(cite_dir) if f.endswith(".md"))
+    if not files:
+        fail("references/citations/ has no style files in it")
+        return
+    for fn in files:
+        rel = os.path.join("skills", "rabbit-writes", "references", "citations", fn)
+        with open(os.path.join(cite_dir, fn), encoding="utf-8") as fh:
+            text = fh.read()
+
+        if CITATION_GUARDRAIL not in text:
+            fail("%s does not state the format guardrail verbatim: %r. Without "
+                 "it the next editor adds a worked example sentence and the "
+                 "plugin ships one way of introducing a source"
+                 % (rel, CITATION_GUARDRAIL))
+        for heading in CITATION_HEADINGS:
+            if heading not in text:
+                fail("%s has no %r section" % (rel, heading))
+        if not CITATION_APPLIES_RX.search(text):
+            fail("%s has no `**Applies to:**` line, so nothing says which "
+                 "disciplines expect this style and the choice between the "
+                 "four is left to guesswork" % rel)
+
+        rows = set(CITATION_ROW_RX.findall(text))
+        missing = [t for t in CITATION_SOURCE_TYPES if t not in rows]
+        if missing:
+            fail("%s has no reference-entry row for %s. A writer who reaches "
+                 "for a source type this file skips invents a format, and the "
+                 "invented one is the part a reader checks"
+                 % (rel, ", ".join(missing)))
+
+        # Each Tells section removed on its own, for the reason check_form_files
+        # gives: removing the concatenation finds nothing once a file has two.
+        elsewhere = text
+        for section in FORM_TELLS_RX.findall(text):
+            elsewhere = elsewhere.replace(section, "")
+        stray = sorted(set(q for q in FORM_QUOTE_RX.findall(elsewhere)
+                           if not CITATION_SLOT_RX.search(q)))
+        if stray:
+            fail("%s has quoted phrases outside its `## Tells` section that "
+                 "carry no `<placeholder>` slot: %s. A quoted phrase here is "
+                 "either a slot in a reference pattern or an example sentence, "
+                 "and this file ships the first and never the second"
+                 % (rel, ", ".join(stray[:4])))
+
+    notes.append("citations: %d style file(s) covering %d source type(s) each"
+                 % (len(files), len(CITATION_SOURCE_TYPES)))
+
+
 def check_template_registers():
     """The template names registers too, and nothing was checking it.
 
@@ -1186,12 +1287,25 @@ def check_cross_references():
             continue
         # References and bundled scripts cite these paths too, and a dead path in
         # a reference file fails exactly as silently as one in SKILL.md.
+        #
+        # One level down as well as at the top, because the reference set now
+        # nests: references/forms/ has been there for two releases and was never
+        # walked, and references/citations/ arrived with the same blind spot. A
+        # non-recursive listdir here meant a whole directory of files could cite
+        # a ${CLAUDE_PLUGIN_ROOT} path that does not resolve, with nothing
+        # reporting it until somebody followed the link by hand.
         targets = [os.path.join(skill_dir, "SKILL.md")]
         for sub in ("references", "scripts", "voices"):
             subdir = os.path.join(skill_dir, sub)
-            if os.path.isdir(subdir):
-                targets += [os.path.join(subdir, f) for f in sorted(os.listdir(subdir))
-                            if f.endswith((".md", ".py"))]
+            if not os.path.isdir(subdir):
+                continue
+            for entry in sorted(os.listdir(subdir)):
+                full = os.path.join(subdir, entry)
+                if entry.endswith((".md", ".py")):
+                    targets.append(full)
+                elif os.path.isdir(full) and entry != "__pycache__":
+                    targets += [os.path.join(full, f) for f in sorted(os.listdir(full))
+                                if f.endswith((".md", ".py"))]
         for path in targets:
             if not os.path.exists(path):
                 continue
@@ -1311,37 +1425,54 @@ def check_book_type_files():
     notes.append("book types: %d file(s) routing rabbit-reads" % len(names))
 
 
-check_manifests()
-check_skills()
-check_voices()
-check_engine()
-check_profile_ids()
-check_matrix_doc()
-check_corpus_summary()
-check_finding_schema()
-check_versions()
-check_single_definition()
-check_no_stale_skill_name()
-check_mode_contract()
-check_form_files()
-check_template_registers()
-check_thesaurus()
-check_book_type_files()
-check_claude_md()
-check_import_paths()
-check_scripts_compile()
-check_precommit_hooks()
-check_cross_references()
-check_cli_error_handling()
+# Guarded so the module can be imported without running the repository sweep.
+# A check that never fires is worth nothing, and until this guard existed the
+# only way to find out whether one fires was to break the repository on purpose
+# and look. scripts/test_validate_checks.py imports this file and drives the
+# individual checks over fixtures instead.
+CHECKS = (
+    check_manifests,
+    check_skills,
+    check_voices,
+    check_engine,
+    check_profile_ids,
+    check_matrix_doc,
+    check_corpus_summary,
+    check_finding_schema,
+    check_versions,
+    check_single_definition,
+    check_no_stale_skill_name,
+    check_mode_contract,
+    check_form_files,
+    check_citation_files,
+    check_template_registers,
+    check_thesaurus,
+    check_book_type_files,
+    check_claude_md,
+    check_import_paths,
+    check_scripts_compile,
+    check_precommit_hooks,
+    check_cross_references,
+    check_cli_error_handling,
+)
 
-for note in notes:
-    print("  %s" % note)
+def main():
+    for check in CHECKS:
+        check()
 
-if problems:
-    print("\n%d problem(s):" % len(problems))
-    for p in problems:
-        print("  FAIL  %s" % p)
-    sys.exit(1)
+    for note in notes:
+        print("  %s" % note)
 
-print("\nrepo valid")
+    if problems:
+        print("\n%d problem(s):" % len(problems))
+        for p in problems:
+            print("  FAIL  %s" % p)
+        return 1
+
+    print("\nrepo valid")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
 

@@ -324,6 +324,7 @@ Load only what the mode needs.
 | `references/injection.md` | Whenever the safety band reports anything. The two axes, the vectors, and what the band does not promise |
 | `references/context.md` | When the register is unclear from the document, or a rule looks wrong for the register it landed in. Register profiles and the tolerance matrix |
 | `references/forms/<form>.md` | Whenever the document is one of the forms below. Its slots, its length bands, its own tells, and which register it sits on |
+| `references/citations/<style>.md` | Whenever the document cites sources. One of `apa7`, `ieee`, `chicago17`, `mla9`. In-text forms, a reference-entry pattern per source type, and that style's common errors |
 | `references/voice.md` | Whenever a sample, a profile, or a named persona is in play |
 | `references/checklist.md` | Always, at the end |
 | `PROOF.md` | When someone asks what a finding costs in practice, or disputes a rate. The measured self-scan and the corpus numbers behind the calibration |
@@ -354,6 +355,27 @@ Read one, and only when the document is that form. The register is what the scan
 | `pentest-report` | `docs` | the deliverable from an authorized assessment |
 
 `README.md` is none of these. It belongs to the `readme-writing` skill.
+
+## Documents that cite sources
+
+The form decides the skeleton and the citation style decides only the reference formats. They are independent: an IEEE technical report and an APA technical report differ in their reference lists and nowhere else. Read `references/citations/<style>.md` in addition to the form file, never instead of it.
+
+Take the style from the user, or from the venue they name, or read it off the document's existing references. Ask when none of the three answers it. Guessing produces a document in two styles, which is more work to fix than asking was.
+
+| Style | Where it applies |
+|---|---|
+| `apa7` | psychology, education, social sciences, health, business, and the default for a journal that names none |
+| `ieee` | computer science, engineering, cybersecurity, and their conferences |
+| `chicago17` | history, the humanities, trade publishing. Two systems in one manual, and picking between them comes first |
+| `mla9` | literature, languages, film, US humanities coursework |
+
+Three rules bind whatever the style.
+
+1. **Guardrail 1 covers citations, and it is the one that matters most here.** Never write a reference for a work you have not been given. A plausible author, a plausible year, and a plausible DOI assemble into a citation that survives every check in this engine and fails the first reader who looks it up. If a claim needs a source and no source is in hand, say the claim needs a source and leave it unsourced.
+
+2. **Every in-text citation has a reference entry, and the entry says what the in-text form says.** This is the direction a reader checks. Nothing mechanical here verifies it.
+
+3. **A citation is on the do-not-touch list.** Guardrail 6 already covers attributed quotations, and a reference entry is the same kind of object: reformatting one from a style you were not asked for is an edit nobody requested. `verify.py` compares numbers, dates, and quotations as multisets, so a rewrite that drops a page range or a year fails the fact check rather than passing quietly.
 
 ## Output shapes
 
