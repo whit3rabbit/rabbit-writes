@@ -2,14 +2,95 @@
 
 ## Unreleased
 
-Three passes. The first was architecture and evidence and changed nothing about
-what the engine flags. The second changes it in six places and says so. The
-third, below, is a review pass over eight reported defects: four of them are a
-rule contradicting itself, two are one span counted twice, one is a default that
-enforced this author's voice on strangers, and one is a documentation file that
-drifted from the data it describes. The 100-repo corpus regression, the
-calibration fixtures, and every published self-scan number were re-run after all
-three.
+Five passes. The first was architecture and evidence and changed nothing about
+what the engine flags. The second changes it in six places, the third resolves
+eight reported defects, and the fourth adds a fifth skill and the first thing
+in this plugin that talks to a model, gated by the checks that were already
+here. The fifth adds an opt-in ASD-STE100 layer and the transcript-mined tier
+phrases that bump the lexicon to version 5. The 100-repo corpus regression,
+the calibration fixtures, and every published self-scan number were re-run
+after all five.
+
+### A fifth skill, rabbit-rewrites
+
+- **The passages the engine flags can now be rewritten by a small local model.**
+  `scan.py --apply-model` sends one passage per finding to any
+  OpenAI-compatible endpoint: llama.cpp's `llama-server`, Ollama, LM Studio,
+  vLLM, or OpenRouter. One client and no per-vendor branch, because the only
+  thing that differs between a Raspberry Pi running a 1.7B and a hosted
+  frontier model is the URL, the model name, and whether a key is needed.
+- **The document is never sent, so there is no chunking strategy.** A tell sits
+  in a sentence. `rwlib/rewrite.py` cuts the file into one unit per finding and
+  sends that unit plus the rule it broke, which is roughly 150 tokens whatever
+  the file's length. A 10,000-word draft with 40 findings is 40 independent
+  150-token calls, and a 4k-context model has room for all of them. Shape
+  findings (`uniformity`, the tier clusters) take the paragraph instead, and a
+  paragraph that does not fit the configured context is reported as such rather
+  than truncated: a truncated rewrite verifies clean, because both sides of the
+  comparison lost the same tail.
+- **A small model is not trusted, it is gated.** Every reply has to survive
+  `verify.py`, the same check that decides whether `--apply-safe` writes at all,
+  plus a rescan proving the phrase it was sent to remove is gone and the total
+  finding count came down. Both halves are needed: checking only the finding id
+  accepts swapping `delve into` for `robust`, and checking only the phrase
+  accepts that same swap from the other direction. A rejected reply is retried
+  with the reason attached, then abandoned, and the original stays.
+- **A document carrying a concealed instruction is refused before the first
+  request.** One step earlier than `--apply-safe` refuses, because a rewriter is
+  exactly what that text is addressed to. Nothing in the safety band is sent to
+  any model.
+- **Which model is a measurement.** `skills/rabbit-rewrites/scripts/bench.py`
+  runs a fixed twelve-passage battery through whatever endpoint is configured
+  and reports the pass rate, the first-attempt rate, seconds per passage, and a
+  histogram of why replies were rejected. Every passage carries a number, a
+  path, a version or a quotation, so a model that rewrites fluently and drops a
+  detail fails rather than scores.
+- **Three refusals in `rwlib/endpoint.py`, each a real failure.** A
+  `.rabbit-model` carrying a literal `api_key` is rejected with the reason (the
+  file gets committed, so it names an environment variable instead), plain
+  `http` reaches loopback and nothing else without an explicit opt-in, and a key
+  echoed back by a server that rejected it is scrubbed out of the error message.
+  There is no localhost auto-discovery: a tool that silently finds a server on
+  port 11434 silently ships somebody's draft to whatever is listening there.
+- **`--model-plan` sends nothing.** It prints what would be sent and how big
+  each request is, which is the flag to run first on a document that is not
+  yours and the one that works before any server exists.
+- **Every request asks the model not to think out loud, and that is worth 0%
+  against 51%.** Most current small models are hybrid reasoning models.
+  Qwen3.5-0.8B-Q4_K_M on `llama-server` scored 0 accepted out of 15 passages
+  with thinking on, all fifteen dying at `max_tokens` because the model spent
+  its whole output budget on a reasoning block and returned empty content, at
+  8.6 seconds a passage. The same model and battery with thinking off: 10 of 15
+  on one pass, 23 of 45 over three, at 0.47 seconds. Two spellings go out
+  (`chat_template_kwargs` for llama.cpp, `reasoning_effort` for hosted
+  OpenAI-compatible endpoints), and a server that rejects both is downgraded
+  once and remembered, so the discovery costs one request and not one per
+  passage. A reply that carried a reasoning block and no rewrite says so by
+  name, because "empty response" sends somebody to the wrong problem entirely.
+- **`scripts/model-bench/run.py` compares several models and writes the
+  evidence.** It starts a server only if one is not already up, stops only what
+  it started, and warms each model before timing it, since an unwarmed run
+  charges the weight load to the first passage. Results land in
+  `docs/model-bench/`.
+
+### An STE layer, and a lexicon measured off real transcripts
+
+- **`scan.py --ste` adds the ASD-STE100 Issue 9 structural checks.** Sentence
+  limits (20 words procedural, 25 descriptive), the modal ladder, banned
+  verbs, condition-before-command ordering, gerund clauses, phrasal verbs
+  with one-word replacements, passive voice, and semicolons. Report-only by
+  design: every `ste-*` id is P1 or P2, so `--check` still gates on P0 alone,
+  and nothing here is mechanically fixed. `--ste-mode procedural|descriptive`
+  forces the sentence limit, and each paragraph classifies itself otherwise.
+- **STE runs inside the engine, not beside it.** The checks read the same
+  exempted copy every other band reads, so a semicolon in a code fence is not
+  a finding, and they run ahead of the suppression pass, so a `rabbit-allow`
+  comment reaches them like anything else. The vocabulary lives in
+  `scripts/ste_lexicon.json` and the prose rules in `references/ste.md`.
+- **`lexicon.json` is version 5.** The new `clarity_phrases` tier entries
+  ("let me check", "now let me", and friends) were counted out of 914 of this
+  author's own assistant transcripts rather than guessed at, and they score
+  zero hits over the 100-README corpus.
 
 ### A fourth skill, rabbit-reads
 

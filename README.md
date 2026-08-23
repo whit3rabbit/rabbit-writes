@@ -37,7 +37,7 @@ codex plugin marketplace add whit3rabbit/rabbit-writes
 codex plugin add rabbit-writes@rabbit-writes
 ```
 
-In Claude Code, `/reload-plugins` applies the install without a restart. In Codex, restart. Then confirm the four skills loaded: `claude plugin list | grep rabbit-writes`, or `/skills` in Codex.
+In Claude Code, `/reload-plugins` applies the install without a restart. In Codex, restart. Then confirm the five skills loaded: `claude plugin list | grep rabbit-writes`, or `/skills` in Codex.
 
 Python 3.9+ with the standard library, and only if you want the scripts. Nothing to build.
 
@@ -92,7 +92,7 @@ git clone https://github.com/whit3rabbit/rabbit-writes
 ln -s "$PWD/rabbit-writes" ~/.claude/skills/rabbit-writes
 ```
 
-The `.claude-plugin/` manifests come along with it, so that loads as `rabbit-writes@skills-dir` rather than as four loose skills, and `${CLAUDE_PLUGIN_ROOT}` still resolves. It picks up edits without a reinstall. Don't run both installs at once: two copies of the same four skills means every request matches twice.
+The `.claude-plugin/` manifests come along with it, so that loads as `rabbit-writes@skills-dir` rather than as five loose skills, and `${CLAUDE_PLUGIN_ROOT}` still resolves. It picks up edits without a reinstall. Don't run both installs at once: two copies of the same five skills means every request matches twice.
 
 </details>
 
@@ -105,12 +105,12 @@ Codex scans `~/.agents/skills/` for user-level skills and `.agents/skills/` at a
 git clone https://github.com/whit3rabbit/rabbit-writes
 cd rabbit-writes
 mkdir -p ~/.agents/skills
-for s in rabbit-writes voice-setup readme-writing rabbit-reads; do
+for s in rabbit-writes voice-setup readme-writing rabbit-reads rabbit-rewrites; do
   ln -s "$PWD/skills/$s" ~/.agents/skills/$s
 done
 ```
 
-Symlink all four. They call each other: `readme-writing` runs the `rabbit-writes` scanner against the active voice, and both read the profiles under `rabbit-writes/voices/`. `scripts/readme_check.py` resolves its siblings by walking up from its own path, so that layout works.
+Symlink all five. They call each other: `readme-writing` runs the `rabbit-writes` scanner against the active voice, and both read the profiles under `rabbit-writes/voices/`. `scripts/readme_check.py` resolves its siblings by walking up from its own path, so that layout works.
 
 What you lose is `docs/`, which sits at the repo root outside every skill folder. The study behind `readme-writing` is then only in the clone. Nothing breaks, `references/patterns.md` carries the same numbers.
 
@@ -119,15 +119,15 @@ What you lose is `docs/`, which sits at the repo root outside every skill folder
 <details>
 <summary><b>claude.ai, as standalone skill uploads</b></summary>
 
-The custom-skill upload on claude.ai takes one skill per zip, so the plugin also packages as four isolated archives:
+The custom-skill upload on claude.ai takes one skill per zip, so the plugin also packages as five isolated archives:
 
 ```bash
 python3 scripts/package_skills.py
 ```
 
-That writes `dist/rabbit-writes.zip`, `dist/voice-setup.zip`, `dist/readme-writing.zip`, and `dist/rabbit-reads.zip`. Upload the ones you want. Each stands alone: the three satellite skills carry their own copy of the engine (`scan.py`, `verify.py`, `rwlib/`, both data files), their own `voices/` snapshot, and a `SKILL.md` rewritten at package time so every path resolves inside the archive rather than through `${CLAUDE_PLUGIN_ROOT}`.
+That writes `dist/rabbit-writes.zip`, `dist/voice-setup.zip`, `dist/readme-writing.zip`, `dist/rabbit-reads.zip`, and `dist/rabbit-rewrites.zip`. Upload the ones you want. Each stands alone: the four satellite skills carry their own copy of the engine (`scan.py`, `verify.py`, `rwlib/`, its data files), their own `voices/` snapshot, and a `SKILL.md` rewritten at package time so every path resolves inside the archive rather than through `${CLAUDE_PLUGIN_ROOT}`.
 
-The isolation is the tradeoff. Two uploaded skills cannot share voices: each carries its own `voices/` copy, and a profile built inside one never reaches another. The plugin install above is the integrated path, one engine and one voices directory for all four skills. `python3 scripts/test_package_skills.py` extracts each archive outside the repo and runs what it ships, which is what keeps the standalone claim true.
+The isolation is the tradeoff. Two uploaded skills cannot share voices: each carries its own `voices/` copy, and a profile built inside one never reaches another. The plugin install above is the integrated path, one engine and one voices directory for all five skills. `python3 scripts/test_package_skills.py` extracts each archive outside the repo and runs what it ships, which is what keeps the standalone claim true.
 
 </details>
 
@@ -141,15 +141,17 @@ does this draft sound like a chatbot?          # -> rabbit-writes, detect mode
 set up my writing voice from these 3 posts     # -> voice-setup, sample mode
 my README is a mess, fix the section order     # -> readme-writing, audit mode
 turn this PDF into a concept doc set           # -> rabbit-reads, distill mode
+clean this up with my local llama.cpp server   # -> rabbit-rewrites, model mode
 ```
 
-The explicit forms are there for when you want to force one. The `rabbit-writes:` prefix is the plugin namespace and comes from the install. In Codex the same four are `$rabbit-writes`, `$voice-setup`, `$readme-writing`, and `$rabbit-reads`.
+The explicit forms are there for when you want to force one. The `rabbit-writes:` prefix is the plugin namespace and comes from the install. In Codex the same five are `$rabbit-writes`, `$voice-setup`, `$readme-writing`, `$rabbit-reads`, and `$rabbit-rewrites`.
 
 ```
 /rabbit-writes:rabbit-writes    # draft, convert, de-slop, or audit prose. four modes, one skill
 /rabbit-writes:voice-setup      # build, measure, edit, blend, or switch a voice profile
 /rabbit-writes:readme-writing   # draft or audit a README against the 100-repo study
 /rabbit-writes:rabbit-reads     # distill a book, paper, or thesis into per-concept cheatsheets
+/rabbit-writes:rabbit-rewrites  # de-slop through a small local model, gated by the engine's own checks
 ```
 
 The scripts run from a shell, not from a skill. Stdlib only, Python 3.9+:
@@ -358,7 +360,7 @@ You can switch between installed profiles (`whit3rabbit`, `satoshi`, or your own
 
 ## What's in it
 
-Four skills.
+Five skills.
 
 **`rabbit-writes`**: the writing skill, and the engine it runs on. Four modes, listed above.
 
@@ -377,6 +379,10 @@ And once the profile exists, `audit_voice.py` turns it back on the corpus it cam
 **`readme-writing`**: drafts or audits a `README.md` against patterns measured from 100 real GitHub repos (section order, sentence length, badge and link conventions) instead of generic advice, in your voice rather than a generated open-source register. Ships `readme_check.py`, which checks structure, links, badges, claims, and the active voice in one pass. The full study is in `docs/README_WRITEUP.md`.
 
 **`rabbit-reads`**: distills a book, paper, or thesis into per-concept cheatsheets, a `<book-slug>-notes/` folder of 40-70 line markdown documents plus a README index. The source arrives as pdf, docx, doc, rtf, html, odt, epub, md, or txt, and `extract_text.py` normalizes it to plain text under `scratch/`, where the intermediates stay. `map_structure.py` maps the source's structure to section line ranges, the concept set comes from that map, and subagents write the individual documents. The notes paraphrase the source and never quote it. `check_notes.py` verifies the finished set mechanically and can run the `rabbit-writes` scanner over it, and the book types (non-fiction, fiction, arxiv paper, thesis) are data files under `references/book-types/`, so adding one is a new file there rather than a code change.
+
+**`rabbit-rewrites`**: rewrites the passages the engine flagged using a small local model instead of a frontier one, over any OpenAI-compatible endpoint (llama.cpp's `llama-server`, Ollama, LM Studio, vLLM, OpenRouter). The document is never sent. A tell sits in a sentence, so one request carries that sentence plus the rule it broke, which is roughly 150 tokens whatever the file's length, and a 4k-context model on a Raspberry Pi is enough for a 10,000-word draft.
+
+Every reply is gated: it has to survive `verify.py`, lose the phrase it was sent to remove, and lower the total finding count, or it is retried with the reason attached and then abandoned with the original left in place. A document carrying a concealed instruction is refused before the first request, since a rewriter is exactly what that text is addressed to. `bench.py` scores any endpoint against a fixed twelve-passage battery through the same gate, so "which model is good enough" is a number rather than an opinion.
 
 ```
 rabbit-writes/
@@ -397,6 +403,7 @@ rabbit-writes/
       references/           patterns, false-positives, context, voice, craft, checklist
       scripts/              scan.py, verify.py, attain.py, lexicon.json, registers.json
         rwlib/              the shared engine: markdown spans, lexicon, voices, facts, suppressions
+                            endpoint.py + rewrite.py, the model-backed rewriting pair
       tests/                calibration fixtures and regression tests
       PROOF.md              the engine scanned with its own scanner
       voices/
@@ -423,6 +430,10 @@ rabbit-writes/
       fanout-prompt.md
       scripts/              _bootstrap.py, extract_text.py, map_structure.py, check_notes.py
       tests/                extraction, structure, and notes checks
+    rabbit-rewrites/
+      SKILL.md
+      scripts/              bench.py, scores an endpoint against battery.json
+      tests/                the battery's own guards, and the bench math
 ```
 
 ## Three bands, never conflated
@@ -508,7 +519,7 @@ Heading classification is keyword-based and sentence splitting is a regex, so re
 
 ## Distill reading notes with it
 
-`rabbit-reads` breaks down long documents—books, research papers, or theses—into modular, per-concept cheatsheets with a `README.md` index instead of chapter-by-chapter summaries.
+`rabbit-reads` breaks a long document (a book, a research paper, a thesis) into modular, per-concept cheatsheets with a `README.md` index, instead of chapter-by-chapter summaries.
 
 ```
 /rabbit-writes:rabbit-reads        # or just: "turn this PDF into a doc set", "extract practices from this book"
@@ -518,11 +529,11 @@ Three modes, picked from what you ask for:
 
 | Mode | Trigger | Delivers |
 |---|---|---|
-| **distill** | new source (PDF, EPUB, DOCX, Markdown, etc.) | a `<book-slug>-notes/` folder of 40–70 line concept docs and a README index |
+| **distill** | new source (PDF, EPUB, DOCX, Markdown, etc.) | a `<book-slug>-notes/` folder of 40-70 line concept docs and a README index |
 | **extend** | existing notes folder needs more coverage | new concept docs matching the existing template and an updated index |
 | **verify** | "check these notes" or unverified folder | structural, template, and voice checks via `check_notes.py` |
 
-The structural rule: **cut by concept, not by chapter.** A single concept can span multiple chapters, and one file per chapter produces low-density summaries rather than actionable reference docs.
+The structural rule: **cut by concept, not by chapter.** A single concept can span multiple chapters, and one file per chapter produces low-density summaries rather than reference docs you can work from.
 
 Each concept doc follows a structured template tailored to the book type (`non-fiction`, `fiction`, `arxiv-paper`, or `thesis`):
 - Concept statement
@@ -540,6 +551,7 @@ python3 scripts/validate.py                        # manifests, skills, voices, 
 python3 skills/rabbit-writes/tests/run.py          # engine, voice, verifier, fixer, invariants
 python3 skills/readme-writing/tests/run.py         # structure, links, voice, 100-repo regression
 python3 skills/rabbit-reads/tests/run.py           # extraction, structure mapping, notes battery
+python3 skills/rabbit-rewrites/tests/run.py        # the model battery, and the bench that scores against it
 ```
 
 `run.py` needs nothing installed, which is the same promise the scripts make. `pytest` collects the same files if you have it, and `run.py -k <substring>` selects by name.
@@ -558,23 +570,27 @@ That fact was asserted in comments in six places and checked nowhere. It is now 
 
 The engine is merged from seven open-source humanizer skills. Each was best at exactly one thing:
 
-- [petergyang/no-ai-slop](https://github.com/petergyang/no-ai-slop) — the portability test, minimum effective edit, detect-without-scoring
-- [conorbronsdon/avoid-ai-writing](https://github.com/conorbronsdon/avoid-ai-writing) — the fingerprint/craft split, register tolerance matrix, severity tiers, "never inject these", the preservation validator, honesty about detector accuracy
-- [blader/humanizer](https://github.com/blader/humanizer) — the Wikipedia pattern port, "what not to flag", "signs of human writing", sample-outranks-the-rules
-- [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop) — false agency, vague declaratives, meta-joiners
-- [brandonwise/humanizer](https://github.com/brandonwise/humanizer) — stylometric ranges, hidden-unicode detection, reliability gating
-- [angelarose210/ghostwriter](https://github.com/angelarose210/ghostwriter) — voice profile as a portable artifact, contaminated-sample handling, weighted blending
-- [tamdogood/orwell-writing](https://github.com/tamdogood/builder-essential-skills/tree/main/skills/orwell-writing) — Orwell's six rules and the ASD-STE100 baseline
+- [petergyang/no-ai-slop](https://github.com/petergyang/no-ai-slop): the portability test, minimum effective edit, detect-without-scoring
+- [conorbronsdon/avoid-ai-writing](https://github.com/conorbronsdon/avoid-ai-writing): the fingerprint/craft split, register tolerance matrix, severity tiers, "never inject these", the preservation validator, honesty about detector accuracy
+- [blader/humanizer](https://github.com/blader/humanizer): the Wikipedia pattern port, "what not to flag", "signs of human writing", sample-outranks-the-rules
+- [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop): false agency, vague declaratives, meta-joiners
+- [brandonwise/humanizer](https://github.com/brandonwise/humanizer): stylometric ranges, hidden-unicode detection, reliability gating
+- [angelarose210/ghostwriter](https://github.com/angelarose210/ghostwriter): voice profile as a portable artifact, contaminated-sample handling, weighted blending
+- [tamdogood/orwell-writing](https://github.com/tamdogood/builder-essential-skills/tree/main/skills/orwell-writing): Orwell's six rules and the ASD-STE100 baseline
 
 Plus three sources that shaped the architecture:
 
-- [testdouble/han, human-readable-output-standard](https://github.com/testdouble/han/blob/main/docs/research/human-readable-output-standard.md) — layered instruction delivery, the audience frame over readability formulas, behaviorally anchored self-checks
-- [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) — the underlying catalog and the mechanism behind it
-- [Ruben Hassid, *I am just a text file*](https://ruben.substack.com/p/i-am-just-a-text-file) — taste is boundaries, and a voice profile is mostly refusals
+- [testdouble/han, human-readable-output-standard](https://github.com/testdouble/han/blob/main/docs/research/human-readable-output-standard.md): layered instruction delivery, the audience frame over readability formulas, behaviorally anchored self-checks
+- [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing): the underlying catalog and the mechanism behind it
+- [Ruben Hassid, *I am just a text file*](https://ruben.substack.com/p/i-am-just-a-text-file): taste is boundaries, and a voice profile is mostly refusals
 
 `docs/COMPARISON.md` is the full writeup: what each repo does, tables of what they share and where they diverge, and the reasoning behind every borrow.
 
 `readme-writing`'s rules come from the same discipline applied to a different question: what do currently-popular READMEs actually do, measured rather than assumed. `docs/README_WRITEUP.md` has the methodology, the 100-repo table, and every finding. `docs/readme-analysis/` has the raw data and per-repo notes behind it.
+
+### Tells mined from real transcripts
+
+The `clarity_phrases` additions in `lexicon.json` version 5 came from measurement rather than intuition. A one-off research script, `scripts/analyze_transcript_tells.py`, read 914 Claude Code transcript sessions on the author's machine (14,425 assistant turns, over 630,000 words of assistant prose), stripped the code blocks and tool tags, and counted n-grams across what was left. The conversational scaffolding rose straight to the top: "let me check" appeared 390 times, "now let me" 300, "let me verify" 186, "i'll start by" 150. Those phrases are now tier entries in the lexicon, with plain alternatives beside them in `skills/rabbit-writes/scripts/thesaurus_alternatives.json`. The transcripts themselves stay on the machine that produced them: only the counts shipped.
 
 ## Contributing a voice
 
