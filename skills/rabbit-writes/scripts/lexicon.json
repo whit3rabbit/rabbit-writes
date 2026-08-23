@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "_version_note": "Bumped whenever a word, a phrase, or a pattern changes, so a published measurement can name the catalogue that produced it. scan.py --json echoes it, PROOF.md's header quotes it, and scripts/validate.py fails when the two disagree. Numbers measured against one version mean nothing against another.",
   "_comment": "Tiered vocabulary and pattern regexes for scan.py. Edit freely; scan.py reads this at runtime. Word entries are matched case-insensitively on word boundaries and cover the listed inflections.",
 
@@ -45,6 +45,8 @@
     "in order to", "due to the fact that", "at this point in time",
     "in the event that", "has the ability to", "have the ability to",
     "it is important to note that", "it's important to note that",
+    "it is worth noting that", "it's worth noting that",
+    "let me check", "now let me", "i'll start by", "let me verify", "let me confirm", "now let's check",
     "serves as", "serve as", "made a decision", "make a decision",
     "with regard to", "in terms of"
   ],

@@ -7,21 +7,22 @@ Reproduce in one command, no dependencies:
 ```bash
 for f in SKILL.md PROOF.md references/*.md references/forms/*.md \
          references/citations/*.md voices/whit3rabbit.md \
-         ../voice-setup/SKILL.md ../readme-writing/SKILL.md; do
+         ../voice-setup/SKILL.md ../readme-writing/SKILL.md \
+         ../rabbit-reads/SKILL.md ../rabbit-rewrites/SKILL.md; do
   echo "== $f"; python3 scripts/scan.py "$f"
 done
 ```
 
-Run it from `skills/rabbit-writes/`. It covers every row in the table below, including the three in other skills, which an earlier version of this command left out.
+Run it from `skills/rabbit-writes/`. It covers every row in the table below, including the four in other skills, which an earlier version of this command left out.
 
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 4, registers 3, measured 19 August 2026, fourteenth pass)
+## Result (v0.1.0, lexicon 5, registers 3, measured 23 August 2026, sixteenth pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 4,744 | 0 | 0 | 0 | 0.71 | 0.71 | 0.0 |
-| `PROOF.md` | 8,540 | 0 | 0 | **1** | 0.58 | 0.72 | 0.0 |
+| `SKILL.md` | 4,891 | 0 | 0 | 0 | 0.71 | 0.71 | 0.0 |
+| `PROOF.md` | 9,066 | 0 | 0 | **1** | 0.59 | 0.72 | 0.0 |
 | `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.87 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 883 | 0 | 0 | **9** | 0.65 | 0.71 | 0.0 |
@@ -29,6 +30,7 @@ Every number below was measured against a particular pattern catalogue, and the 
 | `references/voice.md` | 1,799 | 0 | 0 | 0 | 0.76 | 0.71 | 0.0 |
 | `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
 | `references/checklist.md` | 748 | 0 | 0 | 0 | 0.49 | 0.73 | 0.0 |
+| `references/ste.md` | 904 | 0 | 0 | 0 | 0.56 | 0.72 | 0.0 |
 | `references/forms/abstract.md` | 571 | 0 | 0 | **5** | 0.70 | 0.71 | 0.0 |
 | `references/forms/blog.md` | 400 | 0 | 0 | **4** | 0.81 | 0.71 | 0.0 |
 | `references/forms/case-study.md` | 498 | 0 | 0 | **8** | 0.70 | 0.70 | 0.0 |
@@ -58,10 +60,23 @@ Every number below was measured against a particular pattern catalogue, and the 
 | `voices/whit3rabbit.md` | 1,558 | 0 | 0 | **10** | 0.69 | 0.78 | 0.0 |
 | `../voice-setup/SKILL.md` | 3,686 | 0 | 0 | 0 | 0.65 | 0.72 | 0.0 |
 | `../readme-writing/SKILL.md` | 2,432 | 0 | 0 | 0 | 0.63 | 0.73 | 0.0 |
+| `../rabbit-reads/SKILL.md` | 1,134 | 0 | 0 | **1** | 0.64 | 0.68 | 0.0 |
+| `../rabbit-rewrites/SKILL.md` | 866 | 0 | 0 | 0 | 0.62 | 0.70 | 0.0 |
 
 **Every P2 in the `references/forms/` rows is the same finding:** a bold list label ending in a period, which is how `references/craft.md` has always written its own bullets and why it carries seven. The rule is skipped in the `docs` register and these rows are measured with no register at all, which is what the reproduce command above does.
 
-**Thirteen forms were added in this pass,** nine business and security ones (`memo`, `executive-summary`, `technical-report`, `proposal`, `whitepaper`, `case-study`, `incident-report`, `security-advisory`, `pentest-report`) and four academic ones (`research-paper`, `abstract`, `literature-review`, `thesis-chapter`). All thirteen land at 0 P0 and 0 P1 on the first measurement. Three older rows moved without anybody editing them for style, which is what a stale table looks like: the two satellite `SKILL.md` word counts and `references/patterns.md`'s burstiness had drifted since the twelfth pass.
+**The sixteenth pass added one row and cleaned another.** `references/ste.md`
+documents the STE layer, rewritten here against the code and lexicon that
+shipped after its first version described rules and an API that did not
+exist, and it enters at zero across all three priorities. `SKILL.md` gained
+one word and lost four voice-band semicolons: its `--ste-mode` reference row
+listed five option values the flag never had, and the corrected line needed
+none of the punctuation the fictional one carried. Nothing else moved, the
+right shape for an edit that only touched documentation.
+
+**Two skill rows arrived in the fifteenth,** `../rabbit-rewrites/SKILL.md` for the new skill, and `../rabbit-reads/SKILL.md`, which was missing from a table claiming to cover this plugin's own files. Both land at 0 P0 and 0 P1. The one P2 on `rabbit-reads` is the bold-list-label rule that every `references/forms/` row carries, described above. One older row moved without anybody editing it for style: `SKILL.md` gained 146 words when its mode section grew a thesaurus step.
+
+**Thirteen forms were added two passes before,** nine business and security ones (`memo`, `executive-summary`, `technical-report`, `proposal`, `whitepaper`, `case-study`, `incident-report`, `security-advisory`, `pentest-report`) and four academic ones (`research-paper`, `abstract`, `literature-review`, `thesis-chapter`). All thirteen land at 0 P0 and 0 P1 on the first measurement. Three older rows moved without anybody editing them for style, which is what a stale table looks like: the two satellite `SKILL.md` word counts and `references/patterns.md`'s burstiness had drifted since the twelfth pass.
 
 **The four `references/citations/` rows score zero across all three priorities,** which is worth a sentence because they are the only files in this plugin that ship literal strings on purpose. A reference-entry pattern is a mechanical format with no voice in it, and every one of them is a fenced code span, so `apply_exemptions` blanks it before any rule runs. That is the correct outcome and it is also the reason these rows prove less than the others: the engine is scoring the prose around the formats, not the formats.
 
@@ -206,8 +221,9 @@ Every file is listed this time. An earlier version of this table showed five, wh
 
 | File | Voice hits | What they are |
 |---|---:|---|
+| `../rabbit-rewrites/SKILL.md` | 0 |  |
+| `../readme-writing/SKILL.md` | 0 |  |
 | `references/craft.md` | 0 |  |
-| `references/injection.md` | 0 |  |
 | `references/forms/case-study.md` | 0 |  |
 | `references/forms/docs.md` | 0 |  |
 | `references/forms/essay.md` | 0 |  |
@@ -220,7 +236,7 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `references/forms/technical-report.md` | 0 |  |
 | `references/forms/thesis-chapter.md` | 0 |  |
 | `references/forms/whitepaper.md` | 0 |  |
-| `../readme-writing/SKILL.md` | 0 |  |
+| `references/injection.md` | 0 |  |
 | `references/checklist.md` | 1 | serial-comma advisory |
 | `references/citations/apa7.md` | 1 | serial-comma advisory |
 | `references/citations/chicago17.md` | 1 | serial-comma advisory |
@@ -233,16 +249,18 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `references/forms/linkedin.md` | 1 | serial-comma advisory |
 | `references/forms/literature-review.md` | 1 | serial-comma advisory |
 | `references/forms/technical-blog.md` | 1 | serial-comma advisory |
-| `references/voice.md` | 2 | serial-comma advisories |
-| `PROOF.md` | 3 | serial-comma advisories |
+| `references/ste.md` | 1 | serial-comma advisory |
 | `references/citations/ieee.md` | 2 | serial-comma advisories |
 | `references/citations/mla9.md` | 2 | serial-comma advisories |
 | `references/forms/abstract.md` | 2 | serial-comma advisories |
 | `references/forms/pentest-report.md` | 2 | serial-comma advisories |
+| `references/voice.md` | 2 | serial-comma advisories |
+| `../rabbit-reads/SKILL.md` | 3 | serial-comma advisories |
 | `references/context.md` | 3 | serial-comma advisories |
 | `voices/whit3rabbit.md` | 4 | serial-comma advisories |
-| `SKILL.md` | 6 | serial-comma advisories |
 | `../voice-setup/SKILL.md` | 6 | serial-comma advisories |
+| `PROOF.md` | 6 | serial-comma advisories |
+| `SKILL.md` | 6 | serial-comma advisories |
 | `references/patterns.md` | 25 | 10 em dashes, 7 semicolons, 2 one-word sentences, 6 advisories |
 
 The serial-comma rows are the `oxford_comma` mechanic, which reports at P2 and never at the voice default. It cannot tell a three-item list from a compound sentence, so it advises and says so in the finding. Counting advisories as defects would be the same error in the other direction.
@@ -438,6 +456,30 @@ Two limits, stated rather than papered over. Spelled numbers are not tracked at 
 **The corpus is empty, and the harness is not**, which is the same arrangement `docs/detector-corpus/` has and for the same reason. Gathering real writing from a real person with their consent is the expensive half, and a scorer written afterwards gets written to fit whatever data turned up. `scripts/voice-eval/test_eval_harness.py` runs it over synthetic triples with known answers, in CI, so the day somebody populates the corpus the arithmetic is already known to work: a round trip that landed scores above 0.9, one that moved nothing scores near 0, and one that went backwards scores negative.
 
 Until then, the pipeline's end-to-end behaviour rests on the fixtures in `tests/`, which own their ground truth and are not real writing. That is the same disclaimer the section below makes about the detector corpus, and it is not a smaller one.
+
+## Which models clear the rewrite gate
+
+`skills/rabbit-rewrites/scripts/bench.py` sends the twelve-passage battery through a configured endpoint and scores every reply against the same gate `--apply-model` uses: `verify.py` on the passage, the phrase gone, the finding count down. Three passes each, 45 units per model, on one laptop. The raw JSON is in `docs/model-bench/`.
+
+```bash
+python3 scripts/model-bench/run.py --model qwen2.5:7b --model gemma2:latest --repeat 3
+```
+
+| Model | Served by | Accepted | First try | Findings | Sec / passage | Facts dropped |
+|---|---|---:|---:|---|---:|---:|
+| `Qwen3.5-0.8B` Q4_K_M | llama-server | 23 / 45 (51%) | 19 | 66 -> 31 | 0.50 | 2 |
+| `qwen2.5:7b` | ollama | 27 / 45 (60%) | 27 | 66 -> 9 | 1.45 | 4 |
+| `gemma2` 9B | ollama | 33 / 45 (73%) | 30 | 66 -> 3 | 2.34 | 22 |
+
+**The last column is the reason the gate exists.** `gemma2` has the best pass rate in the table and dropped a number, a date or a quotation on 22 of its 45 passages, roughly one attempt in two. `qwen2.5:7b` did it 4 times. Ranked on pass rate alone, `gemma2` wins and is the worse tool. Every one of those 22 was caught and none reached a document. A rewriter with no preservation check would have shipped all of them, and the only symptom would have been a number quietly changing in somebody's draft.
+
+**An 0.8B is a usable engine for this, which is the claim the design rests on.** It clears half the passages, three times faster than the 7B, and its rejections are mostly harmless (`the model returned` the passage unchanged, x32). It leaves more findings behind, so the honest description is a first pass rather than a finish. On a Raspberry Pi the seconds-per-passage will be worse and the pass rate will not move, because the pass rate is a property of the weights.
+
+**Thinking on is a 0% pass rate.** Measured before the client learned to turn it off: `Qwen3.5-0.8B` scored 0 of 15, every rejection `stopped at max_tokens`, because it spent all 640 output tokens on a reasoning block and returned empty content, at 8.58 seconds a passage. Off, the same model and battery scored 10 of 15 at 0.47. Most current small models are hybrid reasoning models, so this is not a footnote about one file.
+
+**One pass over twelve cases is not a rate.** The same 0.8B scored 67% on a single pass and 51% over three. `--repeat` exists because of that gap, and the table above is the three-pass number in every row.
+
+**What this does not measure.** Grammar, and whether the result sounds like anybody. The gate proves a rewrite kept every number, date, path and quotation and lost the tell it was sent to remove. `qwen2.5:7b` produced "lets teams to use" in an early run and it passed every check here, because it is a fluency problem and nothing in this engine reads for fluency. Read the diff.
 
 ## What this does not prove
 
