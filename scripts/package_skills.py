@@ -18,7 +18,7 @@ if the packaged SKILL.md cites a `scripts/`, `voices/`, or `references/` path
 the archive does not carry, or if the frontmatter uses a key the upload
 endpoint rejects.
 
-Outputs: `dist/rabbit-writes.zip`, `dist/voice-setup.zip`, `dist/readme-writing.zip`.
+Outputs: one zip per name in SKILL_NAMES, under `dist/`.
 
 Usage:
   python3 scripts/package_skills.py
@@ -39,7 +39,8 @@ ENGINE_SCRIPTS_DIR = os.path.join(ENGINE_DIR, "scripts")
 DIST_DIR = os.path.join(ROOT, "dist")
 MAX_FILES = 200
 
-SKILL_NAMES = ["rabbit-writes", "voice-setup", "readme-writing", "rabbit-reads"]
+SKILL_NAMES = ["rabbit-writes", "voice-setup", "readme-writing",
+               "rabbit-reads", "rabbit-rewrites"]
 
 PLUGIN_VAR = "${CLAUDE_PLUGIN_ROOT}"
 
@@ -49,6 +50,16 @@ PLUGIN_VAR = "${CLAUDE_PLUGIN_ROOT}"
 SHARED_ENGINE_FILES = [
     "lexicon.json",
     "registers.json",
+    # `rwlib/ste.py` loads this on the first --ste check. It used to load at
+    # import time, which made every satellite archive missing it raise
+    # FileNotFoundError on --help; the load is lazy now, and the file ships
+    # so --ste works in a bundle at all.
+    "ste_lexicon.json",
+    # The replacement palette rwlib/rewrite.py looks for beside the scripts
+    # dir. Optional at runtime (a checkout without one rewrites slightly
+    # worse rather than failing), but rabbit-rewrites exists to run rewrites,
+    # and a bundle that silently ships degraded gives nobody a signal.
+    "thesaurus_alternatives.json",
     "scan.py",
     "verify.py",
 ]
@@ -101,7 +112,8 @@ IGNORE_FILES = {
 # wording difference ("below means" in rabbit-writes, "means" elsewhere).
 _PATHS_OLD_TAIL = (
     "the directory holding this skill and its siblings (`rabbit-writes`, "
-    "`voice-setup`, `readme-writing`, `rabbit-reads`). Claude Code expands "
+    "`voice-setup`, `readme-writing`, `rabbit-reads`, `rabbit-rewrites`). "
+    "Claude Code expands "
     "the variable. On a host that doesn't, such as Codex, resolve it that "
     "way by hand."
 )
@@ -224,6 +236,14 @@ SUBSTITUTIONS = {
         ],
     },
     "rabbit-reads": {
+        "SKILL.md": [
+            (
+                "**Paths.** `" + PLUGIN_VAR + "/skills/` means " + _PATHS_OLD_TAIL,
+                _PATHS_NEW,
+            ),
+        ],
+    },
+    "rabbit-rewrites": {
         "SKILL.md": [
             (
                 "**Paths.** `" + PLUGIN_VAR + "/skills/` means " + _PATHS_OLD_TAIL,
@@ -445,7 +465,8 @@ def main():
         if not build_skill_zip(skill):
             success = False
     if success:
-        print("All 4 skills packaged as isolated, self-contained archives in dist/.")
+        print("All %d skills packaged as isolated, self-contained archives in "
+              "dist/." % len(SKILL_NAMES))
         return 0
     print("Packaging failed for one or more skills.", file=sys.stderr)
     return 1

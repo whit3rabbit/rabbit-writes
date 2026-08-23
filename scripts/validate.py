@@ -15,6 +15,19 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS = os.path.join(ROOT, "skills")
+
+# Directories no check descends into, in one place because three checks walk the
+# tree and a copy that misses one reads as a check that passed.
+#
+# `.claude` is the entry that cost something. It holds Claude Code's working
+# state, including `.claude/worktrees/`, which holds whole checkouts of this
+# repository at other commits. A worktree opened at any commit before the
+# `human-writing` rename failed the stale-name tripwire on *this* commit, and a
+# second check then failed on that copy's `references/patterns.md`. Neither is
+# source and neither is editable from here. The manifests under
+# `.claude-plugin/` are a different path and are still checked.
+WALK_SKIP_DIRS = {".git", ".claude", "docs", "_to_delete", "__pycache__",
+                  "node_modules"}
 VOICES = os.path.join(SKILLS, "rabbit-writes", "voices")
 ENGINE = os.path.join(SKILLS, "rabbit-writes", "scripts")
 SCAN = os.path.join(ENGINE, "scan.py")
@@ -142,7 +155,8 @@ def check_skills():
         elif len(desc.group(1)) < 60:
             fail("skills/%s: description is too short to trigger reliably" % name)
         found.append(name)
-    for required in ("rabbit-writes", "voice-setup", "readme-writing", "rabbit-reads"):
+    for required in ("rabbit-writes", "voice-setup", "readme-writing",
+                     "rabbit-reads", "rabbit-rewrites"):
         if required not in found:
             fail("expected skill missing: %s" % required)
     notes.append("skills: %s" % ", ".join(found))
@@ -504,7 +518,7 @@ def check_single_definition():
             os.path.join("skills", "rabbit-writes", "references", "patterns.md"),
         ),
     }
-    skip_dirs = {".git", "docs", "_to_delete", "__pycache__", "node_modules"}
+    skip_dirs = WALK_SKIP_DIRS
     for rule, (rx, home) in definitions.items():
         home_path = os.path.join(ROOT, home)
         if os.path.exists(home_path):
@@ -541,7 +555,7 @@ def check_no_stale_skill_name():
     path points at a directory that no longer exists, and fails at runtime inside
     a subagent where nobody sees the traceback. CHANGELOG is exempt: it documents
     the rename and rewriting history is worse than a stale name."""
-    skip_dirs = {".git", "docs", "_to_delete", "__pycache__", "node_modules"}
+    skip_dirs = WALK_SKIP_DIRS
     hits = []
     for base, dirs, files in os.walk(ROOT):
         dirs[:] = [d for d in dirs if d not in skip_dirs]
@@ -675,9 +689,8 @@ def check_claude_md():
         fail("could not read registers.json: %s" % exc)
         return
     checked = 0
-    for base, _dirs, files in os.walk(ROOT):
-        if ".git" in base or "_to_delete" in base:
-            continue
+    for base, dirs, files in os.walk(ROOT):
+        dirs[:] = [d for d in dirs if d not in WALK_SKIP_DIRS]
         if "CLAUDE.md" not in files:
             continue
         rel = os.path.relpath(os.path.join(base, "CLAUDE.md"), ROOT)
@@ -1332,6 +1345,7 @@ def check_cli_error_handling():
         os.path.join(SKILLS, "rabbit-reads", "scripts", "extract_text.py"),
         os.path.join(SKILLS, "rabbit-reads", "scripts", "map_structure.py"),
         os.path.join(SKILLS, "rabbit-reads", "scripts", "check_notes.py"),
+        os.path.join(SKILLS, "rabbit-rewrites", "scripts", "bench.py"),
         os.path.join(ROOT, "scripts", "precommit.py"),
         os.path.join(ROOT, "scripts", "detector-corpus", "add_sample.py"),
         os.path.join(ROOT, "scripts", "detector-corpus", "score.py"),

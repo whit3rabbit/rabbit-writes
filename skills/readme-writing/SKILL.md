@@ -10,7 +10,7 @@ metadata:
 
 Write or edit `README.md` using conventions measured from real data, not folklore. The full study (methodology, the 100-repo table, every stat cited below) lives in `${CLAUDE_PLUGIN_ROOT}/docs/README_WRITEUP.md`. This file is the operational summary. Read `references/patterns.md` for the fuller catalog with more examples, and `references/checklist.md` at the end of any draft or edit.
 
-**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand. `${CLAUDE_PLUGIN_ROOT}/docs/` only exists in a full-repo install. When it's missing, `references/patterns.md` carries the same numbers and `scripts/readme_check.py` still runs, since it resolves its siblings from its own location.
+**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`, `rabbit-rewrites`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand. `${CLAUDE_PLUGIN_ROOT}/docs/` only exists in a full-repo install. When it's missing, `references/patterns.md` carries the same numbers and `scripts/readme_check.py` still runs, since it resolves its siblings from its own location.
 
 ## Modes
 

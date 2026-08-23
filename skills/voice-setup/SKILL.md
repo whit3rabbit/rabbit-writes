@@ -15,7 +15,7 @@ Turn one person's way of writing into two files a machine can apply:
 
 Both live in `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices/`. They are plain text under version control, so a voice is editable, diffable, and shareable.
 
-**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
+**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`, `rabbit-rewrites`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
 
 ## The principle
 

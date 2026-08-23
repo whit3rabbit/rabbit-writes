@@ -444,6 +444,90 @@ def test_plugin_layout_readme_check_uses_the_sibling_voices():
           json.dumps(payload)[:300])
 
 
+MODEL_DRAFT = (
+    "# Notes\n\n"
+    "We need to delve into the retry logic before the 14 March cutover, and "
+    "the seamless failover path is still unproven at 3,000 requests per "
+    "second.\n"
+)
+
+# A word-swapping stand-in for a small model. Obeys the wire format, is not
+# clever, and is enough to prove an extracted archive can hold a whole
+# conversation with an OpenAI-compatible server and gate the reply.
+_STUB_SWAPS = ((" delve into ", " read "), ("seamless", "smooth"))
+
+
+def _stub_model_server():
+    """(base_url, shutdown). A local chat-completions endpoint on a free port."""
+    import re
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self, *args):
+            pass
+
+        def do_POST(self):
+            length = int(self.headers.get("Content-Length") or 0)
+            body = json.loads(self.rfile.read(length) or b"{}")
+            passage = body["messages"][-1]["content"].split("to rewrite:\n", 1)[-1]
+            for old, new in _STUB_SWAPS:
+                passage = re.sub(re.escape(old), new, passage)
+            raw = json.dumps({"choices": [
+                {"finish_reason": "stop",
+                 "message": {"role": "assistant", "content": passage}}]}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
+
+    server = HTTPServer(("127.0.0.1", 0), Handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    return "http://127.0.0.1:%d/v1" % server.server_address[1], server.shutdown
+
+
+def test_rabbit_rewrites_plans_and_rewrites_standalone():
+    # The archive claims a vendored engine carrying endpoint.py and rewrite.py.
+    # scan.py imports both lazily, exactly the way it imports verify.py, so a
+    # bundle missing either packages fine and fails only when somebody asks for
+    # a rewrite. That is the failure this test exists for.
+    ensure_built()
+    scripts = installed("rabbit-rewrites", "scripts")
+    draft = os.path.join(CWD, "model-draft.md")
+    write(draft, MODEL_DRAFT)
+    base_url, shutdown = _stub_model_server()
+    try:
+        r = run([os.path.join(scripts, "scan.py"), draft, "--apply-model",
+                 "--model-plan", "--model-endpoint", base_url,
+                 "--model-name", "stub"])
+        check("rabbit-rewrites: --model-plan runs off the vendored engine",
+              r.returncode == 0 and "unit(s) would be sent" in r.stdout,
+              (r.stderr or r.stdout)[:400])
+
+        r = run([os.path.join(scripts, "scan.py"), draft, "--apply-model",
+                 "--model-endpoint", base_url, "--model-name", "stub",
+                 "--write"])
+        check("rabbit-rewrites: a gated rewrite is written standalone",
+              r.returncode == 0 and "wrote" in r.stdout,
+              (r.stderr or r.stdout)[:400])
+        after = open(draft, encoding="utf-8").read()
+        check("rabbit-rewrites: the tell is gone and the facts are not",
+              "delve into" not in after and "14 March" in after
+              and "3,000" in after, after[:300])
+
+        r = run([os.path.join(scripts, "bench.py"), "--model-endpoint", base_url,
+                 "--model-name", "stub", "--case", "tier1-single-word",
+                 "--json"])
+        payload = json.loads(r.stdout or "{}")
+        check("rabbit-rewrites: bench.py scores a model standalone",
+              r.returncode == 0
+              and payload.get("summary", {}).get("accepted") == 1,
+              (r.stderr or r.stdout)[:400])
+    finally:
+        shutdown()
+
+
 # --------------------------------------------------------------------------
 # Runner. Stays at the bottom: main() collects tests off globals(), so anything
 # defined below it is invisible to a stdlib run and only pytest would find it.

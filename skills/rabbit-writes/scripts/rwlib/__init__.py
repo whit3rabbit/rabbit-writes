@@ -17,6 +17,7 @@ Modules:
     cli_error   formatted LLM error reporting.
     corpus      the README corpus figures, and the drift check against them.
     docx_text   Word document visible text and hidden run extraction.
+    endpoint    one OpenAI-compatible chat endpoint, and how to find it.
     facts       preservation tracking for numbers, dates, ranges, and quotes.
     findings    the finding schema and its version.
     fixes       the mechanically safe subset of edits, for scan.py --apply-safe.
@@ -26,9 +27,11 @@ Modules:
     lexicon     the pattern catalogue, its version, and the regex builders.
     markdown    spans: fences, links, images, tables, quotes, dashes, badges.
     registers   the tolerance matrix, read from registers.json.
+    rewrite     model-backed rewriting, one finding at a time, behind the gate.
     sarif       findings as SARIF 2.1.0, for PR annotations.
     sections    what counts as an "installation" heading, for README work.
     sentences   English sentence and word segmentation.
+    ste         ASD-STE100 structural rules, from ste_lexicon.json.
     stylometry  stylometric distance calculations and exemplars.
     suppress    in-document finding suppression comment parser.
     voice_check rule validator for voice profiles.
@@ -39,8 +42,8 @@ where a person can argue with it.
 """
 
 __all__ = [
-    "artifacts", "cli_error", "corpus", "docx_text", "facts", "findings",
-    "fixes", "inflect", "injection", "language", "lexicon", "markdown",
-    "registers", "sarif", "sections", "sentences", "stylometry", "suppress",
-    "voice_check", "voices"
+    "artifacts", "cli_error", "corpus", "docx_text", "endpoint", "facts",
+    "findings", "fixes", "inflect", "injection", "language", "lexicon",
+    "markdown", "registers", "rewrite", "sarif", "sections", "sentences",
+    "ste", "stylometry", "suppress", "voice_check", "voices"
 ]

@@ -85,6 +85,7 @@ if HERE not in sys.path:
 
 from rwlib import docx_text                      # noqa: E402
 from rwlib import fixes as fixes_mod             # noqa: E402
+from rwlib import ste as ste_mod                # noqa: E402
 from rwlib import cli_error, facts, inflect, injection, language, registers, sarif, suppress  # noqa: E402
 from rwlib import stylometry                       # noqa: E402
 from rwlib import findings as findings_mod       # noqa: E402
@@ -719,7 +720,7 @@ def apply_voice_distance(raw_text, fingerprint, stats, findings):
 
 
 def scan(raw_text, profile=None, exempt=True, voice_rules=None,
-         suppressions=True, voice_fingerprint=None):
+         suppressions=True, voice_fingerprint=None, ste=False, ste_mode=None):
     """`suppressions=False` leaves the inline `rabbit-allow` comments alone.
 
     readme_check.py passes it, because it merges these findings with its own
@@ -1000,6 +1001,16 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
     # may have one without the other.
     if voice_fingerprint:
         apply_voice_distance(raw_text, voice_fingerprint, stats, findings)
+
+    # STE structural checks, opt-in and report-only. Over `scored`, not
+    # `raw_text`: a semicolon in a code fence is not prose, and the first
+    # calibration run counted 1,069 of exactly those. And before the
+    # suppression pass below, so a `rabbit-allow: ste-modal (...)` comment
+    # works on these findings the way it works on everything else.
+    if ste:
+        findings.extend(f for f in ste_mod.check_for_scan(scored,
+                                                          mode=ste_mode)
+                        if f["id"] not in skip)
 
     # Inline `rabbit-allow` comments, after every finding exists and before the
     # sort. Marked, never dropped: a suppressed finding is still reported, it
@@ -1292,26 +1303,8 @@ def run_apply_safe(text, path, voice_rules, write, to_stdout=False,
     # case can be reproduced faithfully; the other two fall back to the platform
     # default, which is what they got before.
     try:
-        dir_name = os.path.dirname(os.path.abspath(path)) or "."
-        nl = newline if isinstance(newline, str) else None
-        tmp_fd, tmp_path = tempfile.mkstemp(dir=dir_name, prefix=".rw_tmp_")
-        with os.fdopen(tmp_fd, "w", encoding="utf-8", newline=nl) as fh:
-            fh.write(fixed)
-        # mkstemp creates at 0600 and os.replace carries that onto the target,
-        # so a 0644 file in a repository comes back readable by nobody but its
-        # owner. Copy the original mode across first. Best effort: a platform
-        # that refuses chmod still gets the write, which is the point.
-        try:
-            os.chmod(tmp_path, stat.S_IMODE(os.stat(path).st_mode))
-        except OSError:
-            pass
-        os.replace(tmp_path, path)
+        _write_back(path, fixed, newline)
     except OSError as exc:
-        if "tmp_path" in locals() and os.path.exists(tmp_path):
-            try:
-                os.remove(tmp_path)
-            except OSError:
-                pass
         examples = [
             "python3 scan.py draft.md",
             "python3 scan.py draft.md --apply-safe --write"
@@ -1324,12 +1317,256 @@ def run_apply_safe(text, path, voice_rules, write, to_stdout=False,
     return 0
 
 
+def _write_back(path, text, newline):
+    """The atomic write --apply-safe and --apply-model share.
+
+    `newline` is the line ending the file was read with. Written back as it came
+    in, because rewriting every line of a CRLF document is not one of the edits
+    with exactly one correct answer, and verify.py cannot see it: both sides are
+    read through universal newlines, so the comparison it runs has already
+    normalized the difference away. A str when the file used one style
+    throughout, a tuple when it mixed them, and None on a file with no line
+    break at all. Only the first case can be reproduced faithfully.
+
+    mkstemp creates at 0600 and os.replace carries that onto the target, so a
+    0644 file in a repository would come back readable by nobody but its owner.
+    The original mode is copied across first, best effort: a platform that
+    refuses chmod still gets the write, which is the point. Two callers doing
+    this by hand is two chances to drop that line.
+    """
+    dir_name = os.path.dirname(os.path.abspath(path)) or "."
+    nl = newline if isinstance(newline, str) else None
+    tmp_fd, tmp_path = tempfile.mkstemp(dir=dir_name, prefix=".rw_tmp_")
+    try:
+        with os.fdopen(tmp_fd, "w", encoding="utf-8", newline=nl) as fh:
+            fh.write(text)
+        try:
+            os.chmod(tmp_path, stat.S_IMODE(os.stat(path).st_mode))
+        except OSError:
+            pass
+        os.replace(tmp_path, path)
+    except OSError:
+        if os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
+        raise
+
+
+def run_apply_model(text, path, args, voice_rules, voice_fingerprint,
+                    newline=None):
+    """Send each finding's own passage to a small model, and gate every reply.
+
+    The document is never sent. `rwlib.rewrite.plan` cuts it into one unit per
+    finding (a sentence, or a paragraph for the shape findings), so the request
+    size is set by the tell rather than by the file, and a 4k-context model on a
+    Raspberry Pi is enough. The argument for all of that is in rewrite.py.
+
+    What lives *here* rather than there is everything the engine knows and the
+    library must not import: the scan itself, `verify.validate`, and
+    `BANDS["burstiness"][0]`, which is the calibrated floor that decides which
+    paragraphs count as uniform. `rwlib` cannot reach up to scan.py or verify.py
+    without closing an import loop, so the three arrive as arguments.
+    """
+    from rwlib import endpoint as endpoint_mod
+    from rwlib import rewrite as rewrite_mod
+
+    stream = sys.stderr if args.stdout else sys.stdout
+    overrides = {}
+    if args.model_endpoint:
+        overrides["base_url"] = args.model_endpoint
+        overrides["model"] = args.model_name or "local"
+    elif args.model_name:
+        print(cli_error.format_llm_error(
+            "scan.py",
+            "--model-name names a model on an endpoint, and no endpoint was "
+            "given. Pass --model-endpoint too, or put both in a .rabbit-model "
+            "file beside the document.",
+            parser=None,
+            examples=["python3 scan.py draft.md --apply-model "
+                      "--model-endpoint http://127.0.0.1:8080/v1 "
+                      "--model-name qwen3-1.7b"]), file=sys.stderr)
+        return 2
+
+    endpoint, note = endpoint_mod.resolve(path, overrides or None)
+    if endpoint is None and not args.model_plan:
+        # An endpoint asked for and not usable exits 2, the same line --voice
+        # draws: you named it, so a clean report on a document nothing rewrote
+        # would be a false pass.
+        print(cli_error.format_llm_error(
+            "scan.py", "no usable model endpoint: %s" % note, parser=None,
+            examples=["python3 scan.py draft.md --apply-model --model-plan",
+                      "python3 scan.py draft.md --apply-model "
+                      "--model-endpoint http://127.0.0.1:8080/v1 "
+                      "--model-name qwen3-1.7b"]), file=sys.stderr)
+        return 2
+
+    exempt = not args.no_exempt
+    findings, _stats = scan(text, args.profile, exempt, voice_rules,
+                            voice_fingerprint=voice_fingerprint)
+
+    print("rabbit-writes --apply-model", file=stream)
+    print("endpoint: %s" % (endpoint.describe() if endpoint else "none"),
+          file=stream)
+    print("source:   %s" % note, file=stream)
+
+    if args.model_plan:
+        # Plan and stop. This is the flag to run first on somebody else's
+        # document and the one to run when there is no server yet: it says
+        # exactly what would be sent and how big each request is, without
+        # sending any of it.
+        budget = endpoint.input_budget() if endpoint else None
+        units, unaddressable = rewrite_mod.plan(
+            text, findings, budget_tokens=budget,
+            estimate=endpoint_mod.estimate_tokens,
+            burstiness_floor=BANDS["burstiness"][0])
+        print("\n%d unit(s) would be sent, one request each%s:"
+              % (len(units), "" if budget is None else
+                 " (budget %d tokens)" % budget), file=stream)
+        for unit in units:
+            print("  L%-4d %-6s %-22s ~%d tokens"
+                  % (line_of(text, unit["start"]), unit["kind"],
+                     ",".join(sorted({f["id"] for f in unit["findings"]}))[:22],
+                     endpoint_mod.estimate_tokens(unit["text"])), file=stream)
+        _report_unaddressable(unaddressable, text, stream)
+        return 0
+
+    import verify as verify_mod
+
+    result = rewrite_mod.run(
+        text, findings, endpoint,
+        scan_fn=lambda t: scan(t, args.profile, exempt, voice_rules,
+                               voice_fingerprint=voice_fingerprint)[0],
+        validate_fn=verify_mod.validate,
+        injection_fn=injection.scan,
+        attempts=args.model_attempts,
+        limit=args.model_limit,
+        estimate=endpoint_mod.estimate_tokens,
+        burstiness_floor=BANDS["burstiness"][0])
+
+    if result["refused"] == "safety":
+        print("\nrefused, nothing was sent to the model and nothing was "
+              "written.", file=stream)
+        print("%s carries concealed text addressed to an agent. A rewriter is "
+              "exactly what that text is written for, so it is quoted here and "
+              "read by a person:\n" % (path or "stdin"), file=stream)
+        for finding in result["blocking"]:
+            print("  L%-4d %s" % (finding["line"], finding["label"]), file=stream)
+            print("        %s" % finding["match"], file=stream)
+        print("\nNothing in the safety band is fixable, and a `rabbit-allow` "
+              "comment cannot clear it: see rwlib/injection.py.", file=stream)
+        if args.stdout:
+            print("Note: output was redirected with --stdout; your redirect "
+                  "target is now empty.", file=sys.stderr)
+        return 1
+
+    accepted = [r for r in result["records"] if r["accepted"]]
+    print("", file=stream)
+    for record in result["records"]:
+        line = line_of(text, record["start"])
+        ids = ",".join(record["ids"])
+        if record["accepted"]:
+            print("  L%-4d %-6s %-24s rewritten" % (line, record["kind"], ids),
+                  file=stream)
+            print("        -  %s" % _one_line(record["before"]), file=stream)
+            print("        +  %s" % _one_line(record["after"]), file=stream)
+        else:
+            print("  L%-4d %-6s %-24s left alone after %d attempt(s)"
+                  % (line, record["kind"], ids, len(record["attempts"])),
+                  file=stream)
+            if record["attempts"]:
+                print("        last: %s" % record["attempts"][-1], file=stream)
+    if not result["records"]:
+        print("  Nothing a model can help with. Every finding is either "
+              "mechanically fixable (--apply-safe), measured over the whole "
+              "document, or in the safety band.", file=stream)
+    _report_unaddressable(result["unaddressable"], text, stream)
+
+    if result["refused"] == "verify":
+        print("\nverify.py rejected the assembled document, so nothing was "
+              "written:", file=stream)
+        for violation in result["verdict"]["violations"]:
+            print("  %-32s %s" % (violation["kind"], violation["detail"]),
+                  file=stream)
+        print("Each rewrite passed its own gate and the document did not. "
+              "Report it.", file=stream)
+        if args.stdout:
+            # Same courtesy as the safety refusal above: with --stdout the
+            # report went to stderr and the redirect target holds nothing.
+            print("Note: output was redirected with --stdout; your redirect "
+                  "target is now empty.", file=sys.stderr)
+        return 1
+
+    verdict = result["verdict"]
+    if verdict:
+        print("\nverified: tells %d -> %d, em dashes %d -> %d"
+              % (verdict["tells_before"], verdict["tells_after"],
+                 verdict["em_dashes_before"], verdict["em_dashes_after"]),
+              file=stream)
+
+    if args.stdout:
+        sys.stdout.write(result["text"])
+        return 0
+    if not args.write:
+        print("\nDry run. Nothing written. Pass --write to apply, or pipe "
+              "--apply-model --stdout into a diff.", file=stream)
+        return 0
+    if not path:
+        print(cli_error.format_llm_error(
+            "scan.py", "--write requires a file argument (cannot write back "
+                       "when reading from stdin)", parser=None,
+            examples=["python3 scan.py draft.md --apply-model --write"]),
+            file=sys.stderr)
+        return 2
+    if not accepted:
+        print("\nNothing accepted, so nothing written.", file=stream)
+        return 0
+    try:
+        _write_back(path, result["text"], newline)
+    except OSError as exc:
+        print(cli_error.format_file_error(
+            "scan.py", path, "file", expected_type="writable file path",
+            details=str(exc),
+            examples=["python3 scan.py draft.md --apply-model --write"]),
+            file=sys.stderr)
+        return 2
+    print("\nwrote %d rewrite(s) to %s" % (len(accepted), path), file=stream)
+    return 0
+
+
+def _one_line(text):
+    return re.sub(r"\s+", " ", (text or "").strip())[:96]
+
+
+def _report_unaddressable(unaddressable, text, stream):
+    """Every finding a model was not asked about, and why.
+
+    Printed rather than dropped, for the same reason `suppress.py` marks a
+    finding instead of removing it: a run that quietly skipped half the report
+    reads exactly like a run that fixed it.
+    """
+    if not unaddressable:
+        return
+    print("\nnot sent to the model (%d):" % len(unaddressable), file=stream)
+    seen = set()
+    for finding, reason in unaddressable:
+        key = (finding.get("id"), reason)
+        if key in seen:
+            continue
+        seen.add(key)
+        print("  L%-4d %-24s %s" % (finding.get("line", 0), finding.get("id"),
+                                    reason), file=stream)
+
+
 def main():
     examples = [
         "python3 scan.py draft.md",
         "python3 scan.py draft.md --json",
         "python3 scan.py draft.md --sarif > scan.sarif",
         "python3 scan.py draft.md --profile technical-blog",
+        "python3 scan.py draft.md --ste",
+        "python3 scan.py draft.md --ste --ste-mode procedural",
         "python3 scan.py draft.md --voice-rules voices/whit3rabbit.rules.json",
         "python3 scan.py draft.md --voice auto",
         "python3 scan.py draft.md --apply-safe --write"
@@ -1341,8 +1578,9 @@ def main():
     )
     ap.add_argument("file", nargs="?", help="file to scan; omit to read stdin")
     ap.add_argument("--version", action="version",
-                    version="scan.py (lexicon v%s, registers v%s)"
-                            % (lexicon_mod.version(), registers.version()))
+                    version="scan.py (lexicon v%s, registers v%s, ste v%s)"
+                            % (lexicon_mod.version(), registers.version(),
+                               ste_mod.version()))
     ap.add_argument("--profile", default=DEFAULT_REGISTER,
                     choices=sorted(REGISTERS) + ["auto"],
                     help="register profile (default: %s). 'auto' detects a "
@@ -1386,22 +1624,91 @@ def main():
                     help="with --apply-safe, write the fixes back to the file. "
                          "Without it, --apply-safe is a dry run")
     ap.add_argument("--stdout", action="store_true",
-                    help="with --apply-safe, print the fixed document instead of "
-                         "the report, so it can be diffed or piped")
+                    help="with --apply-safe or --apply-model, print the fixed "
+                         "document instead of the report, so it can be diffed "
+                         "or piped")
+    ap.add_argument("--ste", action="store_true",
+                    help="run ASD-STE100 structural checks in addition to the "
+                         "normal lexicon scan. STE checks sentence length, "
+                         "modal verbs, -ing verb forms, condition ordering, "
+                         "passive voice, banned verbs, phrasal verbs, and "
+                         "semicolons. Report-only: STE violations are never "
+                         "mechanically fixed.")
+    ap.add_argument("--ste-mode", default=None,
+                    choices=["procedural", "descriptive"],
+                    help="force STE text classification. Without this flag, "
+                         "ste.py classifies each paragraph automatically. "
+                         "'procedural' enforces 20-word sentence limit; "
+                         "'descriptive' enforces 25-word limit.")
+
+    model_group = ap.add_argument_group(
+        "model-backed rewriting",
+        "Sends one passage per finding to a small OpenAI-compatible model and "
+        "gates every reply through verify.py and a rescan. The document itself "
+        "is never sent. Configure the endpoint in a .rabbit-model file beside "
+        "the document, or pass --model-endpoint.")
+    model_group.add_argument("--apply-model", action="store_true",
+                             help="rewrite the passages that carry findings, "
+                                  "keeping only the rewrites that survive the gate")
+    model_group.add_argument("--model-plan", action="store_true",
+                             help="with --apply-model, print what would be sent "
+                                  "and how big each request is, and send nothing")
+    model_group.add_argument("--model-endpoint", metavar="URL",
+                             help="OpenAI-compatible base URL, e.g. "
+                                  "http://127.0.0.1:8080/v1 for llama-server or "
+                                  "http://127.0.0.1:11434/v1 for Ollama")
+    model_group.add_argument("--model-name", metavar="NAME",
+                             help="model to ask for at that endpoint. A local "
+                                  "llama-server ignores it and still needs one")
+    model_group.add_argument("--model-limit", type=int, metavar="N",
+                             help="stop after N passages. What was dropped is "
+                                  "listed rather than silently skipped")
+    model_group.add_argument("--model-attempts", type=int, default=3, metavar="N",
+                             help="tries per passage before leaving it alone "
+                                  "(default 3). Each retry is told why the last "
+                                  "one was rejected")
     args = ap.parse_args()
 
     # Both of these are read by run_apply_safe and by nothing else, so without
     # --apply-safe they were accepted and silently did nothing. `--stdout` is the
     # worse half: a caller piping the output got the report where it expected the
     # document, which is a fixed file that was never fixed.
+    applying = args.apply_safe or args.apply_model
     dead = [flag for flag, on in (("--write", args.write),
                                   ("--stdout", args.stdout)) if on]
-    if dead and not args.apply_safe:
+    if dead and not applying:
         print(cli_error.format_llm_error(
             "scan.py",
-            "%s only applies with --apply-safe, which is what produces the "
-            "fixed document. Without it there is nothing to write or print."
-            % " and ".join(dead),
+            "%s only applies with --apply-safe or --apply-model, which is what "
+            "produces the fixed document. Without one there is nothing to write "
+            "or print." % " and ".join(dead),
+            parser=ap, examples=examples), file=sys.stderr)
+        return 2
+
+    # Every --model-* flag is read by run_apply_model and by nothing else, so
+    # without --apply-model they were accepted and did nothing. The same trap
+    # --write and --stdout fell into above, and worse here: a caller who
+    # configured an endpoint and got a plain report has no way to tell that from
+    # a document with nothing to rewrite.
+    model_flags = [flag for flag, on in (
+        ("--model-plan", args.model_plan),
+        ("--model-endpoint", args.model_endpoint),
+        ("--model-name", args.model_name),
+        ("--model-limit", args.model_limit is not None)) if on]
+    if model_flags and not args.apply_model:
+        print(cli_error.format_llm_error(
+            "scan.py",
+            "%s only applies with --apply-model." % " and ".join(model_flags),
+            parser=ap, examples=examples), file=sys.stderr)
+        return 2
+
+    if args.apply_safe and args.apply_model:
+        print(cli_error.format_llm_error(
+            "scan.py",
+            "--apply-safe and --apply-model are separate passes and the order "
+            "matters. Run --apply-safe --write first: it fixes the edits with "
+            "exactly one correct answer, deterministically and for free, and "
+            "leaves the model a smaller job.",
             parser=ap, examples=examples), file=sys.stderr)
         return 2
 
@@ -1412,17 +1719,17 @@ def main():
             parser=ap, examples=examples), file=sys.stderr)
         return 2
 
-    if args.apply_safe:
+    if applying:
+        mode = "--apply-safe" if args.apply_safe else "--apply-model"
         conflict = [flag for flag, on in (("--check", args.check),
                                           ("--json", args.json),
                                           ("--sarif", args.sarif)) if on]
         if conflict:
             print(cli_error.format_llm_error(
                 "scan.py",
-                "%s cannot be combined with --apply-safe: --apply-safe applies "
-                "mechanical fixes, and the other reports findings. Run the two "
-                "as separate commands."
-                % " and ".join(conflict),
+                "%s cannot be combined with %s: %s applies fixes, and the other "
+                "reports findings. Run the two as separate commands."
+                % (" and ".join(conflict), mode, mode),
                 parser=ap, examples=examples), file=sys.stderr)
             return 2
 
@@ -1438,10 +1745,11 @@ def main():
         # with the paragraph number for a line. No write-back: --apply-safe
         # edits text files, and pretending to edit a zip would either destroy
         # the document or silently write a .md beside it.
-        if args.apply_safe:
+        if applying:
             print(cli_error.format_file_error(
                 "scan.py", args.file, "file", expected_type="text markdown file",
-                details="--apply-safe edits text files and cannot write a .docx",
+                details="%s edits text files and cannot write a .docx"
+                        % ("--apply-safe" if args.apply_safe else "--apply-model"),
                 examples=examples
             ), file=sys.stderr)
             return 2
@@ -1541,16 +1849,24 @@ def main():
     if args.apply_safe:
         return run_apply_safe(text, args.file, voice_rules, args.write,
                               to_stdout=args.stdout, newline=newlines)
+    if args.apply_model:
+        return run_apply_model(text, args.file, args, voice_rules,
+                               voice_fingerprint, newline=newlines)
 
     exempt = not args.no_exempt
+    # STE runs inside scan(), over the exempted copy and ahead of the
+    # suppression pass. Report-only: every ste-* id is P1 or P2, so --check
+    # still gates on P0 alone.
     findings, stats = scan(text, args.profile, exempt, voice_rules,
-                           voice_fingerprint=voice_fingerprint)
+                           voice_fingerprint=voice_fingerprint,
+                           ste=args.ste, ste_mode=args.ste_mode)
     if docx_findings:
         # The docx-declared hidden runs, merged after the scan over the visible
         # text so both halves land in one report and one --check verdict. Their
         # `line` is the paragraph number; the excerpt says so.
         findings.extend(docx_findings)
         findings.sort(key=findings_mod.sort_key)
+
     notes = [n for n in (language.note(text), voice_note, fingerprint_note,
                         register_note) if n]
 

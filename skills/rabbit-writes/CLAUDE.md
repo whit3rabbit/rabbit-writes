@@ -29,6 +29,12 @@ python3 skills/rabbit-writes/scripts/scan.py <file> --profile auto
 # Apply mechanical safe fixes in-place
 python3 skills/rabbit-writes/scripts/scan.py <file> --apply-safe --write
 
+# Show what a model would be sent, one passage per finding, and send nothing
+python3 skills/rabbit-writes/scripts/scan.py <file> --apply-model --model-plan
+
+# Rewrite those passages through a small OpenAI-compatible model, gating each reply
+python3 skills/rabbit-writes/scripts/scan.py <file> --apply-model --model-endpoint http://127.0.0.1:8080/v1 --model-name qwen3-1.7b --write
+
 # Output findings in SARIF 2.1.0 format
 python3 skills/rabbit-writes/scripts/scan.py <file> --sarif
 
@@ -50,7 +56,7 @@ python3 skills/rabbit-writes/scripts/attain.py <source> <target> --voice whit3ra
   - `attain.py`: CLI tool measuring conversion progress and stylometric distance.
   - `lexicon.json`: Machine-writing pattern rules.
   - `registers.json`: The tolerance matrix, and the only home for the register names. `references/context.md` renders its table from this file, `scan.py` derives its skip and relax sets from it, and restating the list here is how this line came to name four registers that do not exist.
-  - `rwlib/`: Shared engine library containing stylometry, injection checks, fixes, suppression, fact checking, voice resolution, SARIF export, and docx text extraction.
+  - `rwlib/`: Shared engine library containing stylometry, injection checks, fixes, suppression, fact checking, voice resolution, SARIF export, docx text extraction, and the model-backed rewriting pair (`endpoint.py`, `rewrite.py`).
 - **`voices/`**: Holds active voice marker (`ACTIVE`), voice markdown profiles (`<name>.md`), rule definitions (`<name>.rules.json`), and fingerprints (`<name>.fingerprint.json`). Includes `TEMPLATE` files.
 - **`references/`**: Technical and craft reference documentation (`craft.md`, `false-positives.md`, `injection.md`, `patterns.md`, `context.md`, `voice.md`, `checklist.md`).
 - **`references/forms/`**: One file per document form. Each names the register it routes to and gives that form's slots, length bands, and tells. A form file supplies slots and never fills them: `check_form_files` in `scripts/validate.py` enforces that by requiring every quoted phrase to sit under `## Tells`, where the heading already says the phrases in it are the ones to avoid.
@@ -61,5 +67,6 @@ python3 skills/rabbit-writes/scripts/attain.py <source> <target> --voice whit3ra
 - **Importing `rwlib`**: Scripts insert `skills/rabbit-writes/scripts` into `sys.path`. Import via `from rwlib import ...`.
 - **ASCII Only for Engine Source**: `test_every_invisible_logic_source_is_escape_only` enforces pure ASCII in engine `.py` files (except `markdown.py`). Write invisible unicode characters as hex/unicode escapes (`\u00a0`), never raw literals.
 - **`verify.py` Blast Radius**: `verify.validate(...)["ok"]` determines whether `scan.py --apply-safe --write` writes output to disk. False positives silently disable the fixer.
-- **Safety Band**: `safety` band findings (concealed text, prompt injection) are never fixable or suppressible. A P0 halts rewrites.
+- **Safety Band**: `safety` band findings (concealed text, prompt injection) are never fixable or suppressible. A P0 halts rewrites, and `rewrite.run` refuses *before the first request* rather than after planning, because a rewriter is exactly what a concealed instruction is written for.
+- **`rwlib` never imports `scan.py` or `verify.py`**: `scan.py` imports `verify` lazily and `verify` imports `rwlib.facts`, so a module down here reaching back up closes the loop. `rewrite.run` takes `scan_fn`, `validate_fn`, and the burstiness floor as arguments for this reason.
 - **Mode Contract Integrity**: `validate.py` pins `SKILL.md` wording. Editing pinned lines in `SKILL.md` will fail `scripts/validate.py`.

@@ -14,7 +14,7 @@ The cut is by concept, not by chapter. A chapter holds several concepts, a conce
 
 Each doc follows the template of its book type: a short statement of the concept, numbered imperative practices, anti-patterns, structural tests, and See also links to its siblings. The worked example in this repository is `docs-best-practices/`, one book distilled into 25 docs.
 
-**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
+**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`, `rabbit-rewrites`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
 
 ## Modes
 

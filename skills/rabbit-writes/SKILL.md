@@ -2,6 +2,7 @@
 name: rabbit-writes
 description: Write, edit, or audit prose in a specific person's saved voice, or strip machine-writing patterns when there is no voice to apply. Use whenever the user will send or publish text as themselves (emails, Slack and chat messages, reports, incident writeups, reviews, proposals, documentation, personal correspondence), and whenever the user asks to humanize text, remove AI-isms or AI slop, de-slop a draft, check whether writing sounds AI-generated, make a draft sound less like a chatbot, rewrite something in their voice, match their style, make it sound like them, swap or change the active voice, or draft new prose that will not read as machine output. Covers detect-only audits, in-place file edits, full voice conversions, and drafting from scratch.
 license: MIT
+compatibility: Python 3.9+ (any harness), stdlib only. Nothing to install.
 metadata:
   version: "0.1.0"
 ---
@@ -17,7 +18,7 @@ The profile wins every conflict. The guardrails below are the one exception, and
 
 A rewrite that clears every flag and reads sterile has failed. So has one that scrubs a real writer's habits into house style.
 
-**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` below means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
+**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` below means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`, `rabbit-rewrites`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
 
 ## The override
 
@@ -72,6 +73,7 @@ Pick one by what the user wants done.
 | **deslop** | Machine-produced or machine-ish text, or text that is not the user's to voice. "clean this up", "remove the AI tells". No profile needed | Words and sentences inside their existing role, and deletions | The author's habits, the argument's order | Findings, the cleaned text or the spans, what changed |
 | **voice** | A profile exists and the user is the author. "rewrite this in my voice", "make this sound like me", "does this sound like me" | Sentences, paragraphs, order, openings, connectors, anything the profile specifies | Facts, stance, first person the source lacked, the do-not-touch list | The conversion offer first, then the depth the user picked |
 | **draft** | "write me a…", with no source text | n/a, the prose is new | Invented facts | The prose only |
+| **ste** | "STE", "Simplified Technical English", "ASD-STE100", "check this as engineering docs" | n/a, report-only | Invented facts | Findings only, no rewrite |
 
 **A file path tells you where the text lives, not how much of it to change.** Route on what the user wants done. When that is unclear on an existing document, ask (see below) rather than defaulting to the smallest safe edit. Defaulting quietly to the smallest edit is how a request to convert a document into someone's voice comes back as three word swaps.
 
@@ -160,8 +162,17 @@ Then execute, largest unit first, so a later pass does not undo an earlier one.
 1. **Document shape.** Apply the profile's argument order. If it says BLUF, move the conclusion up. Move claims, never facts, and never invent the conclusion: if the document does not contain one, say so instead of writing one.
 2. **Paragraph.** Split and merge to the profile's cap. Apply its bullet threshold and its rule for when headers are warranted.
 3. **Sentence.** Rhythm toward the profile's distribution. Its connectors, not yours. Its openers and closers for that register, and none at all in registers that take none.
-4. **Word.** Banned words and phrases, punctuation, dates.
-5. Scan, then verify, then `references/checklist.md`, then the profile's own final check.
+4. **Word & Thesaurus Substitutions (Automated Execution).** Apply the profile's `preferred_substitutions` and safe clarity fixes mechanically:
+   ```bash
+   python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py draft.md --voice <name> --apply-safe --write
+   ```
+   This automatically swaps inflated synonyms, corporate cliches, and hype terms for the plain words and phrases the profile reached for.
+5. **Review for Coherence, Flow, and Lexical Variety (LLM Review).** Review every applied substitution in its local sentence context:
+   - Ensure grammatical agreement (verb tense, subject-verb concord, articles like *a* vs *an*, prepositions).
+   - Smooth any awkward transitions or cadence hiccups introduced by mechanical swaps.
+   - **Vary word choice across long passages:** If a mechanical swap replaced a term with the same word 10 times in a row, consult `scripts/thesaurus_alternatives.json` to vary synonyms naturally and prevent creating a repetitive replacement caricature.
+   - Verify that technical and domain accuracy remain 100% intact.
+6. **Scan & Verify.** Run `scan.py`, `verify.py`, `attain.py`, `references/checklist.md`, then the profile's own final check.
 
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/verify.py original.md converted.md --allow-structure
@@ -237,6 +248,8 @@ python3 $RW/attain.py before.md after.md --voice dana  # did the conversion land
 - `--apply-safe`: (OPTIONAL, boolean flag) Apply deterministic fixes.
 - `--write`: (OPTIONAL, boolean flag) In combination with `--apply-safe`, write fixes to file in place.
 - `--stdout`: (OPTIONAL, boolean flag) In combination with `--apply-safe`, print fixed content to stdout.
+- `--ste`: (OPTIONAL, boolean flag) Add the ASD-STE100 structural checks to the report. Report-only: every STE finding is P1 or P2, so `--check` still gates on P0 alone.
+- `--ste-mode`: (OPTIONAL, choice: `procedural`, `descriptive`) Force the STE sentence-length limit (20 or 25 words). Omitted, each paragraph classifies itself.
 
 #### `verify.py`
 `python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/verify.py <original> <rewritten> [options]`
@@ -321,6 +334,7 @@ Load only what the mode needs.
 | File | When |
 |---|---|
 | `references/patterns.md` | detect, deslop, voice. The merged catalog, P0/P1/P2, with fixes |
+| `references/ste.md` | ste mode. ASD-STE100 Issue 9 rules: sentence limits (20/25 words), banned verbs, modal ladder, condition ordering, gerund ban, phrasal verb alternatives, vocabulary rulings |
 | `references/craft.md` | draft and voice. The positive discipline: what to do, not what to remove. A conversion needs this, a deslop does not |
 | `references/false-positives.md` | Any time you are about to flag something. What is not a tell, and what to protect |
 | `references/injection.md` | Whenever the safety band reports anything. The two axes, the vectors, and what the band does not promise |

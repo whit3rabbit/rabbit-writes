@@ -1,0 +1,727 @@
+#!/usr/bin/env python3
+"""
+STE: ASD-STE100 Issue 9 (2025-01-15) structural rules for scan.py.
+
+This is a REPORT-ONLY layer. Unlike the lexicon tier system, which can
+mechanically fix some violations (hidden characters, utm params, preferred
+substitutions), STE violations almost always require judgment to rewrite.
+The rewrite (re-splitting long sentences, reordering condition-before-command)
+is a language model task. This module flags.
+
+Two modes (from STE, not this module):
+  - procedural   instructions: max 20 words/sentence
+  - descriptive  explanations: max 25 words/sentence
+
+**This module takes prose with the markup already stripped.** scan.py passes
+the exempted copy it already built (`apply_exemptions`), so fenced code,
+inline code spans, and quoted examples arrive blanked and are never flagged.
+Called on raw markdown, every semicolon in a code fence reads as prose, which
+is exactly the 1,069 false positives the first calibration run found. The
+same contract `rwlib/stylometry.py` states for the same reason.
+
+The lexicon (`scripts/ste_lexicon.json`) loads lazily, on the first check,
+not at import: this module is imported by scan.py unconditionally, and an
+eager load made every vendored copy of the engine unimportable when one
+packaging list forgot the JSON. A missing lexicon now fails the first `--ste`
+run with the path in the message, and costs a plain scan nothing.
+
+Synthetic finding IDs, raised by this engine only:
+  ste-sentence-procedural    sentence over 20 words in procedural text
+  ste-sentence-descriptive   sentence over 25 words in descriptive text
+  ste-modal                  banned modal verb (should/would/may/might/could)
+  ste-ing-verb               -ing form opening a clause after a comma
+  ste-condition-order        condition clause after the command verb
+  ste-banned-verb            banned verb (check/verify/confirm/ensure)
+  ste-phrasal-verb           phrasal verb that should be one word
+  ste-no-punctuation         semicolon (STE bans semicolons)
+  ste-passive                passive voice where active is possible
+  ste-vocab                  banned vocabulary item
+
+The `suppression-*` ids are deliberately absent: rwlib/lexicon.py owns them,
+and a second copy here is a drift surface. STE findings pass through the same
+suppression pass as everything else because scan.py appends them before it
+runs `suppress.apply`.
+
+Stdlib only, 3.9+.
+"""
+
+import json
+import os
+import re
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+STE_LEXICON_PATH = os.path.join(HERE, "..", "ste_lexicon.json")
+
+# ---------------------------------------------------------------------------
+# Finding IDs and priorities
+# ---------------------------------------------------------------------------
+
+STE_PRIORITIES = {
+    "ste-sentence-procedural": "P1",
+    "ste-sentence-descriptive": "P1",
+    "ste-modal": "P1",
+    "ste-ing-verb": "P1",
+    "ste-condition-order": "P1",
+    "ste-banned-verb": "P1",
+    "ste-phrasal-verb": "P1",
+    "ste-no-punctuation": "P2",
+    "ste-passive": "P2",
+    "ste-vocab": "P1",
+}
+
+# Derived, not restated: two collections that must agree and are written twice
+# is how the engine's own SYNTHETIC_FINDING_IDS grew a raise-on-drift check.
+STE_FINDING_IDS = frozenset(STE_PRIORITIES)
+
+
+def ste_priority(finding_id):
+    """The priority this engine raises a finding at."""
+    try:
+        return STE_PRIORITIES[finding_id]
+    except KeyError:
+        raise KeyError(
+            "no declared priority for STE finding %r. "
+            "Add it to STE_PRIORITIES in rwlib/ste.py." % finding_id
+        )
+
+
+# ---------------------------------------------------------------------------
+# Word / phrase counting helpers
+# ---------------------------------------------------------------------------
+
+# Words are: alphabetic tokens, numbers, numbers-with-units, abbreviations,
+# alphanumeric identifiers, quoted text. Backtick-quoted identifiers count as
+# one. Hyphenated words count as one.
+WORD_RX = re.compile(r"[A-Za-z][A-Za-z'-]*")
+NUMBER_WITH_UNIT_RX = re.compile(
+    r"\d+(?:\.\d+)?(?:px|ms|s|min|h|d|w|mb|kb|gb|tb|gbps|mbps|hz|mhz|ghz|kw|"
+    r"hw|cc|ml|l|cm|mm|m|km|in|ft|yd|oz|g|kg|lb|%)?")
+
+
+def count_words(text):
+    """Count words in text per STE word-counting rules.
+
+    Numbers, numbers with units, abbreviations, alphanumeric identifiers, and
+    quoted text each count as one word. Hyphenated words count as one.
+    """
+    # Code spans count as one word each
+    code_spans = re.findall(r"`[^`]+`", text)
+    count = len(code_spans)
+
+    # Strip code spans
+    stripped = re.sub(r"`[^`]+`", "", text)
+
+    # Strip markdown links and images
+    stripped = re.sub(r"!?\[[^\]]*\]\([^\)]*\)", "", stripped)
+    # Strip HTML tags
+    stripped = re.sub(r"<[^>]+>", "", stripped)
+
+    # Strip numbers-with-units before counting standalone numbers/words,
+    # so "50mb" contributes 1 to the count, not 2
+    no_units = NUMBER_WITH_UNIT_RX.sub("", stripped)
+    no_units = re.sub(r"\s+", " ", no_units).strip()
+
+    count += len(WORD_RX.findall(no_units))
+
+    # Numbers with units, each one is one word
+    count += len(NUMBER_WITH_UNIT_RX.findall(stripped))
+
+    # Standalone numbers not already consumed by NUMBER_WITH_UNIT_RX
+    count += len(re.findall(r"(?<![A-Za-z0-9])\d+(?![A-Za-z0-9])", no_units))
+
+    return count
+
+
+# ---------------------------------------------------------------------------
+# Vocabulary: banned and approved terms
+# ---------------------------------------------------------------------------
+
+_CACHE = {}
+
+
+def load_ste_lexicon(path=STE_LEXICON_PATH):
+    if path not in _CACHE:
+        try:
+            with open(path, encoding="utf-8") as fh:
+                _CACHE[path] = json.load(fh)
+        except FileNotFoundError:
+            raise FileNotFoundError(
+                "STE lexicon not found at %s. The --ste checks need it; a "
+                "plain scan does not. If this is a packaged copy, the archive "
+                "was built without ste_lexicon.json." % path)
+    return _CACHE[path]
+
+
+def version(path=STE_LEXICON_PATH):
+    lex = load_ste_lexicon(path)
+    return lex.get("version")
+
+
+def word_regex(entries):
+    """Whole-word alternation, longest first. Same logic as rwlib.lexicon."""
+    if not entries:
+        return re.compile(r"(?!)")
+    escaped = sorted((re.escape(e) for e in entries), key=len, reverse=True)
+    return re.compile(r"(?i)(?<![\w-])(" + "|".join(escaped) + r")(?![\w-])")
+
+
+def phrase_regex(entries):
+    """Same for multi-word entries."""
+    if not entries:
+        # (?!) never matches. The earlier fallback here was (?!x), which is a
+        # lookahead that *succeeds* everywhere no "x" follows: an emptied
+        # lexicon list would have turned finditer into a per-character loop.
+        return re.compile(r"(?!)")
+    escaped = sorted((re.escape(e).replace(r"\ ", r"\s+") for e in entries),
+                     key=len, reverse=True)
+    return re.compile(r"(?i)\b(" + "|".join(escaped) + r")\b")
+
+
+# Compiled regexes, built lazily on first use (see module docstring).
+_BANNED_VERBS_RX = None
+_BANNED_MODALS_RX = None
+_PHRASAL_VERBS_RX = None
+_ING_VERB_AFTER_COMMA_RX = None
+_CONDITION_ORDER_RX = None
+_PASSIVE_RX = None
+_AI_SLOP_RX = None
+_REGEXES_BUILT = False
+
+
+def _ensure_regexes():
+    global _BANNED_VERBS_RX, _BANNED_MODALS_RX, _PHRASAL_VERBS_RX
+    global _ING_VERB_AFTER_COMMA_RX, _CONDITION_ORDER_RX, _PASSIVE_RX
+    global _AI_SLOP_RX, _REGEXES_BUILT
+    if _REGEXES_BUILT:
+        return
+
+    lex = load_ste_lexicon()
+
+    _BANNED_VERBS_RX = word_regex(lex.get("banned_verbs", []))
+
+    _BANNED_MODALS_RX = phrase_regex(
+        lex.get("banned_modals", ["should", "would", "may", "might", "could"]))
+
+    _PHRASAL_VERBS_RX = phrase_regex(sorted(_phrasal_examples(lex)))
+
+    # Match -ing form used as verb after a comma (gerund clause, not noun):
+    # "..., making it easy to ...", which STE bans.
+    _ING_VERB_AFTER_COMMA_RX = re.compile(
+        r",\s+([A-Za-z]+ing)\b(?:\s+(?:that|you|we|they|the|this|these|a|an|"
+        r"to|not|it|them|him|her|us|me|be|been|being|get|gets|got|make|makes|"
+        r"made|have|has|had|do|does|did|will|would|can|could|should|may|"
+        r"might|must))+(?:\s+[A-Za-z]+\b){0,6}",
+        re.I)
+
+    # Condition AFTER command: "Do X if Y" is flagged, "If Y, do X" is not.
+    # Anchored to an imperative: the verb must open the sentence (line start,
+    # list marker, or a sentence boundary), or "I do not know if it works"
+    # and every other declarative carrying one of these verbs mid-sentence
+    # reads as a command. The clause may not cross a sentence boundary either,
+    # so a condition that opens the *next* sentence does not count against
+    # this one.
+    _CONDITION_ORDER_RX = re.compile(
+        r"(?:(?<=^)|(?<=[.!?] )|(?<=[.!?]  )|(?<=: ))"
+        r"(?:[-*]\s+|\d+\.\s+)?"
+        r"((?:do|run|set|check|make|install|start|stop|open|close|"
+        r"write|read|delete|remove|add|update|create|build|compile|deploy|"
+        r"execute|launch|send|receive|fetch|pull|push|configure|"
+        r"adjust|increase|decrease|connect|disconnect|log|login|logout|"
+        r"authenticate|verify|confirm|ensure)\b[^.!?\n]*?"
+        r"\b(?:if|when|unless)\b)",
+        re.I | re.M)
+
+    # Passive voice: auxiliary + past participle. Regular participles need at
+    # least two characters before the -ed ("is red" is an adjective, not a
+    # passive), -en covers written/taken/given/hidden and friends, and the
+    # alternation carries the common irregulars that end neither way. The
+    # earlier pattern here was (\w+ed|en): the second branch was the literal
+    # word "en", so "was written" never fired and "is en route" did.
+    _PASSIVE_RX = re.compile(
+        r"\b(is|are|was|were|be|been|being)\s+"
+        r"(\w{2,}ed|\w{2,}en|done|made|put|sent|found|thought|kept|built|set|"
+        r"said|known|shown|drawn|thrown|grown|blown|flown|worn|torn|held|"
+        r"left|lost|meant|met|paid|read|sold|spent|told|understood|won|"
+        r"begun|brought|bought|caught|felt|heard|hung|struck|stuck|laid|"
+        r"run|become)\b",
+        re.I)
+
+    _AI_SLOP_RX = _build_ai_slop_rx(lex)
+    _REGEXES_BUILT = True
+
+
+def _build_ai_slop_rx(lex):
+    """A regex matching every ai_slop vocabulary item."""
+    # Keys starting with "_" are the file's own commentary, not phrases. The
+    # first version compiled "_comment" into the pattern, whose decoded form
+    # " comment" matched every "word comment" in anybody's prose.
+    slop = [k for k in lex.get("ai_slop", {}) if not k.startswith("_")]
+    if not slop:
+        return re.compile(r"(?!)")
+    patterns = sorted((re.escape(k.replace("_", " ")) for k in slop),
+                      key=len, reverse=True)
+    # Case-insensitive like every other STE regex: "Simply run it." is the
+    # sentence-initial position these fillers actually sit in.
+    return re.compile(r"(?i)\b(" + "|".join(patterns) + r")\b")
+
+
+# ---------------------------------------------------------------------------
+# Classification: procedural vs descriptive
+# ---------------------------------------------------------------------------
+
+# Signals that text is procedural (imperative, steps, instructions)
+PROCEDURAL_INDICATORS = (
+    r"\bdo\b", r"\brun\b", r"\binstall\b", r"\bconfigure\b",
+    r"\bstart\b", r"\bstop\b", r"\bopen\b", r"\bclose\b",
+    r"\bcreate\b", r"\bupdate\b", r"\bdelete\b", r"\bremove\b",
+    r"\badd\b", r"\bset\b", r"\bcheck\b", r"\bmake sure\b",
+    r"\bgo to\b", r"\bclick\b", r"\bpress\b", r"\benter\b",
+    r"\bselect\b", r"\btype\b", r"\bcopy\b", r"\bpaste\b",
+    r"\bthen\b", r"\bnext\b", r"\bstep\b", r"\bif\b.*\bdo\b",
+    r"\bprerequisite\b", r"\bto install\b", r"\bto run\b",
+    r"\bstep \d+\b", r"^\d+\.", r"^\-\s", r"^\*\s",
+    # YAML/list-style steps
+    r"^\s*-\s+\w",
+    # Imperative: "Run the migration."
+    r"^\s*(?:run|install|configure|start|stop|check|make|set|add|remove|"
+    r"delete|update|create)\s+",
+)
+PROCEDURAL_RX = re.compile("|".join(PROCEDURAL_INDICATORS), re.I | re.M)
+
+# Signals that text is descriptive (explains, defines, describes)
+DESCRIPTIVE_INDICATORS = (
+    r"\bis\b.*\bthat\b", r"\bcontains\b", r"\bprovides\b", r"\ballows\b",
+    r"\benables\b", r"\bsupports\b", r"\bconsists\b", r"\bincludes\b",
+    r"\bexplains\b", r"\bdescribes\b", r"\bdefines\b", r"\bdetails\b",
+    r"\bThe \w+ is\b", r"\bThis \w+ provides\b", r"\bwhich is\b",
+    r"\bused for\b", r"\bdesigned to\b", r"\baimed at\b",
+    r"\bArchitecture\b", r"\bOverview\b", r"\bIntroduction\b",
+    r"\bIn this section\b", r"\bAs follows\b",
+    # Numeric / measurement descriptions
+    r"\b\d+\s*(?:ms|s|min|h|d|mb|gb|gbps|mbps|hz|kw)\b",
+    r"\btypically\b", r"\bgenerally\b", r"\busually\b",
+    # Third-person explanations
+    r"\bthe system\b.*\bdoes\b", r"\bthe component\b.*\bhandles\b",
+)
+DESCRIPTIVE_RX = re.compile("|".join(DESCRIPTIVE_INDICATORS), re.I | re.M)
+
+
+def classify_passage(text):
+    """Return 'procedural' or 'descriptive' for a passage of text.
+
+    Checks headings, list items, and sentence-level indicators.
+    """
+    # Check for procedural heading keywords
+    procedural_headings = (
+        r"^#+\s*(?:install|setup|configure|run|build|deploy|start|stop|"
+        r"usage|quickstart|getting started|prerequisites|steps?|"
+        r"how to|troubleshoot|faq|known issues|limitations|"
+        r"before you begin|procedure|commands?|options?|flags?)",
+        r"^#+\s*\d+[\.\):]\s",  # "## 1. Install"
+        r"^#+\s*step",           # "### Step 1"
+    )
+    for rx in procedural_headings:
+        if re.search(rx, text, re.I | re.M):
+            return "procedural"
+
+    # Check for procedural list patterns
+    if re.search(r"^\s*(?:[-*]|\d+\.)\s+\w", text, re.M):
+        return "procedural"
+
+    # Check first few sentences for imperative voice
+    first_sentences = " ".join(text.split("\n")[:5])
+    proc_hits = PROCEDURAL_RX.findall(first_sentences)
+    desc_hits = DESCRIPTIVE_RX.findall(first_sentences)
+
+    if len(proc_hits) > len(desc_hits):
+        return "procedural"
+
+    # Check for "you can" / "you should" / imperative structure
+    if re.search(r"\byou\s+(?:can|should|must|will|need to|have to)\b",
+                 text, re.I):
+        return "procedural"
+
+    # Default: descriptive
+    return "descriptive"
+
+
+# ---------------------------------------------------------------------------
+# Sentence-level checks
+# ---------------------------------------------------------------------------
+
+from .markdown import blank_entities as _blank_entities
+from .sentences import split_sentences as _split_sentences
+
+
+def _word_limits():
+    """(procedural, descriptive) sentence caps, from the lexicon.
+
+    Rules 5.1 and 6.3 carry the numbers, so the lexicon's
+    `punctuation_and_word_count` block is their one home and the fallbacks
+    here only cover a lexicon predating it.
+    """
+    counts = load_ste_lexicon().get("punctuation_and_word_count", {})
+
+    def cap(key, default):
+        entry = counts.get(key)
+        return entry.get("max_words", default) if isinstance(entry, dict) \
+            else default
+    return (cap("max_words_procedural_sentence", 20),
+            cap("max_words_descriptive_sentence", 25))
+
+
+def check_sentence_lengths(text, mode=None):
+    """Return findings for sentences over the word-count limit.
+
+    mode: 'procedural' (20 words) or 'descriptive' (25 words).
+    If None, classifies each paragraph.
+    """
+    findings = []
+    procedural_cap, descriptive_cap = _word_limits()
+    offset = 0
+    for para in text.split("\n\n"):
+        stripped = para.strip()
+        if not stripped:
+            offset += len(para) + 2
+            continue
+        effective_mode = mode or classify_passage(stripped)
+        word_limit = (procedural_cap if effective_mode == "procedural"
+                      else descriptive_cap)
+        finding_id = ("ste-sentence-procedural"
+                      if effective_mode == "procedural"
+                      else "ste-sentence-descriptive")
+
+        for sent in _split_sentences(stripped):
+            n_words = count_words(sent)
+            if n_words <= word_limit:
+                continue
+            # Line of the sentence, from character offsets. The first version
+            # searched text.split("\n") for the paragraph's stripped first
+            # line with .index(), which raises ValueError the moment a
+            # paragraph is indented: 11 of the 100 corpus READMEs crashed on
+            # exactly that.
+            at = para.find(sent[:60])
+            line = text.count("\n", 0, offset + (at if at >= 0 else 0)) + 1
+            findings.append({
+                "id": finding_id,
+                "label": "%s sentence: %d words (limit %d)"
+                         % (effective_mode, n_words, word_limit),
+                "band": "craft",
+                "priority": ste_priority(finding_id),
+                "line": line,
+                "match": sent[:80],
+                "excerpt": ("Split this sentence. STE rules: %s text uses "
+                            "max %d words per sentence."
+                            % (effective_mode, word_limit)),
+                "mode": effective_mode,
+            })
+        offset += len(para) + 2
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Modal verb checks
+# ---------------------------------------------------------------------------
+
+# "May" the month, which a case-insensitive modal ban otherwise flags in
+# every changelog: "Released in May 2026." Capitalized, followed by a
+# digit or an ordinal day, or preceded by a month-position word.
+_MAY_DATE_AFTER_RX = re.compile(r"\s+\d")
+_MAY_DATE_BEFORE_RX = re.compile(
+    r"(?i)\b(in|of|by|until|since|before|after|during|late|early|mid)[- ]$")
+
+
+def check_modals(text):
+    """Check for banned modal verbs (should/would/may/might/could).
+
+    STE allows: can, will, must
+    STE bans:  should, would, may, might, could
+    """
+    _ensure_regexes()
+    findings = []
+    for i, line in enumerate(text.split("\n"), 1):
+        for m in _BANNED_MODALS_RX.finditer(line):
+            word = m.group(0)
+            if word == "May" and (
+                    _MAY_DATE_AFTER_RX.match(line[m.end():])
+                    or _MAY_DATE_BEFORE_RX.search(line[:m.start()])):
+                continue
+            findings.append({
+                "id": "ste-modal",
+                "label": "banned modal: '%s'" % word,
+                "band": "craft",
+                "priority": ste_priority("ste-modal"),
+                "line": i,
+                "match": word,
+                "excerpt": ("STE bans '%s'. Modals that STE approves: "
+                            "can, will, must. Rewrite as a direct statement "
+                            "or use an approved modal." % word),
+            })
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# -ing verb form checks
+# ---------------------------------------------------------------------------
+
+def check_ing_verbs(text):
+    """Flag -ing verb forms after commas (gerund clause pattern).
+
+    STE bans: "... , making it easy to ..."
+    """
+    _ensure_regexes()
+    findings = []
+    for i, line in enumerate(text.split("\n"), 1):
+        for m in _ING_VERB_AFTER_COMMA_RX.finditer(line):
+            word = m.group(1)
+            findings.append({
+                "id": "ste-ing-verb",
+                "label": "-ing verb after comma: '%s'" % word,
+                "band": "craft",
+                "priority": ste_priority("ste-ing-verb"),
+                "line": i,
+                "match": m.group(0)[:80],
+                "excerpt": ("STE bans -ing verb forms as clause openers "
+                            "after a comma. Rewrite as two separate "
+                            "sentences or restructure."),
+            })
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Condition-before-command checks
+# ---------------------------------------------------------------------------
+
+def check_condition_order(text):
+    """Flag 'command ... if/when/unless' instead of 'if ... command'.
+
+    STE rule: required conditions must come BEFORE the command.
+    """
+    _ensure_regexes()
+    findings = []
+    for i, line in enumerate(text.split("\n"), 1):
+        for m in _CONDITION_ORDER_RX.finditer(line):
+            findings.append({
+                "id": "ste-condition-order",
+                "label": "condition after command verb",
+                "band": "craft",
+                "priority": ste_priority("ste-condition-order"),
+                "line": i,
+                "match": m.group(0)[:80],
+                "excerpt": ("STE requires conditions BEFORE the command. "
+                            "Rewrite: move the 'if/when/unless' clause to "
+                            "the start. Example: 'If the flag is set, do X' "
+                            "not 'Do X if the flag is set.'"),
+            })
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Banned verb checks (check/verify/confirm/ensure as verbs)
+# ---------------------------------------------------------------------------
+
+def check_banned_verbs(text):
+    """Flag banned verbs: check, verify, confirm, ensure used as verbs.
+
+    STE approved replacements:
+      - check/verify/confirm -> 'make sure that' (state verification)
+                                  OR 'examine' (look for faults)
+                                  OR 'measure' (get a value)
+      - ensure -> 'make sure that'
+    """
+    _ensure_regexes()
+    findings = []
+    for i, line in enumerate(text.split("\n"), 1):
+        for m in _BANNED_VERBS_RX.finditer(line):
+            word = m.group(0)
+            findings.append({
+                "id": "ste-banned-verb",
+                "label": "banned verb used as verb: '%s'" % word,
+                "band": "craft",
+                "priority": ste_priority("ste-banned-verb"),
+                "line": i,
+                "match": word,
+                "excerpt": ("STE bans '%s' as a verb. "
+                            "Replace with: 'make sure that' (verify state), "
+                            "'examine' (look for faults), or 'measure' "
+                            "(get a value)." % word),
+            })
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Phrasal verb checks
+# ---------------------------------------------------------------------------
+
+def _phrasal_examples(lex):
+    """{phrase: one-word replacement} from Rule 9.3's own worked examples.
+
+    Rule 9.3 is a productive-grammar constraint: any two approved words can
+    combine into a phrasal verb whose meaning is not approved, so there is no
+    lookup table to enforce and the standard says so outright ("You will not
+    usually find phrasal verbs listed as 'not approved' in the dictionary").
+    A previous version of the lexicon shipped ~555 generic English phrasal
+    verbs anyway, none of which exist in the Issue 9 PDF. What a regex *can*
+    check is the rule's own worked examples, minus its named approved
+    exceptions (PUT ON, COME ON, GO OFF), and that is all this does. The
+    general constraint is a judgment call the report leaves to the writer.
+    """
+    block = lex.get("phrasal_verbs", {})
+    approved = {k.lower() for k in block.get("approved_exceptions", {})
+                if not k.startswith("_")}
+    out = {}
+    for example in block.get("worked_examples", []):
+        phrase = " ".join(example.get("non_ste", "").split()[:2]).lower()
+        replacement = (example.get("ste", "").split() or [""])[0]
+        if phrase and replacement and phrase not in approved:
+            out[phrase] = replacement
+    return out
+
+
+def check_phrasal_verbs(text):
+    """Flag the phrasal verbs Rule 9.3 itself names. See _phrasal_examples."""
+    _ensure_regexes()
+    findings = []
+    phrasal_map = _phrasal_examples(load_ste_lexicon())
+
+    for i, line in enumerate(text.split("\n"), 1):
+        for m in _PHRASAL_VERBS_RX.finditer(line):
+            phrase = m.group(0)
+            alt = phrasal_map.get(re.sub(r"\s+", " ", phrase.lower()))
+            if not alt:
+                continue
+            findings.append({
+                "id": "ste-phrasal-verb",
+                "label": "phrasal verb: '%s'" % phrase,
+                "band": "craft",
+                "priority": ste_priority("ste-phrasal-verb"),
+                "line": i,
+                "match": phrase,
+                "excerpt": ("STE bans phrasal verbs whose meaning is not the "
+                            "approved meaning of their parts (Rule 9.3). "
+                            "Replace '%s' with '%s'." % (phrase, alt)),
+            })
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Passive voice checks
+# ---------------------------------------------------------------------------
+
+def check_passive(text):
+    """Flag passive voice constructions.
+
+    No per-line code guard here: this module receives the exempted copy, so
+    code spans and fences are already blanked. The first version skipped any
+    line carrying a backtick pair, which silenced "The value `x` was
+    updated." entirely.
+    """
+    _ensure_regexes()
+    findings = []
+    for i, line in enumerate(text.split("\n"), 1):
+        for m in _PASSIVE_RX.finditer(line):
+            findings.append({
+                "id": "ste-passive",
+                "label": "passive voice",
+                "band": "craft",
+                "priority": ste_priority("ste-passive"),
+                "line": i,
+                "match": m.group(0),
+                "excerpt": ("STE prefers active voice. "
+                            "Rewrite with 'you', 'we', or the actor as "
+                            "subject."),
+            })
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Semicolon checks
+# ---------------------------------------------------------------------------
+
+def check_semicolons(text):
+    """Flag semicolons (banned by STE). One finding per line.
+
+    Entities are blanked first, the way the voice semicolon rule does it:
+    the `;` closing `&amp;` is markup, not punctuation.
+    """
+    findings = []
+    for i, line in enumerate(_blank_entities(text).split("\n"), 1):
+        if ";" in line:
+            findings.append({
+                "id": "ste-no-punctuation",
+                "label": "semicolon used",
+                "band": "craft",
+                "priority": ste_priority("ste-no-punctuation"),
+                "line": i,
+                "match": ";",
+                "excerpt": "STE bans semicolons. Write two sentences instead.",
+            })
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# AI slop vocabulary checks
+# ---------------------------------------------------------------------------
+
+def check_ai_slop(text):
+    """Flag AI-overused words from the word-swaps list."""
+    _ensure_regexes()
+    slop = load_ste_lexicon().get("ai_slop", {})
+    findings = []
+    for i, line in enumerate(text.split("\n"), 1):
+        for m in _AI_SLOP_RX.finditer(line):
+            word = m.group(0)
+            key = word.lower()
+            alt = slop.get(key.replace(" ", "_")) or slop.get(key)
+            if not alt:
+                continue
+            findings.append({
+                "id": "ste-vocab",
+                "label": "AI overused word: '%s'" % word,
+                "band": "craft",
+                "priority": ste_priority("ste-vocab"),
+                "line": i,
+                "match": word,
+                "excerpt": ("AI overused word. STE replacement: %s" % alt),
+            })
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Run all STE checks
+# ---------------------------------------------------------------------------
+
+def check(text, mode=None):
+    """Run all STE structural checks against text.
+
+    mode: 'procedural', 'descriptive', or None (classify per paragraph).
+    Only the sentence-length check reads it: the limits are the one rule the
+    two STE modes actually disagree on, and everything else in the standard
+    applies to both.
+    """
+    findings = []
+    findings.extend(check_sentence_lengths(text, mode=mode))
+    for checker in (
+        check_modals,
+        check_ing_verbs,
+        check_condition_order,
+        check_banned_verbs,
+        check_phrasal_verbs,
+        check_ai_slop,
+        check_passive,
+        check_semicolons,
+    ):
+        findings.extend(checker(text))
+    return sorted(findings, key=lambda f: (f["line"], f["id"]))
+
+
+def check_for_scan(text, mode=None):
+    """Run STE checks and return findings in scan.py's findings schema.
+
+    Adds 'ste_version' to each finding so scan.py can echo the lexicon
+    version.
+    """
+    raw = check(text, mode=mode)
+    for f in raw:
+        f["ste_version"] = version()
+    return raw
