@@ -22,12 +22,15 @@ same contract `rwlib/stylometry.py` states for the same reason.
 The lexicon (`scripts/ste_lexicon.json`) loads lazily, on the first check,
 not at import: this module is imported by scan.py unconditionally, and an
 eager load made every vendored copy of the engine unimportable when one
-packaging list forgot the JSON. A missing lexicon now fails the first `--ste`
-run with the path in the message, and costs a plain scan nothing.
+packaging list forgot the JSON. Lazy keeps `--help` and every import working
+without it, but the mechanical band is default-on now and reads the file for
+its caps, so a missing lexicon fails the *scan* rather than only `--ste`.
+`scripts/package_skills.py` ships it in SHARED_ENGINE_FILES for that reason.
 
 Synthetic finding IDs, raised by this engine only:
   ste-sentence-procedural    sentence over 20 words in procedural text
   ste-sentence-descriptive   sentence over 25 words in descriptive text
+  ste-paragraph-sentences    paragraph over six sentences (Rule 6.6)
   ste-modal                  banned modal verb (should/would/may/might/could)
   ste-ing-verb               -ing form opening a clause after a comma
   ste-condition-order        condition clause after the command verb
@@ -36,6 +39,13 @@ Synthetic finding IDs, raised by this engine only:
   ste-no-punctuation         semicolon (STE bans semicolons)
   ste-passive                passive voice where active is possible
   ste-vocab                  banned vocabulary item
+
+The ids split into two bands, and the split is the point: what a script
+counts exactly (sentence words, sentences per paragraph, semicolons,
+condition order) runs in every plain scan, because counting is the one
+thing a script does better than a model. What the lexicon suggests
+(vocabulary, verb forms, modals) is advisory, P2, and only asked for.
+`MECHANICAL_IDS` below is the one home for which is which.
 
 The `suppression-*` ids are deliberately absent: rwlib/lexicon.py owns them,
 and a second copy here is a drift surface. STE findings pass through the same
@@ -57,21 +67,38 @@ STE_LEXICON_PATH = os.path.join(HERE, "..", "ste_lexicon.json")
 # ---------------------------------------------------------------------------
 
 STE_PRIORITIES = {
+    # Mechanical: counted, default-on. P1 where the count is certain; the
+    # semicolon is P2 because a ban on punctuation is a style stance.
     "ste-sentence-procedural": "P1",
     "ste-sentence-descriptive": "P1",
-    "ste-modal": "P1",
-    "ste-ing-verb": "P1",
+    "ste-paragraph-sentences": "P1",
     "ste-condition-order": "P1",
-    "ste-banned-verb": "P1",
-    "ste-phrasal-verb": "P1",
     "ste-no-punctuation": "P2",
+    # Advisory: lexicon-suggested, behind --ste, P2 because a word list is
+    # a judgment about vocabulary rather than a measurement.
+    "ste-modal": "P2",
+    "ste-ing-verb": "P2",
+    "ste-banned-verb": "P2",
+    "ste-phrasal-verb": "P2",
     "ste-passive": "P2",
-    "ste-vocab": "P1",
+    "ste-vocab": "P2",
 }
 
 # Derived, not restated: two collections that must agree and are written twice
 # is how the engine's own SYNTHETIC_FINDING_IDS grew a raise-on-drift check.
 STE_FINDING_IDS = frozenset(STE_PRIORITIES)
+
+# The split the module docstring describes. Which band an id sits in decides
+# whether scan.py runs it in every plain scan (mechanical) or only under
+# --ste (advisory), so a third statement of this list anywhere is drift.
+MECHANICAL_IDS = frozenset((
+    "ste-sentence-procedural",
+    "ste-sentence-descriptive",
+    "ste-paragraph-sentences",
+    "ste-condition-order",
+    "ste-no-punctuation",
+))
+ADVISORY_IDS = STE_FINDING_IDS - MECHANICAL_IDS
 
 
 def ste_priority(finding_id):
@@ -93,9 +120,15 @@ def ste_priority(finding_id):
 # alphanumeric identifiers, quoted text. Backtick-quoted identifiers count as
 # one. Hyphenated words count as one.
 WORD_RX = re.compile(r"[A-Za-z][A-Za-z'-]*")
+# The unit is optional, so without the boundary guards this matches the digit
+# inside an identifier: `item0` counted as `item` plus `0`, two words, and
+# `sha256` the same. The docstring below already says an alphanumeric
+# identifier is one word, and the caps are default-on now, so a technical
+# sentence full of `v2` and `utf8` measured half again as long as it reads.
 NUMBER_WITH_UNIT_RX = re.compile(
-    r"\d+(?:\.\d+)?(?:px|ms|s|min|h|d|w|mb|kb|gb|tb|gbps|mbps|hz|mhz|ghz|kw|"
-    r"hw|cc|ml|l|cm|mm|m|km|in|ft|yd|oz|g|kg|lb|%)?")
+    r"(?<![A-Za-z0-9])\d+(?:\.\d+)?(?:px|ms|s|min|h|d|w|mb|kb|gb|tb|gbps|mbps|"
+    r"hz|mhz|ghz|kw|hw|cc|ml|l|cm|mm|m|km|in|ft|yd|oz|g|kg|lb|%)?"
+    r"(?![A-Za-z0-9])")
 
 
 def count_words(text):
@@ -146,9 +179,12 @@ def load_ste_lexicon(path=STE_LEXICON_PATH):
                 _CACHE[path] = json.load(fh)
         except FileNotFoundError:
             raise FileNotFoundError(
-                "STE lexicon not found at %s. The --ste checks need it; a "
-                "plain scan does not. If this is a packaged copy, the archive "
-                "was built without ste_lexicon.json." % path)
+                "STE lexicon not found at %s. Every scan reads it now: the "
+                "mechanical checks (sentence caps, paragraph cap, condition "
+                "order, semicolon) run by default and take their limits from "
+                "this file. Restore it, or run with --no-ste. If this is a "
+                "packaged copy, the archive was built without "
+                "ste_lexicon.json." % path)
     return _CACHE[path]
 
 
@@ -350,6 +386,7 @@ def classify_passage(text):
 # ---------------------------------------------------------------------------
 
 from .markdown import blank_entities as _blank_entities
+from .markdown import is_prose_block as _is_prose_block
 from .sentences import split_sentences as _split_sentences
 
 
@@ -370,11 +407,22 @@ def _word_limits():
             cap("max_words_descriptive_sentence", 25))
 
 
-def check_sentence_lengths(text, mode=None):
+def _paragraph_cap():
+    """Max sentences per paragraph (Rule 6.6), same block, same contract."""
+    entry = load_ste_lexicon().get("punctuation_and_word_count", {}) \
+        .get("max_sentences_per_paragraph")
+    return entry.get("max_sentences", 6) if isinstance(entry, dict) else 6
+
+
+def check_sentence_lengths(text, mode=None, word_cap=None):
     """Return findings for sentences over the word-count limit.
 
     mode: 'procedural' (20 words) or 'descriptive' (25 words).
     If None, classifies each paragraph.
+
+    word_cap: a voice profile's per-sentence cap, replacing both mode caps
+    when set. The finding id still follows classification (the register
+    tells you *why* the sentence is long); only the number is the profile's.
     """
     findings = []
     procedural_cap, descriptive_cap = _word_limits()
@@ -385,8 +433,15 @@ def check_sentence_lengths(text, mode=None):
             offset += len(para) + 2
             continue
         effective_mode = mode or classify_passage(stripped)
-        word_limit = (procedural_cap if effective_mode == "procedural"
-                      else descriptive_cap)
+        if word_cap is not None:
+            # int(), not int(word_cap): voice_check.py's mechanic_problems
+            # only requires the mechanic to parse as float() ("30.5" passes),
+            # and build_voice.py's own cap probe already coerces the same
+            # field this way. int() alone raised ValueError on that shape.
+            word_limit = int(float(word_cap))
+        else:
+            word_limit = (procedural_cap if effective_mode == "procedural"
+                          else descriptive_cap)
         finding_id = ("ste-sentence-procedural"
                       if effective_mode == "procedural"
                       else "ste-sentence-descriptive")
@@ -410,12 +465,56 @@ def check_sentence_lengths(text, mode=None):
                 "priority": ste_priority(finding_id),
                 "line": line,
                 "match": sent[:80],
-                "excerpt": ("Split this sentence. STE rules: %s text uses "
+                "excerpt": ("Split this sentence. Voice profile cap: max %d "
+                            "words per sentence." % word_limit
+                            if word_cap is not None else
+                            "Split this sentence. STE rules: %s text uses "
                             "max %d words per sentence."
                             % (effective_mode, word_limit)),
                 "mode": effective_mode,
             })
         offset += len(para) + 2
+    return findings
+
+
+def check_paragraph_sentences(text):
+    """Return findings for prose paragraphs over the sentence cap (Rule 6.6).
+
+    A block that is mostly list items is not a paragraph, and
+    `is_prose_block` is the engine's one notion of that: a 10-item bullet
+    list is a legitimate 10 "sentences" and 6.6's answer to it is already
+    the vertical list, so flagging it here would report the fix as the
+    problem. One finding per offending paragraph, at its first line.
+
+    Blocks are split on `\\n\\s*\\n`, the pattern scan.py's own
+    `voice-paragraph-length` uses, and not on a literal blank line. A voice
+    profile carrying `max_paragraph_sentences` stands this check down on the
+    stated ground that the two report the same block, and a separator line
+    carrying a space broke exactly that: one seven-sentence paragraph here,
+    two short ones there, and the block reported by neither.
+    """
+    findings = []
+    cap = _paragraph_cap()
+    offset = 0
+    for para in re.split(r"(\n\s*\n)", text):
+        stripped = para.strip()
+        if stripped and _is_prose_block(stripped):
+            n = len(_split_sentences(stripped))
+            if n > cap:
+                line = text.count("\n", 0, offset + para.find(stripped)) + 1
+                findings.append({
+                    "id": "ste-paragraph-sentences",
+                    "label": "paragraph of %d sentences (limit %d)" % (n, cap),
+                    "band": "craft",
+                    "priority": ste_priority("ste-paragraph-sentences"),
+                    "line": line,
+                    "match": stripped[:80],
+                    "excerpt": ("Split this paragraph. STE rule 6.6: at most "
+                                "%d sentences before a break." % cap),
+                })
+        # The separators come back from the split too, so the offset is the
+        # exact length and never a literal two.
+        offset += len(para)
     return findings
 
 
@@ -691,37 +790,51 @@ def check_ai_slop(text):
 # Run all STE checks
 # ---------------------------------------------------------------------------
 
-def check(text, mode=None):
-    """Run all STE structural checks against text.
+def check(text, mode=None, scope="all", word_cap=None):
+    """Run STE structural checks against text.
 
     mode: 'procedural', 'descriptive', or None (classify per paragraph).
     Only the sentence-length check reads it: the limits are the one rule the
     two STE modes actually disagree on, and everything else in the standard
     applies to both.
+
+    scope: 'mechanical' runs only what a script counts exactly (the ids in
+    MECHANICAL_IDS), which is what every plain scan does. 'all' adds the
+    advisory vocabulary checks behind --ste. An unknown value raises, the
+    same way scan.scan's `ste=` does and for the same reason: silently
+    reading as 'not all' is how a caller asking for the advisory band gets
+    the mechanical one and no error.
     """
+    if scope not in ("mechanical", "all"):
+        raise ValueError("scope= must be 'mechanical' or 'all', not %r"
+                         % (scope,))
     findings = []
-    findings.extend(check_sentence_lengths(text, mode=mode))
-    for checker in (
+    findings.extend(check_sentence_lengths(text, mode=mode, word_cap=word_cap))
+    mechanical = (
+        check_paragraph_sentences,
+        check_condition_order,
+        check_semicolons,
+    )
+    advisory = (
         check_modals,
         check_ing_verbs,
-        check_condition_order,
         check_banned_verbs,
         check_phrasal_verbs,
         check_ai_slop,
         check_passive,
-        check_semicolons,
-    ):
+    )
+    for checker in mechanical + (advisory if scope == "all" else ()):
         findings.extend(checker(text))
     return sorted(findings, key=lambda f: (f["line"], f["id"]))
 
 
-def check_for_scan(text, mode=None):
+def check_for_scan(text, mode=None, scope="all", word_cap=None):
     """Run STE checks and return findings in scan.py's findings schema.
 
     Adds 'ste_version' to each finding so scan.py can echo the lexicon
     version.
     """
-    raw = check(text, mode=mode)
+    raw = check(text, mode=mode, scope=scope, word_cap=word_cap)
     for f in raw:
         f["ste_version"] = version()
     return raw

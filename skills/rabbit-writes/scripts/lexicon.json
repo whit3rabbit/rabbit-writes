@@ -15,7 +15,7 @@
     "intricate", "intricacies", "ever-evolving", "enduring", "daunting",
     "holistic", "holistically", "actionable", "impactful", "learnings",
     "synergy", "synergies", "interplay", "multifaceted",
-    "game-changer", "game-changing", "watershed",
+    "game-changer", "game-changing",
     "thought-leader", "thought-leadership"
   ],
 
@@ -46,7 +46,6 @@
     "in the event that", "has the ability to", "have the ability to",
     "it is important to note that", "it's important to note that",
     "it is worth noting that", "it's worth noting that",
-    "let me check", "now let me", "i'll start by", "let me verify", "let me confirm", "now let's check",
     "serves as", "serve as", "made a decision", "make a decision",
     "with regard to", "in terms of"
   ],
@@ -73,7 +72,7 @@
     "landscape", "landscapes",
     "unpack", "unpacks", "unpacking", "complexities",
     "embrace", "embraces", "embracing",
-    "symphony", "kaleidoscope"
+    "symphony", "kaleidoscope", "watershed"
   ],
 
   "_tier3_note": "Ordinary words, scored only at density. Nothing here may also appear in tier1: a word in both yields a P1 finding and inflates the density that produces a second one. Nothing here may be a top-200 English word either, which is why 'key' was removed: it dominated the count, and the phrase worth catching ('key turning point') is already a pattern regex.",
@@ -104,7 +103,7 @@
       "label": "Chatbot artifact",
       "band": "fingerprint",
       "priority": "P0",
-      "rx": "(?i)\\b(i hope this helps|hope that helps|let me know if (you|there)|feel free to (reach out|ask)|don't hesitate to ask|would you like me to|want me to (give|show|continue)|should i continue|here is a comprehensive|certainly[!,]|of course[!,]|absolutely[!,]\\s+here)"
+      "rx": "(?i)(?:\\b(i hope this helps|hope that helps|let me know if (you|there)|feel free to (reach out|ask)|don't hesitate to ask|would you like me to|want me to (give|show|continue)|should i continue|here is a comprehensive|(?:certainly|of course)!|absolutely[!,]\\s+here)|(?:^|[.!?]\\s+)(?:certainly|of course),)"
     },
     {
       "id": "sycophancy",
@@ -170,34 +169,34 @@
     {
       "id": "negation-runway",
       "label": "Negation runway",
-      "band": "fingerprint",
-      "priority": "P1",
+      "band": "craft",
+      "priority": "P0",
       "rx": "(?i)((it'?s|this|that|the \\w+) (is )?not (just |merely |only |simply )?(about )?[^.;!?\\n]{2,60}[,;] (it'?s|but|they'?re|rather)|not (just|merely|only) [^.;!?\\n]{2,50} but( also)? |isn'?t (the |a |about )?[^.;!?\\n]{2,50}\\.\\s+(it'?s|the real|what|that'?s)|the question isn'?t)"
     },
     {
-      "id": "tailing-negation",
-      "label": "Tailing negation fragment",
+      "id": "rule-of-three-no",
+      "label": "Tricolon with 'no'",
       "band": "craft",
-      "priority": "P1",
+      "priority": "P0",
       "rx": "(?i),\\s*no (guessing|surprises|wasted (motion|time)|hassle|setup|config(uration)?|fuss|magic)\\s*[.!?]"
     },
     {
-      "id": "ing-analysis",
-      "label": "Superficial -ing analysis",
+      "id": "consequence-tacking",
+      "label": "Consequence tacking (-ing participle)",
       "band": "craft",
       "priority": "P1",
       "rx": "(?i),\\s+(highlighting|underscoring|emphasizing|reflecting|symbolizing|showcasing|fostering|cultivating|ensuring|contributing to|encompassing|marking|signaling|cementing|solidifying)\\b"
     },
     {
-      "id": "meaning-telling",
-      "label": "Declarative meaning-telling",
+      "id": "significance-inflation-p1",
+      "label": "Significance inflation (mild)",
       "band": "craft",
       "priority": "P1",
       "rx": "(?i)\\b(this (represents|symbolizes|signals|speaks to) a (broader|larger|wider)|it speaks to a larger|the decision symbolizes)"
     },
     {
-      "id": "false-agency",
-      "label": "False agency",
+      "id": "inanimate-action",
+      "label": "Inanimate subject with active verb",
       "band": "craft",
       "priority": "P1",
       "rx": "(?i)\\b(the (decision|consensus|answer|solution|pattern) emerges|the (culture|conversation|narrative|market|industry) (shifts|moves|rewards|demands|decides)|the data tells us|a complaint becomes|the complaint becomes)"
@@ -217,16 +216,23 @@
       "rx": "(?im)(^|[.!?]\\s+|\\n)\\s*(here'?s the thing|here'?s what i mean|let me be clear|i'?ll be honest|the uncomfortable truth is|real talk[:,]|let'?s be honest|honestly\\?|look,\\s+[a-z]|can we talk about|it turns out that)"
     },
     {
-      "id": "faux-insight",
-      "label": "Faux-insight setup",
+      "id": "contrastive-framing",
+      "label": "Contrastive framing / setup",
+      "band": "craft",
+      "priority": "P1",
+      "rx": "(?i)(far from (being )?(just |merely )?\\w+,|it'?s not just [^,\\n]+, it'?s|what seems like [^,\\n]+ is actually|where [^,\\n]+ was once [^,\\n]+, it is now)"
+    },
+    {
+      "id": "reveal-setup",
+      "label": "Theatrical reveal setup",
       "band": "craft",
       "priority": "P1",
       "rx": "(?i)(this is the part most people (skip|miss)|what most people get wrong|here'?s what nobody (tells|says)|the part (everyone|most people) miss(es)?|nobody('?s| is) (naming|talking about)|the insight everyone'?s missing)"
     },
     {
-      "id": "infomercial-hook",
-      "label": "Infomercial hook",
-      "band": "fingerprint",
+      "id": "conversational-transition",
+      "label": "Conversational transition",
+      "band": "craft",
       "priority": "P1",
       "rx": "(?i)(the (catch|kicker|best part|result|twist)\\?|but here'?s the kicker|plot twist:|spoiler:|here'?s where it gets (interesting|clever|weird))"
     },
@@ -242,7 +248,7 @@
       "label": "Reasoning-chain artifact",
       "band": "fingerprint",
       "priority": "P1",
-      "rx": "(?i)(let me think (step by step|through this)|breaking this down|to approach this systematically|here'?s my thought process|first,? let'?s consider|working through this logically)"
+      "rx": "(?i)(let me think (step by step|through this)|breaking this down|to approach this systematically|here'?s my thought process|first,? let'?s consider|working through this logically|let me (check|verify|confirm)|now let'?s (check|verify)|i'll start by)"
     },
     {
       "id": "acknowledgment-loop",

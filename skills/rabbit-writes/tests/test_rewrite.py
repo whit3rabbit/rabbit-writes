@@ -838,3 +838,13 @@ def test_a_bad_model_endpoint_override_is_a_formatted_error_not_a_traceback():
         assert result.returncode == 2, (result.returncode, result.stderr)
         assert "Traceback" not in result.stderr, result.stderr
         assert "plain http" in result.stderr, result.stderr
+
+
+def test_thesaurus_alternatives_path_exists_and_loads():
+    assert os.path.exists(rewrite.ALTERNATIVES_PATH), rewrite.ALTERNATIVES_PATH
+    palette = rewrite.load_alternatives()
+    assert isinstance(palette, dict)
+    assert len(palette) > 50
+    assert "delve into" in palette
+    assert isinstance(palette["delve into"], list) and len(palette["delve into"]) > 0
+

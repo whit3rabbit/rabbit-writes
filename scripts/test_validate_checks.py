@@ -219,6 +219,82 @@ def test_a_register_nothing_routes_to_is_reported():
         assert s.reported("no form file routes to linkedin"), str(validate.problems)
 
 
+# --------------------------------------------------------------------------
+# the thesaurus alternatives check
+# --------------------------------------------------------------------------
+
+def test_thesaurus_alternatives_passes_shipped_file():
+    with sandbox() as s:
+        validate.check_thesaurus_alternatives()
+        assert not validate.problems, str(validate.problems)
+        assert s.reported("") == []
+
+
+def test_thesaurus_alternatives_anti_tell_rejects_lexicon_matches():
+    rel = os.path.join("skills", "rabbit-writes", "scripts", "thesaurus_alternatives.json")
+    with sandbox() as s:
+        s.edit(rel, '"delve into": [', '"delve into": ["notably,", ')
+        validate.check_thesaurus_alternatives()
+        assert s.reported("matches lexicon pattern 'confidence-calibration'"), str(validate.problems)
+
+
+
+def test_thesaurus_alternatives_uppercase_key_reported():
+    rel = os.path.join("skills", "rabbit-writes", "scripts", "thesaurus_alternatives.json")
+    with sandbox() as s:
+        s.edit(rel, '"delve into":', '"Delve Into":')
+        validate.check_thesaurus_alternatives()
+        assert s.reported("must be lowercase"), str(validate.problems)
+
+
+
+# --------------------------------------------------------------------------
+# the packaging metadata check
+# --------------------------------------------------------------------------
+
+def test_the_packaging_check_passes_the_shipped_files():
+    with sandbox() as s:
+        validate.check_packaging_metadata()
+        assert not validate.problems, str(validate.problems)
+        assert s.reported("") == []
+
+
+def test_an_undeclared_endpoint_env_var_is_reported():
+    """A var endpoint.py grows that no bundle declares is a rejected
+    publish, and the check has to catch it before clawhub's scanner does."""
+    with sandbox() as s:
+        s.edit(os.path.join("skills", "rabbit-writes", "scripts", "rwlib",
+                            "endpoint.py"),
+               'ENV_API_KEY = "RABBIT_MODEL_API_KEY"',
+               'ENV_API_KEY = "RABBIT_MODEL_API_KEY"\n'
+               'ENV_TOKEN = "RABBIT_MODEL_TOKEN"')
+        validate.check_packaging_metadata()
+        assert s.reported("does not declare RABBIT_MODEL_TOKEN"), \
+            "no report: %s" % validate.problems
+
+
+def test_a_drifted_skill_version_is_reported():
+    with sandbox() as s:
+        s.edit(os.path.join("skills", "voice-setup", "SKILL.md"),
+               'version: "0.1.0"', 'version: "0.2.0"')
+        validate.check_packaging_metadata()
+        assert s.reported("skills/voice-setup/SKILL.md says version"), \
+            "no report: %s" % validate.problems
+
+
+def test_a_blanked_env_description_is_reported():
+    with sandbox() as s:
+        s.edit(os.path.join("scripts", "package_skills.py"),
+               '''    _endpoint.ENV_MODEL: (
+        "Model name for --apply-model. Read only when scan.py runs with "
+        "--apply-model. Falls back to local when unset."
+    ),''',
+               '    _endpoint.ENV_MODEL: "",')
+        validate.check_packaging_metadata()
+        assert s.reported("has an empty description"), \
+            "no report: %s" % validate.problems
+
+
 TESTS = [(name, fn) for name, fn in sorted(globals().items())
          if name.startswith("test_") and callable(fn)]
 

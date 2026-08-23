@@ -239,12 +239,10 @@ None excluded. The scanner's P0 gate fired 28 times across the samples, and
 every hit was inspected: 27 were the chatbot-artifact lexicon matching "of
 course," and one matched "plays a significant role". Both are false positives
 over this writer's natural prose (the samples predate AI writing assistance,
-and "of course" is attested 37 times as an ordinary connective). Nothing was
-removed, and nothing was changed to make the gate pass.
-
-Consequence: running the plain scanner over this writer's text reports those
-P0s regardless of this profile. They are engine findings about the phrase, not
-about him.
+and "of course" is attested 37 times as an ordinary connective). The rules file
+ships an `engine_exemptions` mapping for `chatbot-artifact` so scans under this
+voice profile report the exemption cleanly and pass `--check`. The rules file
+also sets `max_sentence_words: 45` to match his measured p95 sentence length.
 
 ## Modes
 

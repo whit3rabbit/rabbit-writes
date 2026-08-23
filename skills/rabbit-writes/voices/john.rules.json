@@ -9,9 +9,13 @@
     "curly_quotes": "allow",
     "oxford_comma": "allow",
     "one_word_sentence": "allow",
-    "date_format": "mdy"
+    "date_format": "mdy",
+    "max_sentence_words": 45
   },
   "mechanics_by_register": {},
+  "engine_exemptions": {
+    "chatbot-artifact": "attested conversational style ('of course,' / 'certainly,' connective in review-essays)"
+  },
   "banned_words": [
     "delve",
     "tapestry",

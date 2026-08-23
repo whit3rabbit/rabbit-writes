@@ -2,14 +2,80 @@
 
 ## Unreleased
 
-Five passes. The first was architecture and evidence and changed nothing about
+Six passes. The first was architecture and evidence and changed nothing about
 what the engine flags. The second changes it in six places, the third resolves
 eight reported defects, and the fourth adds a fifth skill and the first thing
 in this plugin that talks to a model, gated by the checks that were already
-here. The fifth adds an opt-in ASD-STE100 layer and the transcript-mined tier
-phrases that bump the lexicon to version 5. The 100-repo corpus regression,
-the calibration fixtures, and every published self-scan number were re-run
-after all five.
+here.
+
+The fifth adds an opt-in ASD-STE100 layer and the transcript-mined tier
+phrases that bump the lexicon to version 5. The sixth turns the counted half
+of that layer on by default and gives the registers their tolerances for it.
+The 100-repo corpus regression, the calibration fixtures, and every published
+self-scan number were re-run after all six.
+
+### OpenClaw, ClawHub, and Hermes
+
+- **The packager now emits one folder per skill for the hosts that install
+  folders.** `python3 scripts/package_skills.py --target clawhub` writes
+  `dist/clawhub/<skill>/` with the same members as each zip plus three
+  declared deltas: a frontmatter rewritten for ClawHub (`license: MIT-0`, a
+  `homepage`, and one JSON `metadata` line whose `openclaw` block declares
+  `python3` and the three optional `RABBIT_MODEL_*` env vars, keyed off the
+  constants in `rwlib/endpoint.py` rather than restated), `{baseDir}/`-spelled
+  paths in the rewritten markdown, and a SECURITY.md at each bundle root
+  stating what the bundle is, why a scanner may flag it, and the whole
+  network surface. `references/injection.md` and `references/patterns.md`
+  gain a reviewer preamble at packaging time only, and the source files are
+  untouched. The default target is `all`, and a post-build gate holds the
+  folder output to every claim above.
+- **`scripts/publish_clawhub.py` wraps the ClawHub CLI.** It rebuilds each
+  folder through the gate, prints the suggested slug and the changelog, and
+  runs `clawhub skill publish <path> --version <version>` with the two flags
+  every source agrees on, `--extra` forwarding anything else. It exits 1
+  under CI and never runs there.
+- **`check_packaging_metadata` fails the build on drift.** An env var
+  `rwlib/endpoint.py` reads that the declaration dict does not carry, a
+  SKILL.md version off `plugin.json`'s, or a SECURITY template missing its
+  pinned phrases. Four tests in `scripts/test_validate_checks.py` drive it
+  over fixtures built to break it.
+
+### The counted STE checks run in every scan
+
+- **Five checks are measurements, so they no longer wait to be asked for.**
+  The two sentence caps, Rule 6.6's paragraph cap, condition-before-command,
+  and the semicolon all count something, and a count is a fact about the
+  document rather than an opinion about vocabulary. They run in every plain
+  scan. The six word-list checks (modals, banned verbs, phrasal verbs, -ing
+  openers, passive, `ai_slop`) stay behind `--ste` and drop to P2, because
+  the aerospace judgment about a word is not everybody's. `--no-ste`
+  silences all of it. Still report-only: every id is P1 or P2 and `--check`
+  gates on P0 alone.
+- **Rule 6.6 is implemented, `ste-paragraph-sentences`.** Six sentences to a
+  prose paragraph, counted over prose blocks only, since a ten-item bullet
+  list is Rule 6.6's own answer to a long paragraph rather than an instance
+  of the problem.
+- **`registers.json` is version 4, with five new rows.** Every allowance is a
+  per-document count from a sweep rather than a number from the standard:
+  100 trending READMEs under `docs`, this repository's prose under `blog`,
+  and the 19 open-access papers under `academic`. `chat`, `informal` and
+  `linkedin` skip the band, `formal` and `academic` skip the semicolon rule
+  because a semicolon is standard punctuation in both, and `academic` skips
+  the descriptive cap on the same evidence that made `uniformity` a skip
+  there: the papers run a median of 52 long sentences each, about one every
+  75 words.
+- **A voice profile outranks the standard, in three places.** A `semicolon`
+  mechanic at either value stands down the STE copy, a
+  `max_paragraph_sentences` stands down Rule 6.6, and a new
+  `max_sentence_words` replaces the 20 and 25 word caps in both directions,
+  with the label printing the number in force. satoshi carries 35, his
+  measured p95, which takes his whitepaper from 30 sentence findings to 8
+  without silencing the monsters.
+- **Fixed: an alphanumeric identifier counted as two words.** The optional
+  unit in the number pattern let it match the digit inside `sha256` or `v2`,
+  so `count_words` returned 67 for a 37-word sentence. Every sentence cap
+  reads that number and they are default-on now, so a technical sentence
+  measured half again as long as it reads is a finding nobody can act on.
 
 ### A fifth skill, rabbit-rewrites
 

@@ -86,7 +86,10 @@ def run_case(case, endpoint, attempts, burstiness_floor):
     text = case["text"]
 
     def scan_fn(chunk):
-        return scan_mod.scan(chunk, register)[0]
+        # ste="off": the battery's pass rates were calibrated without ste
+        # findings in the gate, and adding them is a battery.json
+        # recalibration rather than a flag.
+        return scan_mod.scan(chunk, register, ste="off")[0]
 
     findings = scan_fn(text)
     units, unaddressable = rewrite_mod.plan(

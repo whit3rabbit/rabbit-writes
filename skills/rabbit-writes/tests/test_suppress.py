@@ -251,3 +251,42 @@ def test_apply_reports_a_refusal_separately_from_a_use():
     assert refused == {"injection-hidden-directive"}
     assert "suppressed" not in findings[0]
     assert findings[1]["suppressed"] == "why"
+
+
+def test_voice_profile_engine_exemptions_suppresses_finding():
+    rules = {
+        "voice": "test-voice",
+        "default_priority": "P0",
+        "engine_exemptions": {
+            "chatbot-artifact": "attested author style"
+        }
+    }
+    from helpers import scan_with_rules
+    # Text with chatbot-artifact
+    text = "Certainly! We can help with that."
+    result, code = scan_with_rules(text, rules, "--check")
+    hit = find(result, "chatbot-artifact")
+    assert hit, result["findings"]
+    assert hit[0]["suppressed"] == "attested author style", hit[0]
+    assert hit[0]["suppressed_by"] == "voice profile (test-voice)", hit[0]
+    assert code == 0, code
+    assert not find(result, "suppression-unused"), result["findings"]
+
+
+def test_voice_profile_cannot_exempt_safety_band():
+    rules = {
+        "voice": "unsafe-voice",
+        "default_priority": "P0",
+        "engine_exemptions": {
+            "injection-hidden-directive": "trust me"
+        }
+    }
+    from helpers import scan_with_rules
+    result, code = scan_with_rules(ATTACK, rules, "--check")
+    hit = find(result, "injection-hidden-directive")
+    assert hit, result["findings"]
+    assert "suppressed" not in hit[0], hit[0]
+    assert code == 1, code
+    refused = find(result, "suppression-refused")
+    assert refused, [f["id"] for f in result["findings"]]
+

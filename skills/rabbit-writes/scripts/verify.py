@@ -67,6 +67,7 @@ from rwlib import cli_error                                      # noqa: E402
 from rwlib import facts                                               # noqa: E402
 from rwlib import lexicon as lexicon_mod                              # noqa: E402
 from rwlib import registers as registers_mod                          # noqa: E402
+from rwlib import voices as voices_mod                                # noqa: E402
 from rwlib.artifacts import norm_url                                  # noqa: E402
 # QUOTED_RX is a re-export, not a caller: test_verify.py asserts it is the
 # same object scan.py holds. See the note in scan.py.
@@ -308,7 +309,8 @@ def fact_delta(a, b):
     return out
 
 
-def validate(original, rewritten, allow_structure=False, allow_facts=False):
+def validate(original, rewritten, allow_structure=False, allow_facts=False,
+             allow_dashes=False):
     a, b = extract(original), extract(rewritten)
     violations = []
     structure_changes = []
@@ -367,16 +369,17 @@ def validate(original, rewritten, allow_structure=False, allow_facts=False):
             "detail": "%d -> %d" % (len(a["headings"]), len(b["headings"])),
         })
 
-    # Em dashes must never be added. Both counters diff the actual hits rather
-    # than the totals, so a failure names the span that moved the number and the
-    # reader can tell a real regression from a false positive without guessing.
+    # Em dashes must not be added, unless explicitly allowed by the active voice
+    # profile or --allow-dashes. Both counters diff the actual hits rather than
+    # the totals, so a report names the span that moved the number.
+    dash_bucket = structure_changes if allow_dashes else violations
     a_dash, b_dash = dash_hits(original), dash_hits(rewritten)
     a_em, b_em = len(a_dash), len(b_dash)
     if b_em > a_em:
         added = multiset_lost(b_dash, a_dash)
-        violations.append({"kind": "em dashes added",
-                           "detail": "%d -> %d: %s"
-                                     % (a_em, b_em, " | ".join(added[:3]))})
+        dash_bucket.append({"kind": "em dashes added",
+                            "detail": "%d -> %d: %s"
+                                      % (a_em, b_em, " | ".join(added[:3]))})
 
     # A rewrite must not end with more tells than it started with.
     a_tells, b_tells = tell_hits(original), tell_hits(rewritten)
@@ -434,7 +437,8 @@ def main():
     examples = [
         "python3 verify.py original.md rewritten.md",
         "python3 verify.py original.md rewritten.md --json",
-        "python3 verify.py original.md converted.md --allow-structure"
+        "python3 verify.py original.md converted.md --allow-structure",
+        "python3 verify.py original.md converted.md --voice john"
     ]
     ap = cli_error.LLMArgumentParser(
         description=__doc__,
@@ -456,6 +460,12 @@ def main():
                          "on it. Dates already compare as their ISO form and a range "
                          "as one token, so a reformat passes without this. It is for "
                          "a profile that spells numbers out, which no regex can model")
+    ap.add_argument("--allow-dashes", action="store_true",
+                    help="report added em dashes under structure changes instead of "
+                         "failing on them. For a voice profile (like john) that uses "
+                         "em dashes authentically")
+    ap.add_argument("--voice", help="voice profile name (e.g. john). If the profile allows em dashes, enables dash allowance")
+    ap.add_argument("--voice-rules", help="path to custom voice rules JSON file")
     args = ap.parse_args()
 
     try:
@@ -478,8 +488,29 @@ def main():
         ), file=sys.stderr)
         return 2
 
+    allow_dashes = args.allow_dashes
+    if not allow_dashes and (args.voice or args.voice_rules):
+        # Named explicitly (there is no --voice auto here), so a bad path or
+        # unparseable rules file exits 2 rather than silently leaving em
+        # dashes disallowed: the repo's convention (see scan.py's own
+        # --voice-rules handling) is that a profile asked for by name and
+        # not readable is a false pass, not a clean report.
+        rules_path = (args.voice_rules if args.voice_rules else
+                     os.path.join(voices_mod.VOICES_DIR,
+                                  args.voice + voices_mod.RULES_SUFFIX))
+        try:
+            vr = voices_mod.load(rules_path)
+        except voices_mod.VoiceError as exc:
+            print(cli_error.format_file_error(
+                "verify.py", rules_path, "--voice-rules / --voice",
+                expected_type="voice rules file path (.rules.json)",
+                details=str(exc), examples=examples), file=sys.stderr)
+            return 2
+        if vr.get("mechanics", {}).get("em_dash") == "allow":
+            allow_dashes = True
+
     result = validate(original, rewritten, allow_structure=args.allow_structure,
-                      allow_facts=args.allow_facts)
+                      allow_facts=args.allow_facts, allow_dashes=allow_dashes)
 
     if args.json:
         print(json.dumps(result, indent=2))

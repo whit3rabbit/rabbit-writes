@@ -26,6 +26,12 @@ python3 skills/rabbit-writes/scripts/scan.py <file> --check
 # Scan with auto-detected register profile
 python3 skills/rabbit-writes/scripts/scan.py <file> --profile auto
 
+# Add the advisory STE vocabulary checks (the counted five are already on)
+python3 skills/rabbit-writes/scripts/scan.py <file> --ste
+
+# Silence the STE layer entirely
+python3 skills/rabbit-writes/scripts/scan.py <file> --no-ste
+
 # Apply mechanical safe fixes in-place
 python3 skills/rabbit-writes/scripts/scan.py <file> --apply-safe --write
 
@@ -56,7 +62,7 @@ python3 skills/rabbit-writes/scripts/attain.py <source> <target> --voice whit3ra
   - `attain.py`: CLI tool measuring conversion progress and stylometric distance.
   - `lexicon.json`: Machine-writing pattern rules.
   - `registers.json`: The tolerance matrix, and the only home for the register names. `references/context.md` renders its table from this file, `scan.py` derives its skip and relax sets from it, and restating the list here is how this line came to name four registers that do not exist.
-  - `rwlib/`: Shared engine library containing stylometry, injection checks, fixes, suppression, fact checking, voice resolution, SARIF export, docx text extraction, and the model-backed rewriting pair (`endpoint.py`, `rewrite.py`).
+  - `rwlib/`: Shared engine library containing stylometry, injection checks, fixes, suppression, fact checking, voice resolution, SARIF export, docx text extraction, the model-backed rewriting pair (`endpoint.py`, `rewrite.py`), and the ASD-STE100 layer (`ste.py`, over `scripts/ste_lexicon.json`). `ste.py` splits into a counted band that runs in every scan and an advisory word-list band behind `--ste`. `references/ste.md` is the prose form.
 - **`voices/`**: Holds active voice marker (`ACTIVE`), voice markdown profiles (`<name>.md`), rule definitions (`<name>.rules.json`), and fingerprints (`<name>.fingerprint.json`). Includes `TEMPLATE` files.
 - **`references/`**: Technical and craft reference documentation (`craft.md`, `false-positives.md`, `injection.md`, `patterns.md`, `context.md`, `voice.md`, `checklist.md`).
 - **`references/forms/`**: One file per document form. Each names the register it routes to and gives that form's slots, length bands, and tells. A form file supplies slots and never fills them: `check_form_files` in `scripts/validate.py` enforces that by requiring every quoted phrase to sit under `## Tells`, where the heading already says the phrases in it are the ones to avoid.

@@ -11,6 +11,7 @@
     "one_word_sentence": "forbid",
     "max_paragraph_sentences": 5,
     "max_avg_sentence_words": 22,
+    "max_sentence_words": 35,
     "date_format": "dmy"
   },
   "banned_words": [

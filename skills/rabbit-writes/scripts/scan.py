@@ -720,7 +720,8 @@ def apply_voice_distance(raw_text, fingerprint, stats, findings):
 
 
 def scan(raw_text, profile=None, exempt=True, voice_rules=None,
-         suppressions=True, voice_fingerprint=None, ste=False, ste_mode=None):
+         suppressions=True, voice_fingerprint=None, ste="mechanical",
+         ste_mode=None):
     """`suppressions=False` leaves the inline `rabbit-allow` comments alone.
 
     readme_check.py passes it, because it merges these findings with its own
@@ -728,15 +729,50 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
     Run here as well, it would audit the same comments twice, and report a
     suppression naming a structure id as covering nothing: this function cannot
     see the half of the report that id belongs to.
+
+    `ste` is a tri-state, not the boolean it once was: 'mechanical' (the
+    default) runs the counted rules in every scan, 'all' adds the advisory
+    vocabulary band behind --ste, 'off' silences the lot. Unknown values
+    raise here rather than reading as false, which would have made --no-ste
+    a silent no-op.
     """
+    if ste not in ("off", "mechanical", "all"):
+        raise ValueError(
+            "ste= must be 'off', 'mechanical', or 'all', not %r. The boolean "
+            "form is gone: --ste maps to 'all' and every plain scan runs "
+            "'mechanical'." % (ste,))
     profile = profile or DEFAULT_REGISTER
     lex = lexicon_mod.load()
     scored = apply_exemptions(raw_text) if exempt else raw_text
     skip = set(PROFILE_SKIP.get(profile, set()))
+    ste_word_cap = None
     if voice_rules:
         mech = voice_mechanics(voice_rules, profile)
         if mech.get("double_hyphen") == "allow":
             skip.add("double-hyphen-dash")
+        # The profile wins every conflict with STE, the same way it wins
+        # against double-hyphen-dash just above. A semicolon mechanic that
+        # is present is a ruling whichever way it reads: 'allow' is the
+        # writer's own sentence shape, and 'forbid' already flags every
+        # occurrence at the voice's priority, so the ste copy underneath is
+        # noise about the same character.
+        if mech.get("semicolon") is not None:
+            skip.add("ste-no-punctuation")
+        # A profile that sets its own paragraph cap has ruled on paragraph
+        # length (voice-paragraph-length enforces it); the STE 6.6 copy
+        # would double-report the same block.
+        if mech.get("max_paragraph_sentences"):
+            skip.add("ste-paragraph-sentences")
+        # A per-sentence cap replaces the STE 20/25 caps outright, in both
+        # directions: stricter than STE is the writer's choice, looser
+        # keeps the monsters flagged past the profile's own number.
+        # A profile carrying a zero means the key is unset everywhere else in
+        # this function, and honoured here it would cap every sentence in the
+        # document at nothing. Checked as a float, not by truthiness: JSON's
+        # own `"0"` string form is truthy in Python and `or None` let it
+        # through as a live zero-word cap, flagging every non-empty sentence.
+        _cap = mech.get("max_sentence_words")
+        ste_word_cap = None if _cap is None or float(_cap) == 0 else _cap
     relax = PROFILE_RELAX.get(profile, {})
     findings = []
     stats = compute_stats(raw_text)
@@ -1002,22 +1038,50 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
     if voice_fingerprint:
         apply_voice_distance(raw_text, voice_fingerprint, stats, findings)
 
-    # STE structural checks, opt-in and report-only. Over `scored`, not
-    # `raw_text`: a semicolon in a code fence is not prose, and the first
-    # calibration run counted 1,069 of exactly those. And before the
-    # suppression pass below, so a `rabbit-allow: ste-modal (...)` comment
-    # works on these findings the way it works on everything else.
-    if ste:
-        findings.extend(f for f in ste_mod.check_for_scan(scored,
-                                                          mode=ste_mode)
-                        if f["id"] not in skip)
+    # STE structural checks, report-only. Over `scored`, not `raw_text`: a
+    # semicolon in a code fence is not prose, and the first calibration run
+    # counted 1,069 of exactly those. Before the suppression pass below, so
+    # a `rabbit-allow: ste-modal (...)` comment works on these findings the
+    # way it works on everything else. 'mechanical' (the counted rules)
+    # runs in every scan; 'all' adds the advisory vocabulary band.
+    #
+    # Register allowances drop the first N per id in document order, the
+    # same contract find() gives the lexicon tiers, and on the same side of
+    # suppress.apply: a rabbit-allow naming an allowed-away hit reports
+    # suppression-unused, exactly as a tier allowance does today.
+    if ste != "off":
+        # Grouped by id, then sliced past the allowance, the same shape
+        # find()'s `hits[allowed:]` gives the lexicon tiers rather than a
+        # second counter-and-compare idiom for the identical contract.
+        # ste_mod.check_for_scan already returns findings sorted by
+        # (line, id), so appending in id-group order preserves each id's own
+        # document order without needing to re-sort.
+        by_id = {}
+        for f in ste_mod.check_for_scan(
+                scored, mode=ste_mode,
+                scope=("all" if ste == "all" else "mechanical"),
+                word_cap=ste_word_cap):
+            if f["id"] not in skip:
+                by_id.setdefault(f["id"], []).append(f)
+        for fid, hits in by_id.items():
+            findings.extend(hits[relax.get(fid, 0):])
 
-    # Inline `rabbit-allow` comments, after every finding exists and before the
-    # sort. Marked, never dropped: a suppressed finding is still reported, it
-    # just stops counting. See rwlib/suppress.py. The safety band is refused
-    # there, because that comment lives in the document under attack.
+    # Inline `rabbit-allow` comments and voice profile engine exemptions,
+    # after every finding exists and before the sort. Marked, never dropped:
+    # a suppressed finding is still reported, it just stops counting. See rwlib/suppress.py.
+    # The safety band is refused there.
     if suppressions:
         allowances, problems = suppress.parse(raw_text)
+        if voice_rules and voice_rules.get("engine_exemptions"):
+            vname = voice_rules.get("voice", "profile")
+            for eid, reason in voice_rules["engine_exemptions"].items():
+                allowances.append({
+                    "ids": [eid],
+                    "reason": reason or ("exempted by %s profile" % vname),
+                    "line": 1,
+                    "profile": True,
+                    "source": "voice profile (%s)" % vname
+                })
         used, refused = suppress.apply(findings, allowances)
         findings.extend(suppress.audit(allowances, problems, used,
                                        findings_mod.make, refused))
@@ -1103,12 +1167,17 @@ def report(findings, stats, profile, exempt, voice_name=None, notes=()):
             out.append("")
 
     if allowed:
-        out.append("suppressed by rabbit-allow (%d, not counted above)"
-                   % len(allowed))
+        out.append("suppressed (%d, not counted above)" % len(allowed))
         for f in allowed:
             out.append("    L%-4d %-32s %s" % (f["line"], f["label"], f["match"]))
-            out.append("          allowed at L%d: %s"
-                       % (f["suppressed_at"], f["suppressed"]))
+            if "suppressed_at" in f:
+                out.append("          allowed at L%d: %s"
+                           % (f["suppressed_at"], f["suppressed"]))
+            elif "suppressed_by" in f:
+                out.append("          allowed by %s: %s"
+                           % (f["suppressed_by"], f["suppressed"]))
+            else:
+                out.append("          allowed: %s" % f["suppressed"])
         out.append("")
 
     out.append("stylometrics")
@@ -1169,6 +1238,7 @@ def json_payload(findings, stats, profile, exempt, voice_name, notes,
         "schema_version": findings_mod.SCHEMA_VERSION,
         "lexicon_version": lexicon_mod.version(),
         "registers_version": registers.version(),
+        "ste_version": ste_mod.version(),
         "profile": profile,
         "register_detection": register_detection,
         "voice": voice_name,
@@ -1403,8 +1473,13 @@ def run_apply_model(text, path, args, voice_rules, voice_fingerprint,
         return 2
 
     exempt = not args.no_exempt
+    # ste='off' on both calls: a rewriter is sent findings it can act on,
+    # and STE is report-only by contract. In the plan that keeps this scan
+    # quiet, and in the rescan that gates each reply, an ste finding would
+    # either be sent to the model or move the before/after count.
     findings, _stats = scan(text, args.profile, exempt, voice_rules,
-                            voice_fingerprint=voice_fingerprint)
+                            voice_fingerprint=voice_fingerprint,
+                            ste="off")
 
     print("rabbit-writes --apply-model", file=stream)
     print("endpoint: %s" % (endpoint.describe() if endpoint else "none"),
@@ -1434,11 +1509,20 @@ def run_apply_model(text, path, args, voice_rules, voice_fingerprint,
 
     import verify as verify_mod
 
+    # A voice whose em_dash mechanic is 'allow' (e.g. john) means an em dash
+    # the model adds is the writer's own sentence shape, not damage verify.py
+    # should reject the candidate over. Without this, the gate treats every
+    # voice the same as one that forbids dashes, and a model rewrite that
+    # legitimately uses one is discarded regardless of the active profile.
+    allow_dashes = bool(voice_rules) and voice_mechanics(
+        voice_rules, args.profile).get("em_dash") == "allow"
+
     result = rewrite_mod.run(
         text, findings, endpoint,
         scan_fn=lambda t: scan(t, args.profile, exempt, voice_rules,
-                               voice_fingerprint=voice_fingerprint)[0],
-        validate_fn=verify_mod.validate,
+                               voice_fingerprint=voice_fingerprint,
+                               ste="off")[0],
+        validate_fn=lambda a, b: verify_mod.validate(a, b, allow_dashes=allow_dashes),
         injection_fn=injection.scan,
         attempts=args.model_attempts,
         limit=args.model_limit,
@@ -1627,13 +1711,20 @@ def main():
                     help="with --apply-safe or --apply-model, print the fixed "
                          "document instead of the report, so it can be diffed "
                          "or piped")
-    ap.add_argument("--ste", action="store_true",
-                    help="run ASD-STE100 structural checks in addition to the "
-                         "normal lexicon scan. STE checks sentence length, "
-                         "modal verbs, -ing verb forms, condition ordering, "
-                         "passive voice, banned verbs, phrasal verbs, and "
-                         "semicolons. Report-only: STE violations are never "
-                         "mechanically fixed.")
+    # Mutually exclusive because they argue about the same default: the
+    # mechanical STE checks run in every plain scan now, so --ste and
+    # --no-ste are 'more' and 'none' against that baseline.
+    ste_group = ap.add_mutually_exclusive_group()
+    ste_group.add_argument("--ste", action="store_true",
+                    help="add the advisory ASD-STE100 checks (vocabulary, "
+                         "passive voice, modals, banned and phrasal verbs) "
+                         "on top of the mechanical ones every scan already "
+                         "runs. Report-only: STE findings are never "
+                         "mechanically fixed and never fail --check.")
+    ste_group.add_argument("--no-ste", action="store_true",
+                    help="silence the mechanical STE checks that run by "
+                         "default (sentence word caps, sentences per "
+                         "paragraph, semicolons, condition order)")
     ap.add_argument("--ste-mode", default=None,
                     choices=["procedural", "descriptive"],
                     help="force STE text classification. Without this flag, "
@@ -1854,12 +1945,14 @@ def main():
                                voice_fingerprint, newline=newlines)
 
     exempt = not args.no_exempt
-    # STE runs inside scan(), over the exempted copy and ahead of the
-    # suppression pass. Report-only: every ste-* id is P1 or P2, so --check
-    # still gates on P0 alone.
+    # STE mechanical runs in every scan; --ste adds the advisory band,
+    # --no-ste silences the lot. Report-only either way: every ste-* id is
+    # P1 or P2, so --check still gates on P0 alone.
+    ste_scope = ("off" if args.no_ste
+                 else "all" if args.ste else "mechanical")
     findings, stats = scan(text, args.profile, exempt, voice_rules,
                            voice_fingerprint=voice_fingerprint,
-                           ste=args.ste, ste_mode=args.ste_mode)
+                           ste=ste_scope, ste_mode=args.ste_mode)
     if docx_findings:
         # The docx-declared hidden runs, merged after the scan over the visible
         # text so both halves land in one report and one --check verdict. Their

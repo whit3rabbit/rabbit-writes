@@ -14,7 +14,7 @@ scan.py imports verify.py lazily, so a bundle missing it packages fine and
 fails only when somebody asks for a fix.
 
 The plugin layout is the other half of the same claim. Installed as a plugin
-(or as Codex loose skills), the three skills sit side by side at a path that is
+(or as Codex loose skills), the skills sit side by side at a path that is
 not this repository, and every script must resolve the sibling engine from
 there. Both repo suites run from this checkout, which is the blind spot that
 shipped two broken hooks, so the `test_plugin_layout_*` half copies `skills/`
@@ -22,6 +22,10 @@ to a temporary root and runs the same battery from a foreign working directory.
 Copying only `skills/` is deliberate: it is the loose-skills install, the
 strictest documented layout, and sibling resolution that survives it also
 survives a full-repo install.
+
+The `test_clawhub_*` half covers the folder target: the same members as the
+zip, with the frontmatter, paths, and scanner-facing additions the clawhub
+target declares, gated at build time.
 
     python3 test_package_skills.py
 
@@ -31,6 +35,7 @@ Stdlib only, 3.9+.
 import atexit
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -139,6 +144,7 @@ READS_NOTES = {
 failures = []
 _built = False
 _plugin_built = False
+_clawhub_built = False
 
 
 def check(name, condition, detail=""):
@@ -150,7 +156,7 @@ def check(name, condition, detail=""):
 
 
 def ensure_built():
-    """Package and extract all three skills once, into the temp root."""
+    """Package and extract all five skills once, into the temp root."""
     global _built
     if _built:
         return
@@ -172,7 +178,7 @@ def ensure_built():
 
 
 def ensure_plugin_copy():
-    """Copy the three skill directories side by side, outside the repo."""
+    """Copy the five skill directories side by side, outside the repo."""
     global _plugin_built
     if _plugin_built:
         return
@@ -191,6 +197,28 @@ def plugin_path(skill, *rel):
 
 def zip_path(skill):
     return os.path.join(getattr(package_skills, "TEST_DIST_DIR", package_skills.DIST_DIR), skill + ".zip")
+
+
+def ensure_clawhub_built():
+    """Build the clawhub folders into the same temp dist the zips use, once."""
+    global _clawhub_built
+    if _clawhub_built:
+        return
+    ensure_built()
+    real_dist = package_skills.DIST_DIR
+    package_skills.DIST_DIR = package_skills.TEST_DIST_DIR
+    try:
+        for skill in package_skills.SKILL_NAMES:
+            if not package_skills.build_skill_folder(skill):
+                raise RuntimeError("clawhub packaging failed for %s" % skill)
+    finally:
+        package_skills.DIST_DIR = real_dist
+        _clawhub_built = True
+
+
+def folder_path(skill, *rel):
+    dist = getattr(package_skills, "TEST_DIST_DIR", package_skills.DIST_DIR)
+    return os.path.join(dist, package_skills.CLAWHUB_DIR, skill, *rel)
 
 
 def installed(skill, *rel):
@@ -526,6 +554,205 @@ def test_rabbit_rewrites_plans_and_rewrites_standalone():
               (r.stderr or r.stdout)[:400])
     finally:
         shutdown()
+
+
+# --------------------------------------------------------------------------
+# The clawhub folder target.
+
+def test_a_dropped_env_declaration_fails_the_clawhub_gate():
+    # The gate is live, not decorative: drop one env var from the declared
+    # set and the build must fail rather than ship a read nothing declared.
+    # Runs first alphabetically, so it also has to leave the folder rebuilt.
+    ensure_clawhub_built()
+    key = sorted(package_skills.OPENCLAW_ENV_DESCRIPTIONS)[0]
+    saved = (key, package_skills.OPENCLAW_ENV_DESCRIPTIONS.pop(key))
+    try:
+        ok = package_skills.build_skill_folder("voice-setup")
+        check("a dropped env declaration fails the clawhub gate",
+              ok is False, "build_skill_folder returned True")
+    finally:
+        package_skills.OPENCLAW_ENV_DESCRIPTIONS[saved[0]] = saved[1]
+    check("restoring the declaration builds again",
+          package_skills.build_skill_folder("voice-setup") is True,
+          "rebuild failed")
+
+
+def test_claude_zip_body_is_unchanged_by_the_refactor():
+    # The claude target must render what it rendered before the clawhub
+    # target existed: no {baseDir} spelling, no MIT-0 line, and no
+    # unrendered template tokens anywhere in any member.
+    ensure_built()
+    for skill in package_skills.SKILL_NAMES:
+        with zipfile.ZipFile(zip_path(skill)) as zf:
+            hits = [n for n in zf.namelist()
+                    if b"{baseDir}" in zf.read(n)
+                    or b"MIT-0" in zf.read(n)
+                    or b"%(p)s" in zf.read(n)
+                    or b"%(paths)s" in zf.read(n)]
+        check("the claude zip for %s carries no clawhub spelling" % skill,
+              hits == [], str(hits))
+
+
+def test_clawhub_folder_is_the_zip_modulo_declared_deltas():
+    # SECURITY.md is the only file the folder adds, and the only changed
+    # files are the ones the clawhub transform itself changes: SKILL.md
+    # (frontmatter), the PREAMBLE_FILES, and any markdown whose clawhub
+    # rendering differs from its claude one (the {baseDir} prefixes). The
+    # expectation is recomputed from the same transforms rather than
+    # hardcoded, so a silent no-op and a silent extra rewrite both fail.
+    ensure_clawhub_built()
+    for skill in package_skills.SKILL_NAMES:
+        folder = folder_path(skill)
+        zip_side = installed(skill)
+
+        def walk_files(root):
+            found = set()
+            for dirpath, dirs, files in os.walk(root):
+                for f in files:
+                    found.add(os.path.relpath(os.path.join(dirpath, f), root))
+            return found
+
+        folder_files = walk_files(folder)
+        zip_files = walk_files(zip_side)
+        check("clawhub %s adds exactly SECURITY.md over the zip" % skill,
+              folder_files - zip_files == {"SECURITY.md"}
+              and zip_files - folder_files == set(),
+              "folder-only %s zip-only %s" % (sorted(folder_files - zip_files),
+                                              sorted(zip_files - folder_files)))
+
+        expected = {"SKILL.md"} | set(package_skills.PREAMBLE_FILES.get(skill, []))
+        for abs_file, rel_dest, rewrite_rel in package_skills.iter_members(skill):
+            if rewrite_rel is None or not abs_file.endswith(".md"):
+                continue
+            with open(abs_file, encoding="utf-8") as fh:
+                src = fh.read()
+            a = package_skills.transform_markdown(skill, rewrite_rel, src)
+            b = package_skills.transform_markdown(skill, rewrite_rel, src, target="clawhub")
+            if a != b:
+                expected.add(rel_dest)
+
+        changed = set()
+        for rel in sorted(folder_files & zip_files):
+            with open(os.path.join(folder, rel), "rb") as fh:
+                folder_bytes = fh.read()
+            with open(os.path.join(zip_side, rel), "rb") as fh:
+                zip_bytes = fh.read()
+            if folder_bytes != zip_bytes:
+                changed.add(rel)
+        check("clawhub %s changes exactly the declared files" % skill,
+              changed == expected,
+              "changed %s expected %s" % (sorted(changed), sorted(expected)))
+
+
+def test_clawhub_frontmatter_parses_and_declares_the_endpoint():
+    ensure_clawhub_built()
+    with open(os.path.join(package_skills.ROOT, ".claude-plugin", "plugin.json"),
+              encoding="utf-8") as fh:
+        plugin = json.load(fh)
+    for skill in package_skills.SKILL_NAMES:
+        with open(folder_path(skill, "SKILL.md"), encoding="utf-8") as fh:
+            text = fh.read()
+        lines = text.split("\n")
+        front = lines[:lines.index("---", 1)]
+        keys = [l.split(":", 1)[0] for l in front[1:]]
+        check("clawhub %s frontmatter keys are clawhub-legal" % skill,
+              set(keys) <= package_skills.CLAWHUB_ALLOWED_FRONTMATTER_KEYS,
+              str(keys))
+        check("clawhub %s is MIT-0, homed, and carries no compatibility" % skill,
+              "license: MIT-0" in front
+              and ("homepage: %s" % plugin["homepage"]) in front
+              and not any(l.startswith("compatibility:") for l in front),
+              str(front[:8]))
+        meta_lines = [l for l in front if l.startswith("metadata: ")]
+        block = None
+        if meta_lines:
+            try:
+                block = json.loads(meta_lines[0][len("metadata: "):])
+            except ValueError:
+                block = None
+        check("clawhub %s metadata is one JSON line" % skill, block is not None,
+              (meta_lines[0][:120] if meta_lines else "no metadata line"))
+        if isinstance(block, dict):
+            openclaw = block.get("openclaw") or {}
+            names = {e.get("name") for e in openclaw.get("envVars") or []}
+            check("clawhub %s declares exactly the endpoint env vars" % skill,
+                  names == set(package_skills.OPENCLAW_ENV_DESCRIPTIONS),
+                  str(sorted(names)))
+            check("clawhub %s pins the plugin version and the python3 bin" % skill,
+                  block.get("version") == plugin["version"]
+                  and (openclaw.get("requires") or {}).get("bins") == ["python3"],
+                  str(block.get("version")))
+
+
+def test_clawhub_basedir_citations_resolve():
+    ensure_clawhub_built()
+    basedir_rx = re.compile(r"\{baseDir\}/(scripts|voices|references)/[A-Za-z0-9_.\-/]*")
+    for skill in package_skills.SKILL_NAMES:
+        folder = folder_path(skill)
+        files = {}
+        for dirpath, dirs, names in os.walk(folder):
+            for f in names:
+                rel = os.path.relpath(os.path.join(dirpath, f), folder)
+                files[rel] = os.path.join(dirpath, f)
+        plugin_var_hits, code_basedir_hits = [], []
+        for rel, path in sorted(files.items()):
+            if rel.endswith((".md", ".py", ".json", ".txt")):
+                with open(path, "rb") as fh:
+                    data = fh.read()
+                if b"${CLAUDE_PLUGIN_ROOT}" in data:
+                    plugin_var_hits.append(rel)
+                if rel.endswith((".py", ".json")) and b"{baseDir}" in data:
+                    code_basedir_hits.append(rel)
+        check("clawhub %s carries no plugin variable" % skill,
+              plugin_var_hits == [], str(plugin_var_hits))
+        check("clawhub %s code and data carry no {baseDir}" % skill,
+              code_basedir_hits == [], str(code_basedir_hits))
+        with open(files["SKILL.md"], encoding="utf-8") as fh:
+            text = fh.read()
+        cited = {m.group(0).rstrip(".").replace("{baseDir}/", "").rstrip("/")
+                 for m in basedir_rx.finditer(text)}
+        missing = sorted(c for c in cited
+                         if c not in files
+                         and not any(f.startswith(c + "/") for f in files))
+        check("clawhub %s cites only paths the folder carries" % skill,
+              missing == [] and "{baseDir}/" in text, str(missing))
+
+
+def test_clawhub_bundles_carry_the_security_note():
+    ensure_clawhub_built()
+    for skill in package_skills.SKILL_NAMES:
+        with open(folder_path(skill, "SECURITY.md"), encoding="utf-8") as fh:
+            text = fh.read()
+        missing = [p for p in package_skills.SECURITY_PINNED_PHRASES if p not in text]
+        check("clawhub %s SECURITY.md carries the pinned phrases" % skill,
+              missing == [], str(missing))
+        license_hits = []
+        for dirpath, dirs, names in os.walk(folder_path(skill)):
+            for f in names:
+                if f.upper().startswith(("LICENSE", "COPYING")):
+                    license_hits.append(f)
+        check("clawhub %s ships no license file" % skill,
+              license_hits == [], str(license_hits))
+    for rel in package_skills.PREAMBLE_FILES.get("rabbit-writes", []):
+        with open(os.path.join(folder_path("rabbit-writes"), rel), encoding="utf-8") as fh:
+            text = fh.read()
+        check("clawhub %s carries the reviewer preamble" % rel,
+              package_skills.PREAMBLE_MARKER in text, rel)
+        with open(os.path.join(installed("rabbit-writes"), rel), encoding="utf-8") as fh:
+            zip_text = fh.read()
+        check("the claude zip leaves %s untouched" % rel,
+              package_skills.PREAMBLE_MARKER not in zip_text, rel)
+
+
+def test_clawhub_scan_runs_from_a_folder_bundle():
+    ensure_clawhub_built()
+    sample = os.path.join(CWD, "clawhub-sample.md")
+    write(sample, FIXABLE)
+    r = run([folder_path("rabbit-writes", "scripts", "scan.py"), sample, "--json"])
+    payload = json.loads(r.stdout or "{}")
+    check("scan.py --json runs from a clawhub folder bundle",
+          r.returncode == 0 and "lexicon_version" in payload,
+          (r.stderr or r.stdout)[:300])
 
 
 # --------------------------------------------------------------------------

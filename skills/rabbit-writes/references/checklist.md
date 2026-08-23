@@ -12,7 +12,7 @@ Asking yourself "is this clear?" does not work: general writing assessment is un
 
 1. Does the output contain any fact, name, number, date, quote, tool, or citation that is **not** in the source or supplied by the user?  *(A yes is the failure.)*
 2. Did you **add** first person, an anecdote, a stated opinion, or a stated preference that the source did not have?  *(A yes is the failure.)*
-3. Did you **add** an em dash anywhere?  *(A yes is the failure.)*
+3. Did you **add** an em dash anywhere (unless the active voice profile allows them)?  *(A yes is the failure.)*
 4. Did you convert ordinary sentences into fragments to manufacture rhythm?  *(A yes is the failure.)*
 5. Are all code blocks, frontmatter, tables, block quotes, inline code, URLs, file paths, and attributed quotations byte-identical to the source?
 6. In `deslop`: is the amount of cutting proportional to the actual slop, with no compression that stripped character?

@@ -309,7 +309,8 @@ def test_every_mechanic_and_ban_is_proven_by_firing_it():
                       "emoji": "forbid", "curly_quotes": "forbid",
                       "one_word_sentence": "forbid", "oxford_comma": "require",
                       "date_format": "dmy", "max_paragraph_sentences": 3,
-                      "max_avg_sentence_words": 20},
+                      "max_avg_sentence_words": 20,
+                      "max_sentence_words": 15},
         "banned_words": ["synergy"],
         "banned_phrases": ["circle back"],
         "banned_regex": [{"id": "war-metaphor", "label": "war",
@@ -507,8 +508,9 @@ def test_a_failing_check_does_not_activate():
 # somebody is honouring.
 
 GOOD_MEASURES = {
-    "avg_sentence_words": {"mean": 14.0, "sd": 2.0, "min": 12.0, "max": 16.0,
-                           "n": 3},
+    m: {"mean": 14.0, "sd": 2.0, "min": 12.0, "max": 16.0, "n": 3}
+    for m in ("avg_sentence_words", "sentence_sd", "burstiness", "mattr",
+              "em_dashes_per_1k", "contraction_rate")
 }
 GOOD_SHAPE = {
     "n_sentences": 30,
@@ -544,7 +546,7 @@ def test_a_well_formed_fingerprint_passes_and_says_what_it_holds():
         voice_check = check_module()
         results = voice_check.check_profile(rules_path)
         assert not voice_check.failures(results), results
-        assert any("1 measures" in r["message"] and "30 sentences" in r["message"]
+        assert any("6 measures" in r["message"] and "30 sentences" in r["message"]
                    for r in results), results
     finally:
         shutil.rmtree(tmp)
@@ -568,8 +570,9 @@ def test_a_fingerprint_with_the_numbers_in_the_wrong_slots_fails():
     nothing can fall outside of."""
     tmp = tempfile.mkdtemp()
     try:
-        swapped = {"avg_sentence_words": {"mean": 14.0, "sd": 2.0, "min": 16.0,
-                                          "max": 12.0, "n": 3}}
+        swapped = dict(GOOD_MEASURES,
+                       avg_sentence_words={"mean": 14.0, "sd": 2.0, "min": 16.0,
+                                           "max": 12.0, "n": 3})
         rules_path = fingerprint_beside(tmp, measures=swapped)
         assert any("not an envelope" in m for m in messages(rules_path)), \
             messages(rules_path)
@@ -581,8 +584,9 @@ def test_a_measure_this_engine_does_not_know_fails():
     tmp = tempfile.mkdtemp()
     try:
         rules_path = fingerprint_beside(
-            tmp, measures={"vibes": {"mean": 1.0, "sd": 0.0, "min": 1.0,
-                                     "max": 1.0, "n": 3}})
+            tmp, measures=dict(GOOD_MEASURES,
+                               vibes={"mean": 1.0, "sd": 0.0, "min": 1.0,
+                                      "max": 1.0, "n": 3}))
         assert any("different builder" in m for m in messages(rules_path)), \
             messages(rules_path)
     finally:

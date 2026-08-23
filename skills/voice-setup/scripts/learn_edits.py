@@ -52,6 +52,8 @@ from collections import Counter
 HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
+if "_bootstrap" in sys.modules and getattr(sys.modules["_bootstrap"], "__file__", None) != os.path.join(HERE, "_bootstrap.py"):
+    del sys.modules["_bootstrap"]
 import _bootstrap
 from _bootstrap import cli_error, inflect, voice_check, voices_mod, load_scan, SKILLS_DIR
 from rwlib import registers as registers_mod, stylometry

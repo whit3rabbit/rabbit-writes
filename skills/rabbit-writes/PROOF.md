@@ -9,20 +9,22 @@ for f in SKILL.md PROOF.md references/*.md references/forms/*.md \
          references/citations/*.md voices/whit3rabbit.md \
          ../voice-setup/SKILL.md ../readme-writing/SKILL.md \
          ../rabbit-reads/SKILL.md ../rabbit-rewrites/SKILL.md; do
-  echo "== $f"; python3 scripts/scan.py "$f"
+  echo "== $f"; python3 scripts/scan.py "$f" --no-ste
 done
 ```
 
 Run it from `skills/rabbit-writes/`. It covers every row in the table below, including the four in other skills, which an earlier version of this command left out.
 
+`--no-ste` is here for the reason the command names no `--voice-rules`. The counted STE checks run in every scan now, and they measure sentence length against an aerospace cap rather than measuring anything this table has ever been about. Folded into the P1 column they would restate a house style as a regression in sixteen passes of prose that did not change. They have their own table further down, with their own command.
+
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 5, registers 3, measured 23 August 2026, sixteenth pass)
+## Result (v0.1.0, lexicon 5, registers 4, measured 23 August 2026, seventeenth pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 4,891 | 0 | 0 | 0 | 0.71 | 0.71 | 0.0 |
-| `PROOF.md` | 9,066 | 0 | 0 | **1** | 0.59 | 0.72 | 0.0 |
+| `SKILL.md` | 4,934 | 0 | 0 | 0 | 0.71 | 0.71 | 0.0 |
+| `PROOF.md` | 9,354 | 0 | 0 | **1** | 0.58 | 0.72 | 0.0 |
 | `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.87 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 883 | 0 | 0 | **9** | 0.65 | 0.71 | 0.0 |
@@ -30,7 +32,7 @@ Every number below was measured against a particular pattern catalogue, and the 
 | `references/voice.md` | 1,799 | 0 | 0 | 0 | 0.76 | 0.71 | 0.0 |
 | `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
 | `references/checklist.md` | 748 | 0 | 0 | 0 | 0.49 | 0.73 | 0.0 |
-| `references/ste.md` | 904 | 0 | 0 | 0 | 0.56 | 0.72 | 0.0 |
+| `references/ste.md` | 1,244 | 0 | 0 | 0 | 0.57 | 0.70 | 0.0 |
 | `references/forms/abstract.md` | 571 | 0 | 0 | **5** | 0.70 | 0.71 | 0.0 |
 | `references/forms/blog.md` | 400 | 0 | 0 | **4** | 0.81 | 0.71 | 0.0 |
 | `references/forms/case-study.md` | 498 | 0 | 0 | **8** | 0.70 | 0.70 | 0.0 |
@@ -59,11 +61,46 @@ Every number below was measured against a particular pattern catalogue, and the 
 | `references/citations/mla9.md` | 685 | 0 | 0 | 0 | 0.63 | 0.69 | 0.0 |
 | `voices/whit3rabbit.md` | 1,558 | 0 | 0 | **10** | 0.69 | 0.78 | 0.0 |
 | `../voice-setup/SKILL.md` | 3,686 | 0 | 0 | 0 | 0.65 | 0.72 | 0.0 |
-| `../readme-writing/SKILL.md` | 2,432 | 0 | 0 | 0 | 0.63 | 0.73 | 0.0 |
+| `../readme-writing/SKILL.md` | 2,514 | 0 | 0 | 0 | 0.63 | 0.73 | 0.0 |
 | `../rabbit-reads/SKILL.md` | 1,134 | 0 | 0 | **1** | 0.64 | 0.68 | 0.0 |
 | `../rabbit-rewrites/SKILL.md` | 866 | 0 | 0 | 0 | 0.62 | 0.70 | 0.0 |
 
 **Every P2 in the `references/forms/` rows is the same finding:** a bold list label ending in a period, which is how `references/craft.md` has always written its own bullets and why it carries seven. The rule is skipped in the `docs` register and these rows are measured with no register at all, which is what the reproduce command above does.
+
+## The counted STE band, seventeenth pass
+
+The five counted checks run in every scan now, so this is the same sweep with the flag left off. Only the files that raise something are listed, and the register is the default `blog`, whose allowances (6 sentence findings of each kind, 2 semicolons, 1 condition, 1 paragraph) come off the top of every file before it reaches this table.
+
+```bash
+for f in SKILL.md PROOF.md references/*.md references/forms/*.md \
+         references/citations/*.md voices/whit3rabbit.md \
+         ../voice-setup/SKILL.md ../readme-writing/SKILL.md \
+         ../rabbit-reads/SKILL.md ../rabbit-rewrites/SKILL.md; do
+  echo "== $f"; python3 scripts/scan.py "$f" --json | \
+    python3 -c 'import sys,json,collections;print(collections.Counter(f["id"] for f in json.load(sys.stdin)["findings"] if f["id"].startswith("ste-")))'
+done
+```
+
+| File | Sentence, procedural | Sentence, descriptive | Condition order | Semicolon |
+|---|---:|---:|---:|---:|
+| `SKILL.md` | 28 | 17 | 0 | 0 |
+| `PROOF.md` | 57 | 108 | 0 | 0 |
+| `references/patterns.md` | 0 | 0 | 0 | 5 |
+| `references/false-positives.md` | 0 | 1 | 0 | 0 |
+| `references/voice.md` | 1 | 2 | 0 | 0 |
+| `references/checklist.md` | 5 | 0 | 0 | 0 |
+| `references/ste.md` | 1 | 0 | 0 | 0 |
+| `voices/whit3rabbit.md` | 3 | 0 | 0 | 0 |
+| `../voice-setup/SKILL.md` | 12 | 16 | 1 | 0 |
+| `../readme-writing/SKILL.md` | 7 | 10 | 0 | 0 |
+| `../rabbit-reads/SKILL.md` | 1 | 0 | 0 | 0 |
+| **Total, 41 files** | **115** | **154** | **1** | **5** |
+
+**Rule 6.6 raises nothing in any of these files.** Not one prose paragraph in the plugin runs past six sentences, the active voice's own cap of five doing its work. The column worth publishing here is the empty one: a check that fires on nothing here is a check whose cost is nothing here.
+
+**269 of the 275 are sentence length, and two documents carry 210 of them.** This file and `SKILL.md` are dense reference prose written in long sentences on purpose, the length the active voice's `max_avg_sentence_words: 22` measures and permits. The aerospace caps are 20 and 25 words for a maintenance manual read under time pressure by somebody whose first language may not be English. Publishing the number rather than tuning it away is the point: a writer who wants those sentences split has a list, and one who does not has `--no-ste` and a register cell.
+
+The 5 semicolons in `references/patterns.md` have the explanation its 5 P0s have: a catalogue of the marks it bans quotes them in before-and-after examples.
 
 **The sixteenth pass added one row and cleaned another.** `references/ste.md`
 documents the STE layer, rewritten here against the code and lexicon that
@@ -237,6 +274,7 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `references/forms/thesis-chapter.md` | 0 |  |
 | `references/forms/whitepaper.md` | 0 |  |
 | `references/injection.md` | 0 |  |
+| `voices/john.md` | 0 |  |
 | `references/checklist.md` | 1 | serial-comma advisory |
 | `references/citations/apa7.md` | 1 | serial-comma advisory |
 | `references/citations/chicago17.md` | 1 | serial-comma advisory |
@@ -261,6 +299,7 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `../voice-setup/SKILL.md` | 6 | serial-comma advisories |
 | `PROOF.md` | 6 | serial-comma advisories |
 | `SKILL.md` | 6 | serial-comma advisories |
+| `voices/satoshi.md` | 12 | 1 em dash, 3 semicolons, 2 serial-comma advisories, 6 catalogue mentions in vocabulary table |
 | `references/patterns.md` | 25 | 10 em dashes, 7 semicolons, 2 one-word sentences, 6 advisories |
 
 The serial-comma rows are the `oxford_comma` mechanic, which reports at P2 and never at the voice default. It cannot tell a three-item list from a compound sentence, so it advises and says so in the finding. Counting advisories as defects would be the same error in the other direction.
@@ -273,15 +312,16 @@ The serial-comma rows are the `oxford_comma` mechanic, which reports at P2 and n
 
 **Merging the two prose skills introduced one of its own.** The "Paths." paragraph, added to every `SKILL.md` so Codex users can resolve `${CLAUDE_PLUGIN_ROOT}` by hand, used a semicolon. Three files, one sentence, caught by this scan and split.
 
-### The voice distance is not calibrated on anybody real yet
+### Voice distance calibration over shipped profiles
 
-`voice-distance` is new, and this table cannot exercise it: no profile in this repository ships a fingerprint, because a fingerprint is built from a person's writing samples and this repository has none of the author's. Nothing in the table above moved, and nothing in a stranger's repository moves either, since the finding only exists where a `voices/<name>.fingerprint.json` does.
+`voice-distance` is calibrated over the authentic writing profiles shipped with the plugin (`satoshi` and `john`):
 
-What the measure has been tested against is two synthetic voices in `tests/test_stylometry.py`: four samples on four unrelated subjects in one register, a fifth held-out sample by the same writer, and a formal committee report. The held-out sample lands inside the band, the report lands at roughly 1.6x it, and the markers the report is charged with are `furthermore`, `therefore`, and `however`. That is the property the module claims and it is the property a test can own without a real person's prose in the repository.
+- **`satoshi`**: Ships four fingerprints (one general, and three register-scoped: `chat`, `formal`, `informal`) calibrated over ~60,000 words of authentic forum posts, technical emails, and the Bitcoin whitepaper. The `satoshi.formal` fingerprint was derived by splitting the single whitepaper into two halves to construct a minimal baseline envelope.
+- **`john`**: Ships one general review-essay fingerprint calibrated over five long-form review essays (~70,900 words).
 
-It is not evidence that the band separates two real writers of similar register, that a person's own samples cluster as tightly as these fixtures do, or that the three verdict thresholds are set at the right places. Those need real profiles, and the honest reading until then is that the number is a signal to look at rather than a measurement to trust. This is why it is P2, why it never fails `--check`, and why the finding text says the measure cannot tell a deliberate change of register from a conversion that did not land.
+In addition, the metric is verified against synthetic fixtures in `tests/test_stylometry.py`: four samples on four unrelated subjects in one register, a fifth held-out sample by the same writer, and a formal committee report. The held-out sample lands inside the band, the report lands at roughly 1.6x it, and the markers the report is charged with are `furthermore`, `therefore`, and `however`.
 
-Two known limits are structural rather than uncalibrated. The marker list is English, like every other calibration in this engine. And a document shorter than 250 words is measured and reported with the number, with no finding raised off it, because below that the marker rates are sampling noise.
+The number remains a diagnostic signal (P2, never failing `--check`). Two structural properties apply: the marker list is English, and documents under 250 words report the raw distance as directional without raising a finding, because below that length function-word frequencies are sampling noise.
 
 ## Bugs found by dogfooding
 

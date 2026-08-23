@@ -73,7 +73,7 @@ Pick one by what the user wants done.
 | **deslop** | Machine-produced or machine-ish text, or text that is not the user's to voice. "clean this up", "remove the AI tells". No profile needed | Words and sentences inside their existing role, and deletions | The author's habits, the argument's order | Findings, the cleaned text or the spans, what changed |
 | **voice** | A profile exists and the user is the author. "rewrite this in my voice", "make this sound like me", "does this sound like me" | Sentences, paragraphs, order, openings, connectors, anything the profile specifies | Facts, stance, first person the source lacked, the do-not-touch list | The conversion offer first, then the depth the user picked |
 | **draft** | "write me a…", with no source text | n/a, the prose is new | Invented facts | The prose only |
-| **ste** | "STE", "Simplified Technical English", "ASD-STE100", "check this as engineering docs" | n/a, report-only | Invented facts | Findings only, no rewrite |
+| **ste** | "STE", "Simplified Technical English", "ASD-STE100", "check this as engineering docs" | n/a, report-only | Invented facts | Findings only, no rewrite. The counted five run in every scan; this mode adds the advisory vocabulary band |
 
 **A file path tells you where the text lives, not how much of it to change.** Route on what the user wants done. When that is unclear on an existing document, ask (see below) rather than defaulting to the smallest safe edit. Defaulting quietly to the smallest edit is how a request to convert a document into someone's voice comes back as three word swaps.
 
@@ -232,45 +232,6 @@ python3 $RW/verify.py before.md after.md               # did the edit break a pr
 python3 $RW/attain.py before.md after.md --voice dana  # did the conversion land
 ```
 
-### Script CLI Arguments Reference
-
-#### `scan.py`
-`python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py [file] [options]`
-- `file`: (OPTIONAL, file path) Path to input markdown/text file or `.docx`. If omitted, reads from `stdin`.
-- `--profile`: (OPTIONAL, choice: `auto`, `academic`, `chat`, `docs`, `formal`, `informal`, `linkedin`, `technical-blog`) Apply register profile.
-- `--voice`: (OPTIONAL, string) Installed voice name or `auto`.
-- `--voice-rules`: (OPTIONAL, file path) File path to `.rules.json` profile.
-- `--json`: (OPTIONAL, boolean flag) Print JSON formatted results.
-- `--sarif`: (OPTIONAL, boolean flag) Print SARIF formatted results.
-- `--sarif-uri`: (OPTIONAL, string) URI for SARIF artifact.
-- `--check`: (OPTIONAL, boolean flag) Exit 1 if P0 finding present.
-- `--no-exempt`: (OPTIONAL, boolean flag) Do not exempt code/quoted spans from scoring.
-- `--apply-safe`: (OPTIONAL, boolean flag) Apply deterministic fixes.
-- `--write`: (OPTIONAL, boolean flag) In combination with `--apply-safe`, write fixes to file in place.
-- `--stdout`: (OPTIONAL, boolean flag) In combination with `--apply-safe`, print fixed content to stdout.
-- `--ste`: (OPTIONAL, boolean flag) Add the ASD-STE100 structural checks to the report. Report-only: every STE finding is P1 or P2, so `--check` still gates on P0 alone.
-- `--ste-mode`: (OPTIONAL, choice: `procedural`, `descriptive`) Force the STE sentence-length limit (20 or 25 words). Omitted, each paragraph classifies itself.
-
-#### `verify.py`
-`python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/verify.py <original> <rewritten> [options]`
-- `original`: (REQUIRED, file path) Path to original markdown file.
-- `rewritten`: (REQUIRED, file path) Path to rewritten markdown file.
-- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON results.
-- `--allow-structure`: (OPTIONAL, boolean flag) Report heading changes instead of failing.
-- `--allow-facts`: (OPTIONAL, boolean flag) Report lost numbers/dates/quotes instead of failing.
-
-#### `attain.py`
-`python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/attain.py [before] <after> [options]`
-- `before`: (OPTIONAL, file path) Path to document before edit.
-- `after`: (REQUIRED, file path) Path to document after edit.
-- `--voice`: (OPTIONAL, string) Installed voice name or `auto`.
-- `--voice-rules`: (OPTIONAL, file path) File path to `.rules.json`.
-- `--register`: (OPTIONAL, choice) Register profile name.
-- `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON results.
-- `--check`: (OPTIONAL, boolean flag) Exit 1 on regression or flat conversion.
-- `--plan`: (OPTIONAL, boolean flag) Print target fingerprint shape.
-
-
 Prefer `--voice` over spelling out a `--voice-rules` path. `auto` runs the same resolution order the rest of the plugin uses, `.rabbit-voice` beside the document, then the working directory, then `voices/ACTIVE`, so a repo that pins its own house voice gets it without you knowing the path. Naming a profile and `--voice-rules` behave the same as each other: both exit 2 when the profile will not read, because scanning on without the rules that were asked for reports a clean voice band on a document nobody checked. `--voice auto` finding nothing is a note and still exits 0, since plenty of repos have no profile.
 
 Outside a plugin install `${CLAUDE_PLUGIN_ROOT}` is unset, which turns every path above into an absolute path that does not exist. If that happens, resolve `scripts/scan.py` relative to this file's own directory instead.
@@ -405,6 +366,8 @@ Three rules bind whatever the style.
 
 **voice.** The offer first. Then, at the chosen depth, the converted text or the spans, and a report in the four conversion bands (structure, paragraph, sentence, word) plus the word delta.
 
+**ste.** Findings only, no rewrite. The five counted structural checks (sentence limits, paragraph limits, condition order, semicolons) plus the advisory vocabulary band (modals, banned verbs, phrasal verbs, passive voice, unapproved words). Report grouped by rule, with each finding naming the STE guideline and showing the plain replacement.
+
 **draft.** The prose. Nothing else unless asked.
 
 When another skill or agent calls this one mid-task, return the final text and nothing else. No findings, no summary.
@@ -431,18 +394,27 @@ A team can keep several profiles in `voices/` and switch per task. A per-project
 
 ### `scan.py`
 `python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py [file] [options]`
-- `file`: (OPTIONAL, file path) Markdown document file to scan. Omit to read text from stdin.
-- `--profile`: (OPTIONAL, choice `auto` or register name in `registers.json`, default: `DEFAULT`) Target register profile.
+- `file`: (OPTIONAL, file path) Markdown document file to scan or `.docx`. Omit to read text from stdin.
+- `--profile`: (OPTIONAL, choice `auto` or register name in `registers.json`: `academic`, `blog`, `chat`, `docs`, `formal`, `informal`, `linkedin`, `technical-blog`, default: `DEFAULT`) Target register profile.
 - `--voice`: (OPTIONAL, choice `auto` or voice name in `voices/`) Voice profile name slug to resolve and apply.
 - `--voice-rules`: (OPTIONAL, file path) Path to a `.rules.json` voice rules file.
 - `--apply-safe`: (OPTIONAL, boolean flag) Apply mechanical fixes safely to document text.
 - `--write`: (OPTIONAL, boolean flag) Write mechanical fixes back to file in place (requires `--apply-safe`).
 - `--stdout`: (OPTIONAL, boolean flag) Print fixed document to stdout instead of findings report (requires `--apply-safe`).
 - `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON findings payload.
-- `--sarif`: (OPTIONAL, boolean flag) Output SARIF 2.1.0 report for GitHub pull request annotations.
+- `--sarif`: (OPTIONAL, boolean flag) Output SARIF 2.1.0 report for GitHub pull request annotations. Suppressed findings retain SARIF level and `suppressions` metadata while standing down the `--check` exit code.
 - `--sarif-uri`: (OPTIONAL, file path / string) URI path to record in SARIF output (requires `--sarif`).
 - `--no-exempt`: (OPTIONAL, boolean flag) Disable exemption for quoted examples.
 - `--check`: (OPTIONAL, boolean flag) Exit 1 if any unsuppressed P0 finding is present.
+- `--ste`: (OPTIONAL, boolean flag) Add advisory ASD-STE100 vocabulary checks.
+- `--no-ste`: (OPTIONAL, boolean flag) Silence the STE layer entirely.
+- `--ste-mode`: (OPTIONAL, choice: `procedural`, `descriptive`) Force STE sentence-length limit (20 or 25 words).
+- `--apply-model`: (OPTIONAL, boolean flag) Run LLM-driven rewrite pass using local or remote model endpoint.
+- `--model-plan`: (OPTIONAL, boolean flag) Print planned LLM edits without applying them.
+- `--model-endpoint`: (OPTIONAL, string / URL) Model API endpoint URL (default: `http://localhost:11434/v1`).
+- `--model-name`: (OPTIONAL, string) Model identifier name.
+- `--model-limit`: (OPTIONAL, integer) Maximum findings to target per rewrite iteration.
+- `--model-attempts`: (OPTIONAL, integer, default: `3`) Maximum verification attempts before stopping.
 
 ### `verify.py`
 `python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/verify.py <original.md> <rewritten.md> [options]`
@@ -450,6 +422,9 @@ A team can keep several profiles in `voices/` and switch per task. A per-project
 - `rewritten`: (REQUIRED, file path) Post-rewrite text file path.
 - `--allow-structure`: (OPTIONAL, boolean flag) Allow structural changes without failing.
 - `--allow-facts`: (OPTIONAL, boolean flag) Report fact changes instead of failing.
+- `--allow-dashes`: (OPTIONAL, boolean flag) Report added em dashes under structure changes instead of failing.
+- `--voice`: (OPTIONAL, string) Voice profile name (e.g. `john`). If the profile allows em dashes, enables dash allowance.
+- `--voice-rules`: (OPTIONAL, file path) Path to custom voice rules JSON file.
 - `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON validation results.
 
 ### `attain.py`
@@ -458,8 +433,11 @@ A team can keep several profiles in `voices/` and switch per task. A per-project
 - `after`: (OPTIONAL, file path) Converted document file path.
 - `--voice`: (OPTIONAL, string) Voice profile name in `voices/`.
 - `--voice-rules`: (OPTIONAL, file path) Path to a `.rules.json` voice rules file.
-- `--profile`: (OPTIONAL, choice: register name) Register name for fingerprint comparison.
-- `--tolerance`: (OPTIONAL, float, default: `1.0`) Tolerance threshold in sample standard deviations.
+- `--profile`: (OPTIONAL, choice: `academic`, `blog`, `chat`, `docs`, `formal`, `informal`, `linkedin`, `technical-blog`) Register name for fingerprint comparison.
+- `--tolerance`: (OPTIONAL, float, default: `1.5`) Tolerance threshold in sample standard deviations (`rwlib.stylometry.ATTAIN_TOLERANCE`).
+- `--ste`: (OPTIONAL, boolean flag) Include STE structural checks in report.
+- `--no-ste`: (OPTIONAL, boolean flag) Silence STE checks.
+- `--ste-mode`: (OPTIONAL, choice: `procedural`, `descriptive`) Force STE sentence-length limit.
 - `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON payload.
 - `--check`: (OPTIONAL, boolean flag) Exit 1 if verdict is `regressed` or `flat`.
 - `--plan`: (OPTIONAL, boolean flag) Output sentence-shape targets for conversion planning.

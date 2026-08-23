@@ -24,6 +24,8 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
+if "_bootstrap" in sys.modules and getattr(sys.modules["_bootstrap"], "__file__", None) != os.path.join(HERE, "_bootstrap.py"):
+    del sys.modules["_bootstrap"]
 import _bootstrap
 from rwlib import fixes  # noqa: E402
 

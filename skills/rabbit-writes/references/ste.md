@@ -4,15 +4,45 @@
 > Used in aircraft maintenance, procedure writing, and regulatory
 > documentation since 1983.
 
-rabbit-writes runs STE checks with `scan.py --ste`. All findings are
-**report-only**: every `ste-*` id is P1 or P2, so `--check` still gates on P0
-alone, and nothing here is mechanically fixed. The rewrite (splitting long
-sentences, reordering conditions) is a judgment call, and usually a language
-model task.
+All findings are **report-only**: every `ste-*` id is P1 or P2, so `--check`
+still gates on P0 alone, and nothing here is mechanically fixed. The rewrite
+(splitting long sentences, reordering conditions) is a judgment call, and
+usually a language model task.
+
+## Default and advisory
+
+The layer runs in two bands, and only one of them is opt-in.
+
+**Mechanical, on in every scan.** Five checks that count something: the two
+sentence caps, the paragraph cap, the condition order, and the semicolon.
+A count is a measurement rather than an opinion, which is the whole reason
+they run by default. `MECHANICAL_IDS` in `rwlib/ste.py` is the list.
+
+**Advisory, behind `--ste`.** Six checks driven by a word list: the modals,
+the -ing openers, the banned verbs, the phrasal verbs, the passive, and the
+`ai_slop` vocabulary. All P2. A word list is a judgment about vocabulary,
+and the aerospace judgment is not everybody's.
+
+```bash
+python3 scan.py doc.md              # the mechanical five
+python3 scan.py doc.md --ste        # the mechanical five plus the advisory six
+python3 scan.py doc.md --no-ste     # neither
+```
+
+Register tolerances apply to the mechanical band the way they apply to
+everything else, and they are the reason a default-on band is bearable:
+`chat`, `informal` and `linkedin` skip all five, `academic` skips the
+descriptive cap on the evidence of its own corpus, and the rest carry
+measured allowances.
+`scripts/registers.json` holds the numbers and where each came from. The
+advisory band carries no cells, because a tolerance on a rule nobody sees
+by default is a number nothing calibrates.
 
 The checks run over the same exempted copy every other band reads. Fenced
 code, inline code spans, and quoted examples are never flagged, and a
-semicolon inside a code block is not a finding. They also run ahead of the
+semicolon inside a code block is not a finding (running with `--no-exempt`
+disables all markup blanking across the engine, in which case raw text is
+scored). They also run ahead of the
 suppression pass, so a `rabbit-allow` comment reaches them like any other
 finding.
 
@@ -142,7 +172,23 @@ The system loads the configuration.
 Rule 8.1: all standard punctuation except the semicolon. Write two sentences
 instead. The `;` closing an HTML entity is markup and does not count.
 
-### 9. Vocabulary
+### 9. Paragraph length
+
+Rule 6.6: six sentences to a paragraph, and three in a procedure. The check
+counts prose blocks only. A ten-item bullet list is ten sentences by the
+splitter and is also Rule 6.6's own answer to a long paragraph, so flagging
+it would report the fix as the problem. `is_prose_block` decides, the same
+notion of a paragraph the rest of the engine uses.
+
+```
+# Violation
+One paragraph carrying seven or more sentences of explanation.
+
+# Compliant
+Two paragraphs, or a vertical list where the sentences are steps.
+```
+
+### 10. Vocabulary
 
 The `ai_slop` block flags AI-overused words and filler ("simply", "leverage",
 "in order to", "it's important to"). This block is deliberately outside the
@@ -171,10 +217,26 @@ and no checker reads them. Each says so in its own `_comment`:
 
 Rules the standard carries that this layer does not check: the six allowed
 verb forms and the perfect-tense ban (Rules 3.2 and 3.4, partially visible
-through the passive check), the one-word-one-meaning principle, the
-six-sentences-per-paragraph cap (Rule 6.6), and the contraction ban (Rule
-4.2). If a check for one of these lands, it lands in `rwlib/ste.py` with a
-test and a corpus number, not in this file first.
+through the passive check), the one-word-one-meaning principle, and the
+contraction ban (Rule 4.2). If a check for one of these lands, it lands in
+`rwlib/ste.py` with a test and a corpus number, not in this file first.
+
+## Voice priority
+
+A voice profile outranks this layer, because the profile is a ruling about
+one person's prose and the standard is a default. Three mechanics decide,
+and `scan.py` applies them where it applies `double_hyphen` (`rwlib/voices.py`
+holds the vocabulary):
+
+| Mechanic | Effect |
+|---|---|
+| `semicolon` (either value) | `ste-no-punctuation` stands down. `allow` is the writer's own sentence shape, and `forbid` already reports every occurrence as `voice-semicolon` at the profile's own priority. |
+| `max_paragraph_sentences` | `ste-paragraph-sentences` stands down. The profile's cap raises `voice-paragraph-length` on the same block. |
+| `max_sentence_words` | Replaces the 20 and 25 word caps outright, in both directions. The finding id still follows classification, and the label prints the number in force. |
+
+The satoshi profile is the worked example. His whitepaper raises 30 sentence
+findings against the STE caps and 8 against his own measured p95 of 35 words,
+which are the sentences long by his standards rather than by aerospace ones.
 
 ## Suppression
 
@@ -191,18 +253,23 @@ it.
 
 ## Finding IDs
 
-| ID | Priority | Description |
-|---|---|---|
-| `ste-sentence-procedural` | P1 | Procedural sentence over 20 words |
-| `ste-sentence-descriptive` | P1 | Descriptive sentence over 25 words |
-| `ste-modal` | P1 | Banned modal verb |
-| `ste-ing-verb` | P1 | -ing verb after comma |
-| `ste-condition-order` | P1 | Condition after command verb |
-| `ste-banned-verb` | P1 | Banned verb used as verb |
-| `ste-phrasal-verb` | P1 | A phrasal verb Rule 9.3 itself names |
-| `ste-passive` | P2 | Passive voice construction |
-| `ste-no-punctuation` | P2 | Semicolon used |
-| `ste-vocab` | P1 | AI-overused vocabulary item |
+| ID | Band | Priority | Description |
+|---|---|---|---|
+| `ste-sentence-procedural` | mechanical | P1 | Procedural sentence over 20 words |
+| `ste-sentence-descriptive` | mechanical | P1 | Descriptive sentence over 25 words |
+| `ste-paragraph-sentences` | mechanical | P1 | Prose paragraph over six sentences |
+| `ste-condition-order` | mechanical | P1 | Condition after command verb |
+| `ste-no-punctuation` | mechanical | P2 | Semicolon used |
+| `ste-modal` | advisory | P2 | Banned modal verb |
+| `ste-ing-verb` | advisory | P2 | -ing verb after comma |
+| `ste-banned-verb` | advisory | P2 | Banned verb used as verb |
+| `ste-phrasal-verb` | advisory | P2 | A phrasal verb Rule 9.3 itself names |
+| `ste-passive` | advisory | P2 | Passive voice construction |
+| `ste-vocab` | advisory | P2 | AI-overused vocabulary item |
+
+The semicolon is P2 in a band of P1s because a ban on one punctuation mark
+is a style stance rather than a count of anything. Every advisory id is P2
+for the same reason, one level down from where they shipped.
 
 The ids and priorities live in `STE_PRIORITIES` in `rwlib/ste.py`, and
 `STE_FINDING_IDS` derives from it, so the two cannot disagree. The

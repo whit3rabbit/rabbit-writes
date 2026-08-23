@@ -21,6 +21,7 @@
       "one_word_sentence": "forbid | allow",
       "max_paragraph_sentences": "integer, or omit",
       "max_avg_sentence_words": "integer, or omit",
+      "max_sentence_words": "integer, or omit. Per-sentence cap, replacing the STE 20/25 caps while it is set. The average cap above tolerates one long sentence in a piece of short ones; this one does not.",
       "max_em_dashes_per_1000w": "number, used when em_dash is 'limit'",
       "date_format": "dmy | mdy | iso | any"
     },
@@ -81,13 +82,11 @@
   "_preferred_substitutions_note": "Enforced by scan.py --apply-safe: each key is rewritten to its value through fixes.py, whole-word and case-insensitive, with no part-of-speech awareness. Only a value that is itself a replacement (one to three words, not opening with an instruction verb like cut or rephrase) is applied. A key with more than one sense is rewritten in every sense it matches, so keys must be unambiguous words. 'utilize' to 'use' is safe and 'state' to 'say' turns 'state machine' into 'say machine'.",
   "preferred_substitutions": {},
 
-  "_contrastive_pairs_note": "Not enforced, and read by the editor at conversion time. One sentence this writer would write and one they would refuse, in their own words, taken from the interview or the samples. A pair is worth ten adjectives: 'direct' describes a hundred writers and 'Also, the rollback worked' against 'Furthermore, the rollback was successful' describes one. Keep `rule` pointing at whichever section of the markdown the pair illustrates.",
-  "_contrastive_pairs_example": [
-    {
-      "rule": "connectors",
-      "would": "Also, the rollback worked.",
-      "would_never": "Furthermore, the rollback was successful."
-    }
-  ],
+  "_engine_exemptions_note": "Optional profile-level standing exemptions for measured engine false positives: {\"pattern-id\": \"reason why this writer uses this pattern\"}. Applied like inline rabbit-allow comments (findings are reported as suppressed with justification and stand down --check). The safety band cannot be exempted.",
+  "_engine_exemptions_example": {
+    "chatbot-artifact": "attested conversational style in published review essays"
+  },
+  "engine_exemptions": {},
+
   "contrastive_pairs": []
 }

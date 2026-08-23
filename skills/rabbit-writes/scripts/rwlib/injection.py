@@ -40,7 +40,7 @@ literals, for the reason artifacts.py gives: as literals they are invisible, and
 any tool that normalizes whitespace turns the check into a no-op without
 changing anything a reader can see.
 
-Stdlib only, 3.8+.
+Stdlib only, 3.9+.
 """
 
 import html

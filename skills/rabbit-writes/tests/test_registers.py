@@ -21,10 +21,16 @@ from helpers import ROOT, lexicon, scan_module, scan_text
 
 from rwlib import injection, registers, sections
 from rwlib.lexicon import SYNTHETIC_FINDING_IDS
+from rwlib.ste import STE_FINDING_IDS
 
 
 def known_ids():
-    return {p["id"] for p in lexicon()["patterns"]} | set(SYNTHETIC_FINDING_IDS)
+    """Every id the engine can raise: the catalogue, the synthetic findings,
+    and the ste layer. A cell naming an id outside this set is the silent
+    no-op problems() exists to catch, so the ste ids joining the matrix
+    means joining this set too."""
+    return ({p["id"] for p in lexicon()["patterns"]}
+            | set(SYNTHETIC_FINDING_IDS) | set(STE_FINDING_IDS))
 
 
 def test_the_matrix_validates():
@@ -223,6 +229,26 @@ TRIGGERS = {
         "This is a sentence of a fairly ordinary length right here. "
         "And here is a second one that runs about the same distance.",
         "\n\n", "", 8),
+    # The mechanical STE band. The joiner is load-bearing on three of these,
+    # because the finding is raised per line or per paragraph rather than per
+    # occurrence: a space joiner collapses N units into one line and the
+    # past-the-allowance half of the relaxed test can then never pass.
+    "ste-sentence-procedural": (
+        "Connect the primary power cable to the rear input socket and then "
+        "tighten the retaining screw by hand before you continue.", " ", "", 0),
+    "ste-sentence-descriptive": (
+        "The scheduler keeps a queue of pending jobs and it hands each one to "
+        "the first worker that reports itself idle, which is the behaviour "
+        "most operators expect from a system of this kind.", "\n\n", "", 0),
+    "ste-no-punctuation": ("The build ran green; the deploy did not.",
+                           "\n", "", 0),
+    "ste-condition-order": ("Run the script if the flag is set.", "\n", "", 0),
+    # One unit is a whole seven-sentence paragraph, since the finding counts
+    # paragraphs.
+    "ste-paragraph-sentences": (
+        "The first step is short. The second step is short. The third step "
+        "is short. The fourth step is short. The fifth step is short. The "
+        "sixth step is short. The seventh step is short.", "\n\n", "", 0),
 }
 
 
@@ -591,4 +617,16 @@ def test_detect_register_calibrated_against_the_100_readme_corpus():
 def test_write_and_check_mutually_exclusive():
     code = registers.main(["--write", "--check"])
     assert code == 2
+
+
+def test_scan_profile_auto_propagates_to_fingerprint_path():
+    # Formal email message with greeting and signoff
+    formal_text = "Dear Satoshi,\n\nWe have reviewed the protocol proposal and the proof-of-work mechanism appears sound.\n\nBest regards,\nHal Finney\n"
+    payload, code = scan_text(formal_text, "--profile", "auto", "--voice", "satoshi")
+    assert payload["profile"] == "formal", payload
+    # When voice satoshi is supplied and register auto-detects to formal,
+    # voice distance should be measured using satoshi.formal.fingerprint.json
+    assert payload.get("voice_distance") is not None, payload
+
+
 

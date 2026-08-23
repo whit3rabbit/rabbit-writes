@@ -204,6 +204,7 @@ def test_heading_grammar_table():
     finally:
         if cleanup:
             shutil.rmtree(cleanup, ignore_errors=True)
+            _ARXIV_LAUNCH.clear()
 
 
 def test_preamble_before_first_heading_is_mapped_as_section():
@@ -221,6 +222,7 @@ def test_preamble_before_first_heading_is_mapped_as_section():
 
 def test_available_types_includes_all_grammars():
     import sys
+    sys.modules.pop("_bootstrap", None)
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts"))
     import map_structure
     types = map_structure.available_types()

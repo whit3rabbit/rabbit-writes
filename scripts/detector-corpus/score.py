@@ -81,7 +81,7 @@ def score(samples, threshold="P0"):
     buckets = {}
     for sample in samples:
         text = corpus_io.read_text(sample)
-        findings, _ = scan.scan(text, sample["register"])
+        findings, _ = scan.scan(text, sample["register"], ste="off")
         hit = flagged(findings, threshold)
         for key in (sample["register"], "all"):
             row = buckets.setdefault(key, {}).setdefault(

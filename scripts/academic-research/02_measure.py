@@ -81,7 +81,7 @@ def measure(papers, profile):
     out = collections.defaultdict(
         lambda: {"docs": 0, "hits": 0, "terms": collections.Counter()})
     for _, text in papers:
-        findings, _stats = scan.scan(text, profile=profile)
+        findings, _stats = scan.scan(text, profile=profile, ste="off")
         seen = set()
         for finding in findings:
             fid = finding.get("id")

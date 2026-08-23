@@ -319,6 +319,12 @@ def priorities(lexicon_path=None):
     for pattern in lexicon.load(lexicon_path or lexicon.LEXICON_PATH).get("patterns", []):
         if pattern.get("id") and pattern.get("priority"):
             out[pattern["id"]] = pattern["priority"]
+    # The ste ids join the same answer, lazily for the same import-shape
+    # reason as the lexicon import above. Without them the p0-only cell
+    # check in problems() has no priority for an ste id and a p0-only cell
+    # on one (all P1/P2, so a disguised full skip) read as fine.
+    from . import ste
+    out.update(ste.STE_PRIORITIES)
     return out
 
 

@@ -54,7 +54,7 @@ LIST_UNION_KEYS = ("banned_words", "banned_phrases")
 # Keys merged by the "id" of each entry, child wins.
 LIST_BY_ID_KEYS = ("banned_regex", "required_when", "signature_moves")
 # Keys merged key by key, child wins.
-DICT_MERGE_KEYS = ("mechanics", "preferred_substitutions")
+DICT_MERGE_KEYS = ("mechanics", "preferred_substitutions", "engine_exemptions")
 # The same, one level deeper: {register: {mechanic: value}}. A shallow update
 # would let a child overriding one mechanic in `chat` drop every other
 # mechanic the parent scoped to `chat`, which is the silent unbanning this
@@ -238,7 +238,7 @@ STRICTNESS = {
 }
 # Caps, where stricter is smaller.
 NUMERIC_MECHANICS = ("max_paragraph_sentences", "max_avg_sentence_words",
-                     "max_em_dashes_per_1000w")
+                     "max_sentence_words", "max_em_dashes_per_1000w")
 # Mechanics with no strictness order at all. `require` and `forbid` are opposite
 # demands rather than degrees of one, and `dmy` and `mdy` are two conventions.
 # The weight decides and the conflict is reported, because silently picking one
@@ -394,6 +394,23 @@ def blend(left, right, weight=0.5, name=None):
     subs.update(heavier.get("preferred_substitutions", {}))
     if subs:
         out["preferred_substitutions"] = subs
+
+    # Intersection, not union: an exemption stands a check down, so *not*
+    # exempting an id is the stricter side, unlike banned_words/banned_phrases
+    # above where more bans is stricter and a union is exactly the Never rule.
+    # A plain union let one side's exemption survive a blend at any weight,
+    # including 0.9 toward a profile that names none at all.
+    left_ex, right_ex = (lighter.get("engine_exemptions", {}),
+                        heavier.get("engine_exemptions", {}))
+    both = set(left_ex) & set(right_ex)
+    exemptions = {eid: right_ex.get(eid) or left_ex.get(eid) for eid in both}
+    dropped = (set(left_ex) | set(right_ex)) - both
+    if dropped:
+        notes.append("engine_exemptions: %s exempted by only one profile, "
+                     "dropped from the blend (the side that still enforces "
+                     "it wins)" % ", ".join(sorted(dropped)))
+    if exemptions:
+        out["engine_exemptions"] = exemptions
 
     cp = _contrastive_union(lighter.get("contrastive_pairs", []),
                             heavier.get("contrastive_pairs", []))

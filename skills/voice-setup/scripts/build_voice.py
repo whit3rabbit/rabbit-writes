@@ -46,8 +46,11 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
+if "_bootstrap" in sys.modules and getattr(sys.modules["_bootstrap"], "__file__", None) != os.path.join(HERE, "_bootstrap.py"):
+    del sys.modules["_bootstrap"]
 import _bootstrap
 from _bootstrap import cli_error, inflect, voice_check, voices_mod, load_scan, NAME_RX, SKILLS_DIR
+from rwlib import registers as registers_mod
 scan = load_scan()
 
 
@@ -311,6 +314,24 @@ def cap_probes(mech):
         text = ("This sentence " + " ".join(["runs"] * n) + " long.")
         out.append(("mechanics.max_avg_sentence_words = %s" % cap, text,
                     {"kind": "id", "value": "voice-sentence-length"}))
+    cap = mech.get("max_sentence_words")
+    if cap:
+        # Procedural on purpose, so the finding is ste-sentence-procedural:
+        # the per-sentence cap raises the ste finding parameterized by the
+        # profile's number, not a voice-band finding of its own. The label
+        # carrying the profile's limit is what the engine suite pins.
+        n = int(float(cap)) + 4
+        sentence = ("Run the installer and then check the configured settings "
+                    + " ".join("word%d" % i for i in range(1, n)) + ".")
+        # Repeated past the widest register allowance for that id. Every
+        # register carries a cell for the mechanical band, so a one-sentence
+        # probe raised one finding, the allowance ate it, and the mechanic
+        # reported itself dead in the register it was proven in.
+        widest = max([0] + [entries.get("ste-sentence-procedural", 0)
+                            for entries in registers_mod.relax_table().values()])
+        text = " ".join([sentence] * (widest + 1))
+        out.append(("mechanics.max_sentence_words = %s" % cap, text,
+                    {"kind": "id", "value": "ste-sentence-procedural"}))
     if mech.get("em_dash") == "limit":
         cap = float(mech.get("max_em_dashes_per_1000w", 2))
         # Build probe text whose em dash rate per 1000 words strictly exceeds cap.
@@ -347,6 +368,11 @@ def live_fire(rules, scan):
     coverage-shaped lie this whole function exists to catch.
     """
     unproven = []
+    # {what: {register}} for a cap probe the register's own matrix silences.
+    # A skip cell is not evidence about the mechanic either way, so those
+    # registers are set aside here and reported below only if no other
+    # register settled the same rule.
+    silenced = {}
     registers = sorted(_probe_registers(rules) | {scan.DEFAULT_REGISTER})
 
     def run(text, register):
@@ -368,7 +394,21 @@ def live_fire(rules, scan):
             for expectation in expect:
                 record(expectation["what"], _fired(voice_findings, expectation))
         for what, cap_text, cap_expect in cap_probes(mech):
-            record(what, _fired(run(cap_text, register), cap_expect))
+            # A register that skips the finding id cannot report the probe
+            # whatever the mechanic does, so recording False here accuses a
+            # working rule: `chat`, `informal` and `linkedin` all skip
+            # `ste-sentence-procedural`, and a profile that scopes
+            # `max_sentence_words` to one of them was called dead.
+            if (cap_expect.get("kind") == "id"
+                    and cap_expect["value"]
+                    in scan.PROFILE_SKIP.get(register, ())):
+                silenced.setdefault(what, set()).add(register)
+                continue
+            # Unfiltered on purpose: `run()` keeps voice-band findings only,
+            # and the max_sentence_words probe raises a craft-band ste
+            # finding whose number came from this profile.
+            cap_findings, _ = scan.scan(cap_text, register, True, rules)
+            record(what, _fired(cap_findings, cap_expect))
 
     # A regex example gets a document of its own. In the combined probe above,
     # a pattern about document shape rather than about a phrase would match the
@@ -425,6 +465,17 @@ def live_fire(rules, scan):
         for register in scoped:
             record(what, _fired(run(probe, register),
                                 {"kind": "id", "value": eid}))
+
+    # A cap probe every one of its registers silenced is unprovable rather
+    # than dead, and saying so is the same answer this function already gives
+    # a `banned_regex` with no example.
+    for what, regs in sorted(silenced.items()):
+        if what not in proven:
+            unproven.append((None, what,
+                             "every register this mechanic is scoped to (%s) "
+                             "skips the finding it raises, so nothing here can "
+                             "prove it. See scripts/registers.json."
+                             % ", ".join(sorted(regs))))
 
     results = [(ok, what,
                 "" if ok else "put through scan.py and nothing was reported")

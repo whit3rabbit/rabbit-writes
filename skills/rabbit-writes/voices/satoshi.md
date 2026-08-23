@@ -25,13 +25,15 @@ complexity: 0.65      # 0 simple, 1 sophisticated. Conceptually dense systems lo
 ## Measured from samples
 
 ```
-avg_sentence_words:    18.93
-sentence_length_sd:    12.78
-burstiness:            0.69
+avg_sentence_words:    19.14
+sentence_length_sd:    15.08
+burstiness:            0.77
 mattr:                 0.70
 em_dashes_per_1000w:   0.0
-contraction_rate:      25.63
+contraction_rate:      21.47
 ```
+
+*Methodology note:* The general fingerprint is calibrated over five sample documents (~60,000 words). The register-specific `satoshi.formal` fingerprint was derived from splitting the single published whitepaper into two halves to establish a baseline calibration envelope for formal systems papers.
 
 ---
 
@@ -58,7 +60,7 @@ When someone refuses to understand or repeats flawed premises, disengage cleanly
 
 ## Mechanics
 
-**Sentences:** Moderate length (mean 18.9 words, median 14 words), highly variable rhythm. Short declarative conclusions followed by explanatory sentences detailing state transitions. Under pressure or disagreement, sentences become even more concise and direct.
+**Sentences:** Moderate length (mean 18.9 words, median 14 words), highly variable rhythm. Short declarative conclusions followed by explanatory sentences detailing state transitions. Under pressure or disagreement, sentences become even more concise and direct. The rules file caps a single sentence at 35 words, his measured p95: it replaces the STE 20/25 caps, which read a whitepaper paragraph as thirty defects, and still flags the ones past his own habit.
 
 **Punctuation:**
 - **Double space after periods (`.  `):** Authentic signature habit in forum posts and correspondence (used over 88% of the time).
@@ -86,7 +88,7 @@ When someone refuses to understand or repeats flawed premises, disengage cleanly
 - Open limits: `"I'm sure that in 20 years there will either be very large transaction volume or no volume."`
 
 **Dates & Numbers:**
-- Date format: `dmy` or ISO `YYYY-MM-DD`.
+- Date format: Split evidence in samples (`dmy` and ISO `YYYY-MM-DD`); rules file sets `date_format: "any"` so neither is flagged.
 - Numbers: Exact integers and floating points for protocol parameters (`21,000,000`, `10 minutes`, `50 BTC`, `0.00000001`).
 
 **Words to Reach For (Measured Thesaurus & Plain Vocabulary):**

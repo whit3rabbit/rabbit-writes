@@ -42,7 +42,7 @@
     "touch base": ["check in", "talk", "connect"],
     "move the needle": ["make progress", "have an impact", "improve results"],
     "low-hanging fruit": ["simple cases", "easy fixes", "quick wins"],
-    "at its core": ["basically", "fundamentally", "in essence"],
+    "at its core": ["basically", "at base", "in essence"],
     "the future looks bright": ["there is potential", "prospects are strong", "outlook is favorable"],
     "harness the power of": ["use", "apply", "draw on"],
     "unlock the potential": ["allow", "enable", "open up"],
@@ -79,7 +79,7 @@
     "let me confirm": ["confirming", "to confirm", "checking"],
     "say the word and": ["if needed,", "on request,"],
     "now let's check": ["checking", "next,", "inspecting"],
-    "it is important to note that": ["note that", "notably,", "importantly,"],
-    "it is worth noting that": ["note that", "notably,"]
+    "it is important to note that": ["note that", "keep in mind that", "remember that"],
+    "it is worth noting that": ["note that", "keep in mind that"]
   }
 }

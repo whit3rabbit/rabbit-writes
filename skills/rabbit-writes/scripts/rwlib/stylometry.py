@@ -69,12 +69,23 @@ import math
 import os
 import re
 import statistics
+import sys
 from collections import Counter
 
 try:
     from .voices import strip_rules_suffix
-except ImportError:                     # run as a script: no package, but
-    from voices import strip_rules_suffix   # rwlib/ is on sys.path
+    from .markdown import CURLY_APOSTROPHE
+except ImportError:
+    # Run as a script, so there is no parent package and the relative imports
+    # above cannot resolve. The fix is to put the directory *above* rwlib on
+    # the path and import the package properly, not to put rwlib itself
+    # there: a bare `import markdown` succeeds (rwlib/markdown.py, loaded as
+    # a top-level module) and then that file's own `from .artifacts import`
+    # fails one level down with the same error, exactly what happened to
+    # rwlib/registers.py's CLI for two releases before this same fix.
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from rwlib.voices import strip_rules_suffix
+    from rwlib.markdown import CURLY_APOSTROPHE
 
 SCHEMA_VERSION = 2
 
@@ -148,12 +159,6 @@ MARKER_WORDS = (
 )
 
 MARKER_SET = frozenset(MARKER_WORDS)
-
-# Written as an escape and never as a literal, the same rule the invisible
-# character tables follow: anything that normalizes the source turns a literal
-# curly apostrophe into a straight one, and the line still looks correct while
-# the substitution it performs has become a no-op.
-CURLY_APOSTROPHE = "\u2019"
 
 # Lowercase on the way in, apostrophes kept, so "Don't" and "don't" are one
 # marker and a contraction is one token. Curly apostrophes are normalized

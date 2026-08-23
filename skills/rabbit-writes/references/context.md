@@ -65,6 +65,11 @@ Rules not listed apply at full strength everywhere.
 | List-label periods | strict | strict | strict | strict | strict | skip | strict | strict |
 | Low burstiness | strict | strict | strict | strict | strict | strict | strict | skip |
 | Trigram repetition | strict | strict | strict | strict | strict | strict | strict | skip |
+| STE sentence length (procedural) | skip | skip | relaxed | strict | relaxed | relaxed | skip | relaxed |
+| STE sentence length (descriptive) | skip | skip | relaxed | strict | relaxed | relaxed | skip | skip |
+| STE punctuation (semicolons) | skip | skip | relaxed | skip | relaxed | relaxed | skip | skip |
+| STE condition order | skip | skip | relaxed | strict | relaxed | relaxed | skip | strict |
+| STE paragraph length | skip | skip | relaxed | strict | relaxed | relaxed | skip | relaxed |
 
 **Extra strict** means flag borderline instances. In a `formal` document, an investor email or a letter, one "thriving ecosystem" undermines the message.
 

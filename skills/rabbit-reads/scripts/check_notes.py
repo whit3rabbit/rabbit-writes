@@ -27,7 +27,11 @@ import re
 import subprocess
 import sys
 from collections import Counter
-
+HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+if "_bootstrap" in sys.modules and getattr(sys.modules["_bootstrap"], "__file__", None) != os.path.join(HERE, "_bootstrap.py"):
+    del sys.modules["_bootstrap"]
 import _bootstrap
 from _bootstrap import SCAN_PATH, cli_error, book_types_dir
 from rwlib import findings as findings_mod

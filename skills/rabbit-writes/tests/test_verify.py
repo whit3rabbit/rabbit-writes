@@ -474,3 +474,33 @@ def test_frontmatter_yaml_comment_is_not_heading():
     assert "Real Heading" in headings
     assert "note: internal" not in headings
 
+
+def test_em_dashes_added_fails_by_default_but_passes_with_allow_dashes():
+    verify = verify_module()
+    orig = "The test failed because the timeout expired."
+    rewr = "The test failed—the timeout expired."
+    # Hard default failure
+    res_default = verify.validate(orig, rewr)
+    assert not res_default["ok"]
+    assert any(v["kind"] == "em dashes added" for v in res_default["violations"])
+
+    # Allowed with allow_dashes
+    res_allowed = verify.validate(orig, rewr, allow_dashes=True)
+    assert res_allowed["ok"]
+    assert any(s["kind"] == "em dashes added" for s in res_allowed["structure_changes"])
+
+
+def test_run_verify_with_voice_flag_allows_dashes_for_john():
+    orig = "The test failed because the timeout expired.\n"
+    rewr = "The test failed—the timeout expired.\n"
+    # Without voice or flag: fails
+    res_fail, code_fail = run_verify(orig, rewr)
+    assert code_fail == 1
+    assert not res_fail["ok"]
+
+    # With --voice john: passes
+    res_pass, code_pass = run_verify(orig, rewr, "--voice", "john")
+    assert code_pass == 0
+    assert res_pass["ok"]
+
+

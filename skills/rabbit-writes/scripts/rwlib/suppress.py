@@ -146,7 +146,10 @@ def apply(findings, allowances):
                 refused.add(finding["id"])
                 continue
             finding["suppressed"] = entry["reason"]
-            finding["suppressed_at"] = entry["line"]
+            if entry.get("source"):
+                finding["suppressed_by"] = entry["source"]
+            if "line" in entry and not entry.get("profile"):
+                finding["suppressed_at"] = entry["line"]
             used.add(finding["id"])
     return used, refused
 
@@ -170,26 +173,27 @@ def audit(allowances, problems, used, make, refused=()):
             out.append(make(
                 REFUSED_ID,
                 "Suppression refused: %s" % ", ".join(blocked),
-                "safety", "P1", entry["line"], match=", ".join(blocked),
-                excerpt=("The safety band cannot be suppressed from inside the "
-                         "document it is scanning, because that is the one "
-                         "place an attacker can write. The finding still "
-                         "counts. Scope the hook with `files:` if you want it "
-                         "gone.")))
+                "safety", "P1", entry.get("line", 1), match=", ".join(blocked),
+                excerpt=("The safety band cannot be suppressed (%s). "
+                         "The finding still counts. Scope the hook with `files:` if you want it gone."
+                         % ("from a voice profile" if entry.get("profile")
+                            else "from inside the document it is scanning"))))
         # A refused id is not stale. It matched, and saying it covers nothing
         # would send somebody to delete the comment instead of reading why.
-        stale = [i for i in entry["ids"] if i not in used and i not in refused]
-        if stale:
-            out.append(make(
-                UNUSED_ID,
-                "Suppression covers nothing: %s" % ", ".join(sorted(stale)),
-                "craft", "P2", entry["line"],
-                match=", ".join(sorted(stale)),
-                excerpt=("Nothing here raises %s. Either the prose that tripped "
-                         "it was fixed, in which case delete the comment, or "
-                         "the id is a typo, in which case whatever it was meant "
-                         "to allow is still failing."
-                         % ", ".join(sorted(stale)))))
+        # Stale check only runs on document inline allowances, not profile exemptions.
+        if not entry.get("profile"):
+            stale = [i for i in entry["ids"] if i not in used and i not in refused]
+            if stale:
+                out.append(make(
+                    UNUSED_ID,
+                    "Suppression covers nothing: %s" % ", ".join(sorted(stale)),
+                    "craft", "P2", entry.get("line", 1),
+                    match=", ".join(sorted(stale)),
+                    excerpt=("Nothing here raises %s. Either the prose that tripped "
+                             "it was fixed, in which case delete the comment, or "
+                             "the id is a typo, in which case whatever it was meant "
+                             "to allow is still failing."
+                             % ", ".join(sorted(stale)))))
     return out
 
 

@@ -41,6 +41,8 @@ Nothing here decides what good writing is. That lives in the reference files,
 where a person can argue with it.
 """
 
+from .voices import load_scan
+
 __all__ = [
     "artifacts", "cli_error", "corpus", "docx_text", "endpoint", "facts",
     "findings", "fixes", "inflect", "injection", "language", "lexicon",

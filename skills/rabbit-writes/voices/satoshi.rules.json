@@ -11,6 +11,7 @@
     "oxford_comma": "allow",
     "one_word_sentence": "allow",
     "max_avg_sentence_words": 28,
+    "max_sentence_words": 35,
     "date_format": "any"
   },
   "mechanics_by_register": {

@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "_comment": "The tolerance matrix, and the only copy of it. scan.py derives its skip and relax tables from this file, and the markdown table in references/context.md is rendered from it by `python3 scripts/rwlib/registers.py --write`. The matrix used to live in three places at once: prose in context.md, PROFILE_SKIP and PROFILE_RELAX in scan.py, and a test that parsed the markdown table to check the two agreed. That test was a workaround for stating the same fact twice, and it broke on table formatting rather than on a real disagreement.",
   "_modes": {
     "strict": "the rule runs at full strength. The default; rules not listed in this file are strict everywhere.",
@@ -11,6 +11,7 @@
   },
   "_spine_comment": "`spine` is the formality ladder, loosest first, and it is the axis a document form maps onto: references/forms/*.md each name one register. Every register not on the spine is a genre column, kept because it carries tolerances no formality band captures: `technical-blog` and `docs` for the vocabulary exemption and parameter lists, `linkedin` for hashtags, bold hooks, and emoji at the end of a heading, `academic` for the vocabulary a paper needs and for the even sentence lengths a paper genuinely has. Stated as data so the split is checkable rather than a claim in a document. `casual` and `investor-email` used to sit in this list: the first collided with the voice persona of the same name, and the second was a document form posing as a strictness level, which is the whole reason forms are registers now.",
   "_academic_comment": "Every `academic` cell below was set from docs/academic-corpus/, 19 open-access papers and 72,704 words, and the ones that are not there are as informative as the ones that are. `uniform-paragraphs`, `em-dash-rate`, `rhetorical-question`, `signposting` and `hedge-stack` were all expected to need tolerances and fire on at most one paper in nineteen, so they carry no cell. `clarity` fires on 14 of 19 (`utilize`, `in terms of`, `it is important to note that`) and is deliberately left at full strength: academic writing being full of those is a fact about academic writing, not a reason to stop reporting it, and academic style guides agree.",
+  "_ste_comment": "The five `ste-` rows are the mechanical band, and they run in every plain scan (`scan.py --no-ste` is the way out). Their allowances are per-document counts from three sweeps rather than from the standard: 100 trending READMEs under `docs`, this repository's own prose under `blog`, and the 19 academic papers. The advisory `ste-` ids (vocabulary, passive, modals) only run under `--ste` and carry no cells, because a tolerance on a rule nobody sees by default is a number nothing calibrates.",
   "registers": ["chat", "informal", "blog", "formal", "technical-blog", "docs", "linkedin", "academic"],
   "spine": ["chat", "informal", "blog", "formal"],
   "default_register": "blog",
@@ -300,6 +301,76 @@
       "id": "trigram-repetition",
       "cells": {
         "academic": {"mode": "skip"}
+      }
+    },
+    {
+      "_note": "Rule 5.1, 20 words. Measured per document: 100 trending READMEs under `docs` run a median of 9 and a p75 of 19, this repository's own prose under `blog` a median of 2 and a p75 of 6, and the 19 corpus papers a median of 10. `chat`, `informal` and `linkedin` skip it outright rather than carrying a number: a word cap on a sentence is a technical-writing rule, and those three registers are not technical writing. `formal` carries no cell, which is where the rule is meant to bite.",
+      "label": "STE sentence length (procedural)",
+      "id": "ste-sentence-procedural",
+      "cells": {
+        "chat": {"mode": "skip"},
+        "informal": {"mode": "skip"},
+        "blog": {"mode": "relaxed", "allowance": 6},
+        "technical-blog": {"mode": "relaxed", "allowance": 6},
+        "docs": {"mode": "relaxed", "allowance": 12},
+        "linkedin": {"mode": "skip"},
+        "academic": {"mode": "relaxed", "allowance": 12}
+      }
+    },
+    {
+      "_note": "Rule 6.3, 25 words. Same sweep: READMEs median 3 and p75 8, repo prose median 3 and p75 5. `academic` skips it on the same evidence that made `uniformity` a skip there: the 19 papers run a median of 52 long sentences each, about one every 75 words, which is the register rather than a defect nobody has noticed 52 times.",
+      "label": "STE sentence length (descriptive)",
+      "id": "ste-sentence-descriptive",
+      "cells": {
+        "chat": {"mode": "skip"},
+        "informal": {"mode": "skip"},
+        "blog": {"mode": "relaxed", "allowance": 6},
+        "technical-blog": {"mode": "relaxed", "allowance": 6},
+        "docs": {"mode": "relaxed", "allowance": 6},
+        "linkedin": {"mode": "skip"},
+        "academic": {"mode": "skip"}
+      }
+    },
+    {
+      "_note": "Rule 3.4, the semicolon and the colon-joined clause. P2 throughout. `formal` and `academic` skip it because a semicolon is standard punctuation in both, which is a fact about the conventions rather than a rate: the papers still run a median of 3. READMEs median 2 and p75 9, repo prose almost none. A voice profile that rules on semicolons at all stands this down whatever the register says (scan.py).",
+      "label": "STE punctuation (semicolons)",
+      "id": "ste-no-punctuation",
+      "cells": {
+        "chat": {"mode": "skip"},
+        "informal": {"mode": "skip"},
+        "blog": {"mode": "relaxed", "allowance": 2},
+        "formal": {"mode": "skip"},
+        "technical-blog": {"mode": "relaxed", "allowance": 2},
+        "docs": {"mode": "relaxed", "allowance": 4},
+        "linkedin": {"mode": "skip"},
+        "academic": {"mode": "skip"}
+      }
+    },
+    {
+      "_note": "Rule 5.2, the condition before the instruction. Rare everywhere it was measured: 38 hits over 100 READMEs, 12 over this repository, and 0 in 19 papers, which is why `academic` carries no cell. `chat`, `informal` and `linkedin` skip it for the reason they skip the sentence caps: command-and-condition ordering is a technical-writing rule and those three registers are not technical writing. A register that skips three of the five and is strict on the other two is a calibration nobody chose.",
+      "label": "STE condition order",
+      "id": "ste-condition-order",
+      "cells": {
+        "chat": {"mode": "skip"},
+        "informal": {"mode": "skip"},
+        "blog": {"mode": "relaxed", "allowance": 1},
+        "technical-blog": {"mode": "relaxed", "allowance": 1},
+        "docs": {"mode": "relaxed", "allowance": 1},
+        "linkedin": {"mode": "skip"}
+      }
+    },
+    {
+      "_note": "Rule 6.6, six sentences to a paragraph. Counted over prose blocks only, so a ten-item bullet list is not a ten-sentence paragraph. Rare in the two markdown corpora (46 hits over 100 READMEs, 5 in this repository) and routine in the papers, median 5 and p75 10, which is what the academic allowance is set from. `linkedin` skips it with `chat` and `informal`, the same three registers that skip every other row in this band.",
+      "label": "STE paragraph length",
+      "id": "ste-paragraph-sentences",
+      "cells": {
+        "chat": {"mode": "skip"},
+        "informal": {"mode": "skip"},
+        "blog": {"mode": "relaxed", "allowance": 1},
+        "technical-blog": {"mode": "relaxed", "allowance": 1},
+        "docs": {"mode": "relaxed", "allowance": 1},
+        "linkedin": {"mode": "skip"},
+        "academic": {"mode": "relaxed", "allowance": 6}
       }
     }
   ]

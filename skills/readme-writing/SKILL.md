@@ -118,6 +118,8 @@ Two things a voice profile does *not* import into a README, because they belong 
 
    Findings come back in four bands. `structure` is this skill's. `voice` is the writer's own rules, and a hit there is a defect rather than a suggestion. `fingerprint` and `craft` come from the `rabbit-writes` engine running at register `docs`.
 
+   The `ste-` ids inside `craft` are the counted half of ASD-STE100, the controlled English used for aircraft maintenance manuals: sentence word caps, six sentences to a paragraph, a condition trailing its command, and semicolons. They run in every scan the engine does. Every one is P1 or P2, and the `docs` register takes a measured allowance off the top of each. `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/references/ste.md` is the reference. Read them as a readability suggestion on a document somebody has to follow under time pressure, not as a defect list.
+
    Fix P0s always. P1s need a reason to keep. P2s are judgment.
 
    Pass `--voice-rules <path>` to check against a different profile, or `--no-voice` when the README is not written in anyone's voice (a generated API reference, a fork's README you're only restructuring).

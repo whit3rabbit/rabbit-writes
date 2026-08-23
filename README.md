@@ -131,6 +131,28 @@ The isolation is the tradeoff. Two uploaded skills cannot share voices: each car
 
 </details>
 
+<details>
+<summary><b>OpenClaw, ClawHub, and Hermes, as skill folders</b></summary>
+
+The same packager emits one folder per skill for the hosts that install folders rather than zips:
+
+```bash
+python3 scripts/package_skills.py --target clawhub
+```
+
+That writes `dist/clawhub/<skill>/` for each of the five. Copy a folder into your OpenClaw workspace skills directory and restart the gateway, or into `~/.hermes/skills/` for Hermes. Each folder stands alone the way the zips do.
+
+Publishing to ClawHub goes through a wrapper that rebuilds every folder through its gate first and prints what it will run:
+
+```bash
+npm i -g clawhub && clawhub login
+python3 scripts/publish_clawhub.py --dry-run
+```
+
+ClawHub relicenses everything it publishes as MIT-0, and its upload scan cross-checks declared metadata against the code, which is why every bundle's SKILL.md declares the three optional `RABBIT_MODEL_*` variables and carries a SECURITY.md for the reviewer. The full story, including what to expect from the scanner: [`docs/OPENCLAW.md`](docs/OPENCLAW.md).
+
+</details>
+
 ## Run it
 
 You rarely need to name a skill. Each one triggers on a plain request, which is what the description field is for:
@@ -248,7 +270,7 @@ That goes in the document and applies to that file. The reason is not optional: 
 
 ## Point it at a document
 
-`rabbit-writes` has four modes, and it picks by what you asked for, never by whether the text arrived as a file or a paste.
+`rabbit-writes` has five modes, and it picks by what you asked for, never by whether the text arrived as a file or a paste.
 
 | Mode | You want | It may change |
 |---|---|---|
@@ -256,6 +278,9 @@ That goes in the document and applies to that file. The reason is not optional: 
 | **deslop** | the machine tells gone | words and sentences, in proportion to the actual slop |
 | **voice** | this to sound like you | sentences, paragraphs, section order, openings, anything the profile specifies |
 | **draft** | prose that does not exist yet | n/a |
+| **ste** | this held to ASD-STE100, the aerospace controlled-language standard | nothing, it reports |
+
+The counted half of that last one is not a mode you ask for. Sentences over the word cap, paragraphs over six sentences, a condition trailing its command, and semicolons are all things Python counts better than a language model does, so they run in every scan, at P1 and P2, under the register's own measured allowances. `--ste` adds the vocabulary half. `--no-ste` turns off both.
 
 Point it at something you wrote, without saying how far to go, and it measures the gap before touching anything:
 
@@ -590,7 +615,9 @@ Plus three sources that shaped the architecture:
 
 ### Tells mined from real transcripts
 
-The `clarity_phrases` additions in `lexicon.json` version 5 came from measurement rather than intuition. A one-off research script, `scripts/analyze_transcript_tells.py`, read 914 Claude Code transcript sessions on the author's machine (14,425 assistant turns, over 630,000 words of assistant prose), stripped the code blocks and tool tags, and counted n-grams across what was left. The conversational scaffolding rose straight to the top: "let me check" appeared 390 times, "now let me" 300, "let me verify" 186, "i'll start by" 150. Those phrases are now tier entries in the lexicon, with plain alternatives beside them in `skills/rabbit-writes/scripts/thesaurus_alternatives.json`. The transcripts themselves stay on the machine that produced them: only the counts shipped.
+The `clarity_phrases` additions in `lexicon.json` version 5 came from measurement rather than intuition. A one-off research script, `scripts/analyze_transcript_tells.py`, read 914 Claude Code transcript sessions on the author's machine: 14,425 assistant turns, over 630,000 words of assistant prose. It stripped the code blocks and tool tags, then counted n-grams across what was left.
+
+The conversational scaffolding rose straight to the top: "let me check" appeared 390 times, "now let me" 300, "let me verify" 186, "i'll start by" 150. Those phrases are now tier entries in the lexicon, with plain alternatives beside them in `skills/rabbit-writes/scripts/thesaurus_alternatives.json`. The transcripts themselves stay on the machine that produced them: only the counts shipped.
 
 ## Contributing a voice
 

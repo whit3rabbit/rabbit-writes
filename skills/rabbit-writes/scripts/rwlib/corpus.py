@@ -47,7 +47,7 @@ SCHEMA_VERSION = 2
 _CACHE = {}
 
 
-def readme_paths():
+def readme_paths(repos_dir=REPOS_DIR):
     """[(slug, path)] for the committed 100-README snapshot, or [] when it is
     not in this checkout.
 
@@ -61,16 +61,17 @@ def readme_paths():
     consumer that hard-failed without it would make the corpus a build
     dependency, which it is not.
     """
-    if "readme_paths" not in _CACHE:
+    cache_key = ("readme_paths", repos_dir)
+    if cache_key not in _CACHE:
         found = []
-        if os.path.isdir(REPOS_DIR):
-            for slug in sorted(os.listdir(REPOS_DIR)):
-                hits = sorted(glob.glob(os.path.join(REPOS_DIR, slug, "README.*")))
+        if os.path.isdir(repos_dir):
+            for slug in sorted(os.listdir(repos_dir)):
+                hits = sorted(glob.glob(os.path.join(repos_dir, slug, "README.*")))
                 preferred = [h for h in hits if h.lower().endswith(".md")]
                 if preferred or hits:
                     found.append((slug, (preferred or hits)[0]))
-        _CACHE["readme_paths"] = found
-    return _CACHE["readme_paths"]
+        _CACHE[cache_key] = found
+    return _CACHE[cache_key]
 
 
 def derive(aggregate):

@@ -772,9 +772,12 @@ def run_prose_scan(raw, rules_path, required=False):
                     "ran" % exc)
     # register 'docs': a README is documentation, not a blog post. The register
     # relaxes general craft rules only, never a voice rule.
+    # ste="mechanical", stated rather than inherited: a README audit is a
+    # docs-register document and the counted rules apply to it, and a future
+    # default change should not move this report silently.
     findings, stats = scan.scan(raw, "docs", True, rules,
-                                suppressions=False)
-    return findings, stats, note
+                                suppressions=False, ste="mechanical")
+    return findings, stats, note, rules
 
 
 # ---------------------------------------------------------------------------
@@ -834,12 +837,18 @@ def report(path, findings, stats, voice_name, notes):
         out.append("")
 
     if allowed:
-        out.append("suppressed by rabbit-allow (%d, not counted above)"
-                   % len(allowed))
+        out.append("suppressed (%d, not counted above)" % len(allowed))
         for f in allowed:
             out.append("    L%-4d %s" % (f["line"], f["label"]))
-            out.append("           allowed at L%d: %s"
-                       % (f["suppressed_at"], f["suppressed"]))
+            # A voice profile's engine_exemptions carries "suppressed_by",
+            # not a real line number (see rwlib/suppress.py's apply()); an
+            # inline rabbit-allow comment carries "suppressed_at" instead.
+            if "suppressed_at" in f:
+                out.append("           allowed at L%d: %s"
+                           % (f["suppressed_at"], f["suppressed"]))
+            else:
+                out.append("           allowed by %s: %s"
+                           % (f.get("suppressed_by", "?"), f["suppressed"]))
         out.append("")
 
     pct = CORPUS["word_count_percentiles"]
@@ -929,7 +938,7 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None):
                 notes.append("read %s too, the rules file is only the "
                              "regex-checkable subset of it" % profile)
 
-    prose_findings, prose_stats, note = run_prose_scan(
+    prose_findings, prose_stats, note, rules = run_prose_scan(
         raw, rules_path, required=bool(use_voice and voice_rules))
     if note:
         notes.append(note)
@@ -944,8 +953,23 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None):
 
     # Inline `rabbit-allow` comments cover the structure half too. scan.scan
     # runs with suppressions=False so that suppress.apply can apply allowances
-    # to all findings (structure and prose) in a single unified pass.
+    # to all findings (structure and prose) in a single unified pass. Voice
+    # profile engine_exemptions ride along the same way scan.py's own
+    # suppression pass builds them: run_prose_scan loaded `rules` for the
+    # scan itself, and without this the same profile that suppresses a
+    # finding under `scan.py --voice-rules` reported it live here instead,
+    # on the identical file.
     allowances, problems = suppress.parse(raw)
+    if rules and rules.get("engine_exemptions"):
+        vname = rules.get("voice", "profile")
+        for eid, reason in rules["engine_exemptions"].items():
+            allowances.append({
+                "ids": [eid],
+                "reason": reason or ("exempted by %s profile" % vname),
+                "line": 1,
+                "profile": True,
+                "source": "voice profile (%s)" % vname
+            })
     used, refused = suppress.apply(findings, allowances)
     findings.extend(suppress.audit(allowances, problems, used,
                                    findings_mod.make, refused))

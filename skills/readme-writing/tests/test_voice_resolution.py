@@ -79,7 +79,12 @@ def test_no_voice_suppresses_the_voice_band():
 def test_voice_findings_do_not_change_structure_findings():
     voiced = run(sample(VOICED), "--voice-rules", sample(TEST_RULES))
     quiet = run(sample(VOICED), "--no-voice")
-    assert set(ids(voiced)) >= set(ids(quiet))
+    # A profile stands down the ste findings its mechanics rule on:
+    # semicolon: forbid already flags every semicolon itself, and
+    # max_paragraph_sentences replaces the STE 6.6 cap. Those ids may be
+    # absent from the voiced run on purpose. Everything else must survive.
+    stood_down = {"ste-no-punctuation", "ste-paragraph-sentences"}
+    assert set(ids(voiced)) >= set(ids(quiet)) - stood_down
 
 
 def scratch_voices():

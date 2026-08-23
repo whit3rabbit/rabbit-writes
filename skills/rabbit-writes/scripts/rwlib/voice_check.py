@@ -38,12 +38,16 @@ import re
 
 try:
     from . import inflect as inflect_mod
+    from . import lexicon as lexicon_mod
     from . import registers as registers_mod
+    from . import ste as ste_mod
     from . import stylometry as stylometry_mod
     from . import voices as voices_mod
 except ImportError:                     # run as a script: rwlib/ is on sys.path
     import inflect as inflect_mod
+    import lexicon as lexicon_mod
     import registers as registers_mod
+    import ste as ste_mod
     import stylometry as stylometry_mod
     import voices as voices_mod
 
@@ -71,6 +75,23 @@ MD_SUFFIX = ".md"
 
 def _finding(level, message):
     return {"level": level, "message": message}
+
+
+_KNOWN_FINDING_IDS = None
+
+
+def _known_finding_ids():
+    """Every id the engine can raise, the same union check_profile_ids in
+    scripts/validate.py already builds for the register matrix. Computed
+    once: the lexicon load is not free and every profile checked in one run
+    wants the same set."""
+    global _KNOWN_FINDING_IDS
+    if _KNOWN_FINDING_IDS is None:
+        lex = lexicon_mod.load()
+        _KNOWN_FINDING_IDS = ({p.get("id") for p in lex.get("patterns", [])}
+                              | set(lexicon_mod.SYNTHETIC_FINDING_IDS)
+                              | set(ste_mod.STE_FINDING_IDS))
+    return _KNOWN_FINDING_IDS
 
 
 def _name_of(rules_path):
@@ -147,6 +168,29 @@ def check_rules(rules_path, voices_dir=None):
         for key, message in voices_mod.mechanic_problems(overrides):
             out.append(_finding(FAIL, "%s: mechanics_by_register.%s.%s %s"
                                 % (name, register, key, message)))
+
+    # engine_exemptions is fed straight into scan.py's suppression pass as a
+    # synthetic rabbit-allow entry (see scan.py), with no other place in the
+    # engine that checks its shape: suppress.py's stale-suppression audit is
+    # deliberately blind to profile-sourced entries, so a typo or the wrong
+    # JSON shape here would otherwise ship silently (dead exemption) or
+    # crash every scan under this profile (a list instead of a dict).
+    exemptions = rules.get("engine_exemptions", {})
+    if not isinstance(exemptions, dict):
+        out.append(_finding(FAIL, "%s: engine_exemptions must be an object of "
+                            "finding id to reason, not a %s"
+                            % (name, type(exemptions).__name__)))
+    else:
+        known_ids = _known_finding_ids()
+        for eid, reason in exemptions.items():
+            if eid not in known_ids:
+                out.append(_finding(FAIL, "%s: engine_exemptions names %r, "
+                                    "which is not a finding id this engine "
+                                    "raises. It will never fire, and nothing "
+                                    "else catches the typo" % (name, eid)))
+            if reason is not None and not isinstance(reason, str):
+                out.append(_finding(FAIL, "%s: engine_exemptions.%s reason "
+                                    "must be a string or null" % (name, eid)))
 
     for key in ("banned_words", "banned_phrases"):
         out += _ban_list_problems(name, key, rules.get(key, []))
@@ -399,6 +443,10 @@ def _measure_problems(data):
         return ["carries no `measures` block, so an attainment check against it "
                 "answers nothing and says nothing. Rebuild it with "
                 "measure_voice.py, which has the numbers"]
+    missing_measures = set(stylometry_mod.MEASURES) - set(measures)
+    if missing_measures:
+        out.append("measures is missing required measure(s) (%s)"
+                   % ", ".join(sorted(missing_measures)))
     n_samples = data.get("n_samples")
     for key in sorted(measures):
         if key not in stylometry_mod.MEASURES:
@@ -521,6 +569,10 @@ def _check_one_fingerprint(rules_path, path):
                                    band.get("max", "?"),
                                    len(data.get("measures") or {}),
                                    shape.get("n_sentences", "no"))))
+            n_samp = data.get("n_samples")
+            if isinstance(n_samp, int) and n_samp < 3:
+                out.append(_finding(NOTE, "%s: thin sample set (n=%d, minimum recommended is 3)"
+                                    % (os.path.basename(path), n_samp)))
     return out
 
 

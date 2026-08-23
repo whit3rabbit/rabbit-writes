@@ -26,6 +26,8 @@ from .artifacts import HIDDEN_UNICODE, REPORT_ONLY_UNICODE, SPACE_LIKE_UNICODE
 from .artifacts import TAG_RX as _TAG_RX
 from .artifacts import VS_RX as _VS_RX
 
+CURLY_APOSTROPHE = "\u2019"
+
 # --------------------------------------------------------------------------
 # code and literal spans
 # --------------------------------------------------------------------------

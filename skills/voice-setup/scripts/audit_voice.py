@@ -76,6 +76,8 @@ from collections import Counter
 HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
+if "_bootstrap" in sys.modules and getattr(sys.modules["_bootstrap"], "__file__", None) != os.path.join(HERE, "_bootstrap.py"):
+    del sys.modules["_bootstrap"]
 import _bootstrap
 from _bootstrap import cli_error, inflect, voices_mod, load_scan
 from rwlib import registers as registers_mod, stylometry
@@ -195,9 +197,11 @@ def scoped_out_count(rules, register):
 
 def audit_one(scan, path, text, rules, fingerprint, register):
     """One sample's whole contribution, off exactly one scan() call."""
+    # ste="off": this measures one writer's own rules firing over their own
+    # prose. A standards band in the same list conflates the two judgments.
     findings, stats = scan.scan(text, profile=register, exempt=True,
                                 voice_rules=rules, suppressions=True,
-                                voice_fingerprint=fingerprint)
+                                voice_fingerprint=fingerprint, ste="off")
     live = [f for f in findings if "suppressed" not in f]
     prose = scan.strip_for_stats(text)
     # The same exempted copy `scan()` just measured over, so the numbers the

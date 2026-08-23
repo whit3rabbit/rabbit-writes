@@ -137,7 +137,10 @@ Every word in this table is in `scripts/lexicon.json` under `tier1` or `tier1_ph
 | multifaceted | describe the facets, or cut |
 | the future looks bright / only time will tell | (cut) |
 
-**Carve-out:** `load-bearing` before a literal structural noun (wall, beam, joist, girder) is building terminology, not a tell. "The load-bearing structure of his argument" still flags.
+**Carve-outs:**
+- `load-bearing` before a literal structural noun (wall, beam, joist, girder) is building terminology, not a tell. "The load-bearing structure of his argument" still flags.
+- `intricate` describing physical craft, carvings, circuitry, or mechanisms (e.g. "intricate woodwork", "intricate clockwork") is literal descriptive prose.
+- `bustling` in direct travel reporting or urban descriptions where physical movement is being observed (e.g. "bustling market street").
 
 ## 13. Wordiness [C]
 

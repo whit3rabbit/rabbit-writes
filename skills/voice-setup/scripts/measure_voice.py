@@ -70,6 +70,8 @@ from collections import Counter
 HERE = os.path.dirname(os.path.abspath(__file__))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
+if "_bootstrap" in sys.modules and getattr(sys.modules["_bootstrap"], "__file__", None) != os.path.join(HERE, "_bootstrap.py"):
+    del sys.modules["_bootstrap"]
 import _bootstrap
 from _bootstrap import cli_error, inflect, voice_check, voices_mod, load_scan, NAME_RX, SKILLS_DIR
 from rwlib import registers as registers_mod, stylometry
@@ -203,7 +205,9 @@ def measure_one(scan, path, examples=None):
 
     # `contraction_rate` arrives in `stats` now. It used to be computed here off
     # a local regex, which was a second counter for a fact scan.py also needed.
-    findings, stats = scan.scan(text)
+    # ste="off": sample statistics, not a defect report. Same reason as
+    # audit_voice.py's call.
+    findings, stats = scan.scan(text, ste="off")
     p0 = [f for f in findings if f["priority"] == "P0"]
     scored = scan.apply_exemptions(text)
 

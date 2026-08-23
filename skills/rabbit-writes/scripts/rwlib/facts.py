@@ -56,6 +56,8 @@ Stdlib only, 3.9+.
 
 import re
 
+from .markdown import CURLY_APOSTROPHE
+
 MONTH_NAMES = ("January", "February", "March", "April", "May", "June", "July",
                "August", "September", "October", "November", "December")
 MONTHS = {name.lower(): i for i, name in enumerate(MONTH_NAMES, 1)}
@@ -64,10 +66,6 @@ _MONTH_ALT = "|".join(MONTH_NAMES)
 
 EN_DASH = "\u2013"
 EM_DASH = "\u2014"
-# The apostrophe only. The three quote marks that used to sit here went with
-# QUOTED_RX when it moved to rwlib.markdown, and a copy of them left behind is
-# a second home for the same fact.
-CURLY_APOSTROPHE = "\u2019"
 
 # Moved verbatim from scan.py, where `voice-date-format` still reads them
 # through the aliases there. Changing one of these changes a voice rule, so

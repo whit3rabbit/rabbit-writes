@@ -47,8 +47,14 @@ def load_module(name, path):
     """Import a bundled script by path, the way the plugin host does."""
     key = ("module", name, path)
     if key not in _CACHE:
+        parent_dir = os.path.dirname(path)
+        if parent_dir in sys.path:
+            sys.path.remove(parent_dir)
+        sys.path.insert(0, parent_dir)
+        sys.modules.pop("_bootstrap", None)
         spec = importlib.util.spec_from_file_location(name, path)
         module = importlib.util.module_from_spec(spec)
+        sys.modules[name] = module
         spec.loader.exec_module(module)
         _CACHE[key] = module
     return _CACHE[key]

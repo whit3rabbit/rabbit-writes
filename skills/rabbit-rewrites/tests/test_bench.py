@@ -24,7 +24,11 @@ def test_every_battery_case_actually_raises_a_finding():
     scan = helpers.scan_module()
     silent = []
     for case in helpers.battery()["cases"]:
-        findings, _stats = scan.scan(case["text"], case["register"])
+        # ste="off", the same as bench.py's own scan_fn. Scanned with the
+        # default the check drifts off what the bench measures: a case whose
+        # only finding is a long sentence would pass here and still be a case
+        # the bench sends nothing for, which is this test's whole subject.
+        findings, _stats = scan.scan(case["text"], case["register"], ste="off")
         if not findings:
             silent.append(case["id"])
     assert not silent, ("these cases raise nothing in their declared register, "
@@ -57,7 +61,9 @@ def test_the_battery_covers_both_unit_kinds():
     scan = helpers.scan_module()
     kinds = set()
     for case in helpers.battery()["cases"]:
-        findings, _ = scan.scan(case["text"], case["register"])
+        # ste="off" for the reason above: the units this counts have to be
+        # the units the bench plans.
+        findings, _ = scan.scan(case["text"], case["register"], ste="off")
         units, _ = rewrite.plan(case["text"], findings, burstiness_floor=0.45)
         kinds.update(u["kind"] for u in units)
     assert kinds == {"span", "block"}, kinds
