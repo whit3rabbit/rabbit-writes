@@ -63,6 +63,19 @@
       ]
     },
     {
+      "root": "skills/rabbit-rewrites/scripts",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
+      ]
+    },
+    {
+      "root": "skills/rabbit-rewrites/tests",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts",
+        "skills/rabbit-rewrites/scripts"
+      ]
+    },
+    {
       "root": "scripts/detector-corpus",
       "extraPaths": [
         "skills/rabbit-writes/scripts"

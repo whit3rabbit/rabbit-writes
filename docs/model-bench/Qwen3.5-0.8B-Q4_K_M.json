@@ -1,0 +1,1152 @@
+{
+  "endpoint": "Qwen3.5-0.8B-Q4_K_M @ http://127.0.0.1:8080/v1 (no key, ctx 4096)",
+  "battery_version": 1,
+  "repeat": 3,
+  "attempts": 3,
+  "summary": {
+    "cases": 36,
+    "units": 45,
+    "accepted": 23,
+    "accepted_pct": 51.1,
+    "first_attempt": 19,
+    "findings_before": 66,
+    "findings_after": 31,
+    "findings_removed_pct": 53.0,
+    "seconds_total": 22.5,
+    "seconds_per_unit": 0.5,
+    "rejected_by": {
+      "the model returned": 32,
+      "length went to": 11,
+      "findings went": 10,
+      "inline code altered or removed": 9,
+      "still contains": 8,
+      "number altered or removed": 2
+    }
+  },
+  "cases": [
+    {
+      "id": "tier1-single-word",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 66,
+          "ids": [
+            "tier1"
+          ],
+          "before": "We need to delve into the retry logic before the 14 March cutover.",
+          "after": "We need to examine the retry logic before the 14 March cutover.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.11627445800695568
+        }
+      ],
+      "before": "We need to delve into the retry logic before the 14 March cutover.",
+      "after": "We need to examine the retry logic before the 14 March cutover."
+    },
+    {
+      "id": "tier1-several-words",
+      "register": "blog",
+      "findings_before": 2,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 108,
+          "ids": [
+            "tier1"
+          ],
+          "before": "The new scheduler is robust and the failover path is seamless, so the 4 remaining alerts should stop firing.",
+          "after": "The new scheduler is reliable and the failover path is unbroken, so the 4 remaining alerts should stop firing.",
+          "attempts": [
+            "still contains 'robust'"
+          ],
+          "accepted": true,
+          "seconds": 0.2820984169957228
+        }
+      ],
+      "before": "The new scheduler is robust and the failover path is seamless, so the 4 remaining alerts should stop firing.",
+      "after": "The new scheduler is reliable and the failover path is unbroken, so the 4 remaining alerts should stop firing."
+    },
+    {
+      "id": "negation-runway",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 1,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 113,
+          "ids": [
+            "negation-runway"
+          ],
+          "before": "It's not just about the 200ms we saved, it's about what the profile told us: the parser was doing the work twice.",
+          "after": null,
+          "attempts": [
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged"
+          ],
+          "accepted": false,
+          "seconds": 0.47359958302695304
+        }
+      ],
+      "before": "It's not just about the 200ms we saved, it's about what the profile told us: the parser was doing the work twice.",
+      "after": "It's not just about the 200ms we saved, it's about what the profile told us: the parser was doing the work twice."
+    },
+    {
+      "id": "transition-stack",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 82,
+          "ids": [
+            "transition-stack"
+          ],
+          "before": "Moreover, the queue drained in 40 minutes rather than the 6 hours we budgeted for.",
+          "after": "The queue drained in 40 minutes rather than the 6 hours we budgeted for.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.11329220799962059
+        }
+      ],
+      "before": "Moreover, the queue drained in 40 minutes rather than the 6 hours we budgeted for.",
+      "after": "The queue drained in 40 minutes rather than the 6 hours we budgeted for."
+    },
+    {
+      "id": "clarity-hedge",
+      "register": "technical-blog",
+      "findings_before": 1,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 112,
+          "ids": [
+            "clarity"
+          ],
+          "before": "It is important to note that the migration in `db/0007_backfill.sql` has to run before the deploy, not after it.",
+          "after": "The migration in `db/0007_backfill.sql` must run before the deploy.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.11881499999435619
+        }
+      ],
+      "before": "It is important to note that the migration in `db/0007_backfill.sql` has to run before the deploy, not after it.",
+      "after": "The migration in `db/0007_backfill.sql` must run before the deploy."
+    },
+    {
+      "id": "clarity-hedge-with-quote",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 136,
+          "ids": [
+            "clarity"
+          ],
+          "before": "It is important to note that the on-call engineer wrote \"the clock on worker-3 is eleven minutes fast\" in the incident channel at 02:14.",
+          "after": "The on-call engineer wrote \"the clock on worker-3 is eleven minutes fast\" in the incident channel at 02:14.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.16111358301714063
+        }
+      ],
+      "before": "It is important to note that the on-call engineer wrote \"the clock on worker-3 is eleven minutes fast\" in the incident channel at 02:14.",
+      "after": "The on-call engineer wrote \"the clock on worker-3 is eleven minutes fast\" in the incident channel at 02:14."
+    },
+    {
+      "id": "corporate-vocabulary",
+      "register": "blog",
+      "findings_before": 2,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "block",
+          "start": 0,
+          "end": 115,
+          "ids": [
+            "tier1",
+            "tier2-cluster"
+          ],
+          "before": "This release empowers teams to leverage the new pipeline and unlock a comprehensive view of the 12 services we run.",
+          "after": "This release empowers teams to use the new pipeline and unlock a view of the 12 services we run.",
+          "attempts": [
+            "still contains 'comprehensive'"
+          ],
+          "accepted": true,
+          "seconds": 0.2799004999687895
+        }
+      ],
+      "before": "This release empowers teams to leverage the new pipeline and unlock a comprehensive view of the 12 services we run.",
+      "after": "This release empowers teams to use the new pipeline and unlock a view of the 12 services we run."
+    },
+    {
+      "id": "tier2-cluster-paragraph",
+      "register": "blog",
+      "findings_before": 6,
+      "findings_after": 6,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "block",
+          "start": 0,
+          "end": 229,
+          "ids": [
+            "tier2-cluster"
+          ],
+          "before": "The seamless integration empowers every team to leverage cutting-edge tooling. This holistic approach ensures comprehensive coverage of the transformation. The result is a robust platform that scales to 3,000 requests per second.",
+          "after": null,
+          "attempts": [
+            "length went to 167% of the original, outside 50-160%",
+            "the model returned the passage unchanged",
+            "length went to 200% of the original, outside 50-160%"
+          ],
+          "accepted": false,
+          "seconds": 1.0568875420140103
+        }
+      ],
+      "before": "The seamless integration empowers every team to leverage cutting-edge tooling. This holistic approach ensures comprehensive coverage of the transformation. The result is a robust platform that scales to 3,000 requests per second.",
+      "after": "The seamless integration empowers every team to leverage cutting-edge tooling. This holistic approach ensures comprehensive coverage of the transformation. The result is a robust platform that scales to 3,000 requests per second."
+    },
+    {
+      "id": "uniform-paragraphs",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 1,
+      "units": 4,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "block",
+          "start": 0,
+          "end": 216,
+          "ids": [
+            "uniformity"
+          ],
+          "before": "The build runs on every push to main. The tests run right after the build. The report lands in the shared log. The team reads the report each morning. The whole loop takes 9 minutes. The cache keeps the last 20 runs.",
+          "after": null,
+          "attempts": [
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged"
+          ],
+          "accepted": false,
+          "seconds": 0.7491250419989228
+        },
+        {
+          "kind": "block",
+          "start": 218,
+          "end": 466,
+          "ids": [
+            "uniformity"
+          ],
+          "before": "The queue drains at a steady rate. The workers pull from the same shard. The retry count sits at 3 attempts. The dead letter box holds 41 items. The alert fires at 100 items. The rota covers every weekday shift. The handover happens at 09:00 sharp.",
+          "after": null,
+          "attempts": [
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged",
+            "length went to 228% of the original, outside 50-160%"
+          ],
+          "accepted": false,
+          "seconds": 1.3123639170080423
+        },
+        {
+          "kind": "block",
+          "start": 468,
+          "end": 718,
+          "ids": [
+            "uniformity"
+          ],
+          "before": "We changed the shard key on 2026-02-11. The change landed in `internal/queue/shard.go` that day. The backlog cleared within the hour. Nobody has paged about it since then. The old key stayed in place for a week. We deleted it on the following Monday.",
+          "after": null,
+          "attempts": [
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged",
+            "findings went 0 -> 0, so nothing improved"
+          ],
+          "accepted": false,
+          "seconds": 0.9642619580263272
+        },
+        {
+          "kind": "block",
+          "start": 720,
+          "end": 911,
+          "ids": [
+            "uniformity"
+          ],
+          "before": "The dashboard shows the same four panels. The graph on the left tracks the depth. The graph beside it tracks the age. The panel below counts the retries. The last panel lists the failed jobs.",
+          "after": null,
+          "attempts": [
+            "findings went 0 -> 0, so nothing improved",
+            "findings went 0 -> 0, so nothing improved",
+            "findings went 0 -> 0, so nothing improved"
+          ],
+          "accepted": false,
+          "seconds": 0.5378192079951987
+        }
+      ],
+      "before": "The build runs on every push to main. The tests run right after the build. The report lands in the shared log. The team reads the report each morning. The whole loop takes 9 minutes. The cache keeps the last 20 runs.\n\nThe queue drains at a steady rate. The workers pull from the same shard. The retry count sits at 3 attempts. The dead letter box holds 41 items. The alert fires at 100 items. The rota covers every weekday shift. The handover happens at 09:00 sharp.\n\nWe changed the shard key on 2026-02-11. The change landed in `internal/queue/shard.go` that day. The backlog cleared within the hour. Nobody has paged about it since then. The old key stayed in place for a week. We deleted it on the following Monday.\n\nThe dashboard shows the same four panels. The graph on the left tracks the depth. The graph beside it tracks the age. The panel below counts the retries. The last panel lists the failed jobs.",
+      "after": "The build runs on every push to main. The tests run right after the build. The report lands in the shared log. The team reads the report each morning. The whole loop takes 9 minutes. The cache keeps the last 20 runs.\n\nThe queue drains at a steady rate. The workers pull from the same shard. The retry count sits at 3 attempts. The dead letter box holds 41 items. The alert fires at 100 items. The rota covers every weekday shift. The handover happens at 09:00 sharp.\n\nWe changed the shard key on 2026-02-11. The change landed in `internal/queue/shard.go` that day. The backlog cleared within the hour. Nobody has paged about it since then. The old key stayed in place for a week. We deleted it on the following Monday.\n\nThe dashboard shows the same four panels. The graph on the left tracks the depth. The graph beside it tracks the age. The panel below counts the retries. The last panel lists the failed jobs."
+    },
+    {
+      "id": "hedge-plus-vocabulary",
+      "register": "technical-blog",
+      "findings_before": 3,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 139,
+          "ids": [
+            "clarity",
+            "confidence-calibration",
+            "tier1"
+          ],
+          "before": "It's worth noting that we should delve into whether the cache in `internal/cache/lru.go` is actually the bottleneck, given the 8% hit rate.",
+          "after": "The cache in `internal/cache/lru.go` is not the bottleneck, given that it has an 8% hit rate.",
+          "attempts": [
+            "length went to 308% of the original, outside 35-190%"
+          ],
+          "accepted": true,
+          "seconds": 0.7236017920076847
+        }
+      ],
+      "before": "It's worth noting that we should delve into whether the cache in `internal/cache/lru.go` is actually the bottleneck, given the 8% hit rate.",
+      "after": "The cache in `internal/cache/lru.go` is not the bottleneck, given that it has an 8% hit rate."
+    },
+    {
+      "id": "facts-under-pressure",
+      "register": "technical-blog",
+      "findings_before": 1,
+      "findings_after": 1,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 151,
+          "ids": [
+            "transition-stack"
+          ],
+          "before": "In today's fast-paced deployment landscape, the rollback took 1,240 seconds on 2025-11-03 and the runbook at `docs/rollback.md` says it should take 90.",
+          "after": null,
+          "attempts": [
+            "inline code altered or removed: `docs/rollback.md`",
+            "inline code altered or removed: `docs/rollback.md`",
+            "inline code altered or removed: `docs/rollback.md`"
+          ],
+          "accepted": false,
+          "seconds": 0.670398042013403
+        }
+      ],
+      "before": "In today's fast-paced deployment landscape, the rollback took 1,240 seconds on 2025-11-03 and the runbook at `docs/rollback.md` says it should take 90.",
+      "after": "In today's fast-paced deployment landscape, the rollback took 1,240 seconds on 2025-11-03 and the runbook at `docs/rollback.md` says it should take 90."
+    },
+    {
+      "id": "version-and-path",
+      "register": "docs",
+      "findings_before": 2,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 143,
+          "ids": [
+            "clarity"
+          ],
+          "before": "It is important to note that Python 3.9 is the floor, and utilizing a newer syntax in `scripts/validate.py` will break the ubuntu-22.04 runner.",
+          "after": "Python 3.9 is the floor, and using a newer syntax in `scripts/validate.py` will break the ubuntu-22.04 runner.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.18303245800780132
+        }
+      ],
+      "before": "It is important to note that Python 3.9 is the floor, and utilizing a newer syntax in `scripts/validate.py` will break the ubuntu-22.04 runner.",
+      "after": "Python 3.9 is the floor, and using a newer syntax in `scripts/validate.py` will break the ubuntu-22.04 runner."
+    },
+    {
+      "id": "tier1-single-word",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 66,
+          "ids": [
+            "tier1"
+          ],
+          "before": "We need to delve into the retry logic before the 14 March cutover.",
+          "after": "We need to examine the retry logic before the 14 March cutover.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.10296729195397347
+        }
+      ],
+      "before": "We need to delve into the retry logic before the 14 March cutover.",
+      "after": "We need to examine the retry logic before the 14 March cutover."
+    },
+    {
+      "id": "tier1-several-words",
+      "register": "blog",
+      "findings_before": 2,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 108,
+          "ids": [
+            "tier1"
+          ],
+          "before": "The new scheduler is robust and the failover path is seamless, so the 4 remaining alerts should stop firing.",
+          "after": "The new scheduler is reliable and the failover path is unbroken, so the 4 remaining alerts should stop firing.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.1349007089738734
+        }
+      ],
+      "before": "The new scheduler is robust and the failover path is seamless, so the 4 remaining alerts should stop firing.",
+      "after": "The new scheduler is reliable and the failover path is unbroken, so the 4 remaining alerts should stop firing."
+    },
+    {
+      "id": "negation-runway",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 1,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 113,
+          "ids": [
+            "negation-runway"
+          ],
+          "before": "It's not just about the 200ms we saved, it's about what the profile told us: the parser was doing the work twice.",
+          "after": null,
+          "attempts": [
+            "length went to 18% of the original, outside 35-190%",
+            "length went to 27% of the original, outside 35-190%",
+            "length went to 264% of the original, outside 35-190%"
+          ],
+          "accepted": false,
+          "seconds": 0.5849694589851424
+        }
+      ],
+      "before": "It's not just about the 200ms we saved, it's about what the profile told us: the parser was doing the work twice.",
+      "after": "It's not just about the 200ms we saved, it's about what the profile told us: the parser was doing the work twice."
+    },
+    {
+      "id": "transition-stack",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 82,
+          "ids": [
+            "transition-stack"
+          ],
+          "before": "Moreover, the queue drained in 40 minutes rather than the 6 hours we budgeted for.",
+          "after": "The queue drained in 40 minutes rather than the 6 hours we budgeted for.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.11617333302274346
+        }
+      ],
+      "before": "Moreover, the queue drained in 40 minutes rather than the 6 hours we budgeted for.",
+      "after": "The queue drained in 40 minutes rather than the 6 hours we budgeted for."
+    },
+    {
+      "id": "clarity-hedge",
+      "register": "technical-blog",
+      "findings_before": 1,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 112,
+          "ids": [
+            "clarity"
+          ],
+          "before": "It is important to note that the migration in `db/0007_backfill.sql` has to run before the deploy, not after it.",
+          "after": "The migration in `db/0007_backfill.sql` must run before the deploy, not after.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.1283557919668965
+        }
+      ],
+      "before": "It is important to note that the migration in `db/0007_backfill.sql` has to run before the deploy, not after it.",
+      "after": "The migration in `db/0007_backfill.sql` must run before the deploy, not after."
+    },
+    {
+      "id": "clarity-hedge-with-quote",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 136,
+          "ids": [
+            "clarity"
+          ],
+          "before": "It is important to note that the on-call engineer wrote \"the clock on worker-3 is eleven minutes fast\" in the incident channel at 02:14.",
+          "after": "The on-call engineer wrote \"the clock on worker-3 is eleven minutes fast\" in the incident channel at 02:14.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.1546315419836901
+        }
+      ],
+      "before": "It is important to note that the on-call engineer wrote \"the clock on worker-3 is eleven minutes fast\" in the incident channel at 02:14.",
+      "after": "The on-call engineer wrote \"the clock on worker-3 is eleven minutes fast\" in the incident channel at 02:14."
+    },
+    {
+      "id": "corporate-vocabulary",
+      "register": "blog",
+      "findings_before": 2,
+      "findings_after": 2,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "block",
+          "start": 0,
+          "end": 115,
+          "ids": [
+            "tier1",
+            "tier2-cluster"
+          ],
+          "before": "This release empowers teams to leverage the new pipeline and unlock a comprehensive view of the 12 services we run.",
+          "after": null,
+          "attempts": [
+            "still contains 'comprehensive'",
+            "still contains 'comprehensive'",
+            "still contains 'comprehensive'"
+          ],
+          "accepted": false,
+          "seconds": 0.39243770902976394
+        }
+      ],
+      "before": "This release empowers teams to leverage the new pipeline and unlock a comprehensive view of the 12 services we run.",
+      "after": "This release empowers teams to leverage the new pipeline and unlock a comprehensive view of the 12 services we run."
+    },
+    {
+      "id": "tier2-cluster-paragraph",
+      "register": "blog",
+      "findings_before": 6,
+      "findings_after": 6,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "block",
+          "start": 0,
+          "end": 229,
+          "ids": [
+            "tier2-cluster"
+          ],
+          "before": "The seamless integration empowers every team to leverage cutting-edge tooling. This holistic approach ensures comprehensive coverage of the transformation. The result is a robust platform that scales to 3,000 requests per second.",
+          "after": null,
+          "attempts": [
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged",
+            "length went to 206% of the original, outside 50-160%"
+          ],
+          "accepted": false,
+          "seconds": 0.8652737079537474
+        }
+      ],
+      "before": "The seamless integration empowers every team to leverage cutting-edge tooling. This holistic approach ensures comprehensive coverage of the transformation. The result is a robust platform that scales to 3,000 requests per second.",
+      "after": "The seamless integration empowers every team to leverage cutting-edge tooling. This holistic approach ensures comprehensive coverage of the transformation. The result is a robust platform that scales to 3,000 requests per second."
+    },
+    {
+      "id": "uniform-paragraphs",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 1,
+      "units": 4,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "block",
+          "start": 0,
+          "end": 216,
+          "ids": [
+            "uniformity"
+          ],
+          "before": "The build runs on every push to main. The tests run right after the build. The report lands in the shared log. The team reads the report each morning. The whole loop takes 9 minutes. The cache keeps the last 20 runs.",
+          "after": null,
+          "attempts": [
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged"
+          ],
+          "accepted": false,
+          "seconds": 0.7582246250240132
+        },
+        {
+          "kind": "block",
+          "start": 218,
+          "end": 466,
+          "ids": [
+            "uniformity"
+          ],
+          "before": "The queue drains at a steady rate. The workers pull from the same shard. The retry count sits at 3 attempts. The dead letter box holds 41 items. The alert fires at 100 items. The rota covers every weekday shift. The handover happens at 09:00 sharp.",
+          "after": null,
+          "attempts": [
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged"
+          ],
+          "accepted": false,
+          "seconds": 0.9251271249959245
+        },
+        {
+          "kind": "block",
+          "start": 468,
+          "end": 718,
+          "ids": [
+            "uniformity"
+          ],
+          "before": "We changed the shard key on 2026-02-11. The change landed in `internal/queue/shard.go` that day. The backlog cleared within the hour. Nobody has paged about it since then. The old key stayed in place for a week. We deleted it on the following Monday.",
+          "after": null,
+          "attempts": [
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged"
+          ],
+          "accepted": false,
+          "seconds": 0.9748652079724707
+        },
+        {
+          "kind": "block",
+          "start": 720,
+          "end": 911,
+          "ids": [
+            "uniformity"
+          ],
+          "before": "The dashboard shows the same four panels. The graph on the left tracks the depth. The graph beside it tracks the age. The panel below counts the retries. The last panel lists the failed jobs.",
+          "after": null,
+          "attempts": [
+            "findings went 0 -> 0, so nothing improved",
+            "findings went 0 -> 0, so nothing improved",
+            "findings went 0 -> 0, so nothing improved"
+          ],
+          "accepted": false,
+          "seconds": 0.5462368750013411
+        }
+      ],
+      "before": "The build runs on every push to main. The tests run right after the build. The report lands in the shared log. The team reads the report each morning. The whole loop takes 9 minutes. The cache keeps the last 20 runs.\n\nThe queue drains at a steady rate. The workers pull from the same shard. The retry count sits at 3 attempts. The dead letter box holds 41 items. The alert fires at 100 items. The rota covers every weekday shift. The handover happens at 09:00 sharp.\n\nWe changed the shard key on 2026-02-11. The change landed in `internal/queue/shard.go` that day. The backlog cleared within the hour. Nobody has paged about it since then. The old key stayed in place for a week. We deleted it on the following Monday.\n\nThe dashboard shows the same four panels. The graph on the left tracks the depth. The graph beside it tracks the age. The panel below counts the retries. The last panel lists the failed jobs.",
+      "after": "The build runs on every push to main. The tests run right after the build. The report lands in the shared log. The team reads the report each morning. The whole loop takes 9 minutes. The cache keeps the last 20 runs.\n\nThe queue drains at a steady rate. The workers pull from the same shard. The retry count sits at 3 attempts. The dead letter box holds 41 items. The alert fires at 100 items. The rota covers every weekday shift. The handover happens at 09:00 sharp.\n\nWe changed the shard key on 2026-02-11. The change landed in `internal/queue/shard.go` that day. The backlog cleared within the hour. Nobody has paged about it since then. The old key stayed in place for a week. We deleted it on the following Monday.\n\nThe dashboard shows the same four panels. The graph on the left tracks the depth. The graph beside it tracks the age. The panel below counts the retries. The last panel lists the failed jobs."
+    },
+    {
+      "id": "hedge-plus-vocabulary",
+      "register": "technical-blog",
+      "findings_before": 3,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 139,
+          "ids": [
+            "clarity",
+            "confidence-calibration",
+            "tier1"
+          ],
+          "before": "It's worth noting that we should delve into whether the cache in `internal/cache/lru.go` is actually the bottleneck, given the 8% hit rate.",
+          "after": "We should examine whether the cache in `internal/cache/lru.go` is actually the bottleneck, given the 8% hit rate.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.16043208399787545
+        }
+      ],
+      "before": "It's worth noting that we should delve into whether the cache in `internal/cache/lru.go` is actually the bottleneck, given the 8% hit rate.",
+      "after": "We should examine whether the cache in `internal/cache/lru.go` is actually the bottleneck, given the 8% hit rate."
+    },
+    {
+      "id": "facts-under-pressure",
+      "register": "technical-blog",
+      "findings_before": 1,
+      "findings_after": 1,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 151,
+          "ids": [
+            "transition-stack"
+          ],
+          "before": "In today's fast-paced deployment landscape, the rollback took 1,240 seconds on 2025-11-03 and the runbook at `docs/rollback.md` says it should take 90.",
+          "after": null,
+          "attempts": [
+            "inline code altered or removed: `docs/rollback.md`",
+            "inline code altered or removed: `docs/rollback.md`",
+            "inline code altered or removed: `docs/rollback.md`"
+          ],
+          "accepted": false,
+          "seconds": 0.7213815419818275
+        }
+      ],
+      "before": "In today's fast-paced deployment landscape, the rollback took 1,240 seconds on 2025-11-03 and the runbook at `docs/rollback.md` says it should take 90.",
+      "after": "In today's fast-paced deployment landscape, the rollback took 1,240 seconds on 2025-11-03 and the runbook at `docs/rollback.md` says it should take 90."
+    },
+    {
+      "id": "version-and-path",
+      "register": "docs",
+      "findings_before": 2,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 143,
+          "ids": [
+            "clarity"
+          ],
+          "before": "It is important to note that Python 3.9 is the floor, and utilizing a newer syntax in `scripts/validate.py` will break the ubuntu-22.04 runner.",
+          "after": "Python 3.9 is the floor, and using a newer syntax in `scripts/validate.py` will break the ubuntu-22.04 runner.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.19392708304803818
+        }
+      ],
+      "before": "It is important to note that Python 3.9 is the floor, and utilizing a newer syntax in `scripts/validate.py` will break the ubuntu-22.04 runner.",
+      "after": "Python 3.9 is the floor, and using a newer syntax in `scripts/validate.py` will break the ubuntu-22.04 runner."
+    },
+    {
+      "id": "tier1-single-word",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 66,
+          "ids": [
+            "tier1"
+          ],
+          "before": "We need to delve into the retry logic before the 14 March cutover.",
+          "after": "We need to examine the retry logic before the 14 March cutover.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.1046064579859376
+        }
+      ],
+      "before": "We need to delve into the retry logic before the 14 March cutover.",
+      "after": "We need to examine the retry logic before the 14 March cutover."
+    },
+    {
+      "id": "tier1-several-words",
+      "register": "blog",
+      "findings_before": 2,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 108,
+          "ids": [
+            "tier1"
+          ],
+          "before": "The new scheduler is robust and the failover path is seamless, so the 4 remaining alerts should stop firing.",
+          "after": "The new scheduler is reliable and the failover path is unbroken, so the 4 remaining alerts should stop firing.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.13863058399874717
+        }
+      ],
+      "before": "The new scheduler is robust and the failover path is seamless, so the 4 remaining alerts should stop firing.",
+      "after": "The new scheduler is reliable and the failover path is unbroken, so the 4 remaining alerts should stop firing."
+    },
+    {
+      "id": "negation-runway",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 1,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 113,
+          "ids": [
+            "negation-runway"
+          ],
+          "before": "It's not just about the 200ms we saved, it's about what the profile told us: the parser was doing the work twice.",
+          "after": null,
+          "attempts": [
+            "the model returned the passage unchanged",
+            "still contains \"It's not just about the 200ms we saved, it's\"",
+            "the model returned the passage unchanged"
+          ],
+          "accepted": false,
+          "seconds": 0.6500050419708714
+        }
+      ],
+      "before": "It's not just about the 200ms we saved, it's about what the profile told us: the parser was doing the work twice.",
+      "after": "It's not just about the 200ms we saved, it's about what the profile told us: the parser was doing the work twice."
+    },
+    {
+      "id": "transition-stack",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 82,
+          "ids": [
+            "transition-stack"
+          ],
+          "before": "Moreover, the queue drained in 40 minutes rather than the 6 hours we budgeted for.",
+          "after": "The queue drained in 40 minutes rather than the 6 hours we budgeted for.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.11259679199429229
+        }
+      ],
+      "before": "Moreover, the queue drained in 40 minutes rather than the 6 hours we budgeted for.",
+      "after": "The queue drained in 40 minutes rather than the 6 hours we budgeted for."
+    },
+    {
+      "id": "clarity-hedge",
+      "register": "technical-blog",
+      "findings_before": 1,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 112,
+          "ids": [
+            "clarity"
+          ],
+          "before": "It is important to note that the migration in `db/0007_backfill.sql` has to run before the deploy, not after it.",
+          "after": "The migration in `db/0007_backfill.sql` must run before the deploy, not after it.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.1340767500223592
+        }
+      ],
+      "before": "It is important to note that the migration in `db/0007_backfill.sql` has to run before the deploy, not after it.",
+      "after": "The migration in `db/0007_backfill.sql` must run before the deploy, not after it."
+    },
+    {
+      "id": "clarity-hedge-with-quote",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 136,
+          "ids": [
+            "clarity"
+          ],
+          "before": "It is important to note that the on-call engineer wrote \"the clock on worker-3 is eleven minutes fast\" in the incident channel at 02:14.",
+          "after": "The on-call engineer wrote \"the clock on worker-3 is eleven minutes fast\" in the incident channel at 02:14.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.15766533400164917
+        }
+      ],
+      "before": "It is important to note that the on-call engineer wrote \"the clock on worker-3 is eleven minutes fast\" in the incident channel at 02:14.",
+      "after": "The on-call engineer wrote \"the clock on worker-3 is eleven minutes fast\" in the incident channel at 02:14."
+    },
+    {
+      "id": "corporate-vocabulary",
+      "register": "blog",
+      "findings_before": 2,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "block",
+          "start": 0,
+          "end": 115,
+          "ids": [
+            "tier1",
+            "tier2-cluster"
+          ],
+          "before": "This release empowers teams to leverage the new pipeline and unlock a comprehensive view of the 12 services we run.",
+          "after": "This release empowers teams to use the new pipeline and unlock a view of the 12 services we run.",
+          "attempts": [
+            "still contains 'comprehensive'",
+            "still contains 'comprehensive'"
+          ],
+          "accepted": true,
+          "seconds": 0.38943841599393636
+        }
+      ],
+      "before": "This release empowers teams to leverage the new pipeline and unlock a comprehensive view of the 12 services we run.",
+      "after": "This release empowers teams to use the new pipeline and unlock a view of the 12 services we run."
+    },
+    {
+      "id": "tier2-cluster-paragraph",
+      "register": "blog",
+      "findings_before": 6,
+      "findings_after": 5,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "block",
+          "start": 0,
+          "end": 229,
+          "ids": [
+            "tier2-cluster"
+          ],
+          "before": "The seamless integration empowers every team to leverage cutting-edge tooling. This holistic approach ensures comprehensive coverage of the transformation. The result is a robust platform that scales to 3,000 requests per second.",
+          "after": "The seamless integration empowers every team to use cutting-edge tooling. This approach ensures comprehensive coverage of the transformation. The result is a robust platform that scales to 3,000 requests per second.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.21390095801325515
+        }
+      ],
+      "before": "The seamless integration empowers every team to leverage cutting-edge tooling. This holistic approach ensures comprehensive coverage of the transformation. The result is a robust platform that scales to 3,000 requests per second.",
+      "after": "The seamless integration empowers every team to use cutting-edge tooling. This approach ensures comprehensive coverage of the transformation. The result is a robust platform that scales to 3,000 requests per second."
+    },
+    {
+      "id": "uniform-paragraphs",
+      "register": "blog",
+      "findings_before": 1,
+      "findings_after": 1,
+      "units": 4,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "block",
+          "start": 0,
+          "end": 216,
+          "ids": [
+            "uniformity"
+          ],
+          "before": "The build runs on every push to main. The tests run right after the build. The report lands in the shared log. The team reads the report each morning. The whole loop takes 9 minutes. The cache keeps the last 20 runs.",
+          "after": null,
+          "attempts": [
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged",
+            "number altered or removed: 9; number altered or removed: 20"
+          ],
+          "accepted": false,
+          "seconds": 0.7321684170165099
+        },
+        {
+          "kind": "block",
+          "start": 218,
+          "end": 466,
+          "ids": [
+            "uniformity"
+          ],
+          "before": "The queue drains at a steady rate. The workers pull from the same shard. The retry count sits at 3 attempts. The dead letter box holds 41 items. The alert fires at 100 items. The rota covers every weekday shift. The handover happens at 09:00 sharp.",
+          "after": null,
+          "attempts": [
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged"
+          ],
+          "accepted": false,
+          "seconds": 0.9213329999474809
+        },
+        {
+          "kind": "block",
+          "start": 468,
+          "end": 718,
+          "ids": [
+            "uniformity"
+          ],
+          "before": "We changed the shard key on 2026-02-11. The change landed in `internal/queue/shard.go` that day. The backlog cleared within the hour. Nobody has paged about it since then. The old key stayed in place for a week. We deleted it on the following Monday.",
+          "after": null,
+          "attempts": [
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged",
+            "the model returned the passage unchanged"
+          ],
+          "accepted": false,
+          "seconds": 0.9491129170055501
+        },
+        {
+          "kind": "block",
+          "start": 720,
+          "end": 911,
+          "ids": [
+            "uniformity"
+          ],
+          "before": "The dashboard shows the same four panels. The graph on the left tracks the depth. The graph beside it tracks the age. The panel below counts the retries. The last panel lists the failed jobs.",
+          "after": null,
+          "attempts": [
+            "findings went 0 -> 0, so nothing improved",
+            "findings went 0 -> 0, so nothing improved",
+            "findings went 0 -> 0, so nothing improved"
+          ],
+          "accepted": false,
+          "seconds": 0.551876290992368
+        }
+      ],
+      "before": "The build runs on every push to main. The tests run right after the build. The report lands in the shared log. The team reads the report each morning. The whole loop takes 9 minutes. The cache keeps the last 20 runs.\n\nThe queue drains at a steady rate. The workers pull from the same shard. The retry count sits at 3 attempts. The dead letter box holds 41 items. The alert fires at 100 items. The rota covers every weekday shift. The handover happens at 09:00 sharp.\n\nWe changed the shard key on 2026-02-11. The change landed in `internal/queue/shard.go` that day. The backlog cleared within the hour. Nobody has paged about it since then. The old key stayed in place for a week. We deleted it on the following Monday.\n\nThe dashboard shows the same four panels. The graph on the left tracks the depth. The graph beside it tracks the age. The panel below counts the retries. The last panel lists the failed jobs.",
+      "after": "The build runs on every push to main. The tests run right after the build. The report lands in the shared log. The team reads the report each morning. The whole loop takes 9 minutes. The cache keeps the last 20 runs.\n\nThe queue drains at a steady rate. The workers pull from the same shard. The retry count sits at 3 attempts. The dead letter box holds 41 items. The alert fires at 100 items. The rota covers every weekday shift. The handover happens at 09:00 sharp.\n\nWe changed the shard key on 2026-02-11. The change landed in `internal/queue/shard.go` that day. The backlog cleared within the hour. Nobody has paged about it since then. The old key stayed in place for a week. We deleted it on the following Monday.\n\nThe dashboard shows the same four panels. The graph on the left tracks the depth. The graph beside it tracks the age. The panel below counts the retries. The last panel lists the failed jobs."
+    },
+    {
+      "id": "hedge-plus-vocabulary",
+      "register": "technical-blog",
+      "findings_before": 3,
+      "findings_after": 3,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 139,
+          "ids": [
+            "clarity",
+            "confidence-calibration",
+            "tier1"
+          ],
+          "before": "It's worth noting that we should delve into whether the cache in `internal/cache/lru.go` is actually the bottleneck, given the 8% hit rate.",
+          "after": null,
+          "attempts": [
+            "length went to 292% of the original, outside 35-190%",
+            "length went to 372% of the original, outside 35-190%",
+            "length went to 356% of the original, outside 35-190%"
+          ],
+          "accepted": false,
+          "seconds": 1.9598400840186514
+        }
+      ],
+      "before": "It's worth noting that we should delve into whether the cache in `internal/cache/lru.go` is actually the bottleneck, given the 8% hit rate.",
+      "after": "It's worth noting that we should delve into whether the cache in `internal/cache/lru.go` is actually the bottleneck, given the 8% hit rate."
+    },
+    {
+      "id": "facts-under-pressure",
+      "register": "technical-blog",
+      "findings_before": 1,
+      "findings_after": 1,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 151,
+          "ids": [
+            "transition-stack"
+          ],
+          "before": "In today's fast-paced deployment landscape, the rollback took 1,240 seconds on 2025-11-03 and the runbook at `docs/rollback.md` says it should take 90.",
+          "after": null,
+          "attempts": [
+            "inline code altered or removed: `docs/rollback.md`",
+            "inline code altered or removed: `docs/rollback.md`",
+            "inline code altered or removed: `docs/rollback.md`"
+          ],
+          "accepted": false,
+          "seconds": 0.7187843749998137
+        }
+      ],
+      "before": "In today's fast-paced deployment landscape, the rollback took 1,240 seconds on 2025-11-03 and the runbook at `docs/rollback.md` says it should take 90.",
+      "after": "In today's fast-paced deployment landscape, the rollback took 1,240 seconds on 2025-11-03 and the runbook at `docs/rollback.md` says it should take 90."
+    },
+    {
+      "id": "version-and-path",
+      "register": "docs",
+      "findings_before": 2,
+      "findings_after": 0,
+      "units": 1,
+      "unaddressable": 0,
+      "records": [
+        {
+          "kind": "span",
+          "start": 0,
+          "end": 143,
+          "ids": [
+            "clarity"
+          ],
+          "before": "It is important to note that Python 3.9 is the floor, and utilizing a newer syntax in `scripts/validate.py` will break the ubuntu-22.04 runner.",
+          "after": "Python 3.9 is the floor, and using a newer syntax in `scripts/validate.py` will break the ubuntu-22.04 runner.",
+          "attempts": [],
+          "accepted": true,
+          "seconds": 0.18615441699512303
+        }
+      ],
+      "before": "It is important to note that Python 3.9 is the floor, and utilizing a newer syntax in `scripts/validate.py` will break the ubuntu-22.04 runner.",
+      "after": "Python 3.9 is the floor, and using a newer syntax in `scripts/validate.py` will break the ubuntu-22.04 runner."
+    }
+  ],
+  "warm_seconds": 0.03
+}
