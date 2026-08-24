@@ -206,6 +206,25 @@ def word_regex(entries):
     return re.compile(r"(?i)(?<![\w-])(" + "|".join(escaped) + r")(?![\w-])")
 
 
+def dictionary_vocab_regex(entries):
+    """Whole-word/phrase alternation with word_regex's hyphen-aware boundary,
+    for a list mixing single words and phrases.
+
+    Not phrase_regex: that one's `\\b` boundary treats a hyphen as a break,
+    so "cross" matches inside "cross-platform" and "mid" matches inside
+    "mid-air". A short, common word from the ASD-STE100 dictionary is
+    exactly the shape most likely to also be a hyphenated-compound prefix in
+    software prose ("cross-", "mid-", "self-"), which is what
+    02_corpus_evidence.py's own counting has to use too, or the corpus
+    evidence measures a different regex than the one that ships.
+    """
+    if not entries:
+        return re.compile(r"(?!)")
+    escaped = sorted((re.escape(e).replace(r"\ ", r"\s+") for e in entries),
+                     key=len, reverse=True)
+    return re.compile(r"(?i)(?<![\w-])(" + "|".join(escaped) + r")(?![\w-])")
+
+
 def phrase_regex(entries):
     """Same for multi-word entries."""
     if not entries:
@@ -226,13 +245,14 @@ _ING_VERB_AFTER_COMMA_RX = None
 _CONDITION_ORDER_RX = None
 _PASSIVE_RX = None
 _AI_SLOP_RX = None
+_DICTIONARY_VOCAB_RX = None
 _REGEXES_BUILT = False
 
 
 def _ensure_regexes():
     global _BANNED_VERBS_RX, _BANNED_MODALS_RX, _PHRASAL_VERBS_RX
     global _ING_VERB_AFTER_COMMA_RX, _CONDITION_ORDER_RX, _PASSIVE_RX
-    global _AI_SLOP_RX, _REGEXES_BUILT
+    global _AI_SLOP_RX, _DICTIONARY_VOCAB_RX, _REGEXES_BUILT
     if _REGEXES_BUILT:
         return
 
@@ -298,6 +318,7 @@ def _ensure_regexes():
         re.I)
 
     _AI_SLOP_RX = _build_ai_slop_rx(lex)
+    _DICTIONARY_VOCAB_RX = dictionary_vocab_regex(sorted(lex.get("dictionary_vocabulary", {})))
     _REGEXES_BUILT = True
 
 
@@ -812,6 +833,40 @@ def check_ai_slop(text):
     return findings
 
 
+def check_dictionary_vocabulary(text):
+    """Flag words the ASD-STE100 Issue 9 dictionary does not approve.
+
+    Same `ste-vocab` id and priority as check_ai_slop, a different source: the
+    dictionary_vocabulary block is the corpus-calibrated bulk word list
+    scripts/ste-research/ builds from ste_dictionary_full.json, not the
+    hand-picked ai_slop phrases. Kept as its own check rather than folded into
+    check_ai_slop because that function's tests pin exact counts against the
+    ai_slop list specifically, and a merge would make every one of those
+    counts depend on whether a probe sentence happens to also contain a
+    dictionary word.
+    """
+    _ensure_regexes()
+    vocab = load_ste_lexicon().get("dictionary_vocabulary", {})
+    findings = []
+    for i, line in enumerate(text.split("\n"), 1):
+        for m in _DICTIONARY_VOCAB_RX.finditer(line):
+            word = m.group(0)
+            alt = vocab.get(word.lower())
+            if not alt:
+                continue
+            findings.append({
+                "id": "ste-vocab",
+                "label": "Not approved in ASD-STE100: '%s'" % word,
+                "band": "craft",
+                "priority": ste_priority("ste-vocab"),
+                "line": i,
+                "match": word,
+                "excerpt": ("Not an approved ASD-STE100 dictionary word. "
+                           "Approved alternative: %s" % alt),
+            })
+    return findings
+
+
 # ---------------------------------------------------------------------------
 # Run all STE checks
 # ---------------------------------------------------------------------------
@@ -847,6 +902,7 @@ def check(text, mode=None, scope="all", word_cap=None):
         check_banned_verbs,
         check_phrasal_verbs,
         check_ai_slop,
+        check_dictionary_vocabulary,
         check_passive,
     )
     for checker in mechanical + (advisory if scope == "all" else ()):

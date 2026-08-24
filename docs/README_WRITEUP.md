@@ -1,6 +1,6 @@
 # What makes a README work: an evidence-based study
 
-This is the research behind the `readme-writing` skill in this plugin. Rather than guess at "best practices," we pulled the README of 100 real, currently-trending GitHub repositories, measured their structure and prose mechanically, and read the most-starred ones by hand for the qualitative patterns a word-count can't see. Every claim below traces back to a number in `readme-analysis/` or a quoted line from a specific repo — nothing here is asserted from priors.
+This is the research behind the `rabbit-readme-improver` skill in this plugin. Rather than guess at "best practices," we pulled the README of 100 real, currently-trending GitHub repositories, measured their structure and prose mechanically, and read the most-starred ones by hand for the qualitative patterns a word-count can't see. Every claim below traces back to a number in `readme-analysis/` or a quoted line from a specific repo — nothing here is asserted from priors.
 
 ## Methodology
 
@@ -216,7 +216,7 @@ These are the specific, named techniques that showed up repeatedly across the tw
 
 ## Distilled checklist
 
-This is the operational summary the `readme-writing` skill applies. Each line is backed by a number or a named repo above.
+This is the operational summary the `rabbit-readme-improver` skill applies. Each line is backed by a number or a named repo above.
 
 1. State what the thing does and why, in the first two sentences — before any badge row, sponsor content, or hero image. (ECC and cc-switch are the cautionary examples; markitdown and pi are the terse counter-examples.)
 2. Order: pitch/features → fastest path to running it (installation) → depth (architecture, API, config) for people still reading → contributing/credits → license last. This is the measured convention across 100 repos, not a stylistic preference.

@@ -1,5 +1,5 @@
 ---
-name: readme-writing
+name: rabbit-readme-improver
 description: Draft a new README.md, or audit and improve an existing one, using patterns measured from 100 real, currently-trending GitHub repos rather than generic advice, and written in the user's own saved voice rather than a generated open-source register. Use when the user asks to write a README, create a project README, improve or clean up their README, review a README against best practices, add badges or a table of contents, restructure a README's sections, make a README look more professional, or make one sound like they wrote it. Covers new-project READMEs and edits to existing files.
 license: MIT
 metadata:
@@ -10,7 +10,7 @@ metadata:
 
 Write or edit `README.md` using conventions measured from real data, not folklore. The full study (methodology, the 100-repo table, every stat cited below) lives in `${CLAUDE_PLUGIN_ROOT}/docs/README_WRITEUP.md`. This file is the operational summary. Read `references/patterns.md` for the fuller catalog with more examples, and `references/checklist.md` at the end of any draft or edit.
 
-**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`, `rabbit-rewrites`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand. `${CLAUDE_PLUGIN_ROOT}/docs/` only exists in a full-repo install. When it's missing, `references/patterns.md` carries the same numbers and `scripts/readme_check.py` still runs, since it resolves its siblings from its own location.
+**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `rabbit-readme-improver`, `rabbit-reads`, `rabbit-rewrites`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand. `${CLAUDE_PLUGIN_ROOT}/docs/` only exists in a full-repo install. When it's missing, `references/patterns.md` carries the same numbers and `scripts/readme_check.py` still runs, since it resolves its siblings from its own location.
 
 ## Modes
 
@@ -100,25 +100,27 @@ Two things a voice profile does *not* import into a README, because they belong 
 5. **Run the checker.** It covers structure, links, badges, claims, and the active voice's rules in one pass:
 
    ```bash
-   python3 ${CLAUDE_PLUGIN_ROOT}/skills/readme-writing/scripts/readme_check.py README.md
+   python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-readme-improver/scripts/readme_check.py README.md
    ```
 
 ### Script CLI Arguments Reference
 
 #### `readme_check.py`
-`python3 ${CLAUDE_PLUGIN_ROOT}/skills/readme-writing/scripts/readme_check.py <file> [options]`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-readme-improver/scripts/readme_check.py <file> [options]`
 - `file`: (REQUIRED, file path) Path to README markdown file to check.
 - `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON results.
 - `--sarif`: (OPTIONAL, boolean flag) Output SARIF 2.1.0 report for GitHub pull request annotations.
 - `--sarif-uri`: (OPTIONAL, file path / string) Relative path to record in SARIF output.
 - `--no-voice`: (OPTIONAL, boolean flag) Disable active voice profile rules.
 - `--voice-rules`: (OPTIONAL, file path) Path to `<name>.rules.json` profile file (overrides `.rabbit-voice` and `ACTIVE`).
+- `--no-ste`: (OPTIONAL, boolean flag) Disable STE readability rules (sentence length caps, paragraph sentence counts, trailing conditions).
+- `--fragment`: (OPTIONAL, boolean flag) Check as a section fragment; disables document-level structure findings (no-pitch, no-install, no-license, etc.).
 - `--check`: (OPTIONAL, boolean flag) Exit 1 if any unsuppressed P0 finding is present.
 
 
-   Findings come back in four bands. `structure` is this skill's. `voice` is the writer's own rules, and a hit there is a defect rather than a suggestion. `fingerprint` and `craft` come from the `rabbit-writes` engine running at register `docs`.
+   Findings come back in five bands. `safety` is prompt injection and concealed text. `structure` is this skill's. `voice` is the writer's own rules, and a hit there is a defect rather than a suggestion. `fingerprint` and `craft` come from the `rabbit-writes` engine running at register `docs`.
 
-   The `ste-` ids inside `craft` are the counted half of ASD-STE100, the controlled English used for aircraft maintenance manuals: sentence word caps, six sentences to a paragraph, a condition trailing its command, and semicolons. They run in every scan the engine does. Every one is P1 or P2, and the `docs` register takes a measured allowance off the top of each. `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/references/ste.md` is the reference. Read them as a readability suggestion on a document somebody has to follow under time pressure, not as a defect list.
+   The `ste-` ids inside `craft` are the counted half of ASD-STE100, the controlled English used for aircraft maintenance manuals: sentence word caps, six sentences to a paragraph, a condition trailing its command, and semicolons. They run in every scan the engine does. Every one is P1 or P2, and the `docs` register takes a measured allowance off the top of each. `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/references/ste.md` is the reference. Read them as a readability suggestion on a document somebody has to follow under time pressure, not as a defect list. Pass `--no-ste` to silence them.
 
    Fix P0s always. P1s need a reason to keep. P2s are judgment.
 
@@ -138,7 +140,7 @@ Two things a voice profile does *not* import into a README, because they belong 
 
 7. **Self-check** against `references/checklist.md`. The checker can't decide whether the pitch is honest or the example runs. That is what the checklist is for. Fix every "no" once, re-check once, stop.
 
-8. **Report what you did.** For audit mode, a plain list of findings ordered by impact (structural first, voice second, craft third), each pointing at the actual line or section.
+8. **Report what you did.** For audit mode, a plain list of findings ordered by impact (safety first, structural second, voice third, fingerprint and craft fourth), each pointing at the actual line or section.
 
    Keep three groups visibly apart: what the script found, what reading the profile found and you fixed, and the judgment calls you deliberately left open. The last group is the one the user is most likely to overrule, and burying it inside the others quietly makes their decision for them.
 

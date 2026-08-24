@@ -10,6 +10,7 @@ sh scripts on a private PATH, so no test depends on poppler or on textutil
 being installed, and no test silently uses the host's real copies.
 """
 
+import json
 import os
 import shutil
 import tempfile
@@ -562,3 +563,134 @@ def test_a_visible_directive_is_reported_without_failing():
         assert "injection-visible-directive" in err, err[:400]
     finally:
         shutil.rmtree(scratch, ignore_errors=True)
+
+
+# --------------------------------------------------------------------------
+# multi-source merge
+# --------------------------------------------------------------------------
+
+def test_two_sources_merge_in_the_order_given_with_a_manifest():
+    extract = script_path("extract_text.py")
+    work = tempfile.mkdtemp(prefix="rr-multi-")
+    try:
+        a = plain_file(work, "a.txt", "intro text here\n")
+        b = plain_file(work, "b.txt", "more text here\n")
+        out = os.path.join(work, "merged.txt")
+        rc, out_text, err = run([extract, b, a, "--out", out])
+        assert rc == 0, (out_text + err)[:600]
+        with open(out, encoding="utf-8") as fh:
+            merged = fh.read()
+        lines = merged.splitlines()
+        assert lines[0] == ("========== rabbit-reads source: %s =========="
+                            % b), lines[0]
+        assert lines[1] == "more text here"
+        assert lines[3].endswith("a.txt =========="), lines[3]
+        assert lines[4] == "intro text here", lines
+        manifest_path = out + ".manifest.json"
+        assert os.path.isfile(manifest_path), "no manifest beside the merge"
+        with open(manifest_path, encoding="utf-8") as fh:
+            manifest = json.load(fh)
+        # The offset addresses each source's block; the first text line of
+        # the source sits one line below it.
+        for entry, first_line in zip(manifest,
+                                     ("more text here", "intro text here")):
+            assert lines[entry["line_offset"]] == first_line, (entry, lines)
+        assert [e["path"] for e in manifest] == [b, a], manifest
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
+def test_a_concealed_directive_in_a_later_source_names_its_file():
+    extract = script_path("extract_text.py")
+    work = tempfile.mkdtemp(prefix="rr-multi-")
+    try:
+        a = plain_file(work, "a.txt", "clean prose only\n")
+        b = plain_file(
+            work, "b.html",
+            "<html><body><p>Visible prose.</p>"
+            '<div style="display:none">%s</div>'
+            "</body></html>\n" % CONCEALED_DIRECTIVE)
+        out = os.path.join(work, "merged.txt")
+        rc, out_text, err = run([extract, a, b, "--out", out])
+        assert rc == 1, "a concealed directive must exit 1, got %d" % rc
+        report = out_text + err
+        assert "Safety findings: %s" % b in report, report[:600]
+        assert os.path.isfile(out), "the text still lands: flagged, not lost"
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
+def test_a_single_source_writes_no_manifest_and_keeps_its_shape():
+    extract = script_path("extract_text.py")
+    work = tempfile.mkdtemp(prefix="rr-single-")
+    try:
+        src = plain_file(work, "book.txt", "just one file\n")
+        out = os.path.join(work, "one.txt")
+        rc, out_text, err = run([extract, src, "--out", out])
+        assert rc == 0, (out_text + err)[:600]
+        with open(out, encoding="utf-8") as fh:
+            assert fh.read() == "just one file\n"
+        assert not os.path.isfile(out + ".manifest.json"), \
+            "a single source gets no manifest"
+        assert "demarcation" not in out_text, out_text
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
+def test_multiple_sources_refuse_stdout():
+    extract = script_path("extract_text.py")
+    work = tempfile.mkdtemp(prefix="rr-multi-")
+    try:
+        a = plain_file(work, "a.txt", "one\n")
+        b = plain_file(work, "b.txt", "two\n")
+        rc, out_text, err = run([extract, a, b, "--stdout"])
+        assert rc == 2, "--stdout over several sources is usage error, got %d" % rc
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
+# --------------------------------------------------------------------------
+# --check preflight and the token estimate
+# --------------------------------------------------------------------------
+
+def test_check_reports_converters_and_processes_nothing():
+    if os.name != "posix":
+        return
+    extract = script_path("extract_text.py")
+    work = tempfile.mkdtemp(prefix="rr-check-")
+    try:
+        rc, out, err = run([extract, "--check"])
+        assert rc == 0, "--check is informational and exits 0, got %d" % rc
+        assert "pdftotext" in out and "textutil" in out, out[:400]
+        assert "usable now:" in out, out[:400]
+        assert os.listdir(work) == [], "--check must not create files"
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
+def test_check_with_a_source_is_usage_error():
+    extract = script_path("extract_text.py")
+    scratch = tempfile.mkdtemp(prefix="rr-check-")
+    try:
+        rc, out, err = run([extract, os.path.join(scratch, "x.txt"),
+                            "--check"])
+        assert rc == 2, "mixing --check with a source must exit 2, got %d" % rc
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+def test_check_reports_missing_binaries_through_path_shim():
+    if os.name != "posix":
+        return
+    extract = script_path("extract_text.py")
+    empty_bin = tempfile.mkdtemp(prefix="rr-empty-bin-")
+    try:
+        rc, out, err = run_env([extract, "--check"],
+                               env=path_without_everything(empty_bin))
+        assert rc == 0
+        assert "MISSING" in out, out[:400]
+        assert "Install poppler" in out, out[:600]
+        assert "usable now: txt, md, docx, docm, html, htm, epub" in out, \
+            out[:600]
+    finally:
+        shutil.rmtree(empty_bin, ignore_errors=True)

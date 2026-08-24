@@ -427,7 +427,7 @@ def test_the_lineage_is_reported():
 # The order used to live in readme_check.py alone, so the two checkers in this
 # one plugin could disagree about whose rules were in force. It is in
 # rwlib.voices now and scan.py reaches it through `--voice auto`. The
-# readme-writing suite tests the same function through its own caller; these
+# rabbit-readme-improver suite tests the same function through its own caller; these
 # test the engine's half, and the flag handling around it.
 
 
@@ -462,7 +462,7 @@ def test_resolve_with_no_document_still_answers():
     invoked. With no document, `resolve` probes the working directory for a
     `.rabbit-voice`, so a repository that pins its own house voice (this one
     does) would otherwise decide the result and the failure would read as a bug
-    in the resolution order. The readme-writing suite draws the same line in its
+    in the resolution order. The rabbit-readme-improver suite draws the same line in its
     NEUTRAL_CWD.
     """
     scratch = scratch_voices("ada")

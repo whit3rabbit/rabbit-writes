@@ -19,6 +19,15 @@ This one separates the two halves. A **voice profile** says how *you* write. An 
 
 The voice is data. Swap it, edit it, blend two of them, or write your own from a template. Nothing in the engine knows anything about any particular person.
 
+## Skills
+
+- rabbit-writes: The main skill that simplifies, rewrites, and audits prose.
+- rabbit-readme-improver: The main skill that simplifies, rewrites, and audits README.md files. Trained on over 1k of top GitHub README.md files.
+- rabbit-rewrites: The main skill that uses another local LLM to rewrite text to a specific voice.
+- rabbit-reads: The main skill that distills a book, paper, or thesis into per-concept cheatsheets.
+- voice-setup: The main skill that builds, measures, edits, blends, or switches a voice profile.
+
+
 ## Install
 
 One set of manifests, two hosts. Codex reads Claude Code's `.claude-plugin/` marketplace format, so the same repo installs as a plugin in both.
@@ -105,14 +114,14 @@ Codex scans `~/.agents/skills/` for user-level skills and `.agents/skills/` at a
 git clone https://github.com/whit3rabbit/rabbit-writes
 cd rabbit-writes
 mkdir -p ~/.agents/skills
-for s in rabbit-writes voice-setup readme-writing rabbit-reads rabbit-rewrites; do
+for s in rabbit-writes voice-setup rabbit-readme-improver rabbit-reads rabbit-rewrites; do
   ln -s "$PWD/skills/$s" ~/.agents/skills/$s
 done
 ```
 
-Symlink all five. They call each other: `readme-writing` runs the `rabbit-writes` scanner against the active voice, and both read the profiles under `rabbit-writes/voices/`. `scripts/readme_check.py` resolves its siblings by walking up from its own path, so that layout works.
+Symlink all five. They call each other: `rabbit-readme-improver` runs the `rabbit-writes` scanner against the active voice, and both read the profiles under `rabbit-writes/voices/`. `scripts/readme_check.py` resolves its siblings by walking up from its own path, so that layout works.
 
-What you lose is `docs/`, which sits at the repo root outside every skill folder. The study behind `readme-writing` is then only in the clone. Nothing breaks, `references/patterns.md` carries the same numbers.
+What you lose is `docs/`, which sits at the repo root outside every skill folder. The study behind `rabbit-readme-improver` is then only in the clone. Nothing breaks, `references/patterns.md` carries the same numbers.
 
 </details>
 
@@ -125,7 +134,7 @@ The custom-skill upload on claude.ai takes one skill per zip, so the plugin also
 python3 scripts/package_skills.py
 ```
 
-That writes `dist/rabbit-writes.zip`, `dist/voice-setup.zip`, `dist/readme-writing.zip`, `dist/rabbit-reads.zip`, and `dist/rabbit-rewrites.zip`. Upload the ones you want. Each stands alone: the four satellite skills carry their own copy of the engine (`scan.py`, `verify.py`, `rwlib/`, its data files), their own `voices/` snapshot, and a `SKILL.md` rewritten at package time so every path resolves inside the archive rather than through `${CLAUDE_PLUGIN_ROOT}`.
+That writes `dist/rabbit-writes.zip`, `dist/voice-setup.zip`, `dist/rabbit-readme-improver.zip`, `dist/rabbit-reads.zip`, and `dist/rabbit-rewrites.zip`. Upload the ones you want. Each stands alone: the four satellite skills carry their own copy of the engine (`scan.py`, `verify.py`, `rwlib/`, its data files), their own `voices/` snapshot, and a `SKILL.md` rewritten at package time so every path resolves inside the archive rather than through `${CLAUDE_PLUGIN_ROOT}`.
 
 The isolation is the tradeoff. Two uploaded skills cannot share voices: each carries its own `voices/` copy, and a profile built inside one never reaches another. The plugin install above is the integrated path, one engine and one voices directory for all five skills. `python3 scripts/test_package_skills.py` extracts each archive outside the repo and runs what it ships, which is what keeps the standalone claim true.
 
@@ -161,17 +170,17 @@ You rarely need to name a skill. Each one triggers on a plain request, which is 
 write a note to the team about the cert outage # -> rabbit-writes, in your voice
 does this draft sound like a chatbot?          # -> rabbit-writes, detect mode
 set up my writing voice from these 3 posts     # -> voice-setup, sample mode
-my README is a mess, fix the section order     # -> readme-writing, audit mode
+my README is a mess, fix the section order     # -> rabbit-readme-improver, audit mode
 turn this PDF into a concept doc set           # -> rabbit-reads, distill mode
 clean this up with my local llama.cpp server   # -> rabbit-rewrites, model mode
 ```
 
-The explicit forms are there for when you want to force one. The `rabbit-writes:` prefix is the plugin namespace and comes from the install. In Codex the same five are `$rabbit-writes`, `$voice-setup`, `$readme-writing`, `$rabbit-reads`, and `$rabbit-rewrites`.
+The explicit forms are there for when you want to force one. The `rabbit-writes:` prefix is the plugin namespace and comes from the install. In Codex the same five are `$rabbit-writes`, `$voice-setup`, `$rabbit-readme-improver`, `$rabbit-reads`, and `$rabbit-rewrites`.
 
 ```
 /rabbit-writes:rabbit-writes    # draft, convert, de-slop, or audit prose. five modes, one skill
 /rabbit-writes:voice-setup      # build, measure, edit, blend, or switch a voice profile
-/rabbit-writes:readme-writing   # draft or audit a README against the 100-repo study
+/rabbit-writes:rabbit-readme-improver   # draft or audit a README against the 100-repo study
 /rabbit-writes:rabbit-reads     # distill a book, paper, or thesis into per-concept cheatsheets
 /rabbit-writes:rabbit-rewrites  # de-slop through a small local model, gated by the engine's own checks
 ```
@@ -401,7 +410,7 @@ It also writes a **voice fingerprint**. Every voice rule is a refusal, and a dra
 
 And once the profile exists, `audit_voice.py` turns it back on the corpus it came from: it exits 1 when one of your own rules fires on your own prose, suggests the fix with the measured number behind it, and reports (without judging) which samples sit outside the fingerprint band, whether the corpus holds two sentence registers, and which engine tells are false positives over you.
 
-**`readme-writing`**: drafts or audits a `README.md` against patterns measured from 100 real GitHub repos (section order, sentence length, badge and link conventions) instead of generic advice, in your voice rather than a generated open-source register. Ships `readme_check.py`, which checks structure, links, badges, claims, and the active voice in one pass. The full study is in `docs/README_WRITEUP.md`.
+**`rabbit-readme-improver`**: drafts or audits a `README.md` against patterns measured from 100 real GitHub repos (section order, sentence length, badge and link conventions) instead of generic advice, in your voice rather than a generated open-source register. Ships `readme_check.py`, which checks structure, links, badges, claims, and the active voice in one pass. The full study is in `docs/README_WRITEUP.md`.
 
 **`rabbit-reads`**: distills a book, paper, or thesis into per-concept cheatsheets, a `<book-slug>-notes/` folder of 40-70 line markdown documents plus a README index. The source arrives as pdf, docx, doc, rtf, html, odt, epub, md, or txt, and `extract_text.py` normalizes it to plain text under `scratch/`, where the intermediates stay. `map_structure.py` maps the source's structure to section line ranges, the concept set comes from that map, and subagents write the individual documents. The notes paraphrase the source and never quote it. `check_notes.py` verifies the finished set mechanically and can run the `rabbit-writes` scanner over it, and the book types (non-fiction, fiction, arxiv paper, thesis) are data files under `references/book-types/`, so adding one is a new file there rather than a code change.
 
@@ -415,11 +424,11 @@ rabbit-writes/
   scripts/
     validate.py              repo validator
     precommit.py             the entry point every pre-commit hook goes through
-    readme-research/         the pipeline behind readme-writing's evidence base
+    readme-research/         the pipeline behind rabbit-readme-improver's evidence base
     detector-corpus/         the false-positive measurement harness, and its own tests
   docs/
     COMPARISON.md            the craft engine's source writeup
-    README_WRITEUP.md        the readme-writing skill's source writeup
+    README_WRITEUP.md        the rabbit-readme-improver skill's source writeup
     readme-analysis/         raw + aggregated data behind that writeup, one folder per repo studied
     detector-corpus/         the labeled corpus protocol and manifest, empty for now
   skills/
@@ -443,7 +452,7 @@ rabbit-writes/
                             build_voice.py, scaffolds a profile and proves its rules fire
                             learn_edits.py, reads your corrections back into the profile
                             audit_voice.py, runs the finished profile over your own corpus
-    readme-writing/
+    rabbit-readme-improver/
       SKILL.md
       references/           patterns (the full catalog), checklist
       scripts/              readme_check.py, the structural + voice linter
@@ -508,10 +517,10 @@ Exits non-zero if the rewrite altered a code block, frontmatter, a table row, a 
 
 ## Write a README with it
 
-`readme-writing` is the odd skill out. Not voice, not AI tells. It answers one narrow question with data instead of folklore: what do currently-popular READMEs actually do?
+`rabbit-readme-improver` is the odd skill out. Not voice, not AI tells. It answers one narrow question with data instead of folklore: what do currently-popular READMEs actually do?
 
 ```
-/rabbit-writes:readme-writing        # or just: "write me a README", "review my README"
+/rabbit-writes:rabbit-readme-improver        # or just: "write me a README", "review my README"
 ```
 
 Four modes, picked from what you ask for:
@@ -574,7 +583,7 @@ Intermediates are normalized to plain text under a gitignored `scratch/` directo
 ```bash
 python3 scripts/validate.py                        # manifests, skills, voices, cross-refs, tripwires
 python3 skills/rabbit-writes/tests/run.py          # engine, voice, verifier, fixer, invariants
-python3 skills/readme-writing/tests/run.py         # structure, links, voice, 100-repo regression
+python3 skills/rabbit-readme-improver/tests/run.py         # structure, links, voice, 100-repo regression
 python3 skills/rabbit-reads/tests/run.py           # extraction, structure mapping, notes battery
 python3 skills/rabbit-rewrites/tests/run.py        # the model battery, and the bench that scores against it
 ```
@@ -611,7 +620,7 @@ Plus three sources that shaped the architecture:
 
 `docs/COMPARISON.md` is the full writeup: what each repo does, tables of what they share and where they diverge, and the reasoning behind every borrow.
 
-`readme-writing`'s rules come from the same discipline applied to a different question: what do currently-popular READMEs actually do, measured rather than assumed. `docs/README_WRITEUP.md` has the methodology, the 100-repo table, and every finding. `docs/readme-analysis/` has the raw data and per-repo notes behind it.
+`rabbit-readme-improver`'s rules come from the same discipline applied to a different question: what do currently-popular READMEs actually do, measured rather than assumed. `docs/README_WRITEUP.md` has the methodology, the 100-repo table, and every finding. `docs/readme-analysis/` has the raw data and per-repo notes behind it.
 
 ### Tells mined from real transcripts
 

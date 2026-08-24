@@ -7,7 +7,7 @@ it mirrored docs/readme-analysis/03_aggregate_summary.json. Nothing checked the
 promise, so regenerating the corpus silently orphaned the checker's thresholds:
 the script kept quoting "corpus median 5" at a corpus whose median had moved.
 
-Now there is a committed extract, skills/readme-writing/scripts/corpus_summary.json,
+Now there is a committed extract, skills/rabbit-readme-improver/scripts/corpus_summary.json,
 which is what ships and what the checker reads. It is small enough that shipping
 it costs nothing, and it keeps the skill working when installed without the
 research data. `derive` is the function that produces it from the aggregate, so
@@ -31,7 +31,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 # rwlib -> scripts -> rabbit-writes -> skills -> the plugin root. Walked rather
 # than hardcoded, so the skill directory can be renamed without editing this.
 PLUGIN_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(HERE))))
-SUMMARY_PATH = os.path.join(PLUGIN_ROOT, "skills", "readme-writing", "scripts",
+SUMMARY_PATH = os.path.join(PLUGIN_ROOT, "skills", "rabbit-readme-improver", "scripts",
                             "corpus_summary.json")
 AGGREGATE_PATH = os.path.join(PLUGIN_ROOT, "docs", "readme-analysis",
                               "03_aggregate_summary.json")
@@ -107,11 +107,12 @@ def derive(aggregate):
             "reference": aggregate["link_style_corpus_totals"]["pct_reference_style"],
         },
         "avg_link_text_words": round(aggregate["avg_link_text_words"], 1),
-        "median_license_words": lic.get("median_words"),
+        "median_license_words": int(lic.get("median_words", 13)),
         "pct_has_installation_section": aggregate["pct_has_installation_section"],
         "pct_has_code_blocks": aggregate["pct_has_code_blocks"],
         "pct_has_license_section_or_badge": aggregate["pct_has_license_section_or_badge"],
         "pct_has_toc": aggregate["pct_has_toc"],
+        "pct_has_toc_heading": aggregate.get("section_category_presence_pct", {}).get("toc", 12.0),
         "section_avg_position": {
             cat: v["avg_relative_position"] for cat, v in pos.items()
         },

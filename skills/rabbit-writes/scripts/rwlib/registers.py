@@ -249,7 +249,7 @@ def detect_register(text, path=None, registers_path=REGISTERS_PATH):
     shape routes to which register. This reads the same short list of strong,
     unambiguous signals mechanically: a run of docs-shaped headings, as
     rwlib.sections classifies them, for docs (skipped for a file named
-    README.*, which routes to the separate readme-writing skill instead), a
+    README.*, which routes to the separate rabbit-readme-improver skill instead), a
     trailing hashtag line for linkedin, and a greeting-then-signoff shape for
     formal (covers both the email and letter forms, which route to the same
     register).

@@ -63,6 +63,7 @@ def test_every_invisible_logic_source_is_escape_only():
         os.path.join(repo, "scripts", "thesaurus-research"),
         os.path.join(repo, "scripts", "academic-research"),
         os.path.join(repo, "scripts", "model-bench"),
+        os.path.join(repo, "scripts", "ste-research"),
         os.path.join(repo, "skills", "rabbit-reads", "scripts"),
         os.path.join(repo, "skills", "rabbit-rewrites", "scripts"),
     ]

@@ -484,7 +484,7 @@ def test_detect_register_finds_docs_shaped_headings():
 
 def test_detect_register_carves_out_readme_from_docs():
     """references/forms/docs.md routes a file literally named README.md to
-    the separate readme-writing skill instead. A README with docs-shaped
+    the separate rabbit-readme-improver skill instead. A README with docs-shaped
     headings must not be auto-detected as docs."""
     register, confidence, signals = registers.detect_register(
         DOCS_SAMPLE, path="README.md")

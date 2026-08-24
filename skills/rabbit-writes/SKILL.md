@@ -18,7 +18,7 @@ The profile wins every conflict. The guardrails below are the one exception, and
 
 A rewrite that clears every flag and reads sterile has failed. So has one that scrubs a real writer's habits into house style.
 
-**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` below means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`, `rabbit-rewrites`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
+**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` below means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `rabbit-readme-improver`, `rabbit-reads`, `rabbit-rewrites`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
 
 ## The override
 
@@ -79,7 +79,7 @@ Pick one by what the user wants done.
 
 Default to **deslop** when the user pastes text and says nothing. Default to **voice** when a profile is active and the text is theirs to publish.
 
-A file named `README.md` belongs to the `readme-writing` skill, which knows the measured section conventions this one does not. Hand it over rather than converting it here.
+A file named `README.md` belongs to the `rabbit-readme-improver` skill, which knows the measured section conventions this one does not. Hand it over rather than converting it here.
 
 ## Load the voice
 
@@ -335,7 +335,7 @@ Read one, and only when the document is that form. The register is what the scan
 | `literature-review` | `academic` | a synthesis of what a body of work establishes and has not tried |
 | `thesis-chapter` | `academic` | one chapter of a longer work, with a chapter before and after it |
 
-`README.md` is none of these. It belongs to the `readme-writing` skill.
+`README.md` is none of these. It belongs to the `rabbit-readme-improver` skill.
 
 ## Documents that cite sources
 

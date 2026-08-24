@@ -24,16 +24,16 @@
       ]
     },
     {
-      "root": "skills/readme-writing/scripts",
+      "root": "skills/rabbit-readme-improver/scripts",
       "extraPaths": [
         "skills/rabbit-writes/scripts"
       ]
     },
     {
-      "root": "skills/readme-writing/tests",
+      "root": "skills/rabbit-readme-improver/tests",
       "extraPaths": [
         "skills/rabbit-writes/scripts",
-        "skills/readme-writing/scripts"
+        "skills/rabbit-readme-improver/scripts"
       ]
     },
     {
@@ -98,6 +98,12 @@
       "extraPaths": [
         "skills/rabbit-writes/scripts",
         "skills/voice-setup/scripts"
+      ]
+    },
+    {
+      "root": "scripts/ste-research",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
       ]
     },
     {

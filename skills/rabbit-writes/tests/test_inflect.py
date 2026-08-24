@@ -45,6 +45,32 @@ def test_the_regular_suffixes():
     assert inflect.gerund("agree") == "agreeing"
 
 
+def test_singular():
+    assert inflect.singular("classes") == "class"
+    assert inflect.singular("class") == "class"
+    assert inflect.singular("boxes") == "box"
+    assert inflect.singular("entries") == "entry"
+    assert inflect.singular("cases") == "case"
+    assert inflect.singular("libraries") == "library"
+    assert inflect.singular("cats") == "cat"
+    assert inflect.singular("status") == "status"
+    assert inflect.singular("statuses") == "status"
+    assert inflect.singular("alias") == "alias"
+    assert inflect.singular("aliases") == "alias"
+    assert inflect.singular("bus") == "bus"
+    assert inflect.singular("buses") == "bus"
+    assert inflect.singular("canvas") == "canvas"
+    assert inflect.singular("canvases") == "canvas"
+    assert inflect.singular("lens") == "lens"
+    assert inflect.singular("lenses") == "lens"
+    assert inflect.singular("basis") == "basis"
+    assert inflect.singular("series") == "series"
+    assert inflect.singular("species") == "species"
+    assert inflect.singular("release") == "release"
+    assert inflect.singular("releases") == "release"
+
+
+
 def test_y_after_a_vowel_is_not_a_consonant_y():
     """`day` takes an s. `synergy` takes ies. Getting this backwards produces
     `daies`, a pattern that matches nothing and reads as a rule that fired."""

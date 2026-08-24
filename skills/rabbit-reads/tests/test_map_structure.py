@@ -381,3 +381,49 @@ def test_json_section_count_equals_the_markdown_row_count():
             % (len(rows), len(payload["sections"]), plain[:400]))
     finally:
         shutil.rmtree(scratch, ignore_errors=True)
+
+
+# --------------------------------------------------------------------------
+# markdown headings: ATX, fences, setext
+# --------------------------------------------------------------------------
+
+def test_markdown_atx_headings_map_to_sections():
+    lines = ["# A", "", "text", "", "## B", "", "body", "", "## C"]
+    payload = json_run(lines)
+    assert triples(payload) == [("A", "chapter", 1),
+                                ("B", "section", 5),
+                                ("C", "section", 9)], triples(payload)
+
+
+def test_an_atx_heading_inside_a_fence_is_not_a_heading():
+    lines = (["Chapter 1. Opening"] + body("First", 12)
+             + ["```python", "## not a heading", "print('x')", "```"]
+             + body("Second", 12))
+    payload = json_run(lines)
+    got = triples(payload)
+    assert all("not a heading" != t for t, _, _ in got), got
+
+
+def test_a_setext_pair_maps_as_its_underline_kind():
+    lines = ["Title One", "=========", "", "body under one.", "",
+             "Title Two", "---------", "", "body under two."]
+    payload = json_run(lines)
+    got = triples(payload)
+    assert ("Title One", "chapter", 1) in got, got
+    assert ("Title Two", "section", 6) in got, got
+
+
+def test_batch_columns_sum_to_the_document_counts():
+    lines = (["Chapter 1. Opening Moves"] + body("First", 12)
+             + ["Chapter 2. Middle Moves"] + body("Second", 12)
+             + ["Chapter 3. Closing Moves"] + body("Third", 12))
+    payload = json_run(lines, args=["--batches", "2"])
+    batches = payload["batches"]
+    doc_words = sum(len(l.split()) for l in lines)
+    assert sum(b["words"] for b in batches) == doc_words
+    from rwlib.endpoint import estimate_tokens
+    doc_tokens = estimate_tokens("\n".join(lines))
+    # Each batch estimates over its own slice; the whole-document estimate
+    # sits between the largest batch and their sum plus per-batch slack.
+    assert all(b["tokens"] > 0 for b in batches)
+    assert max(b["tokens"] for b in batches) <= doc_tokens

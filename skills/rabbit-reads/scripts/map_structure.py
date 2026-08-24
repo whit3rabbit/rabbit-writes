@@ -32,6 +32,7 @@ if "_bootstrap" in sys.modules and getattr(sys.modules["_bootstrap"], "__file__"
     del sys.modules["_bootstrap"]
 import _bootstrap
 from _bootstrap import cli_error, book_types_dir
+from rwlib.endpoint import estimate_tokens
 
 EXAMPLES = [
     "map_structure.py scratch/book.txt",
@@ -44,7 +45,7 @@ DEFAULT_TYPE = "non-fiction"
 # The generic grammar: everything except arxiv-style numbered sections, which
 # false-positive hard on prose once you leave a paper's front matter.
 DEFAULT_FEATURES = {"chapters": True, "numbered": True, "parts": True,
-                    "matter": True, "arxiv": False}
+                    "matter": True, "arxiv": False, "markdown": True}
 
 # A per-type override of the above. Unknown types get the generic default,
 # which is what makes a new references/book-types/<name>.md file choosable
@@ -52,10 +53,10 @@ DEFAULT_FEATURES = {"chapters": True, "numbered": True, "parts": True,
 GRAMMARS = {
     "non-fiction": DEFAULT_FEATURES,
     "fiction": {"chapters": True, "numbered": False, "parts": True,
-                "matter": True, "arxiv": False},
+                "matter": True, "arxiv": False, "markdown": True},
     "thesis": DEFAULT_FEATURES,
     "arxiv-paper": {"chapters": False, "numbered": False, "parts": False,
-                    "matter": True, "arxiv": True},
+                    "matter": True, "arxiv": True, "markdown": True},
 }
 
 MAX_HEADING_CHARS = 80
@@ -74,6 +75,12 @@ BARE_NUM_RX = re.compile(r"^(\d{1,2})\.\s+(\S.*)$")
 BARE_ROMAN_RX = re.compile(r"^([IVXLCDM]{1,7})\.\s+(\S.*)$")
 ARXIV_SUB_RX = re.compile(r"^(\d+(?:\.\d+)+)\s+([A-Z].*)$")
 ARXIV_TOP_RX = re.compile(r"^(\d+)\s+([A-Z].*)$")
+
+# Markdown headings. The ATX level is the length of group 1; the title is
+# group 3 with any markup stripped by the tail of the pattern itself.
+ATX_RX = re.compile(r"^(#{1,6})\s+(#{0,6}\s*)(\S.*?)\s*#*\s*$")
+FENCE_RX = re.compile(r"^```")
+
 # A TOC entry: some text, a real gap (dot leaders or 2+ spaces, the way a
 # TOC's page-number column is set off), then a bare page number. One plain
 # space is what an ordinary sentence ending in a small number looks like, so
@@ -227,6 +234,40 @@ def numbered_headings(lines, features, start, hard, min_lines):
     return out
 
 
+def markdown_headings(lines, features, start):
+    """[(line_no, kind, title)] for ATX and setext markdown headings.
+
+    Single pass with a fence toggle: lines inside an open ``` fence never
+    match, and the fence lines themselves do not either. ATX headings bypass
+    plausibly_titled and blank_before because they are unambiguous markup;
+    a setext underline is the same kind of proof. `#` maps as chapter,
+    `##`/`###` as section, deeper levels are ignored as noise, and a setext
+    `=` underline is a chapter where `-` is a section.
+    """
+    out = []
+    in_fence = False
+    for i in range(start, len(lines)):
+        if FENCE_RX.match(lines[i]):
+            in_fence = not in_fence
+            continue
+        stripped = lines[i].strip()
+        if in_fence or not stripped or not features["markdown"]:
+            continue
+        m = ATX_RX.match(stripped)
+        if m:
+            level = len(m.group(1))
+            if level == 1:
+                out.append((i + 1, "chapter", m.group(3).strip()))
+            elif level <= 3:
+                out.append((i + 1, "section", m.group(3).strip()))
+            continue
+        nxt = lines[i + 1].strip() if i + 1 < len(lines) else ""
+        if len(nxt) >= 2 and (nxt == "=" * len(nxt) or nxt == "-" * len(nxt)):
+            kind = "chapter" if nxt[0] == "=" else "section"
+            out.append((i + 1, kind, stripped))
+    return out
+
+
 def find_toc(lines):
     """[start, end] (1-based, inclusive) of a contents run, or None.
 
@@ -270,8 +311,13 @@ def build_sections(raw, total_lines):
     return sections
 
 
-def build_batches(sections, count):
+def build_batches(sections, count, lines=None):
     """N groups of sections, each holding roughly span/N lines.
+
+    When `lines` is given, each batch also carries its own word count and a
+    pessimistic token estimate over exactly the lines it spans, so a fan-out
+    budget is set from what the batch holds rather than guessed from its
+    line range alone.
 
     Greedy by line count, with a floor of one section per batch so the count
     asked for is never inflated with empty groups. Roughly equal is the goal
@@ -297,9 +343,13 @@ def build_batches(sections, count):
         else:
             group = sections[i - 1:]
             i = len(sections)
+        batch_lines = ([] if lines is None
+                       else lines[group[0]["start"] - 1:group[-1]["end"]])
         batches.append({"batch": b, "start": group[0]["start"],
                         "end": group[-1]["end"],
-                        "titles": [s["title"] for s in group]})
+                        "titles": [s["title"] for s in group],
+                        "words": sum(len(l.split()) for l in batch_lines),
+                        "tokens": estimate_tokens("\n".join(batch_lines))})
     return batches
 
 
@@ -382,9 +432,18 @@ def main(argv=None):
 
     hard = hard_headings(lines, features, start)
     numbered = numbered_headings(lines, features, start, hard, args.min_lines)
-    raw = sorted(hard + numbered)
+    markdown = markdown_headings(lines, features, start)
+    # Grammar-priority dedupe: a line number claimed by several grammars
+    # belongs to the most specialized one, hard then numbered then markdown,
+    # so an arxiv `1 Introduction` is not doubled by its own ATX twin.
+    raw, seen = [], set()
+    for source in (hard, numbered, markdown):
+        for item in source:
+            if item[0] not in seen:
+                seen.add(item[0])
+                raw.append(item)
+    raw = sorted(raw)
     if not raw:
-        print("No headings recognized in %s." % args.source)
         echoes = candidate_lines(lines, start)
         if echoes:
             print("First heading-like candidates:")
@@ -403,7 +462,7 @@ def main(argv=None):
     payload = {"source": args.source, "book_type": args.book_type,
                "lines": len(lines), "toc": toc, "sections": sections}
     if args.batches is not None:
-        payload["batches"] = build_batches(sections, args.batches)
+        payload["batches"] = build_batches(sections, args.batches, lines)
 
     if args.json:
         body = json.dumps(payload, indent=2)
@@ -434,9 +493,11 @@ def render_table(payload):
     if "batches" in payload:
         out.append("")
         for b in payload["batches"]:
-            out.append("batch %d: lines %d-%d (%d sections)"
+            out.append("batch %d: lines %d-%d (%d sections, %d words, "
+                       "~%d tokens)"
                        % (b["batch"], b["start"], b["end"],
-                          len(b["titles"])))
+                          len(b["titles"]), b.get("words", 0),
+                          b.get("tokens", 0)))
     return "\n".join(out)
 
 

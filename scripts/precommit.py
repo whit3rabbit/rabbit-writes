@@ -37,7 +37,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CHECKERS = {
     "scan": os.path.join(ROOT, "skills", "rabbit-writes", "scripts", "scan.py"),
-    "readme": os.path.join(ROOT, "skills", "readme-writing", "scripts",
+    "readme": os.path.join(ROOT, "skills", "rabbit-readme-improver", "scripts",
                            "readme_check.py"),
 }
 

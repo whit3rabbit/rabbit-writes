@@ -11,7 +11,7 @@ installed. This exists because every script in this plugin runs on a checkout
 with nothing installed, and a test suite that needs a package manager is a test
 suite that stops being run on the machine where a bug shows up.
 
-Copied from skills/readme-writing/tests/run.py, deliberately identical to the
+Copied from skills/rabbit-readme-improver/tests/run.py, deliberately identical to the
 runners in the other skill test directories: four skills with four test
 directories should not have four different ways to run a test.
 """

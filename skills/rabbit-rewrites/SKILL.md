@@ -10,7 +10,7 @@ metadata:
 
 Detection in this plugin needs no model. `scan.py` is pure Python and runs on a Pi today. Rewriting is the part that needs one, and this is the path that uses a small local model for it rather than a frontier model.
 
-**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `readme-writing`, `rabbit-reads`, `rabbit-rewrites`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
+**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `rabbit-readme-improver`, `rabbit-reads`, `rabbit-rewrites`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
 
 The design rests on one fact and one mechanism.
 

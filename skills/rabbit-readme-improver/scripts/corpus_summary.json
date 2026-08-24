@@ -22,11 +22,12 @@
     "reference": 0.2
   },
   "avg_link_text_words": 2.2,
-  "median_license_words": 13.5,
+  "median_license_words": 13,
   "pct_has_installation_section": 84.0,
   "pct_has_code_blocks": 97.0,
   "pct_has_license_section_or_badge": 83.0,
   "pct_has_toc": 32.0,
+  "pct_has_toc_heading": 12.0,
   "section_avg_position": {
     "features": 0.2,
     "toc": 0.23,

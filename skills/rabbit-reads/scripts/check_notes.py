@@ -33,7 +33,8 @@ if HERE not in sys.path:
 if "_bootstrap" in sys.modules and getattr(sys.modules["_bootstrap"], "__file__", None) != os.path.join(HERE, "_bootstrap.py"):
     del sys.modules["_bootstrap"]
 import _bootstrap
-from _bootstrap import SCAN_PATH, cli_error, book_types_dir
+from _bootstrap import (SCAN_PATH, cli_error, book_types_dir,
+                        layouts_dir)
 from rwlib import findings as findings_mod
 
 EXAMPLES = [
@@ -47,6 +48,8 @@ EXAMPLES = [
 REQUIRED_KEYS = ("Kind markers", "Length band", "Template sections",
                  "Source line")
 OPTIONAL_KEYS = ("Free-form files",)
+
+DEFAULT_LAYOUT = "cheatsheets"
 
 SPEC_HEADER_RX = re.compile(r"^\*\*([^*]+):\*\*\s*(.*)$")
 BAND_RX = re.compile(r"^(\d+)\s*-\s*(\d+)$")
@@ -64,6 +67,18 @@ NUMBERED_RX = re.compile(r"^\d+\.\s+")
 LINK_RX = re.compile(r"(?<!!)\[[^\]]*\]\(((?:[^()]|\([^()]*\))*)\)")
 TABLE_ROW_RX = re.compile(r"^\s*\|.*\|\s*$")
 SEP_ROW_RX = re.compile(r"^\s*\|[\s:|-]+\|\s*$")
+
+# Obsidian-style link: [[target]] or [[target|display text]]. The target is
+# everything before the first pipe, so a display label never leaks into it.
+WIKILINK_RX = re.compile(r"\[\[([^\]|]+)(?:\|[^\]]*)?\]\]")
+HEADING_RX = re.compile(r"^#{1,6}\s")
+
+# The layout header block, parsed by load_layout the way REQUIRED_KEYS is
+# parsed by load_spec. `(none)` and `(flat)` are legal values, so presence
+# is what is required, not non-emptiness.
+LAYOUT_REQUIRED_KEYS = ("Index file", "Link syntax", "Frontmatter keys",
+                        "Note kinds", "Spine notes", "Folders")
+SPINE_BAND_RX = re.compile(r"^([a-z]+):(\d+)-(\d+)$")
 
 # The ASCII ceiling, written as a constant because the sweep itself must never
 # ship the characters it exists to catch. 0x7F (DEL) is the last ASCII byte.
@@ -160,6 +175,84 @@ def load_spec(book_type):
         "template": template,
         "freeform": freeform,
         "source_rx": source_rx,
+    }, None
+
+
+def available_layouts():
+    """--layout choices off references/layouts, default always choosable."""
+    names = {DEFAULT_LAYOUT}
+    ref_dir = layouts_dir()
+    if ref_dir:
+        for name in os.listdir(ref_dir):
+            if name.endswith(".md"):
+                names.add(name[:-3])
+    return sorted(names)
+
+
+def load_layout(name):
+    """The parsed header block of references/layouts/<name>.md.
+
+    Same strictness as load_spec for the same reason: a layout is a spec a
+    human documents and this script executes, so a missing or malformed key
+    is an exit 2 naming the file, never a silent default. `(none)` and
+    `(flat)` are legal values, so keys are checked for presence rather than
+    non-emptiness.
+    """
+    ref_dir = layouts_dir()
+    path = os.path.join(ref_dir, "%s.md" % name) if ref_dir else None
+    if not path or not os.path.isfile(path):
+        have = []
+        if ref_dir and os.path.isdir(ref_dir):
+            have = sorted(n[:-3] for n in os.listdir(ref_dir)
+                          if n.endswith(".md"))
+        return None, die_io("--layout", path or "<none>",
+                            "no layout file for %r. Available: %s"
+                            % (name, ", ".join(have) or "none"))
+    try:
+        with open(path, encoding="utf-8") as fh:
+            raw = fh.read()
+    except (OSError, UnicodeDecodeError) as exc:
+        return None, die_io("--layout", path, str(exc))
+
+    header = {}
+    for line in raw.splitlines():
+        m = SPEC_HEADER_RX.match(line)
+        if m and m.group(1) in LAYOUT_REQUIRED_KEYS:
+            header[m.group(1)] = m.group(2).strip()
+    missing = [k for k in LAYOUT_REQUIRED_KEYS if k not in header]
+    if missing:
+        return None, die_io("--layout", path,
+                            "header block is missing: %s"
+                            % ", ".join(missing))
+
+    if header["Link syntax"] not in ("markdown", "wikilink"):
+        return None, die_io("--layout", path,
+                            "Link syntax %r is neither markdown nor "
+                            "wikilink" % header["Link syntax"])
+
+    spine_bands = []
+    if header["Spine notes"] != "(none)":
+        for segment in header["Spine notes"].split(","):
+            m = SPINE_BAND_RX.match(segment.strip())
+            if not m or int(m.group(2)) >= int(m.group(3)):
+                return None, die_io("--layout", path,
+                                    "Spine notes pair %r is not "
+                                    "kind:min-max with min below max"
+                                    % segment.strip())
+            spine_bands.append((m.group(1), int(m.group(2)),
+                                int(m.group(3))))
+
+    fm_text = header["Frontmatter keys"]
+    frontmatter_keys = ([] if fm_text == "(none)"
+                        else [s.strip() for s in fm_text.split(",") if s.strip()])
+    folders = [s.strip() for s in header["Folders"].split(",") if s.strip()]
+    return {
+        "path": path,
+        "index": header["Index file"],
+        "link_syntax": header["Link syntax"],
+        "frontmatter_keys": frontmatter_keys,
+        "spine_bands": spine_bands,
+        "folders": folders,
     }, None
 
 
@@ -328,8 +421,47 @@ def shape_problems(sections, declared):
     return problems
 
 
-def see_also_problems(sections, declared, notes_dir):
-    """Every filename the See also section names resolves inside the folder."""
+def build_link_index(notes_dir):
+    """Every *.md under notes_dir, as (relative paths, stem -> paths).
+
+    Built once per run when the layout links by wikilink, because every doc's
+    See also and the index all resolve against the same set. Paths are
+    relative to notes_dir with forward slashes, which is what a wikilink
+    target is written against.
+    """
+    rels = []
+    for dirpath, _, filenames in os.walk(notes_dir):
+        for fn in filenames:
+            if fn.endswith(".md"):
+                rel = os.path.relpath(os.path.join(dirpath, fn), notes_dir)
+                rels.append(rel.replace(os.sep, "/"))
+    by_stem = {}
+    for rel in rels:
+        by_stem.setdefault(os.path.splitext(os.path.basename(rel))[0],
+                           []).append(rel)
+    return set(rels), by_stem
+
+
+def resolve_wikilink(target, link_index):
+    """True when a wikilink target names a note, by path or bare stem."""
+    rels, by_stem = link_index
+    name = target.strip().replace(os.sep, "/")
+    for candidate in (name, name + ".md"):
+        if candidate in rels:
+            return True
+    return bool(by_stem.get(os.path.splitext(os.path.basename(name))[0]))
+
+
+def see_also_problems(sections, declared, notes_dir, layout=None,
+                      link_index=None):
+    """Every link the See also sections name resolves inside the folder.
+
+    Markdown mode is the flat cheatsheets behavior: a bare line or a
+    `[label](target)` names one file. Wikilink mode resolves
+    `[[target]]`/`[[target|label]]` against the whole-vault index, trying the
+    target bare and with `.md`, then by stem, so `[[other-slug]]` reaches
+    `concepts/other-slug.md`.
+    """
     if "See also" not in declared:
         return []
     problems = []
@@ -338,6 +470,13 @@ def see_also_problems(sections, declared, notes_dir):
             continue
         for line in body_lines:
             if not line.strip():
+                continue
+            if layout and layout["link_syntax"] == "wikilink":
+                for m in WIKILINK_RX.finditer(line):
+                    if not resolve_wikilink(m.group(1), link_index):
+                        problems.append(("see-also",
+                                         "unresolved link: %s"
+                                         % m.group(1).strip()))
                 continue
             target = line.strip()
             m = LINK_RX.search(target)
@@ -420,8 +559,19 @@ def check_freeform(name, lines):
     return problems
 
 
-def check_readme(notes_dir, readme_name, doc_names):
-    """The index: one row per doc, every row a real file, every link real."""
+def check_readme(notes_dir, readme_name, doc_names, layout=None,
+                 link_index=None):
+    """The index: one row per doc, every row a real file, every link real.
+
+    Under a vault layout the index is a Map of Content instead of a
+    Doc/Source/Kind table, so the whole table battery gives way to the MOC
+    battery: the index exists, every concept doc appears as a wikilink
+    target in it exactly once, and no wikilink in it is unresolved. The
+    flat cheatsheets behavior is byte-identical to before.
+    """
+    if layout and (layout["link_syntax"] == "wikilink"
+                   or layout["index"] != "README.md"):
+        return moc_problems(notes_dir, readme_name, doc_names, link_index)
     problems = []
     path = os.path.join(notes_dir, readme_name)
     try:
@@ -503,6 +653,97 @@ def check_readme(notes_dir, readme_name, doc_names):
     return problems
 
 
+def moc_problems(notes_dir, index_name, doc_names, link_index):
+    """The MOC battery: the index exists, links every concept exactly once.
+
+    Occurrences are counted over every wikilink in the file resolving to the
+    doc, however it is spelled, so `[[concepts/foo]]` and `[[foo|Foo]]` are
+    both one occurrence of `concepts/foo.md`.
+    """
+    path = os.path.join(notes_dir, index_name)
+    try:
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+    except (OSError, UnicodeDecodeError):
+        return [("readme", "%s is missing or unreadable" % index_name)]
+    problems = []
+    rels, by_stem = link_index
+    counts = Counter()
+    for m in WIKILINK_RX.finditer(text):
+        name = m.group(1).strip().replace(os.sep, "/")
+        resolved = next((r for r in (name, name + ".md") if r in rels), None)
+        if resolved is None:
+            stem_hits = by_stem.get(os.path.splitext(os.path.basename(name))[0])
+            resolved = stem_hits[0] if stem_hits else None
+        if resolved is None:
+            problems.append(("readme", "unresolved wikilink: %s" % name))
+            continue
+        counts[resolved] += 1
+    for doc in doc_names:
+        seen = counts.get(doc, 0)
+        if seen == 0:
+            problems.append(("readme", "%s is not in the index" % doc))
+        elif seen > 1:
+            problems.append(("readme", "%s appears %d times in the index"
+                             % (doc, seen)))
+    return problems
+
+
+def frontmatter_problems(lines, layout):
+    """The declared frontmatter keys present with non-empty values.
+
+    A no-frontmatter layout returns nothing, which leaves the flat
+    cheatsheets battery untouched. No YAML parser, on the stdlib floor: the
+    block is line-scanned for `key:` lines, unknown keys are ignored, and
+    the closing delimiter is only trusted within the first ten lines so a
+    stray `---` deep in the body is not mistaken for it.
+    """
+    keys = layout["frontmatter_keys"]
+    if not keys:
+        return []
+    if not lines or lines[0].strip() != "---":
+        return [("frontmatter", "no opening --- on line 1")]
+    close = None
+    for i in range(1, min(len(lines), 10)):
+        if lines[i].strip() == "---":
+            close = i
+            break
+    if close is None:
+        return [("frontmatter", "no closing --- within the first 10 lines")]
+    present = set()
+    for line in lines[1:close]:
+        m = re.match(r"^([^:\s]+):\s*(\S.*)$", line)
+        if m:
+            present.add(m.group(1))
+    return [("frontmatter", "missing or empty key: %s" % k)
+            for k in keys if k not in present]
+
+
+def spine_problems(lines, lo, hi):
+    """The two spine-note checks: its band, and that links lead it.
+
+    A spine note is a map, not a summary: wikilink-carrying lines must
+    strictly outnumber prose lines, where prose is a non-blank line that is
+    neither a heading, nor a table row, nor itself carrying a wikilink.
+    Labels stay distinct from the doc `length` check so a padded chapter
+    names its own rule.
+    """
+    problems = []
+    count = len(lines)
+    if not lo <= count <= hi:
+        problems.append(("spine-band", "%d lines, band is %d-%d"
+                         % (count, lo, hi)))
+    link_lines = sum(1 for l in lines if WIKILINK_RX.search(l))
+    prose_lines = sum(1 for l in lines
+                      if l.strip() and not HEADING_RX.match(l)
+                      and not TABLE_ROW_RX.match(l)
+                      and not WIKILINK_RX.search(l))
+    if link_lines <= prose_lines:
+        problems.append(("spine-ratio", "%d link lines vs %d prose lines"
+                         % (link_lines, prose_lines)))
+    return problems
+
+
 def scan_problems(path, voice_rules, profile=SCAN_PROFILE):
     """One scan.py --check --json per doc, through the engine's own CLI.
 
@@ -574,6 +815,10 @@ def main(argv=None):
     ap.add_argument("--book-type", metavar="NAME", default="non-fiction",
                     help="which references/book-types/<name>.md spec to load "
                          "(default: non-fiction)")
+    ap.add_argument("--layout", metavar="NAME", default=DEFAULT_LAYOUT,
+                    choices=available_layouts(),
+                    help="which references/layouts/<name>.md folder shape "
+                         "to check against (default: %s)" % DEFAULT_LAYOUT)
     ap.add_argument("--min-lines", metavar="N", type=int,
                     help="override the spec's band floor")
     ap.add_argument("--max-lines", metavar="N", type=int,
@@ -613,17 +858,56 @@ def main(argv=None):
     spec, code = load_spec(args.book_type)
     if code:
         return code
+    layout, code = load_layout(args.layout)
+    if code:
+        return code
     band = (args.min_lines if args.min_lines is not None else spec["min"],
             args.max_lines if args.max_lines is not None else spec["max"])
 
-    all_names = sorted(n for n in os.listdir(args.notes_dir)
-                       if n.endswith(".md"))
-    freeform = [n for n in spec["freeform"] if n in all_names]
-    readme_name = args.readme
-    docs = [n for n in all_names
-            if n != readme_name and n not in spec["freeform"]]
+    flat = layout["folders"] == ["(flat)"]
+    readme_name = args.readme if flat else layout["index"]
+    spine_notes = []
+    if flat:
+        all_names = sorted(n for n in os.listdir(args.notes_dir)
+                           if n.endswith(".md"))
+        freeform = [n for n in spec["freeform"] if n in all_names]
+        docs = [n for n in all_names
+                if n != readme_name and n not in spec["freeform"]]
+    else:
+        # Vault shape: concepts walk recursively under concepts/ and are
+        # tracked relative to the vault root, so index rows and See also
+        # resolve against names like `concepts/<slug>.md`. Spine notes come
+        # from the kind-to-location convention: kind `chapter` lives in
+        # `chapters/`, and a root-level `<kind>.md` matches that kind.
+        docs = []
+        for dirpath, _, filenames in os.walk(
+                os.path.join(args.notes_dir, "concepts")):
+            for fn in filenames:
+                if fn.endswith(".md"):
+                    rel = os.path.relpath(os.path.join(dirpath, fn),
+                                          args.notes_dir)
+                    docs.append(rel.replace(os.sep, "/"))
+        docs.sort()
+        for kind, lo, hi in layout["spine_bands"]:
+            folder = os.path.join(args.notes_dir, kind + "s")
+            if os.path.isdir(folder):
+                for dirpath, _, filenames in os.walk(folder):
+                    for fn in sorted(filenames):
+                        if fn.endswith(".md"):
+                            rel = os.path.relpath(
+                                os.path.join(dirpath, fn), args.notes_dir)
+                            spine_notes.append((rel.replace(os.sep, "/"),
+                                                kind, lo, hi))
+            root_note = "%s.md" % kind
+            if os.path.isfile(os.path.join(args.notes_dir, root_note)):
+                spine_notes.append((root_note, kind, lo, hi))
+        freeform = [n for n in spec["freeform"]
+                    if os.path.isfile(os.path.join(args.notes_dir, n))]
 
-    if not docs and not freeform:
+    link_index = (build_link_index(args.notes_dir)
+                  if layout["link_syntax"] == "wikilink" else None)
+
+    if not docs and not freeform and not spine_notes:
         print("FAIL %s: battery: no notes found (*.md)" % args.notes_dir)
         print("0 docs, 1 problem")
         return 1
@@ -639,9 +923,12 @@ def main(argv=None):
             continue
         for check, detail in check_doc(lines, spec, band):
             findings.append((name, check, detail))
+        for check, detail in frontmatter_problems(lines, layout):
+            findings.append((name, check, detail))
         sections = h2_sections(lines)
         for check, detail in see_also_problems(sections, spec["template"],
-                                               args.notes_dir):
+                                               args.notes_dir, layout,
+                                               link_index):
             findings.append((name, check, detail))
         for check, detail in verbatim_problems(lines, windows):
             findings.append((name, check, detail))
@@ -663,7 +950,23 @@ def main(argv=None):
         for check, detail in verbatim_problems(lines, windows):
             findings.append((name, check, detail))
 
-    for check, detail in check_readme(args.notes_dir, readme_name, docs):
+    for name, kind, lo, hi in spine_notes:
+        try:
+            with open(os.path.join(args.notes_dir, name),
+                      encoding="utf-8") as fh:
+                lines = fh.read().splitlines()
+        except (OSError, UnicodeDecodeError) as exc:
+            findings.append((name, "io", str(exc)))
+            continue
+        for check, detail in spine_problems(lines, lo, hi):
+            findings.append((name, check, detail))
+        for check, detail in ascii_problems(lines):
+            findings.append((name, check, detail))
+        for check, detail in verbatim_problems(lines, windows):
+            findings.append((name, check, detail))
+
+    for check, detail in check_readme(args.notes_dir, readme_name, docs,
+                                      layout, link_index):
         findings.append((readme_name, check, detail))
 
     total_docs = len(docs) + len(freeform)

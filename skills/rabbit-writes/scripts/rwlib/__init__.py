@@ -1,5 +1,5 @@
 """
-rwlib - the shared engine behind rabbit-writes, readme-writing, and the corpus
+rwlib - the shared engine behind rabbit-writes, rabbit-readme-improver, and the corpus
 research scripts.
 
 Stdlib only, and importable by path, because these scripts run from a plugin
@@ -46,6 +46,6 @@ from .voices import load_scan
 __all__ = [
     "artifacts", "cli_error", "corpus", "docx_text", "endpoint", "facts",
     "findings", "fixes", "inflect", "injection", "language", "lexicon",
-    "markdown", "registers", "rewrite", "sarif", "sections", "sentences",
+    "links", "markdown", "registers", "rewrite", "sarif", "sections", "sentences",
     "ste", "stylometry", "suppress", "voice_check", "voices"
 ]

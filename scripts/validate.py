@@ -181,7 +181,7 @@ def check_skills():
                 seen_headings[heading] = line_num
 
         found.append(name)
-    for required in ("rabbit-writes", "voice-setup", "readme-writing",
+    for required in ("rabbit-writes", "voice-setup", "rabbit-readme-improver",
                      "rabbit-reads", "rabbit-rewrites"):
         if required not in found:
             fail("expected skill missing: %s" % required)
@@ -349,12 +349,12 @@ def check_engine():
             fail("rabbit-writes/references/%s is missing" % ref)
 
     for ref in ("patterns.md", "checklist.md"):
-        if not os.path.exists(os.path.join(SKILLS, "readme-writing", "references", ref)):
-            fail("readme-writing/references/%s is missing" % ref)
+        if not os.path.exists(os.path.join(SKILLS, "rabbit-readme-improver", "references", ref)):
+            fail("rabbit-readme-improver/references/%s is missing" % ref)
 
-    check_path = os.path.join(SKILLS, "readme-writing", "scripts", "readme_check.py")
+    check_path = os.path.join(SKILLS, "rabbit-readme-improver", "scripts", "readme_check.py")
     if not os.path.exists(check_path):
-        fail("readme-writing/scripts/readme_check.py is missing")
+        fail("rabbit-readme-improver/scripts/readme_check.py is missing")
     else:
         # readme_check imports scan.py by path. A rename on either side breaks it
         # at runtime, inside a subagent, where nobody sees the traceback.
@@ -437,7 +437,7 @@ def check_corpus_summary():
         fail("could not import rwlib.corpus: %s" % exc)
         return
     if not os.path.exists(corpus.SUMMARY_PATH):
-        fail("skills/readme-writing/scripts/corpus_summary.json is missing, so "
+        fail("skills/rabbit-readme-improver/scripts/corpus_summary.json is missing, so "
              "readme_check.py has nothing to compare a README against")
         return
     if not os.path.exists(corpus.AGGREGATE_PATH):
@@ -481,8 +481,8 @@ def check_finding_schema():
     for index, problem in findings_mod.validate(found):
         fail("scan.py finding %d does not match the schema: %s" % (index, problem))
 
-    check_path = os.path.join(SKILLS, "readme-writing", "scripts", "readme_check.py")
-    bad_readme = os.path.join(SKILLS, "readme-writing", "tests", "samples", "bad-readme.md")
+    check_path = os.path.join(SKILLS, "rabbit-readme-improver", "scripts", "readme_check.py")
+    bad_readme = os.path.join(SKILLS, "rabbit-readme-improver", "tests", "samples", "bad-readme.md")
     if not (os.path.exists(check_path) and os.path.exists(bad_readme)):
         return
     spec = importlib.util.spec_from_file_location("rc_validate", check_path)
@@ -892,7 +892,7 @@ def check_scripts_compile():
     """A syntax error in a bundled script only surfaces when a skill runs it."""
     import ast
     for rel in ("rabbit-writes/scripts/scan.py", "rabbit-writes/scripts/verify.py",
-                "readme-writing/scripts/readme_check.py",
+                "rabbit-readme-improver/scripts/readme_check.py",
                 "voice-setup/scripts/measure_voice.py",
                 "voice-setup/scripts/build_voice.py",
                 "voice-setup/scripts/audit_voice.py",
@@ -1364,7 +1364,7 @@ def check_cli_error_handling():
         os.path.join(SKILLS, "rabbit-writes", "scripts", "scan.py"),
         os.path.join(SKILLS, "rabbit-writes", "scripts", "verify.py"),
         os.path.join(SKILLS, "rabbit-writes", "scripts", "attain.py"),
-        os.path.join(SKILLS, "readme-writing", "scripts", "readme_check.py"),
+        os.path.join(SKILLS, "rabbit-readme-improver", "scripts", "readme_check.py"),
         os.path.join(SKILLS, "voice-setup", "scripts", "build_voice.py"),
         os.path.join(SKILLS, "voice-setup", "scripts", "learn_edits.py"),
         os.path.join(SKILLS, "voice-setup", "scripts", "measure_voice.py"),
@@ -1618,6 +1618,50 @@ def check_book_type_files():
     notes.append("book types: %d file(s) routing rabbit-reads" % len(names))
 
 
+def check_layout_files():
+    """The layouts rabbit-reads routes on, in references/layouts/.
+
+    Same reasoning as the book types: the header block is data somebody
+    edits and a spec check_notes.py parses at runtime, so the grammar is
+    checked here rather than only in the skill's tests. `(none)` and
+    `(flat)` are legal values, which is why presence is what is required.
+    """
+    layouts_dir = os.path.join(SKILLS, "rabbit-reads", "references", "layouts")
+    if not os.path.isdir(layouts_dir):
+        fail("skills/rabbit-reads/references/layouts is missing")
+        return
+    names = sorted(n for n in os.listdir(layouts_dir) if n.endswith(".md"))
+    if not names:
+        fail("skills/rabbit-reads/references/layouts holds no layout files")
+        return
+    headers = ["Index file", "Link syntax", "Frontmatter keys", "Note kinds",
+               "Spine notes", "Folders"]
+    for name in names:
+        text = read("skills", "rabbit-reads", "references", "layouts", name)
+        stem = name[:-3]
+        for header in headers:
+            if not re.search(r"(?m)^\*\*%s:\*\* .+$" % re.escape(header), text):
+                fail("%s.md has no %s header line" % (stem, header))
+        syntax = re.search(r"(?m)^\*\*Link syntax:\*\* (.+)$", text)
+        if syntax and syntax.group(1).strip() not in ("markdown", "wikilink"):
+            fail("%s.md Link syntax %r is neither markdown nor wikilink"
+                 % (stem, syntax.group(1).strip()))
+        spine = re.search(r"(?m)^\*\*Spine notes:\*\* (.+)$", text)
+        if spine and spine.group(1).strip() != "(none)":
+            for segment in spine.group(1).split(","):
+                band = re.match(r"^([a-z]+):(\d+)-(\d+)$", segment.strip())
+                if not band or int(band.group(2)) >= int(band.group(3)):
+                    fail("%s.md Spine notes pair %r is not kind:min-max with "
+                         "min below max" % (stem, segment.strip()))
+        folders = re.search(r"(?m)^\*\*Folders:\*\* (.+)$", text)
+        if folders and folders.group(1).strip() != "(flat)":
+            for segment in folders.group(1).split(","):
+                if not segment.strip().endswith("/"):
+                    fail("%s.md Folders entry %r is not a /-terminated "
+                         "directory name" % (stem, segment.strip()))
+    notes.append("layouts: %d file(s) shaping rabbit-reads output" % len(names))
+
+
 # Guarded so the module can be imported without running the repository sweep.
 # A check that never fires is worth nothing, and until this guard existed the
 # only way to find out whether one fires was to break the repository on purpose
@@ -1641,6 +1685,7 @@ CHECKS = (
     check_template_registers,
     check_thesaurus,
     check_thesaurus_alternatives,
+    check_layout_files,
     check_book_type_files,
     check_claude_md,
     check_import_paths,

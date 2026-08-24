@@ -674,3 +674,165 @@ def test_a_missing_source_file_exits_2():
         assert rc == 2, "an unreadable --source must exit 2, got %d" % rc
     finally:
         shutil.rmtree(directory, ignore_errors=True)
+
+
+
+# --------------------------------------------------------------------------
+# layouts: the flat default is untouched, the obsidian vault adds its own
+# --------------------------------------------------------------------------
+
+def vault_concept(spec, title, locator, see_also, drop_key=None):
+    """One concept doc under concepts/, frontmatter plus the template."""
+    lines = conforming_doc(spec, title, locator).splitlines()
+    wikilinks = "\n".join("- [[%s]]" % target for target in see_also)
+    kept = []
+    for line in lines:
+        if line.startswith("- [") and "](" in line:
+            continue
+        kept.append(line)
+    body = "\n".join(kept).replace(
+        "## See also\n", "## See also\n\n%s\n" % wikilinks)
+    frontmatter = ["---",
+                   "source: A Book About Practice",
+                   "kind: practice",
+                   "tags: reading",
+                   "aliases: %s" % title.lower()]
+    if drop_key:
+        frontmatter = [l for l in frontmatter
+                       if not l.startswith(drop_key + ":")]
+    return "\n".join(frontmatter + ["---", ""]) + body
+
+
+def build_vault(chapter_lines=None):
+    """A conforming obsidian vault, or one with a replaced chapter body."""
+    launch, spec, _, _ = notes_setup()
+    chapter = chapter_lines if chapter_lines is not None else [
+        "# Chapter 1",
+        "",
+        "[[concepts/one]]",
+        "",
+        "[[concepts/two]]",
+        "",
+        "[[summary]]",
+        "",
+        "Orients the reader before the links take over.",
+    ]
+    files = {
+        "index.md": "\n".join([
+            "# Index",
+            "",
+            "Start at [[concepts/one]], then [[concepts/two]].",
+            "",
+            "Chapters: [[chapters/01-intro]]",
+            "",
+            "Topics: [[topics/practice]]",
+            "",
+            "Whole source: [[summary]]",
+        ]) + "\n",
+        "summary.md": "\n".join(
+            ["# Summary"]
+            + ["[[concepts/%s]]" % slug for slug in ("one", "two") * 10]
+            + ["The spine of the whole source in links."]) + "\n",
+        "concepts/one.md": vault_concept(
+            spec, "Note One", "ch. 1", ["concepts/two", "topics/practice"]),
+        "concepts/two.md": vault_concept(
+            spec, "Note Two", "ch. 2", ["concepts/one"]),
+        "chapters/01-intro.md": "\n".join(chapter) + "\n",
+        "topics/practice.md": "\n".join([
+            "# Practice",
+            "[[concepts/one]]",
+            "",
+            "[[concepts/two]]",
+            "",
+            "Points back into the concepts.",
+            "",
+            "[[summary]]",
+        ]) + "\n",
+    }
+    return build_tree(files)
+
+
+def test_a_conforming_folder_checks_clean_under_the_default_layout():
+    launch, spec, _, _ = notes_setup()
+    directory = build_tree(base_files(spec))
+    try:
+        rc, out, err = launch(directory, "non-fiction",
+                              extra=["--layout", "cheatsheets"])
+        assert rc == 0, (out + err)[:600]
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_a_conforming_vault_checks_clean_under_obsidian():
+    launch, _, _, _ = notes_setup()
+    directory = build_vault()
+    try:
+        rc, out, err = launch(directory, "non-fiction",
+                              extra=["--layout", "obsidian"])
+        assert rc == 0, (out + err)[:600]
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_an_unresolved_wikilink_fails_see_also():
+    launch, spec, _, _ = notes_setup()
+    directory = build_vault()
+    path = os.path.join(directory, "concepts", "one.md")
+    with open(path, encoding="utf-8") as fh:
+        text = fh.read()
+    with open(path, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(text.replace("[[concepts/two]]", "[[concepts/ghost]]"))
+    try:
+        rc, out, err = launch(directory, "non-fiction",
+                              extra=["--layout", "obsidian"])
+        assert rc == 1, "an unresolved wikilink must fail, got %d" % rc
+        assert "see-also" in out and "concepts/ghost" in out, (out + err)[:600]
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_a_chapter_padded_past_its_band_fails_spine_band():
+    launch, _, _, _ = notes_setup()
+    padded = ["# Chapter 1"]
+    for i in range(20):
+        padded += ["", "[[concepts/%s]]" % ("one" if i % 3 else "two")]
+    directory = build_vault(chapter_lines=padded)
+    try:
+        rc, out, err = launch(directory, "non-fiction",
+                              extra=["--layout", "obsidian"])
+        assert rc == 1, "a padded chapter must fail, got %d" % rc
+        assert "spine-band" in out, (out + err)[:600]
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_a_chapter_of_prose_fails_spine_ratio():
+    launch, _, _, _ = notes_setup()
+    prosy = ["# Chapter 1"] + ["A prose line carries no link out at all."
+                               for _ in range(9)]
+    directory = build_vault(chapter_lines=prosy)
+    try:
+        rc, out, err = launch(directory, "non-fiction",
+                              extra=["--layout", "obsidian"])
+        assert rc == 1, "a prose chapter must fail, got %d" % rc
+        assert "spine-ratio" in out, (out + err)[:600]
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
+
+
+def test_a_concept_missing_the_aliases_key_fails_frontmatter():
+    launch, spec, _, _ = notes_setup()
+    directory = build_vault()
+    doc = vault_concept(spec, "Note One", "ch. 1",
+                        ["concepts/two", "topics/practice"],
+                        drop_key="aliases")
+    with open(os.path.join(directory, "concepts", "one.md"), "w",
+              encoding="utf-8", newline="\n") as fh:
+        fh.write(doc)
+    try:
+        rc, out, err = launch(directory, "non-fiction",
+                              extra=["--layout", "obsidian"])
+        assert rc == 1, "a missing frontmatter key must fail, got %d" % rc
+        assert "frontmatter" in out and "aliases" in out, (out + err)[:600]
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-readme_check.py - the mechanical layer of the readme-writing skill.
+readme_check.py - the mechanical layer of the rabbit-readme-improver skill.
 
 Checks a README against the conventions measured in docs/README_WRITEUP.md
 (100 currently-trending GitHub repos), and, unless told otherwise, runs the
@@ -63,11 +63,14 @@ for path in (HERE, RWLIB_PARENT):
 from rwlib import cli_error                        # noqa: E402
 from rwlib import corpus as corpus_mod            # noqa: E402
 from rwlib import findings as findings_mod        # noqa: E402
-from rwlib import language, sarif, suppress       # noqa: E402
+from rwlib import inflect, language, links, sarif, suppress  # noqa: E402
 from rwlib import voices as voices_mod            # noqa: E402
+from rwlib.injection import COMMENT_RX as HTML_COMMENT_RX  # noqa: E402
+from rwlib.links import CAVEAT_RX, CLAIM_RX, VAGUE_LINK_TEXT  # noqa: E402
 from rwlib.markdown import (BARE_URL_RX, FENCE_RX, HEADING_RX,  # noqa: E402
-                            HTML_ANCHOR_RX, HTML_IMG_RX, HTML_LINK_RX, HTML_TAG_LINE_RX,
-                            HTML_TAG_RX, IMAGE_RX, INLINE_CODE_RX, LINK_RX,
+                            HTML_ANCHOR_RX, HTML_IMG_ALT_RX, HTML_IMG_RX, HTML_LINK_RX,
+                            HTML_TAG_LINE_RX, HTML_TAG_RX, IMAGE_RX,
+                            INLINE_CODE_RX, LINK_RX,
                             REF_DEF_RX, REF_LINK_RX, TABLE_ROW_RX, blank,
                             is_badge, is_prose_block, line_of, strip_images,
                             strip_wrapped_urls, word_count)
@@ -103,21 +106,8 @@ PITCH_MAX_NONBLANK_LINES = 25
 LONG_PARAGRAPH_WORDS = 60     # checklist item 8
 BADGE_WALL = 12               # corpus median 5, p75 8, p90 14
 
-# Anchor text that tells a reader nothing out of context, which is how a screen
-# reader and a skimmer both encounter it. Kept here rather than in rwlib because
-# it is a README convention rather than a fact about markdown.
-VAGUE_LINK_TEXT = {"here", "click here", "this", "this link", "link", "read more", "more",
-                   "learn more", "see here", "this page", "documentation here"}
-CLAIM_RX = re.compile(
-    r"(?i)\b(\d+(?:\.\d+)?\s*(?:x|times)\s*(?:faster|smaller|cheaper|less|more|quicker)"
-    r"|\d+(?:\.\d+)?\s*%\s*(?:faster|smaller|cheaper|fewer|less|more|reduction|savings?|accura\w+)"
-    r"|saves?\s+(?:you\s+)?\d+(?:\.\d+)?\s*%"
-    r"|cuts?\s+\w+\s+by\s+\d+(?:\.\d+)?\s*%)")
-CAVEAT_RX = re.compile(
-    r"(?i)(caveat|varies|vary|depends|depending|measured (on|with|against)|does not (cover|include)"
-    r"|doesn't (cover|include)|not a guarantee|your mileage|approximat|excluding|only counts"
-    r"|net.negative|worst case|in some cases|under (this|these) conditions|methodolog)")
-NUMBER_NOUN_RX = re.compile(r"(?<![.\d])(\d[\d,]*)\s+([A-Za-z][A-Za-z-]{3,20})\b")
+NUMBER_NOUN_RX = re.compile(r"(?<![.\d])(\d[\d,]*)\s+(?:[A-Za-z]{1,3}\s+)?([A-Za-z][A-Za-z-]{3,20})\b")
+NOUN_NUMBER_RX = re.compile(r"\b([A-Za-z][A-Za-z-]{3,20})\s*\(\s*(\d[\d,]*)\s*\)")
 # Units of measure legitimately take different numbers in one document ("13 words",
 # "6,040 words"). Only a countable noun naming the same set twice is a real conflict.
 MEASURE_NOUNS = {"word", "line", "char", "character", "byte", "kilobyte", "megabyte", "second",
@@ -125,45 +115,7 @@ MEASURE_NOUNS = {"word", "line", "char", "character", "byte", "kilobyte", "megab
                  "step", "point", "version", "item", "case", "example", "column", "row", "level",
                  "page", "sentence", "paragraph", "commit", "star", "issue", "entry"}
 
-
-# HTML patterns for alt text and comments
-HTML_IMG_ALT_RX = re.compile(r"""<img\b[^>]*?\balt\s*=\s*["']([^"']*)["']""", re.I)
-HTML_COMMENT_RX = re.compile(r"<!--.*?-->", re.S)
-
-INVARIANT_OR_S_SINGULARS = {
-    "alias", "status", "canvas", "basis", "lens", "series", "species",
-    "corpus", "analysis", "hypothesis", "parenthesis", "focus", "virus",
-    "census", "radius", "syllabus", "bus"
-}
-
-
-def _singular(noun):
-    """A grouping key for a countable noun, so a plural and its singular
-    collapse together.
-
-    `rstrip("s")` was the key, and it split every regular plural from its
-    singular: "classes" became "classe" and "class" became "cla", since rstrip
-    takes every trailing s, so the same count reported two ways stopped being
-    flagged. This handles the regular English shapes a number-and-noun heading
-    reaches for. Irregulars (children, people) are left alone, which can only
-    ever cost a missed collision, never a false one.
-
-    -ies to -y is length-gated so a four-letter -ie-plus-s word (ties, pies)
-    falls through to the plain -s rule and keeps its real singular. The -es rule
-    only fires after a sibilant, so "cases" still drops one s to "case" and
-    stays a unit of measure rather than becoming "cas"."""
-    n = noun.lower()
-    if n in INVARIANT_OR_S_SINGULARS:
-        return n
-    if n.endswith("ies") and len(n) > 4:
-        return n[:-3] + "y"
-    if n.endswith(("sses", "shes", "ches", "xes", "zes")):
-        return n[:-2]
-    if n.endswith("ses") and len(n) > 4 and n[:-2] in INVARIANT_OR_S_SINGULARS:
-        return n[:-2]
-    if n.endswith("s") and not n.endswith("ss"):
-        return n[:-1]
-    return n
+_singular = inflect.singular
 
 
 def finding(fid, label, priority, line, detail):
@@ -216,9 +168,31 @@ def find_pitch(raw, scored=None):
 
 HTML_BLOCK_OPEN_RX = re.compile(r"(?i)<(?:details|table)\b")
 HTML_BLOCK_CLOSE_RX = re.compile(r"(?i)</(?:details|table)>")
-# A line that opens a fence, whether or not anything ever closes it. Only used
-# as a backstop against FENCE_RX, which requires the pair.
-OPEN_FENCE_RX = re.compile(r"^```", re.M)
+# The body may not contain another <details> opener, so nested blocks match
+# innermost-first and collapse_details reduces them inside-out instead of
+# leaving the outer closer behind as a stray counted line.
+DETAILS_RX = re.compile(r"(?is)<details\b[^>]*>((?:(?!<details\b).)*?)</details>")
+SUMMARY_RX = re.compile(r"(?i)<summary\b[^>]*>.*?</summary>")
+
+
+def collapse_details(text):
+    """Every closed <details> block reduced to its summary line.
+
+    One search per block. This was a conditional lambda running the same
+    re.search twice, once as the guard and once for .group, which is one
+    missed edit away from crashing on a summary-less block. A block with no
+    <summary>, or one whose summary spans lines, counts as a single
+    placeholder line instead.
+    """
+    def summary_line(m):
+        s = SUMMARY_RX.search(m.group(1))
+        return s.group(0) if s else "\n<details>\n"
+
+    while True:
+        compressed = DETAILS_RX.sub(summary_line, text)
+        if compressed == text:
+            return compressed
+        text = compressed
 
 
 def scan_for_pitch(raw, skip_html_blocks=True, heading_closes_blocks=False):
@@ -287,13 +261,21 @@ def check_structure(raw, scored, findings, stats):
             "Nothing in this file states what the project is in prose. A reader "
             "deciding whether to keep scrolling has nothing to decide on."))
     else:
-        head = "\n".join(lines[:pitch_line - 1])
-        nonblank_above = len([l for l in lines[:pitch_line - 1] if l.strip()])
-        urls_above = [u for _, u in IMAGE_RX.findall(head)] + HTML_IMG_RX.findall(head)
+        head_raw = "\n".join(lines[:pitch_line - 1])
+        # Count a fence as one line, and a closed <details> block as its summary line
+        head_compressed = FENCE_RX.sub("\n```code```\n", head_raw)
+        head_compressed = collapse_details(head_compressed)
+        nonblank_above = len([l for l in head_compressed.splitlines() if l.strip()])
+        urls_above = [u for _, u in IMAGE_RX.findall(head_raw)] + HTML_IMG_RX.findall(head_raw)
         badges_above = len([u for u in urls_above if is_badge(u)])
         images_above = len(urls_above)
+
+        # Search visible text only (strip tags, URLs, alt text) before matching sponsors
+        visible_head = strip_images(head_raw)
+        visible_head = HTML_TAG_RX.sub(" ", visible_head)
+        visible_head = BARE_URL_RX.sub(" ", visible_head)
         sponsorish = re.search(r"(?i)\b(sponsors?|sponsorship|backers?|funding|patreon|"
-                               r"open ?collective|buy me a coffee|our partners)\b", head)
+                               r"open ?collective|buy me a coffee|our partners)\b", visible_head)
         stats["nonblank_lines_above_pitch"] = nonblank_above
         stats["badges_above_pitch"] = badges_above
         if nonblank_above > PITCH_MAX_NONBLANK_LINES:
@@ -313,20 +295,32 @@ def check_structure(raw, scored, findings, stats):
         if sponsorish:
             findings.append(finding(
                 "promo-before-pitch", "Promotional block above the pitch", "P1",
-                line_of(head, sponsorish.start()),
+                line_of(head_raw, sponsorish.start()),
                 "Sponsor or funding content sits before the project description. "
                 "Every future reader pays for that placement, move it below the quickstart."))
 
     # --- install position
+    INSTALL_CMD_RX = re.compile(r"(?i)\b(pip|npm|npx|pnpm|yarn|brew|cargo|go get|go install|docker|docker-compose|git clone)\b")
+    usage_with_install = False
+    usage_line = None
+    for h in headings:
+        if h["category"] == "usage":
+            nxt = next((nxt_h for nxt_h in headings if nxt_h["pos"] > h["pos"]), None)
+            section_body = raw[h["pos"]:nxt["pos"] if nxt else len(raw)]
+            if INSTALL_CMD_RX.search(section_body):
+                usage_with_install = True
+                usage_line = h["line"]
+                break
+
     cats = [h["category"] for h in sections]
-    if "installation" not in cats:
+    if "installation" not in cats and not usage_with_install:
         findings.append(finding(
             "no-install", "No installation or quickstart section", "P1", 1,
             "%g%% of the corpus has one and it is the earliest structural section "
             "(avg. position %.2f). Give the reader a copy-pasteable path to running it."
             % (CORPUS.get("pct_has_installation_section", 84),
                CORPUS.get("section_avg_position", {}).get("installation", 0.34))))
-    else:
+    elif "installation" in cats:
         install_at = cats.index("installation")
         late_first = next((c for c in cats[:install_at] if c in LATE_SECTIONS), None)
         if late_first:
@@ -337,8 +331,26 @@ def check_structure(raw, scored, findings, stats):
                 "Get the reader running the thing before the community mechanics."
                 % (late_first, CORPUS["section_avg_position"].get(late_first, 0.8),
                    CORPUS["section_avg_position"].get("installation", 0.34))))
+    elif usage_with_install:
+        usage_at = cats.index("usage") if "usage" in cats else 0
+        late_first = next((c for c in cats[:usage_at] if c in LATE_SECTIONS), None)
+        if late_first:
+            findings.append(finding(
+                "install-late", "Install comes after %s" % late_first, "P1",
+                usage_line or 1,
+                "%s sits at avg. position %.2f in the corpus, installation at %.2f. "
+                "Get the reader running the thing before the community mechanics."
+                % (late_first, CORPUS["section_avg_position"].get(late_first, 0.8),
+                   CORPUS["section_avg_position"].get("installation", 0.34))))
 
     # --- license: last, and short
+    all_image_urls = [u for _, u in IMAGE_RX.findall(scored)] + HTML_IMG_RX.findall(scored)
+    has_license_badge = any(is_badge(u) and "license" in u.lower() for u in all_image_urls)
+    trailing_10_lines = "\n".join(lines[-10:]) if lines else ""
+    has_trailing_license = bool(re.search(r"(?i)\blicen[cs]e\b", trailing_10_lines))
+    stats["has_license_badge"] = has_license_badge
+    stats["has_license_mention"] = has_license_badge or has_trailing_license
+
     if "license" in cats:
         # The last license heading, not the first. A README that mentions the
         # licence early, in a "License and credits" line near the header or in a
@@ -365,19 +377,19 @@ def check_structure(raw, scored, findings, stats):
                 "license-long", "License section is %d words" % lic_words, "P2", lic["line"],
                 "Corpus median is %g. Name the license and link the file, nobody reads "
                 "restated legal text in a README." % CORPUS.get("median_license_words", 13)))
-    else:
+    elif not (has_license_badge or has_trailing_license):
         findings.append(finding(
             "no-license", "No license section", "P2", 1,
             "%g%% of the corpus names one. Check for a LICENSE file rather than guessing, "
-            "and if there is none, say so." % CORPUS.get("pct_has_license_section_or_badge", 72)))
+            "and if there is none, say so." % CORPUS.get("pct_has_license_section_or_badge", 83)))
 
     return sections
 
 
 # Matched case-insensitively against the whole stem or stem + ./- separator.
-# `LICENSE`, `LICENSE.md`, `LICENSE.txt`, `license`, `LICENSE-MIT`, `COPYING`
-# all match. `licensing.md` and `license_check.py` do not.
-LICENSE_FILE_RX = re.compile(r"^(license|licence|copying|copyright)([.-]|$)", re.I)
+# `LICENSE`, `LICENSE.md`, `LICENSE.txt`, `license`, `LICENSE-MIT`, `UNLICENSE`,
+# `MIT-LICENSE.txt`, `COPYING` all match. `licensing.md` and `license_check.py` do not.
+LICENSE_FILE_RX = re.compile(r"^(?:[A-Za-z0-9_-]+[.-])?(license|licence|copying|unlicense)([.-]|$)", re.I)
 
 
 def find_license_file(readme_path, max_up=8):
@@ -402,9 +414,15 @@ def find_license_file(readme_path, max_up=8):
         except OSError:
             return None, False
         for name in sorted(names):
-            if (LICENSE_FILE_RX.match(name)
-                    and os.path.isfile(os.path.join(directory, name))):
-                return os.path.join(directory, name), True
+            full = os.path.join(directory, name)
+            if LICENSE_FILE_RX.match(name) and os.path.isfile(full):
+                return full, True
+            if name.lower() in ("licenses", "licences") and os.path.isdir(full):
+                try:
+                    if os.listdir(full):
+                        return full, True
+                except OSError:
+                    pass
         if ".git" in names:
             return None, True
         parent = os.path.dirname(directory)
@@ -430,10 +448,11 @@ def check_license_file(readme_path, findings, stats):
     if not readme_path or not os.path.isfile(readme_path):
         return
     has_section = "license" in stats.get("sections", [])
+    has_mention = stats.get("has_license_mention", False)
     path, saw_root = find_license_file(readme_path)
     stats["license_file"] = os.path.basename(path) if path else None
 
-    if path and not has_section:
+    if path and not has_section and not has_mention:
         # The hedge in `no-license` is there because this script could not see
         # the tree. Now that it can, and the file is sitting right there, the
         # finding is a fact rather than a prompt to go and look.
@@ -444,14 +463,14 @@ def check_license_file(readme_path, findings, stats):
                     "%s is sitting beside this README and the README does not "
                     "name it. %g%% of the corpus does. One line at the end: the "
                     "licence name and a link to the file."
-                    % (os.path.basename(path), CORPUS.get("pct_has_license_section_or_badge", 72)))
+                    % (os.path.basename(path), CORPUS.get("pct_has_license_section_or_badge", 83)))
                 break
-    elif has_section and not path and saw_root:
+    elif (has_section or has_mention) and not path and saw_root:
         findings.append(finding(
             "license-file-missing",
             "License section with no license file in the tree", "P1", 1,
             "The README has a License section and there is no LICENSE, LICENCE, "
-            "or COPYING file here or in any parent up to the repository root. "
+            "UNLICENSE, or COPYING file or LICENSES/ directory here or in any parent up to the repository root. "
             "Either the file is missing from the repository, in which case a "
             "reader cannot act on the section, or it is somewhere this check "
             "does not look. Confirm before publishing: a licence a project does "
@@ -593,20 +612,10 @@ def check_media_and_claims(raw, scored, findings, stats):
     badges = [u for u in image_urls if is_badge(u)]
     stats["badge_count"] = len(badges)
     stats["image_count"] = len(image_urls)
+    # FENCE_RX closes on \Z as well as a paired delimiter, so a final fence
+    # nobody closed still counts one. A backstop against an OPEN_FENCE_RX used
+    # to repair the count here, from before rwlib's FENCE_RX learned that.
     stats["code_blocks"] = len(FENCE_RX.findall(raw))
-    if not stats["code_blocks"] and OPEN_FENCE_RX.search(raw):
-        # Backstop for a final fence nobody closed, in the shape of the one
-        # find_pitch keeps for an unclosed <table>. FENCE_RX needs a closing
-        # delimiter, so a README whose last block runs to end of file counts
-        # zero and reports no-code-block, which is visibly false: GitHub renders
-        # the block anyway. The strict count runs first and this only fires when
-        # it found nothing at all, so a well-formed README never reaches it.
-        #
-        # Only the count is repaired. The unclosed block's body still survives
-        # the blanking below and in check_prose_shape, so its contents are
-        # measured as prose. Fixing that means teaching FENCE_RX about a fence
-        # with no end, which moves every number this file reports.
-        stats["code_blocks"] = 1
 
     if len(badges) > BADGE_WALL:
         findings.append(finding(
@@ -650,9 +659,15 @@ def check_media_and_claims(raw, scored, findings, stats):
         prominent.append((m.group(2), line_of(scored, m.start())))
     for m in IMAGE_RX.finditer(scored):
         prominent.append((m.group(1), line_of(scored, m.start())))
+        url = m.group(2)
+        if is_badge(url):
+            import urllib.parse
+            unquoted = urllib.parse.unquote(url).replace("-", " ").replace("_", " ")
+            prominent.append((unquoted, line_of(scored, m.start())))
     for m in HTML_IMG_ALT_RX.finditer(scored):
-        if m.group(1).strip():
-            prominent.append((m.group(1), line_of(scored, m.start())))
+        alt = m.group(2).strip()
+        if alt:
+            prominent.append((alt, line_of(scored, m.start())))
 
     pairs = {}
     for text, line in prominent:
@@ -661,6 +676,14 @@ def check_media_and_claims(raw, scored, findings, stats):
             if len(num_str) == 4 and num_str.isdigit() and 1900 <= int(num_str) <= 2099:
                 continue
             noun = _singular(m.group(2))
+            if noun in MEASURE_NOUNS or noun in {"the", "and", "for", "with", "from", "that", "this"}:
+                continue
+            pairs.setdefault(noun, {}).setdefault(num_str, line)
+        for m in NOUN_NUMBER_RX.finditer(text):
+            num_str = m.group(2).replace(",", "").lstrip("0") or "0"
+            if len(num_str) == 4 and num_str.isdigit() and 1900 <= int(num_str) <= 2099:
+                continue
+            noun = _singular(m.group(1))
             if noun in MEASURE_NOUNS or noun in {"the", "and", "for", "with", "from", "that", "this"}:
                 continue
             pairs.setdefault(noun, {}).setdefault(num_str, line)
@@ -743,8 +766,8 @@ def load_scan():
     return module
 
 
-def run_prose_scan(raw, rules_path, required=False):
-    """(findings, stats, note) for the prose half of the report.
+def run_prose_scan(raw, rules_path, required=False, ste="mechanical"):
+    """(findings, stats, note, rules) for the prose half of the report.
 
     A voice that cannot be loaded never cancels the scan. It used to return an
     empty finding list, so `--voice-rules <typo>` printed "No mechanical
@@ -760,7 +783,7 @@ def run_prose_scan(raw, rules_path, required=False):
     """
     scan = load_scan()
     if scan is None:
-        return [], {}, "rabbit-writes/scripts/scan.py not found, prose not scanned"
+        return [], {}, "rabbit-writes/scripts/scan.py not found, prose not scanned", None
     rules, note = None, None
     if rules_path:
         try:
@@ -775,8 +798,8 @@ def run_prose_scan(raw, rules_path, required=False):
     # ste="mechanical", stated rather than inherited: a README audit is a
     # docs-register document and the counted rules apply to it, and a future
     # default change should not move this report silently.
-    findings, stats = scan.scan(raw, "docs", True, rules,
-                                suppressions=False, ste="mechanical")
+    findings, stats = scan.scan(raw, profile="docs", exempt=True, voice_rules=rules,
+                                suppressions=False, ste=ste)
     return findings, stats, note, rules
 
 
@@ -788,7 +811,7 @@ PRIORITY_TITLES = {"P0": "P0  a reader bounces here",
                    "P1": "P1  clear violation of the measured convention",
                    "P2": "P2  polish"}
 BAND_TITLES = {"safety": "  safety (concealed text, or text aimed at an agent)",
-               "structure": "  structure and format (readme-writing)",
+               "structure": "  structure and format (rabbit-readme-improver)",
                "voice": "  voice (this writer's own rules)",
                "fingerprint": "  fingerprints (evidence about production)",
                "craft": "  craft (bad writing regardless of author)"}
@@ -898,7 +921,8 @@ def report(path, findings, stats, voice_name, notes):
     return "\n".join(out)
 
 
-def check_readme(raw, readme_path, use_voice=True, voice_rules=None):
+def check_readme(raw, readme_path, use_voice=True, voice_rules=None,
+                 no_ste=False, fragment=False):
     scored = FENCE_RX.sub(blank, raw)
     findings, stats, notes = [], {}, []
 
@@ -938,8 +962,9 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None):
                 notes.append("read %s too, the rules file is only the "
                              "regex-checkable subset of it" % profile)
 
+    ste_mode = None if no_ste else "mechanical"
     prose_findings, prose_stats, note, rules = run_prose_scan(
-        raw, rules_path, required=bool(use_voice and voice_rules))
+        raw, rules_path, required=bool(use_voice and voice_rules), ste=ste_mode)
     if note:
         notes.append(note)
     findings.extend(prose_findings)
@@ -950,6 +975,20 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None):
     note = language.note(raw)
     if note:
         notes.append(note)
+        # Skip section-classification findings on non-English READMEs
+        SECTION_FINDING_IDS = {"no-pitch", "pitch-buried", "heavy-header",
+                               "no-install", "install-late", "no-license",
+                               "license-not-last", "license-long"}
+        findings = [f for f in findings if f["id"] not in SECTION_FINDING_IDS]
+
+    if fragment:
+        # In fragment mode, ignore whole-document structure requirements
+        FRAGMENT_EXEMPT_IDS = {
+            "no-pitch", "pitch-buried", "heavy-header", "no-install", "install-late",
+            "no-license", "license-not-last", "license-long", "license-file-missing",
+            "toc-missing", "toc-unneeded", "very-long"
+        }
+        findings = [f for f in findings if f["id"] not in FRAGMENT_EXEMPT_IDS]
 
     # Inline `rabbit-allow` comments cover the structure half too. scan.scan
     # runs with suppressions=False so that suppress.apply can apply allowances
@@ -960,16 +999,7 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None):
     # finding under `scan.py --voice-rules` reported it live here instead,
     # on the identical file.
     allowances, problems = suppress.parse(raw)
-    if rules and rules.get("engine_exemptions"):
-        vname = rules.get("voice", "profile")
-        for eid, reason in rules["engine_exemptions"].items():
-            allowances.append({
-                "ids": [eid],
-                "reason": reason or ("exempted by %s profile" % vname),
-                "line": 1,
-                "profile": True,
-                "source": "voice profile (%s)" % vname
-            })
+    allowances.extend(suppress.profile_allowances(rules))
     used, refused = suppress.apply(findings, allowances)
     findings.extend(suppress.audit(allowances, problems, used,
                                    findings_mod.make, refused))
@@ -1004,6 +1034,12 @@ def main():
                          "craft are still checked")
     ap.add_argument("--voice-rules", metavar="PATH",
                     help="a voice's <name>.rules.json; overrides .rabbit-voice and ACTIVE")
+    ap.add_argument("--no-ste", action="store_true",
+                    help="disable STE readability rules (sentence length caps, "
+                         "paragraph sentence counts, trailing conditions)")
+    ap.add_argument("--fragment", action="store_true",
+                    help="check as a section fragment; disables document-level "
+                         "structure findings (no-pitch, no-install, no-license, etc.)")
     ap.add_argument("--check", action="store_true", help="exit 1 if any P0 finding is present")
     args = ap.parse_args()
 
@@ -1020,7 +1056,9 @@ def main():
     try:
         findings, stats, voice_name, notes = check_readme(
             raw, args.file, use_voice=not args.no_voice,
-            voice_rules=args.voice_rules)
+            voice_rules=args.voice_rules,
+            no_ste=args.no_ste,
+            fragment=args.fragment)
     except voices_mod.VoiceError as exc:
         print(cli_error.format_file_error(
             "readme_check.py", args.voice_rules or "voice profile", "--voice-rules",
@@ -1034,7 +1072,7 @@ def main():
         sarif.warn_if_uri_drops(sarif_uri)
         print(json.dumps(sarif.build(
             findings, sarif_uri, "rabbit-writes/readme-check",
-            tool_version=CORPUS.get("schema_version"),
+            tool_version=str(CORPUS.get("schema_version", "1")),
             information_uri="https://github.com/whit3rabbit/rabbit-writes",
             extra_properties={"corpusRepos": CORPUS["n_repos"],
                               "corpusMeasuredAt": CORPUS.get("measured_at"),
@@ -1064,3 +1102,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+

@@ -307,3 +307,114 @@ def test_a_singular_and_plural_with_different_numbers_is_flagged():
         assert "inconsistent-number" in ids(result), str(ids(result))
     finally:
         shutil.rmtree(scratch, ignore_errors=True)
+
+
+def test_sponsor_badge_in_clean_header_does_not_fire_promo_before_pitch():
+    """A GitHub Sponsors badge URL/alt text in the header row should not fire promo-before-pitch."""
+    scratch = tempfile.mkdtemp()
+    try:
+        body = (
+            "# Widget\n\n"
+            "[![Sponsors](https://img.shields.io/github/sponsors/whit3rabbit)](https://github.com/sponsors/whit3rabbit)\n\n"
+            "Widget converts one file format into another without a build step.\n\n"
+            "## Install\n\n```bash\npip install widget\n```\n\n"
+            "## License\n\nMIT.\n"
+        )
+        result = run(written(scratch, "README.md", body), "--no-voice")
+        assert "promo-before-pitch" not in ids(result), str(ids(result))
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+def test_ascii_diagram_opener_over_25_lines_is_counted_as_fence_and_does_not_bury_pitch():
+    """A large ASCII diagram code block above the pitch should count as 1 fence line, not bury the pitch."""
+    scratch = tempfile.mkdtemp()
+    try:
+        diagram_lines = "\n".join("  | line %d |" % i for i in range(30))
+        body = (
+            "# Tool\n\n"
+            "```text\n"
+            + diagram_lines + "\n"
+            "```\n\n"
+            "Tool orchestrates complex workflows cleanly.\n\n"
+            "## Install\n\n```bash\npip install tool\n```\n\n"
+            "## License\n\nMIT.\n"
+        )
+        result = run(written(scratch, "README.md", body), "--no-voice")
+        assert "pitch-buried" not in ids(result), str(ids(result))
+        assert "heavy-header" not in ids(result), str(ids(result))
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+def test_usage_section_with_install_fence_satisfies_installation():
+    """## Usage containing pip install satisfies the installation requirement."""
+    scratch = tempfile.mkdtemp()
+    try:
+        body = (
+            "# Tool\n\n"
+            "Tool processes logs.\n\n"
+            "## Usage\n\n"
+            "Run the following command to get started:\n\n"
+            "```bash\npip install mytool\nmytool --help\n```\n\n"
+            "## License\n\nMIT.\n"
+        )
+        result = run(written(scratch, "README.md", body), "--no-voice")
+        assert "no-install" not in ids(result), str(ids(result))
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+def test_positive_no_install_heavy_header_toc_missing_very_long_no_code_block():
+    """Verify positive triggers for structural checks."""
+    scratch = tempfile.mkdtemp()
+    try:
+        # 1. no-install & no-code-block
+        body_no_install = "# Tool\n\nTool processes logs.\n\n## Overview\n\nSome overview.\n\n## License\n\nMIT.\n"
+        res1 = run(written(scratch, "R1.md", body_no_install), "--no-voice")
+        assert "no-install" in ids(res1)
+        assert "no-code-block" in ids(res1)
+
+        # 2. heavy-header (16 nonblank lines before pitch)
+        filler = "\n".join("Line %d" % i for i in range(16))
+        body_heavy = "# Tool\n\n" + filler + "\n\nTool is a fast parser for structured text.\n\n## Install\n\n```sh\npip install tool\n```\n\n## License\n\nMIT.\n"
+        res2 = run(written(scratch, "R2.md", body_heavy), "--no-voice")
+        assert "heavy-header" in ids(res2)
+
+        # 3. toc-missing (>2500 words with headings and no TOC) and very-long (>6040 words)
+        paragraphs = "\n\n".join(" ".join(["word"] * 50) for _ in range(130))  # 6500 words
+        body_long = "# Tool\n\nTool is a fast parser for structured text.\n\n## Install\n\n```sh\npip install tool\n```\n\n## Section 1\n\n" + paragraphs + "\n\n## License\n\nMIT.\n"
+        res3 = run(written(scratch, "R3.md", body_long), "--no-voice")
+        assert "toc-missing" in ids(res3)
+        assert "very-long" in ids(res3)
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+def test_fragment_mode_disables_document_level_findings():
+    """--fragment ignores whole-document structure findings."""
+    scratch = tempfile.mkdtemp()
+    try:
+        # A section fragment with no pitch, no install, no license
+        body = "## Architecture\n\nThe server connects to the database.\n\n```python\nconnect()\n```\n"
+        res = run(written(scratch, "FRAGMENT.md", body), "--no-voice", "--fragment")
+        for bad_id in ("no-pitch", "no-install", "no-license"):
+            assert bad_id not in ids(res), "%s was not filtered in fragment mode" % bad_id
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+def test_non_english_readme_suppresses_section_classification_findings():
+    """A non-English README note suppresses English section findings."""
+    scratch = tempfile.mkdtemp()
+    try:
+        # Chinese README with > 200 characters
+        chinese_prose = "这是一个用于自动化测试和文档分析的高性能工具，旨在帮助开发者快速构建高质量的软件项目并提供清晰的文档支持。" * 6
+        body = "# 项目名称\n\n" + chinese_prose + "\n\n## 安装\n\n```bash\npip install x\n```\n\n## 许可证\n\nMIT\n"
+        res = run(written(scratch, "README.md", body), "--no-voice")
+        assert any("ascii" in n.lower() or "language" in n.lower() or "cjk" in n.lower() or "chinese" in n.lower() or "non-english" in n.lower() for n in res["notes"]), res["notes"]
+        assert "no-install" not in ids(res)
+        assert "no-license" not in ids(res)
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+

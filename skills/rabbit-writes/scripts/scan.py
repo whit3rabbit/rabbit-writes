@@ -1072,16 +1072,7 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
     # The safety band is refused there.
     if suppressions:
         allowances, problems = suppress.parse(raw_text)
-        if voice_rules and voice_rules.get("engine_exemptions"):
-            vname = voice_rules.get("voice", "profile")
-            for eid, reason in voice_rules["engine_exemptions"].items():
-                allowances.append({
-                    "ids": [eid],
-                    "reason": reason or ("exempted by %s profile" % vname),
-                    "line": 1,
-                    "profile": True,
-                    "source": "voice profile (%s)" % vname
-                })
+        allowances.extend(suppress.profile_allowances(voice_rules))
         used, refused = suppress.apply(findings, allowances)
         findings.extend(suppress.audit(allowances, problems, used,
                                        findings_mod.make, refused))

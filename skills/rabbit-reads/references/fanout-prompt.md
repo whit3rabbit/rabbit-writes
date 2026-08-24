@@ -8,6 +8,7 @@ The subagent boilerplate for workflow phase 4. Fill the placeholders, build one 
 - `{TEMPLATE}`: the fenced template from the book-type file, pasted verbatim.
 - `{STYLE}`: the voice constraints in force for the run, or the word none.
 - `{SIBLINGS}`: the sibling doc slugs the See also sections may point at.
+- `{LAYOUT}`: the layout's link syntax, frontmatter requirement, and spine-note rules, pasted from the layout file.
 
 Copy the skeleton between the fences and fill it:
 
@@ -37,6 +38,9 @@ Style constraints in force:
 Siblings available for See also:
 {SIBLINGS}
 
+
+Layout constraints:
+{LAYOUT}
 Return contract: reply with one line per file written, the filename and its line count. Do not paste any doc contents back. Do not create, modify, or delete any other file.
 ```
 

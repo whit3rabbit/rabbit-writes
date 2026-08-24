@@ -87,5 +87,15 @@ def book_types_dir():
     return _walk_up(os.path.join("references", "book-types"), predicate=_has_md)
 
 
+def layouts_dir():
+    """This skill's references/layouts directory, or None when absent.
+
+    check_notes enumerates --layout choices off it and loads the layout spec
+    out of it, the same way book_types_dir feeds --book-type. None is a
+    working state (the default layout is built in), not an install error.
+    """
+    return _walk_up(os.path.join("references", "layouts"), predicate=_has_md)
+
+
 __all__ = ["HERE", "SKILLS_DIR", "RWLIB_PARENT", "SCAN_PATH", "cli_error",
-            "book_types_dir"]
+            "book_types_dir", "layouts_dir"]

@@ -6,7 +6,7 @@ A form file supplies slots. Only the voice may fill them. Every quoted phrase in
 
 Reference and instruction: a guide, a how-to, an API page, a runbook. A genre column rather than a rung on the formality spine. The reader is not reading, they are looking something up while blocked on it, and every relaxation this register carries follows from that.
 
-A file named `README.md` is not this form. It belongs to the `readme-writing` skill, which holds the measured section conventions this one does not. Hand it over rather than treating it as a docs page.
+A file named `README.md` is not this form. It belongs to the `rabbit-readme-improver` skill, which holds the measured section conventions this one does not. Hand it over rather than treating it as a docs page.
 
 ## Slots
 

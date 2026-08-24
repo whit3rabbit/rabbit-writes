@@ -133,3 +133,36 @@ def test_a_caveat_in_the_claims_own_section_counts():
     finally:
         shutil.rmtree(scratch, ignore_errors=True)
     assert "uncaveated-claim" not in ids(result), str(ids(result))
+
+
+def test_inconsistent_number_between_badge_and_heading_fires():
+    """84 UI Styles vs Available Styles (67) should fire inconsistent-number."""
+    text = (
+        "# Project\n\n"
+        "Project does one thing well and fast.\n\n"
+        "![Styles](https://img.shields.io/badge/styles-84%20UI%20Styles-blue)\n\n"
+        "## Install\n\n```sh\npip install x\n```\n\n"
+        "## Available Styles (67)\n\nHere are the styles.\n\n"
+        "## License\n\nMIT\n"
+    )
+    scratch = tempfile.mkdtemp()
+    try:
+        result = run(written(scratch, "README.md", text), "--no-voice")
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+    assert "inconsistent-number" in ids(result), str(ids(result))
+
+
+def test_bare_url_overflow_caps_displayed_findings():
+    """README with >20 bare URLs shouldn't overflow, caps properly."""
+    urls = "\n".join("https://example.com/item/%d" % i for i in range(25))
+    text = "# Project\n\nProject does something.\n\n## Install\n\n```sh\npip install x\n```\n\n## Links\n\n" + urls + "\n\n## License\n\nMIT\n"
+    scratch = tempfile.mkdtemp()
+    try:
+        result = run(written(scratch, "README.md", text), "--no-voice")
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+    assert result["stats"]["bare_urls"] == 25
+    bare_findings = [f for f in result["findings"] if f["id"] == "bare-url"]
+    assert len(bare_findings) == 21
+

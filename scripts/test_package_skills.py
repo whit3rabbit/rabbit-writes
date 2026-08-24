@@ -316,7 +316,7 @@ def test_readme_check_runs_and_finds_its_voices_dir():
     os.makedirs(pinned, exist_ok=True)
     write(os.path.join(pinned, "README.md"), README_SAMPLE)
     write(os.path.join(pinned, ".rabbit-voice"), "whit3rabbit\n")
-    r = run([installed("readme-writing", "scripts", "readme_check.py"), "README.md", "--json"],
+    r = run([installed("rabbit-readme-improver", "scripts", "readme_check.py"), "README.md", "--json"],
             cwd=pinned)
     payload = json.loads(r.stdout or "{}")
     check("readme_check.py runs standalone",
@@ -462,7 +462,7 @@ def test_plugin_layout_readme_check_uses_the_sibling_voices():
     os.makedirs(project, exist_ok=True)
     write(os.path.join(project, "README.md"), README_SAMPLE)
     write(os.path.join(project, ".rabbit-voice"), "whit3rabbit\n")
-    r = run([plugin_path("readme-writing", "scripts", "readme_check.py"),
+    r = run([plugin_path("rabbit-readme-improver", "scripts", "readme_check.py"),
              "README.md", "--json"], cwd=project)
     payload = json.loads(r.stdout or "{}")
     check("plugin layout: readme_check.py runs from a stranger's project",

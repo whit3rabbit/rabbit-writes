@@ -108,6 +108,23 @@ def parse(text):
     return allowances, problems
 
 
+def profile_allowances(rules):
+    """Allowances built from a voice profile's `engine_exemptions` mapping."""
+    if not rules or not rules.get("engine_exemptions"):
+        return []
+    vname = rules.get("voice", "profile")
+    out = []
+    for eid, reason in rules["engine_exemptions"].items():
+        out.append({
+            "ids": [eid],
+            "reason": reason or ("exempted by %s profile" % vname),
+            "line": 1,
+            "profile": True,
+            "source": "voice profile (%s)" % vname
+        })
+    return out
+
+
 def apply(findings, allowances):
     """Mark the findings an allowance covers, in place, and report what was used.
 

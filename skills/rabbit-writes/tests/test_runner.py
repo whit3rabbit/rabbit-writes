@@ -22,7 +22,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 RUNNERS = [
     os.path.join(HERE, "run.py"),
-    os.path.join(REPO_ROOT, "skills", "readme-writing", "tests", "run.py"),
+    os.path.join(REPO_ROOT, "skills", "rabbit-readme-improver", "tests", "run.py"),
 ]
 
 

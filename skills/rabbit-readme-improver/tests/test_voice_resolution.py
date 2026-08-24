@@ -43,9 +43,10 @@ def test_a_resolved_voice_reaches_the_payload_without_being_named():
         rc.VOICES_DIR = tmp
         with open(os.path.join(tmp, "ACTIVE"), "w") as fh:
             fh.write("grace\n")
-        with open(readme, "w") as fh:
+        with open(readme, "w", encoding="utf-8") as fh:
             fh.write("# Title\n\nA sentence about the thing.\n")
-        raw = open(readme).read()
+        with open(readme, encoding="utf-8") as fh:
+            raw = fh.read()
         _, _, voice, notes = rc.check_readme(raw, readme)
         assert voice == "grace", (voice, notes)
         # A clean scan reads like a pass, and the half that decides whether this
@@ -209,3 +210,32 @@ def test_a_named_profile_that_cannot_be_read_is_an_error_not_a_silent_pass():
         assert "citation-leak" in ids(json.loads(out.stdout), "P0")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+
+def test_missing_scan_py_returns_note_and_does_not_crash():
+    """When scan.py is missing (e.g. in a standalone bundle), run_prose_scan returns 4 values and unpacks cleanly."""
+    rc = check_module()
+    real_scan_path = rc.SCAN_PATH
+    try:
+        rc.SCAN_PATH = "/nonexistent/path/scan.py"
+        raw = "# Project\n\nProject description in prose.\n\n## Install\n\n```sh\npip install x\n```\n\n## License\n\nMIT.\n"
+        findings, stats, voice, notes = rc.check_readme(raw, "README.md", use_voice=False)
+        assert any("not found" in n for n in notes), notes
+    finally:
+        rc.SCAN_PATH = real_scan_path
+
+
+def test_sarif_output_validates_as_json_with_string_version():
+    """SARIF output must be valid JSON with tool.driver.version as a string."""
+    import subprocess
+    import sys
+    from helpers import CHECK, NEUTRAL_CWD, sample
+    out = subprocess.run(
+        [sys.executable, CHECK, sample("bad-readme.md"), "--sarif"],
+        capture_output=True, text=True, cwd=NEUTRAL_CWD)
+    assert out.returncode == 0, out.stderr
+    payload = json.loads(out.stdout)
+    assert payload["version"] == "2.1.0"
+    driver = payload["runs"][0]["tool"]["driver"]
+    assert isinstance(driver.get("version"), str), type(driver.get("version"))
+

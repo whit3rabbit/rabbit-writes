@@ -1,4 +1,4 @@
-# readme-writing
+# rabbit-readme-improver
 
 README auditing, drafting, restructuring, and section writing skill based on empirical analysis of 100 trending GitHub repositories.
 
@@ -6,22 +6,22 @@ README auditing, drafting, restructuring, and section writing skill based on emp
 
 ```bash
 # Run unit tests
-python3 skills/readme-writing/tests/run.py
+python3 skills/rabbit-readme-improver/tests/run.py
 
 # Pytest equivalent
-pytest skills/readme-writing/tests/
+pytest skills/rabbit-readme-improver/tests/
 
 # Audit or check a README.md file
-python3 skills/readme-writing/scripts/readme_check.py path/to/README.md
+python3 skills/rabbit-readme-improver/scripts/readme_check.py path/to/README.md
 
 # Audit with JSON payload
-python3 skills/readme-writing/scripts/readme_check.py path/to/README.md --json
+python3 skills/rabbit-readme-improver/scripts/readme_check.py path/to/README.md --json
 
-# Run as a gate (exit 1 on P0/P1 issues)
-python3 skills/readme-writing/scripts/readme_check.py path/to/README.md --check
+# Run as a gate (exit 1 on P0 issues)
+python3 skills/rabbit-readme-improver/scripts/readme_check.py path/to/README.md --check
 
 # Check README with explicit voice rules
-python3 skills/readme-writing/scripts/readme_check.py path/to/README.md --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
+python3 skills/rabbit-readme-improver/scripts/readme_check.py path/to/README.md --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
 ```
 
 ## Structure & Architecture

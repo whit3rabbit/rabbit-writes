@@ -36,7 +36,7 @@ the engine's data rather than the release, and `validate.py` holds them to
 
 `.github/workflows/ci.yml` runs on every push to `main` and every pull
 request, across Python 3.9 through 3.13 on Linux, plus one Windows and one
-macOS entry. It runs the repo validator, the engine, readme-writing,
+macOS entry. It runs the repo validator, the engine, rabbit-readme-improver,
 voice-setup, and rabbit-reads suites, three stubbed research harnesses
 (detector-corpus, thesaurus-research, voice-eval), the dogfood scans over
 the repo's own prose, and an informational labeled-corpus score that never

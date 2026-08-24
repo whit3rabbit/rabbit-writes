@@ -295,6 +295,48 @@ def test_a_blanked_env_description_is_reported():
             "no report: %s" % validate.problems
 
 
+# --------------------------------------------------------------------------
+# the rabbit-reads layout check
+# --------------------------------------------------------------------------
+
+LAYOUTS = os.path.join("skills", "rabbit-reads", "references", "layouts")
+
+
+def test_the_layout_check_passes_the_shipped_files():
+    with sandbox() as s:
+        validate.check_layout_files()
+        assert s.reported("") == []
+
+
+def test_a_missing_layout_header_is_reported():
+    with sandbox() as s:
+        s.edit(os.path.join(LAYOUTS, "obsidian.md"),
+               "**Frontmatter keys:** source, kind, tags, aliases",
+               "Frontmatter keys are declared nowhere.")
+        validate.check_layout_files()
+        assert s.reported("has no Frontmatter keys header line"), \
+            str(validate.problems)
+
+
+def test_a_bad_spine_band_pair_is_reported():
+    with sandbox() as s:
+        s.edit(os.path.join(LAYOUTS, "obsidian.md"),
+               "**Spine notes:** chapter:8-20, topic:8-25, summary:20-40",
+               "**Spine notes:** chapter:20-8")
+        validate.check_layout_files()
+        assert s.reported("kind:min-max"), str(validate.problems)
+
+
+def test_an_unknown_link_syntax_is_reported():
+    with sandbox() as s:
+        s.edit(os.path.join(LAYOUTS, "cheatsheets.md"),
+               "**Link syntax:** markdown",
+               "**Link syntax:** org-mode")
+        validate.check_layout_files()
+        assert s.reported("neither markdown nor wikilink"), \
+            str(validate.problems)
+
+
 TESTS = [(name, fn) for name, fn in sorted(globals().items())
          if name.startswith("test_") and callable(fn)]
 

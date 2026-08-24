@@ -72,7 +72,7 @@ jobs:
         run: python skills/rabbit-writes/tests/run.py
 
       - name: readme structure, voice, and corpus regression
-        run: python skills/readme-writing/tests/run.py
+        run: python skills/rabbit-readme-improver/tests/run.py
 
       - name: voice-setup scaffolding, thesaurus, and edit-learning
         # This suite covers the measured thesaurus, and it had never run in CI:
@@ -104,10 +104,10 @@ jobs:
 
       - name: dogfood the scanner on the repo's own prose
         run: |
-          python skills/readme-writing/scripts/readme_check.py README.md --check
+          python skills/rabbit-readme-improver/scripts/readme_check.py README.md --check
           python skills/rabbit-writes/scripts/scan.py skills/rabbit-writes/SKILL.md \
             --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
-          python skills/rabbit-writes/scripts/scan.py skills/readme-writing/SKILL.md \
+          python skills/rabbit-writes/scripts/scan.py skills/rabbit-readme-improver/SKILL.md \
             --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json
           python skills/rabbit-writes/scripts/scan.py skills/voice-setup/SKILL.md \
             --check --voice-rules skills/rabbit-writes/voices/whit3rabbit.rules.json

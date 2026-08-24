@@ -122,26 +122,27 @@ def env_with_pythonpath(extra=None):
     return env
 
 
-def make_book_type_tree(files):
-    """A skill-shaped temp tree with script copies and given book-type files.
+def make_book_type_tree(files, refs=("book-types",)):
+    """A skill-shaped temp tree with script copies and given reference files.
 
-    Used only when the shipped book-type file a run needs has not been
-    written yet: --book-type choices are enumerated from
-    ../references/book-types relative to the scripts directory, so a fallback
-    file has to sit in that same shape to be selectable at all. Returns the
-    tree root, which the caller owns and removes.
+    Used only when the shipped reference file a run needs has not been
+    written yet: --book-type and --layout choices are enumerated from
+    ../references/<refs> relative to the scripts directory, so a fallback
+    file has to sit in that same shape to be selectable at all. Pass
+    refs=("layouts",) for layout fixtures. Returns the tree root, which the
+    caller owns and removes.
     """
     tree = tempfile.mkdtemp(prefix="rr-bt-")
     scripts_copy = os.path.join(tree, "scripts")
     os.makedirs(scripts_copy)
-    os.makedirs(os.path.join(tree, "references", "book-types"))
+    os.makedirs(os.path.join(tree, "references", *refs))
     if os.path.isdir(SCRIPTS_DIR):
         for name in sorted(os.listdir(SCRIPTS_DIR)):
             if name.endswith(".py"):
                 shutil.copyfile(os.path.join(SCRIPTS_DIR, name),
                                 os.path.join(scripts_copy, name))
     for name, text in sorted(files.items()):
-        with open(os.path.join(tree, "references", "book-types", name), "w",
+        with open(os.path.join(tree, "references", *refs, name), "w",
                   encoding="utf-8", newline="\n") as fh:
             fh.write(text)
     return tree

@@ -21,7 +21,7 @@ import os
 import shutil
 import tempfile
 
-from helpers import Repo, check_module, ids, run
+from helpers import Repo, check_module, ids, run, written
 
 LICENSED = """# widget
 
@@ -164,3 +164,48 @@ def test_a_document_that_is_not_on_disk_is_left_alone():
     rc.check_license_file("/nonexistent/path/README.md", findings, stats)
     assert not findings, findings
     assert "license_file" not in stats, stats
+
+
+def test_licenses_directory_and_variants_count_as_license_file():
+    """UNLICENSE, MIT-LICENSE.txt, and a LICENSES/ directory should satisfy the license file check."""
+    for name in ("UNLICENSE", "MIT-LICENSE.txt", "LICENSE.MIT"):
+        repo = Repo(LICENSED, name)
+        try:
+            assert "license-file-missing" not in ids(run(repo.readme)), name
+        finally:
+            repo.close()
+
+    # LICENSES directory
+    repo = Repo(LICENSED)
+    try:
+        lic_dir = os.path.join(repo.path, "LICENSES")
+        os.makedirs(lic_dir)
+        with open(os.path.join(lic_dir, "MIT.txt"), "w") as fh:
+            fh.write("MIT License terms")
+        assert "license-file-missing" not in ids(run(repo.readme))
+    finally:
+        repo.close()
+
+
+def test_license_badge_and_trailing_mention_prevent_no_license():
+    """A license badge or a license mention in the last 10 lines prevents no-license."""
+    # 1. Badge only
+    badge_readme = "# Widget\n\nWidget does things.\n\n[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)\n\n## Install\n\n```sh\npip install x\n```\n"
+    scratch = tempfile.mkdtemp()
+    try:
+        res1 = run(written(scratch, "README.md", badge_readme), "--no-voice")
+        assert "no-license" not in ids(res1), ids(res1)
+        assert res1["stats"]["has_license_mention"] is True
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+    # 2. Mention in final 10 lines
+    trailing_readme = "# Widget\n\nWidget does things.\n\n## Install\n\n```sh\npip install x\n```\n\nReleased under the MIT license.\n"
+    scratch = tempfile.mkdtemp()
+    try:
+        res2 = run(written(scratch, "README.md", trailing_readme), "--no-voice")
+        assert "no-license" not in ids(res2), ids(res2)
+        assert res2["stats"]["has_license_mention"] is True
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+

@@ -4,7 +4,7 @@ Step 5: export the figures readme_check.py compares a README against.
 
 Steps 03 and 04 leave a full aggregate under docs/readme-analysis/. That file is
 research output and does not ship with the skill. This writes the small extract
-that does: skills/readme-writing/scripts/corpus_summary.json.
+that does: skills/rabbit-readme-improver/scripts/corpus_summary.json.
 
 The extraction itself lives in rwlib.corpus.derive, so this script and the
 drift check in scripts/validate.py run the same code over the same input. Two

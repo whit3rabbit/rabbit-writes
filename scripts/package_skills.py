@@ -51,7 +51,7 @@ ENGINE_SCRIPTS_DIR = os.path.join(ENGINE_DIR, "scripts")
 DIST_DIR = os.path.join(ROOT, "dist")
 MAX_FILES = 200
 
-SKILL_NAMES = ["rabbit-writes", "voice-setup", "readme-writing",
+SKILL_NAMES = ["rabbit-writes", "voice-setup", "rabbit-readme-improver",
                "rabbit-reads", "rabbit-rewrites"]
 
 PLUGIN_VAR = "${CLAUDE_PLUGIN_ROOT}"
@@ -92,7 +92,7 @@ SHARED_ENGINE_FILES = [
 # Engine files a satellite skill's SKILL.md cites and therefore must carry.
 # Maps archive-relative destination to a path under the engine skill dir.
 EXTRA_VENDOR = {
-    "readme-writing": [
+    "rabbit-readme-improver": [
         (os.path.join("references", "craft.md"), os.path.join("references", "craft.md")),
         (os.path.join("references", "ste.md"), os.path.join("references", "ste.md")),
     ],
@@ -206,7 +206,7 @@ IGNORE_FILES = {
 # wording difference ("below means" in rabbit-writes, "means" elsewhere).
 _PATHS_OLD_TAIL = (
     "the directory holding this skill and its siblings (`rabbit-writes`, "
-    "`voice-setup`, `readme-writing`, `rabbit-reads`, `rabbit-rewrites`). "
+    "`voice-setup`, `rabbit-readme-improver`, `rabbit-reads`, `rabbit-rewrites`). "
     "Claude Code expands "
     "the variable. On a host that doesn't, such as Codex, resolve it that "
     "way by hand."
@@ -290,7 +290,7 @@ SUBSTITUTIONS = {
             ),
         ],
     },
-    "readme-writing": {
+    "rabbit-readme-improver": {
         "SKILL.md": [
             (
                 "The full study (methodology, the 100-repo table, every stat "

@@ -49,7 +49,8 @@ CURLY_APOSTROPHE = "\u2019"
 # closer onward stayed unblanked and reached every counter in the engine as
 # prose.
 FENCE_RX = re.compile(
-    r"^[ \t]*(?:(`{3,}).*?^[ \t]*\1`*|(~{3,}).*?^[ \t]*\2~*)", re.M | re.S)
+    r"^[ \t]*(?:(`{3,}).*?(?:^[ \t]*\1`*|\Z)|(~{3,}).*?(?:^[ \t]*\2~*|\Z))", re.M | re.S)
+OPEN_FENCE_RX = re.compile(r"^[ \t]*(?:`{3,}|~{3,})", re.M)
 # The same fences taken apart, for the corpus study, which counts languages and
 # body lines. Two patterns because they answer two questions, not because
 # anybody forgot to merge them: this one does not anchor to the line start, so
@@ -237,6 +238,7 @@ BARE_URL_RX = URL_RX
 HTML_TAG_RX = re.compile(r"</?[a-zA-Z][^>]*>")
 HTML_ATTR_URL_RX = re.compile(r"(?:src|href)\s*=\s*[\"'][^\"']*[\"']", re.I)
 HTML_IMG_RX = re.compile(r"<img[^>]+src\s*=\s*[\"']([^\"']+)[\"']", re.I)
+HTML_IMG_ALT_RX = re.compile(r"""<img\b[^>]*?\balt\s*=\s*(["'])(.*?)\1""", re.I)
 HTML_LINK_RX = re.compile(r"<a[^>]+href\s*=\s*[\"']([^\"']+)[\"']", re.I)
 # Anchor text, for the vague-link-text check. Non-greedy and DOTALL because a
 # centered header routinely puts the badge image and the anchor text on separate

@@ -158,3 +158,32 @@ def term_of(entry):
     if isinstance(entry, dict):
         return entry.get("word") or entry.get("phrase") or ""
     return ""
+
+
+INVARIANT_OR_S_SINGULARS = {
+    "alias", "status", "canvas", "basis", "lens", "series", "species",
+    "corpus", "analysis", "hypothesis", "parenthesis", "focus", "virus",
+    "census", "radius", "syllabus", "bus"
+}
+
+
+def singular(noun):
+    """A grouping key for a countable noun, so a plural and its singular
+    collapse together. Inverse of plural().
+
+    Handles regular English noun shapes. Irregulars (children, people)
+    are left alone.
+    """
+    n = noun.lower()
+    if n in INVARIANT_OR_S_SINGULARS:
+        return n
+    if n.endswith("ies") and len(n) > 4:
+        return n[:-3] + "y"
+    if n.endswith(("sses", "shes", "ches", "xes", "zes")):
+        return n[:-2]
+    if n.endswith("ses") and len(n) > 4 and n[:-2] in INVARIANT_OR_S_SINGULARS:
+        return n[:-2]
+    if n.endswith("s") and not n.endswith("ss"):
+        return n[:-1]
+    return n
+

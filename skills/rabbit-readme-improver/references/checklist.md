@@ -8,7 +8,7 @@ Run through before delivering a draft, restructure, or audit. Every item is yes 
 2. Does installation come right after the pitch, not buried past several other sections?
 3. Is there a working, copy-pasteable path from "clone/install" to "it's running" — not just a list of prerequisites?
 4. Is license the last section (or close to it), and short — name plus link, not restated terms?
-5. If there's a table of contents, does the document actually need one (roughly 1,500+ words)? If it's under that, is the TOC adding scroll instead of saving it?
+5. If there's a table of contents, does the document actually need one (optional at roughly 1,500+ words, expected at 2,500+)? If it's under 1,500, is the TOC adding scroll instead of saving it?
 6. Is anything promotional (sponsors, badges beyond the header row, a hero image) sitting between the top of the file and the real description? If so, move it down or cut it.
 
 ## Craft
@@ -24,7 +24,7 @@ Run through before delivering a draft, restructure, or audit. Every item is yes 
 ## Accuracy
 
 14. Does every install command, dependency, and version number actually match the project as it exists right now — nothing invented or assumed?
-15. Does the license section name the license the project actually uses (check for a `LICENSE` file rather than guessing)? `readme_check.py` now does half of this for you: run on a real path, it walks up to the repository root for a `LICENSE`, `LICENCE`, or `COPYING` file and reports the mismatch either way. It cannot tell you whether the section names the *right* license, only whether there is a file to name.
+15. Does the license section name the license the project actually uses (check for a `LICENSE` file rather than guessing)? `readme_check.py` now does half of this for you: run on a real path, it walks up to the repository root for a `LICENSE`, `LICENCE`, `UNLICENSE`, `COPYING` file or `LICENSES/` directory and reports the mismatch either way. It cannot tell you whether the section names the *right* license, only whether there is a file to name.
 16. Are code examples runnable as written, not simplified to the point of being wrong?
 
 ## Voice
@@ -39,8 +39,5 @@ Run through before delivering a draft, restructure, or audit. Every item is yes 
 
 ## Before delivering
 
-24. For an audit: are findings ordered by impact (structural first, voice second, craft third), each pointing at a real line or section — not a generic list that could apply to any README?
-25. Did you run `python3 ${CLAUDE_PLUGIN_ROOT}/skills/readme-writing/scripts/readme_check.py <file>`, clear every P0, and either fix or consciously keep each P1?
-
-*(Note: An unclosed final code fence ` ``` ` at the end of a README is counted as 1 code block, but its body text is measured as prose. If a paragraph or claim finding points into code at the end of a file, check for an unclosed fence.)*
-
+24. For an audit: are findings ordered by impact (safety first, structural second, voice third, fingerprint and craft fourth), each pointing at a real line or section — not a generic list that could apply to any README?
+25. Did you run `python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-readme-improver/scripts/readme_check.py <file>`, clear every P0, and either fix or consciously keep each P1?

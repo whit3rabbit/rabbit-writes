@@ -291,6 +291,25 @@ def check_ai_slop_text(text):
     return check_ai_slop(text)
 
 
+def test_dictionary_vocabulary_fires_on_a_known_word_and_reports_ste_vocab():
+    from rwlib.ste import check_dictionary_vocabulary
+    findings = check_dictionary_vocabulary("If there is a fire, abandon the area.")
+    assert len(findings) == 1
+    assert findings[0]["id"] == "ste-vocab"
+    assert findings[0]["match"].lower() == "abandon"
+    assert "GO" in findings[0]["excerpt"]
+
+
+def test_dictionary_vocabulary_does_not_fire_inside_a_hyphenated_compound():
+    # scripts/ste-research/02_corpus_evidence.py's own history: a plain \b
+    # boundary matched "cross" inside "cross-platform" 266 times over the
+    # 100-README corpus before dictionary_vocab_regex's hyphen-aware
+    # boundary (word_regex's own) replaced it.
+    from rwlib.ste import check_dictionary_vocabulary
+    assert check_dictionary_vocabulary("This tool is cross-platform.") == []
+    assert len(check_dictionary_vocabulary("Do not cross the road.")) == 1
+
+
 # ------------------------------------------------------------ integration ----
 
 def test_full_check_returns_all_categories():

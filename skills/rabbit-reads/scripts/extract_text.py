@@ -34,9 +34,12 @@ output lands under scratch/ in the working directory, which .gitignore covers.
 """
 
 import argparse
+import glob
+import json
 import os
 import posixpath
 import re
+import shutil
 import subprocess
 import sys
 import zipfile
@@ -51,6 +54,7 @@ import _bootstrap
 from _bootstrap import cli_error
 from rwlib import artifacts, injection, language
 from rwlib.findings import sort_key
+from rwlib.endpoint import estimate_tokens
 
 EXAMPLES = [
     "extract_text.py book.epub",
@@ -74,6 +78,19 @@ MIN_PDF_CHARS = 200
 SCANNED_VERDICT = ("likely a scanned PDF with no text layer, needs OCR before "
                    "any reading (tesseract, or the print-disabled route your "
                    "platform offers)")
+
+# Shared by the extractors and the --check preflight, so the hint a failing
+# conversion prints is word for word the one the preflight shows up front.
+PDF_HINT = ("Install poppler: `brew install poppler` on macOS, "
+            "`apt-get install poppler-utils` on Debian/Ubuntu.")
+TEXTUTIL_HINT = ("textutil ships with macOS. On another platform convert the "
+                 "file on a Mac, or via pandoc / libreoffice, and feed the "
+                 "result in as .txt or .md.")
+
+# Demarcation between concatenated sources. Deliberately matches nothing in
+# map_structure.py: no `Chapter N`, no bare `N.`, no ATX hashes, so a
+# demarcation line never surfaces as a section boundary.
+SOURCE_DEMARC = "========== rabbit-reads source: %s =========="
 
 
 def die_usage(message):
@@ -121,8 +138,7 @@ def run_converter(argv, path, parameter, install_hint):
 
 
 def extract_pdf(path):
-    hint = ("Install poppler: `brew install poppler` on macOS, "
-            "`apt-get install poppler-utils` on Debian/Ubuntu.")
+    hint = PDF_HINT
     text, code = run_converter(["pdftotext", "-enc", "UTF-8", path, "-"],
                                path, "source (.pdf)", hint)
     if code:
@@ -135,13 +151,10 @@ def extract_pdf(path):
 
 
 def extract_textutil(path):
-    # textutil ships with macOS and nothing standard ships it elsewhere, so
-    # the hint names the platform rather than a package to install.
-    hint = ("textutil ships with macOS. On another platform convert the file "
-            "on a Mac, or via pandoc / libreoffice, and feed the result in as "
-            ".txt or .md.")
+    hint = TEXTUTIL_HINT
     return run_converter(["textutil", "-convert", "txt", "-stdout", path],
-                         path, "source (%s)" % os.path.splitext(path)[1].lower(),
+                         path,
+                         "source (%s)" % os.path.splitext(path)[1].lower(),
                          hint)
 
 
@@ -323,75 +336,95 @@ def invisible_note(text):
             % ", ".join(parts))
 
 
-def print_findings(findings, stream):
-    stream.write("Safety findings\n")
+def print_findings(findings, stream, header="Safety findings"):
+    stream.write("%s\n" % header)
     for f in findings:
         stream.write("  L%-4d %s %s: %s\n"
                      % (f.get("line", 0), f.get("priority", "?"),
                         f.get("id", "?"), f.get("label", "")))
 
 
-def main(argv=None):
-    ap = cli_error.LLMArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        examples=EXAMPLES)
-    ap.add_argument("source", metavar="PATH",
-                    help="the document to normalize: %s"
-                         % ", ".join(SUPPORTED))
-    ap.add_argument("--out", metavar="PATH",
-                    help="where the text goes. Defaults to "
-                         "scratch/<source-stem>.txt under the working "
-                         "directory, created if missing")
-    ap.add_argument("--stdout", action="store_true",
-                    help="print the text instead of writing a file, with the "
-                         "stats on stderr so stdout stays pipeable")
-    args = ap.parse_args(argv)
+def run_preflight(stream):
+    """The --check report: which converters exist, what that makes usable.
 
-    path = args.source
-    if not os.path.isfile(path):
-        return die_io("source", path, "no such file")
+    Informational by design: it processes nothing and exits 0 whether or not
+    the external binaries are there, because a hard-fail preflight is a
+    different flag with a different contract. The hints are the same
+    constants the failing conversions print, so the advice never drifts.
+    """
+    usable = {"txt", "md", "html", "htm", "epub"}
+    for name, hint, enables in (
+            ("pdftotext", PDF_HINT, ("pdf",)),
+            ("textutil", TEXTUTIL_HINT, ("doc", "rtf", "odt"))):
+        found = shutil.which(name)
+        if found:
+            stream.write("%s: FOUND: %s\n" % (name, found))
+            usable.update(enables)
+        else:
+            stream.write("%s: MISSING. %s\n" % (name, hint))
+    order = ["txt", "md", "docx", "docm", "pdf", "doc", "rtf", "html",
+             "htm", "odt", "epub"]
+    # docx and docm go through the stdlib reader, so they ride with the
+    # always-usable set rather than behind either external binary.
+    usable.update(("docx", "docm"))
+    ok = [f for f in order if f.lstrip(".") in usable]
+    no = [f for f in order if f.lstrip(".") not in usable]
+    stream.write("usable now: %s\n" % (", ".join(ok) or "none"))
+    if no:
+        stream.write("not usable: %s\n" % ", ".join(no))
+    return 0
+
+
+def print_findings(findings, stream, header="Safety findings"):
+    stream.write("%s\n" % header)
+    for f in findings:
+        stream.write("  L%-4d %s %s: %s\n"
+                     % (f.get("line", 0), f.get("priority", "?"),
+                        f.get("id", "?"), f.get("label", "")))
+
+
+def normalize_one(path):
+    """(text, findings, converter, code) for one source.
+
+    The per-format branch bodies main() used to inline, factored out so a
+    multi-source run converts and safety-scans each file the same way the
+    single-source run always has. code is this source's contribution to the
+    exit: 2 a failed conversion (the caller stops), 1 a scanned PDF or a
+    concealed directive (the text still lands), 0 clean.
+    """
     ext = os.path.splitext(path)[1].lower()
-    if ext not in SUPPORTED:
-        return die_usage("unsupported format %r. Supported: %s"
-                         % (ext or "<none>", ", ".join(SUPPORTED)))
-
-    # `spans` is what the safety scan reads when the output text is not the
-    # richest thing available. None means "scan the output", which is right for
-    # every format whose converter hands back plain text and nothing else.
     findings, spans = [], None
     if ext in (".txt", ".md"):
         try:
             text, code = read_passthrough(path), 0
         except IOError as exc:
-            return die_io("source", path, str(exc))
+            return None, [], None, die_io("source", path, str(exc))
         converter = "passthrough"
     elif ext in (".docx", ".docm"):
         text, findings, code = extract_docx(path)
         if code == 2:
-            return 2
+            return None, [], None, 2
         converter = "rwlib.docx_text"
     elif ext == ".pdf":
         text, code = extract_pdf(path)
         if code == 2:
-            return 2
+            return None, [], None, 2
         converter = "pdftotext"
     elif ext == ".epub":
         text, spans, code = extract_epub(path)
         if code:
-            return code
+            return None, [], None, code
         converter = "stdlib zipfile (epub spine)"
     elif ext in (".html", ".htm"):
         text, spans, code = extract_html(path)
         if code:
-            return code
+            return None, [], None, code
         converter = "stdlib html (strip_xhtml)"
     else:
         text, code = extract_textutil(path)
         if code:
-            return code
+            return None, [], None, code
         converter = "textutil"
-
     findings.extend(safety_findings(
         spans if spans is not None else [("", text)]))
     # One rule, every format. A concealed directive still produces the text
@@ -400,35 +433,185 @@ def main(argv=None):
     if any(f.get("band") == "safety" and f.get("priority") == "P0"
            for f in findings):
         code = 1
+    return text, findings, converter, code
 
-    if findings:
-        print_findings(findings, sys.stderr if args.stdout else sys.stdout)
 
-    out_path = args.out or os.path.join("scratch",
-                                        "%s.txt" % os.path.splitext(
-                                            os.path.basename(path))[0])
-    if args.stdout:
-        sys.stdout.write(text)
-    else:
-        os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
-        with open(out_path, "w", encoding="utf-8", newline="\n") as fh:
-            fh.write(text)
+def expand_sources(entries):
+    """The positional entries as one ordered file list, or an error string.
+
+    Each entry expands in this order: an existing directory becomes its
+    sorted non-recursive supported members; a glob pattern becomes its sorted
+    file matches; anything else is one file that has to exist and be
+    supported. Order is the merge order, so it is stable on purpose.
+    """
+    files = []
+    for entry in entries:
+        if os.path.isdir(entry):
+            members = sorted(
+                n for n in os.listdir(entry)
+                if os.path.splitext(n)[1].lower() in SUPPORTED
+                and os.path.isfile(os.path.join(entry, n)))
+            if not members:
+                return die_io("source", entry,
+                              "no supported files (%s) in directory"
+                              % ", ".join(SUPPORTED))
+            files.extend(os.path.join(entry, n) for n in members)
+        elif any(c in entry for c in "*?["):
+            matches = sorted(p for p in glob.glob(entry) if os.path.isfile(p))
+            if not matches:
+                return die_io("source", entry, "glob matched no files")
+            files.extend(matches)
+        else:
+            if not os.path.isfile(entry):
+                return die_io("source", entry, "no such file")
+            files.append(entry)
+    for path in files:
+        if os.path.splitext(path)[1].lower() not in SUPPORTED:
+            return die_usage("unsupported format %r in %r. Supported: %s"
+                             % (os.path.splitext(path)[1].lower(), path,
+                                ", ".join(SUPPORTED)))
+    return files
+
+
+def main(argv=None):
+    ap = cli_error.LLMArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        examples=EXAMPLES)
+    ap.add_argument("sources", metavar="PATH", nargs="*",
+                    help="the document(s) to normalize: %s. A directory "
+                         "expands to its sorted supported members, a glob to "
+                         "its matches, and several sources merge in the order "
+                         "given, each behind a demarcation line"
+                         % ", ".join(SUPPORTED))
+    ap.add_argument("--out", metavar="PATH",
+                    help="where the text goes. Defaults to "
+                         "scratch/<source-stem>.txt under the working "
+                         "directory for one source; required for several, "
+                         "which also writes <out>.manifest.json")
+    ap.add_argument("--stdout", action="store_true",
+                    help="print the text instead of writing a file, with the "
+                         "stats on stderr so stdout stays pipeable")
+    ap.add_argument("--check", action="store_true",
+                    help="report which converters are installed and which "
+                         "input formats are therefore usable, then exit 0. "
+                         "Processes nothing")
+    args = ap.parse_args(argv)
+
+    if args.check:
+        if args.sources:
+            return die_usage("--check processes nothing, so it cannot be "
+                             "combined with source paths")
+        return run_preflight(sys.stdout)
+    if not args.sources:
+        return die_usage("give at least one source path, or --check")
+
+    files = expand_sources(args.sources)
+    if isinstance(files, int):
+        return files
+
+    multi = len(files) > 1
+    if multi and args.stdout:
+        return die_usage("multiple sources cannot go to --stdout; give --out "
+                         "so the merge and its manifest land somewhere")
+    if multi and not args.out:
+        return die_usage("multiple sources need --out: there is no single "
+                         "stem to name a default output after")
+
+    if not multi:
+        # One source: the shape this script has always had, byte for byte.
+        path = files[0]
+        text, findings, converter, code = normalize_one(path)
+        if code == 2:
+            return 2
+        if findings:
+            print_findings(findings, sys.stderr if args.stdout else sys.stdout)
+
+        out_path = args.out or os.path.join(
+            "scratch", "%s.txt" % os.path.splitext(os.path.basename(path))[0])
+        if args.stdout:
+            sys.stdout.write(text)
+        else:
+            os.makedirs(os.path.dirname(os.path.abspath(out_path)),
+                        exist_ok=True)
+            with open(out_path, "w", encoding="utf-8", newline="\n") as fh:
+                fh.write(text)
+
+        stats = sys.stderr if args.stdout else sys.stdout
+        stats.write("format: %s\n" % (os.path.splitext(path)[1].lstrip(".")
+                                      or "none"))
+        stats.write("converter: %s\n" % converter)
+        stats.write("bytes in: %d\n" % os.path.getsize(path))
+        stats.write("chars out: %d\n" % len(text))
+        stats.write("words out: %d\n" % len(text.split()))
+        stats.write("lines out: %d\n" % len(text.splitlines()))
+        # A budget, not a tokenizer; rwlib.endpoint pins the pessimism.
+        stats.write("est. tokens: %d\n" % estimate_tokens(text))
+        stats.write("output: %s\n"
+                    % ("<stdout>" if args.stdout else out_path))
+        invisible = invisible_note(text)
+        if invisible:
+            stats.write(invisible + "\n")
+        foreign = language.note(text)
+        if foreign:
+            stats.write(foreign + "\n")
+        stats.write(GUARDRAIL + "\n")
+        return code
+
+    merged_parts, manifest = [], []
+    line_cursor, code = 0, 0
+    for path in files:
+        text, findings, converter, src_code = normalize_one(path)
+        if src_code == 2:
+            return 2
+        demarc = SOURCE_DEMARC % path
+        # Each source is one block: the demarcation line, its text, and a
+        # blank separator. line_offset addresses the demarcation, which is
+        # where the source's slice of the merged file begins.
+        offset = line_cursor + 1
+        merged_parts.append(demarc + "\n")
+        if not text.endswith("\n"):
+            text += "\n"
+        merged_parts.append(text)
+        merged_parts.append("\n")
+        line_cursor += len(text.splitlines()) + 2
+        manifest.append({"path": path, "converter": converter,
+                         "bytes_in": os.path.getsize(path),
+                         "words": len(text.split()),
+                         "line_offset": offset})
+        if findings:
+            stream = sys.stderr if args.stdout else sys.stdout
+            print_findings(findings, stream, "Safety findings: %s" % path)
+        code = max(code, src_code)
+
+    merged = "".join(merged_parts)
+    out_path = args.out
+    os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
+    with open(out_path, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(merged)
+    manifest_path = out_path + ".manifest.json"
+    with open(manifest_path, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(manifest, fh, indent=2)
+        fh.write("\n")
 
     stats = sys.stderr if args.stdout else sys.stdout
-    stats.write("format: %s\n" % (ext.lstrip(".") or "none"))
-    stats.write("converter: %s\n" % converter)
-    stats.write("bytes in: %d\n" % os.path.getsize(path))
-    stats.write("chars out: %d\n" % len(text))
-    stats.write("words out: %d\n" % len(text.split()))
-    stats.write("lines out: %d\n" % len(text.splitlines()))
-    stats.write("output: %s\n" % ("<stdout>" if args.stdout else out_path))
-    invisible = invisible_note(text)
+    stats.write("sources: %d\n" % len(files))
+    for i, entry in enumerate(manifest):
+        stats.write("source[%d]: %s (%s, %d bytes in, %d words, line %d)\n"
+                    % (i, entry["path"], entry["converter"],
+                       entry["bytes_in"], entry["words"],
+                       entry["line_offset"]))
+    stats.write("chars out: %d\n" % len(merged))
+    stats.write("words out: %d\n" % len(merged.split()))
+    stats.write("lines out: %d\n" % len(merged.splitlines()))
+    # A budget, not a tokenizer; rwlib.endpoint pins the pessimism.
+    stats.write("est. tokens: %d\n" % estimate_tokens(merged))
+    stats.write("output: %s\n" % out_path)
+    stats.write("manifest: %s\n" % manifest_path)
+    invisible = invisible_note(merged)
     if invisible:
         stats.write(invisible + "\n")
-    # The ASCII rule the fan-out prompt imposes on the notes collides with any
-    # source carrying non-Latin script, and the reader has to decide what to do
-    # about that before a subagent improvises an answer per doc.
-    foreign = language.note(text)
+    foreign = language.note(merged)
     if foreign:
         stats.write(foreign + "\n")
     stats.write(GUARDRAIL + "\n")

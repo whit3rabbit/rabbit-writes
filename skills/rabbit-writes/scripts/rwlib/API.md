@@ -1,6 +1,6 @@
 # `rwlib` Public API Reference
 
-`rwlib` is the shared engine behind `rabbit-writes`, `readme-writing`, and companion scripts. It requires only the Python standard library (Python 3.9+) and zero external dependencies.
+`rwlib` is the shared engine behind `rabbit-writes`, `rabbit-readme-improver`, and companion scripts. It requires only the Python standard library (Python 3.9+) and zero external dependencies.
 
 ## Integration Patterns
 
@@ -93,7 +93,7 @@ Stylometric fingerprinting and voice distance calculations.
 
 ### `rwlib.ste`
 ASD-STE100 Issue 9 Simplified Technical English structural and vocabulary checks.
-- `version(path=None)`: STE lexicon version integer (`3`).
+- `version(path=None)`: STE lexicon version integer (`4`).
 - `check(text, mode=None, scope="all", word_cap=None)`: Run STE checks. `scope="mechanical"` runs the default counted band; `scope="all"` includes advisory vocabulary.
 - `check_for_scan(text, ...)`: Run STE checks and attach `ste_version` to each finding.
 - `MECHANICAL_IDS`: Counted, default-on finding IDs (`ste-sentence-procedural`, `ste-sentence-descriptive`, `ste-paragraph-sentences`, `ste-condition-order`, `ste-no-punctuation`).

@@ -8,6 +8,9 @@ Skill for distilling books, papers, and theses into terse per-concept cheatsheet
 # Normalize a source to plain text (txt, md, docx, pdf, doc, rtf, html, odt, epub)
 python3 skills/rabbit-reads/scripts/extract_text.py <source>
 
+# Normalize several sources into one merge with a manifest
+python3 skills/rabbit-reads/scripts/extract_text.py <source>... --out scratch/merged.txt
+
 # Map section line ranges over the normalized text, cut into fan-out batches
 python3 skills/rabbit-reads/scripts/map_structure.py <source> --book-type <type> --batches <n>
 

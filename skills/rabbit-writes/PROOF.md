@@ -7,7 +7,7 @@ Reproduce in one command, no dependencies:
 ```bash
 for f in SKILL.md PROOF.md references/*.md references/forms/*.md \
          references/citations/*.md voices/whit3rabbit.md \
-         ../voice-setup/SKILL.md ../readme-writing/SKILL.md \
+         ../voice-setup/SKILL.md ../rabbit-readme-improver/SKILL.md \
          ../rabbit-reads/SKILL.md ../rabbit-rewrites/SKILL.md; do
   echo "== $f"; python3 scripts/scan.py "$f" --no-ste
 done
@@ -61,7 +61,7 @@ Every number below was measured against a particular pattern catalogue, and the 
 | `references/citations/mla9.md` | 685 | 0 | 0 | 0 | 0.68 | 0.69 | 0.0 |
 | `voices/whit3rabbit.md` | 1,558 | 0 | 0 | **10** | 0.68 | 0.78 | 0.0 |
 | `../voice-setup/SKILL.md` | 3,532 | 0 | 0 | 0 | 0.65 | 0.72 | 0.0 |
-| `../readme-writing/SKILL.md` | 2,514 | 0 | 0 | 0 | 0.64 | 0.73 | 0.0 |
+| `../rabbit-readme-improver/SKILL.md` | 2,514 | 0 | 0 | 0 | 0.64 | 0.73 | 0.0 |
 | `../rabbit-reads/SKILL.md` | 1,134 | 0 | 0 | **1** | 0.64 | 0.68 | 0.0 |
 | `../rabbit-rewrites/SKILL.md` | 866 | 0 | 0 | 0 | 0.62 | 0.70 | 0.0 |
 
@@ -74,7 +74,7 @@ The five counted checks run in every scan now, so this is the same sweep with th
 ```bash
 for f in SKILL.md PROOF.md references/*.md references/forms/*.md \
          references/citations/*.md voices/whit3rabbit.md \
-         ../voice-setup/SKILL.md ../readme-writing/SKILL.md \
+         ../voice-setup/SKILL.md ../rabbit-readme-improver/SKILL.md \
          ../rabbit-reads/SKILL.md ../rabbit-rewrites/SKILL.md; do
   echo "== $f"; python3 scripts/scan.py "$f" --json | \
     python3 -c 'import sys,json,collections;print(collections.Counter(f["id"] for f in json.load(sys.stdin)["findings"] if f["id"].startswith("ste-")))'
@@ -92,7 +92,7 @@ done
 | `references/ste.md` | 1 | 0 | 0 | 0 |
 | `voices/whit3rabbit.md` | 3 | 0 | 0 | 0 |
 | `../voice-setup/SKILL.md` | 12 | 16 | 1 | 0 |
-| `../readme-writing/SKILL.md` | 7 | 10 | 0 | 0 |
+| `../rabbit-readme-improver/SKILL.md` | 7 | 10 | 0 | 0 |
 | `../rabbit-reads/SKILL.md` | 1 | 0 | 0 | 0 |
 | **Total, 41 files** | **115** | **154** | **1** | **5** |
 
@@ -158,7 +158,7 @@ The `forget` family took a second pass, in review rather than against the corpus
 
 The twelfth pass moved one row and no findings column. `../voice-setup/SKILL.md` grew to 3,379 words where the measured thesaurus is now documented: the words-to-reach-for table, the proposals it prints, and the families file beside the script. Its burstiness and MATTR moved with the words, and the voice table below still carries its six serial-comma advisories.
 
-The eleventh pass moved four word counts and no findings column, and one of the four had been wrong before any document changed. `SKILL.md` published 3,806 against 3,860 measured at the time, a transposition nobody caught, and it has since grown to 3,987 where opt-in register auto-detection is documented. `references/injection.md` gained the sentence saying a quoted span in a report is data rather than an instruction, and it is the only row whose burstiness moved with its words. `../voice-setup/SKILL.md` gained the `--out` flag and the note that `--scaffold --activate` is refused until a profile passes its own check, and `../readme-writing/SKILL.md` lost ten words tightening the table-of-contents threshold. Every P0, P1, and P2 column is where it was.
+The eleventh pass moved four word counts and no findings column, and one of the four had been wrong before any document changed. `SKILL.md` published 3,806 against 3,860 measured at the time, a transposition nobody caught, and it has since grown to 3,987 where opt-in register auto-detection is documented. `references/injection.md` gained the sentence saying a quoted span in a report is data rather than an instruction, and it is the only row whose burstiness moved with its words. `../voice-setup/SKILL.md` gained the `--out` flag and the note that `--scaffold --activate` is refused until a profile passes its own check, and `../rabbit-readme-improver/SKILL.md` lost ten words tightening the table-of-contents threshold. Every P0, P1, and P2 column is where it was.
 
 The ninth pass moved one row, this file's, and it moved a findings column. A bug-fix pass narrowed the `forget` rule and the paragraph explaining it quotes an attack shape, which the safety band reads and reports at P2 the way it reports the nine in `references/injection.md`. Two other fixes could have moved a column here and did not: tier-1 words no longer double-count a tier-1 phrase they sit inside, which cost nothing in this table because both hits were in exempted spans, and `verify.py` stopped reporting a path inside a table row twice, which nothing in this table measures.
 
@@ -168,7 +168,7 @@ It caught this document once on the way, which is the only reason worth publishi
 
 The fifth pass moved them for the same reason and not because the engine changed its mind about anything above. `voices/whit3rabbit.md` gained the Quick reference card and Anti-overfitting sections that `TEMPLATE.md` has always had and the worked example did not, which is 335 more words and three more list-label advisories. `references/voice.md`, `SKILL.md`, and `../voice-setup/SKILL.md` grew where blending, per-register mechanics, and `measure_voice.py` are now documented. Every P0 and P1 column is where it was.
 
-The seventh pass moved three rows, and two of them are the plugin failing its own rules in public. `../readme-writing/SKILL.md` dropped from 7 P2 hits to 0: every one was `list-label-period`, its own craft band firing on its own bolded list labels. `../voice-setup/SKILL.md` went from 1.3 em dashes per 1,000 words to 0.0, which matters because the active voice forbids em dashes outright and `CLAUDE.md` states that as the repo's convention. `SKILL.md` grew where `--voice auto` and the `PROOF.md` reference row are now documented. No P0 or P1 column moved anywhere.
+The seventh pass moved three rows, and two of them are the plugin failing its own rules in public. `../rabbit-readme-improver/SKILL.md` dropped from 7 P2 hits to 0: every one was `list-label-period`, its own craft band firing on its own bolded list labels. `../voice-setup/SKILL.md` went from 1.3 em dashes per 1,000 words to 0.0, which matters because the active voice forbids em dashes outright and `CLAUDE.md` states that as the repo's convention. `SKILL.md` grew where `--voice auto` and the `PROOF.md` reference row are now documented. No P0 or P1 column moved anywhere.
 
 One of those em dashes is worth naming, because the scan did not find it and a reader has to. An em dash on a list line that also carries an inline code span is not reported, while the same dash on a plain list line is. Two of the three in `../voice-setup/SKILL.md` sat behind a code span in exactly that shape. They were found by sweeping the file for codepoints above 127, which is the habit `CLAUDE.md` already prescribes for invisible characters, and the same habit turns out to catch a visible one the counters miss.
 
@@ -188,7 +188,7 @@ Anyone enabling the `rabbit-scan` pre-commit hook on a repository that writes ab
 
 **`craft.md` has 7 P2 hits.** The boilerplate detector firing on "the intersection of" and the transition detector firing on paragraph-initial "Additionally" inside rule text. Real hits on prose that is quoting rules rather than following them.
 
-**`readme-writing/SKILL.md` used to carry 8 em dashes per 1,000 words,** the highest rate in the plugin and above the 6.0 human-range ceiling. An earlier version of this file left that visible rather than fixing it, on the grounds that publishing the number was the honest move.
+**`rabbit-readme-improver/SKILL.md` used to carry 8 em dashes per 1,000 words,** the highest rate in the plugin and above the 6.0 human-range ceiling. An earlier version of this file left that visible rather than fixing it, on the grounds that publishing the number was the honest move.
 
 That was half right. `CLAUDE.md` states the repo's prose convention as no em dashes and no semicolons, so leaving them made the convention untrue rather than making the report honest. The prose was rewritten instead. The file now reads 0.0 per 1,000 words and 0 voice hits, and the P1 it used to carry is gone with them.
 
@@ -259,7 +259,7 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | File | Voice hits | What they are |
 |---|---:|---|
 | `../rabbit-rewrites/SKILL.md` | 0 |  |
-| `../readme-writing/SKILL.md` | 0 |  |
+| `../rabbit-readme-improver/SKILL.md` | 0 |  |
 | `references/craft.md` | 0 |  |
 | `references/forms/case-study.md` | 0 |  |
 | `references/forms/docs.md` | 0 |  |
@@ -553,4 +553,4 @@ A second one was parked in the third review, with the measurement written down t
 
 Filtering the paragraph statistics through `is_prose_block()` was measured too, and rejected for the opposite reason: what survives in a list-heavy file is the one-sentence lead-ins, whose length is uniform by nature, so `checklist.md` drops to a paragraph sd of 0.53 and newly trips `uniform-paragraphs` for having short paragraphs that are correct. A bullet is also prose a reader reads, which a `##` is not.
 
-The readme-writing skill had the same rule reading the same shape wrong, from the other direction: a block whose first line was prose and whose remaining lines were bullets scored as one long paragraph. That one was not parked, because nothing published depends on it. It is item 28 above.
+The rabbit-readme-improver skill had the same rule reading the same shape wrong, from the other direction: a block whose first line was prose and whose remaining lines were bullets scored as one long paragraph. That one was not parked, because nothing published depends on it. It is item 28 above.
