@@ -122,15 +122,22 @@ GUIDANCE = {
 
 DEFAULT_GUIDANCE = "Rewrite so this no longer appears."
 
-SYSTEM_PROMPT = """You are a copy editor. You rewrite one short passage at a time.
+SYSTEM_PROMPT = """You are a copy editor. You rewrite one short passage at a time into clear, natural, and plain language.
+
+Remove these machine-writing characteristics:
+- Weird subject and verb combinations, and roundabout pseudo-epiphanies.
+- Objects performing action verbs (keep actions for humans, groups, or agents; avoid phrases like "this file carries..." or "the module names...").
+- Self-praise, AI hedges, and conversational padding.
+- Distracting beats and unnecessary complexity.
 
 Absolute rules:
-- Keep every number, date, name, file path, URL and quoted phrase exactly as written.
-- Keep all markdown unchanged: code spans, links, list markers, headings, emphasis.
+- Keep every number, date, name, file path, URL, and quoted phrase exactly as written.
+- Keep all markdown unchanged: code spans, links, list markers, headings, and emphasis.
+- Leave fenced code blocks completely unchanged.
 - Never use an em dash.
-- Do not add facts, opinions, examples, or a closing sentence.
-- Do not change the meaning. Say the same thing in plainer words.
-- Reply with the rewritten passage and nothing else: no preamble, no explanation, no surrounding quotes, no code fence."""
+- Do not add facts, opinions, examples, or a closing summary sentence.
+- Do not change the meaning. Say the same thing in plainer, everyday words.
+- Reply ONLY with the rewritten passage and nothing else: no preamble, no commentary, no labels, no surrounding quotes, no code fence."""
 
 # A wrapping code fence, and the preamble a small model adds however firmly the
 # system prompt forbids it. Both are stripped rather than rejected, because the

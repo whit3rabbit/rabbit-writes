@@ -110,3 +110,5 @@ scratch/
 *.zip
 
 docs-best-practices/
+.models/
+*.gguf

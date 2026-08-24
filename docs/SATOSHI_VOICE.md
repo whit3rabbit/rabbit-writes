@@ -81,7 +81,7 @@ Using `measure_voice.py` and dedicated stylometric tokenizers from `rwlib/stylom
 
 ## 3. Qualitative Voice Architecture
 
-The qualitative profile lives in [`skills/rabbit-writes/voices/satoshi.md`](file:///Users/whit3rabbit/Documents/GitHub/rabbit-writes/skills/rabbit-writes/voices/satoshi.md).
+The qualitative profile lives in [`skills/rabbit-writes/voices/satoshi.md`](../skills/rabbit-writes/voices/satoshi.md).
 
 ### The Three Essentials
 
@@ -121,7 +121,7 @@ complexity: 0.65      # Conceptually dense systems logic expressed in simple, un
 
 ## 4. Machine-Enforceable Rules (`satoshi.rules.json`)
 
-The mechanical layer lives in [`skills/rabbit-writes/voices/satoshi.rules.json`](file:///Users/whit3rabbit/Documents/GitHub/rabbit-writes/skills/rabbit-writes/voices/satoshi.rules.json).
+The mechanical layer lives in [`skills/rabbit-writes/voices/satoshi.rules.json`](../skills/rabbit-writes/voices/satoshi.rules.json).
 
 ### Validated Rules Schema
 
@@ -177,7 +177,7 @@ The mechanical layer lives in [`skills/rabbit-writes/voices/satoshi.rules.json`]
 
 ## 5. Oracle Discrimination Testing Benchmark
 
-We built an automated test runner ([`scripts/satoshi_oracle_test.py`](file:///Users/whit3rabbit/Documents/GitHub/rabbit-writes/scripts/satoshi_oracle_test.py)) to test authorship discrimination.
+We built an automated test runner ([`scripts/satoshi_oracle_test.py`](../scripts/satoshi_oracle_test.py)) to test authorship discrimination.
 
 A document is classified as **Satoshi** if:
 1. **0 P0 Voice Violations** (clean of banned words, hype, buzzwords, and absolute security claims).

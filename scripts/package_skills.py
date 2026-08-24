@@ -276,8 +276,8 @@ SUBSTITUTIONS = {
                 "```\n\n"
                 "Same structural checks over every installed profile, plus "
                 "active-voice alignment and file pairing. Note the path: it sits "
-                "at the repository root rather than under `" + PLUGIN_VAR + "/skills/`, "
-                "so it only exists in a full-repo install and is absent when the "
+                "at the repository root rather than under `" + PLUGIN_VAR + "/skills/`. "
+                "It only exists in a full-repo install, and is absent when the "
                 "skills were copied in loose. `build_voice.py --check` is "
                 "the one that ships with the skill, which is why it is the step "
                 "above and not this one.",

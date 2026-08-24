@@ -12,37 +12,40 @@ Detection in this plugin needs no model. `scan.py` is pure Python and runs on a 
 
 **Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `rabbit-readme-improver`, `rabbit-reads`, `rabbit-rewrites`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
 
-The design rests on one fact and one mechanism.
+The design rests on three core principles: targeted chunking, persistent settings reuse, and gated execution.
 
-**The fact.** A tell sits in a sentence. Send that sentence and the rule it broke, and the request is about 150 tokens whatever the document's length. The document is never sent, so there is no chunking strategy, no overlap window, and no context limit to design around. A 10,000-word draft with 40 findings is 40 independent 150-token calls.
+## 1. Targeted chunking and context
 
-**The mechanism.** A small model is not trusted, it is gated. Every reply has to survive `verify.py`, which is the same check that decides whether `--apply-safe` writes at all, plus a rescan proving the tell is gone and nothing new arrived. A rejected reply is retried with the reason attached, then abandoned, and the original text stays. That is what makes a 1.7B a plausible engine here and what makes "which model" a measurement rather than an argument.
+Rather than sending entire documents (which exceed small model context windows and cause hallucinated edits), the engine chunks flagged prose into focused, contextual units:
 
-## Set up an endpoint
+- **Sentence units with local context**: A tell sitting in a sentence is chunked alongside its preceding sentence context. The model receives the target sentence, the specific problem to remove, and surrounding context to resolve pronoun referents, antecedents, and narrative tone without being asked to rewrite the context itself.
+- **Passage and block units**: Structural and density tells (`uniformity`, `tier2-cluster`, `tier3-density`) are chunked at the full paragraph level, sized against the endpoint's input budget.
+- **Unit merging**: Multiple findings landing within the same sentence are merged into a single rewrite unit, preventing colliding edits from invalidating the comparison baseline.
 
-Any server speaking `POST {base_url}/chat/completions` works. There is one client, and the URL does the rest.
+A 10,000-word draft with 40 findings becomes 40 focused 150- to 350-token requests, keeping token budgets tight while giving the model enough context to preserve flow.
 
-```bash
-llama-server -m qwen3-1.7b-q4_k_m.gguf --port 8080 -c 4096 --flash-attn
-```
+## 2. Settings: Looked at and saved first
 
-```bash
-ollama serve   # then use http://127.0.0.1:11434/v1
-```
+Always look for existing settings before prompting or reconfiguring. The engine checks configuration sources in this order:
 
-Point the tool at it once, in a `.rabbit-model` file beside the document or at the repository root, next to `.rabbit-voice`:
+1. `.rabbit-model` in the directory beside the document or the current working directory.
+2. `.rabbit-model` at the repository root.
+3. Environment variables: `$RABBIT_MODEL_BASE_URL`, `$RABBIT_MODEL_NAME`, `$RABBIT_MODEL_API_KEY`.
+
+Save user configuration to `.rabbit-model` so settings persist and are automatically reused on every run:
 
 ```json
 {
   "base_url": "http://127.0.0.1:8080/v1",
-  "model": "qwen3-1.7b",
+  "model": "qwen2.5-3b-instruct",
   "context_tokens": 4096,
   "max_output_tokens": 640,
-  "temperature": 0.2
+  "temperature": 0.2,
+  "disable_thinking": true
 }
 ```
 
-For a hosted endpoint, name the environment variable holding the key. Never the key itself:
+For hosted endpoints (e.g. OpenRouter), specify the environment variable holding the key (`api_key_env`) rather than committing raw keys:
 
 ```json
 {
@@ -52,72 +55,111 @@ For a hosted endpoint, name the environment variable holding the key. Never the 
 }
 ```
 
-`$RABBIT_MODEL_BASE_URL`, `$RABBIT_MODEL_NAME` and `$RABBIT_MODEL_API_KEY` are the fallback for CI. Nothing is configured by default and nothing is auto-discovered: a tool that quietly finds a server on port 11434 is a tool that quietly ships somebody's draft to whatever is listening there.
+## 3. Recommended models and download locations
 
-**Thinking is turned off in every request, and you want it that way.** Most current small models are hybrid reasoning models, and a reasoning block eats the output budget before the model reaches the rewrite. Measured on Qwen3.5-0.8B-Q4_K_M over the battery below: thinking on scored 0 accepted out of 15 at 8.6 seconds a passage, all fifteen dying at `max_tokens` with an empty reply. Thinking off, the same model scored 10 of 15 at 0.47 seconds. Set `"disable_thinking": false` if you have a model that needs it, and raise `max_output_tokens` well past 640 when you do.
+Small local models (1.5B to 8B parameters) perform reliably when guided by strict prompts and the verification gate. Detailed download sources, commands, and quantization notes live in `references/models.md`.
+
+| Model Family | Recommended Sizes | Primary Download Source | Ollama Tag |
+|---|---|---|---|
+| **Qwen 2.5 / 3** | 1.5B, 3B, 7B | Hugging Face (`Qwen/Qwen2.5-3B-Instruct-GGUF`) | `qwen2.5:1.5b`, `qwen2.5:3b`, `qwen2.5:7b` |
+| **Gemma 2 / 4** | 2B, 9B, 26B (MLX) | Hugging Face (`google/gemma-2-2b-it-GGUF`) | `gemma2:2b`, `gemma2:9b`, `gemma4:26b-mlx` |
+| **Llama 3.2 / 3.1** | 3B, 8B | Hugging Face (`meta-llama/Llama-3.2-3B-Instruct-GGUF`) | `llama3.2:3b`, `llama3.1:8b` |
+
+### Suggested storage paths
+
+- Local project directory: `./models/`
+- User model cache: `~/.cache/llama.cpp/` or `~/.local/share/models/`
+- LM Studio / Ollama cache: `~/.cache/lm-studio/models/` or `~/.ollama/models/`
+
+### Serving an endpoint
+
+```bash
+# llama-server
+llama-server -m ./models/qwen2.5-3b-instruct-q4_k_m.gguf --port 8080 -c 4096 --flash-attn
+
+# Ollama (endpoint at http://127.0.0.1:11434/v1)
+ollama serve
+```
+
+## 4. System prompt and editing rules
+
+The rewriting system prompt blends plain-language simplification with targeted de-slopping:
+
+```text
+You are a copy editor. You rewrite one short passage at a time into clear, natural, and plain language.
+
+Remove these machine-writing characteristics:
+- Weird subject and verb combinations, and roundabout pseudo-epiphanies.
+- Objects performing action verbs (keep actions for humans, groups, or agents; avoid phrases like "this file carries..." or "the module names...").
+- Self-praise, AI hedges, and conversational padding.
+- Distracting beats and unnecessary complexity.
+
+Absolute rules:
+- Keep every number, date, name, file path, URL, and quoted phrase exactly as written.
+- Keep all markdown unchanged: code spans, links, list markers, headings, and emphasis.
+- Leave fenced code blocks completely unchanged.
+- Never use an em dash (—).
+- Do not add facts, opinions, examples, or a closing summary sentence.
+- Do not change the meaning. Say the same thing in plainer, everyday words.
+- Reply ONLY with the rewritten passage and nothing else: no preamble, no commentary, no labels, no surrounding quotes, no code fence.
+```
+
+### Style presets
+- **Default (Plain Language)**: Everyday vocabulary, active verbs, concise sentences.
+- **TL;DR**: Short summary retaining every key fact, cutting length by half.
+- **5-Year-Old (5y)**: Maximum simplicity, short conversational phrasing.
+
+**Thinking / reasoning tokens:** Disabled by default (`"disable_thinking": true`, sending `reasoning_effort: "none"` and `enable_thinking: false`). Reasoning blocks consume the output token budget before the model emits the rewrite.
+
+## 5. The gating mechanism
+
+A small model is never trusted blindly:
+1. **Fact preservation**: Every candidate must pass `verify.py` validation (numbers, dates, paths, code spans, quotes, and links must match exactly).
+2. **Rescan validation**: A rescan verifies that the flagged tell is gone and no new tells were introduced.
+3. **Retry loop**: Rejected completions are retried with the rejection reason appended. If all attempts fail, the original text is preserved untouched.
 
 ## Run it
 
-Deterministic fixes first. They are free, they are correct, and they leave the model a smaller job.
-
+Deterministic fixes first:
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py draft.md --apply-safe --write
 ```
 
-Then see what would be sent, without sending any of it. Run this first on a document that is not yours.
-
+Dry run / plan what would be sent:
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py draft.md --apply-model --model-plan
 ```
 
-Then the rewrite. Without `--write` it is a dry run that prints every before and after.
-
+Apply model rewrites:
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py draft.md --apply-model
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py draft.md --apply-model --write
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py draft.md --apply-model --stdout | diff draft.md -
 ```
 
-`--model-limit N` stops after N passages and lists what it dropped. `--model-attempts N` changes how many tries each passage gets before it is left alone, and each retry is told why the last one was rejected.
+`--model-limit N` stops after N passages. `--model-attempts N` controls retry attempts per passage.
 
-## Which model
+## Benchmarking models
 
-Do not take a recommendation, take a measurement. The bench runs a fixed battery of twelve passages through whatever endpoint is configured and reports the pass rate through the same gate the real run uses.
+Measure actual pass rates using the fixed 12-passage test battery:
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-rewrites/scripts/bench.py --model-endpoint http://127.0.0.1:8080/v1 --model-name qwen3-1.7b
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-rewrites/scripts/bench.py --repeat 3 --json > qwen3-1.7b.json
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-rewrites/scripts/bench.py --model-endpoint http://127.0.0.1:8080/v1 --model-name qwen2.5-3b
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-rewrites/scripts/bench.py --repeat 3 --json > qwen2.5-3b.json
 ```
-
-Read the rejection histogram before the pass rate. A model failing mostly on "nothing improved" wants a better prompt or more parameters. One failing on "number altered or removed" is unsafe for this job at any size, and its pass rate is beside the point.
-
-Two things worth knowing before you pick. Sub-2B models are reported to struggle with multi-step instructions, and the reason one is plausible here is that the task is deliberately single-step and single-passage. And a model trained on the same prose everything else was trained on will reach for a second tell while removing the first, which the gate catches and counts as a rejection rather than a fix.
 
 ## What this will not do
 
-**It will not match a voice.** Rewriting a passage to hit a stored fingerprint is not a sentence-level task and a small model cannot do it. This is the de-slop path. Voice conversion stays with `rabbit-writes` and a capable model.
-
-**It will not check grammar.** The gate proves a rewrite kept every number, date, path, and quotation, and lost the tell. A fluent-sounding but ungrammatical reply passes every check here. Read the diff.
-
-**It will not touch code, tables, headings, or lists.** Only prose blocks are sent, and a finding inside anything else is reported as not sent rather than skipped silently.
-
-**It will not fix everything the scan reports.** Document-wide measurements (lexical diversity, paragraph-length distribution) are not reachable by editing any one passage, and the safety band is never rewritten at all. Both are listed under "not sent to the model" with the reason.
-
-## Safety
-
-**A document carrying a concealed instruction is not sent to any model.** A rewriter is exactly what that text is written for, so the run refuses before the first request, quotes the span, and writes nothing. Nothing in the safety band is fixable and a `rabbit-allow` comment cannot clear it.
-
-**No key in a committed file.** `.rabbit-model` names an environment variable and is rejected outright if it carries an `api_key`.
-
-**No document text over plain http off this machine.** `http://` reaches loopback and nothing else unless the config sets `allow_insecure` for a host you control.
+- **Will not match a voice profile**: Matching a personal voice fingerprint requires broader context and a capable frontier model. Use `rabbit-writes` for voice conversion.
+- **Will not touch code, tables, headings, or lists**: Only prose blocks are processed.
+- **Will not alter safety band findings**: Any concealed instructions or prompt injections are rejected prior to sending.
 
 ## Where things live
 
 | Path | What it holds |
 | --- | --- |
-| `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/rwlib/endpoint.py` | the endpoint, its config resolution, and the three refusals above |
-| `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/rwlib/rewrite.py` | unit planning, the prompts, the gate, the retry loop |
-| `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-rewrites/scripts/bench.py` | the model bench |
-| `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-rewrites/scripts/battery.json` | the twelve passages it scores against |
-
-Editing `battery.json` changes what every published pass rate means, which is what its `version` key is for.
+| `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/rwlib/endpoint.py` | endpoint configuration, resolution, and security checks |
+| `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/rwlib/rewrite.py` | unit planning, prompt templates, gate validation, retry loop |
+| `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-rewrites/references/models.md` | recommended models, download sources, and endpoint setup |
+| `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-rewrites/scripts/bench.py` | the model benchmarking runner |
+| `${CLAUDE_PLUGIN_ROOT}/skills/rabbit-rewrites/scripts/battery.json` | the twelve passages scored in the benchmark |

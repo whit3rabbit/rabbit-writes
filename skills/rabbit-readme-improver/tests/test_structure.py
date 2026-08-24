@@ -369,11 +369,12 @@ def test_positive_no_install_heavy_header_toc_missing_very_long_no_code_block():
     """Verify positive triggers for structural checks."""
     scratch = tempfile.mkdtemp()
     try:
-        # 1. no-install & no-code-block
+        # 1. no-install & no-code-block (short doc: also below the p75 length tier)
         body_no_install = "# Tool\n\nTool processes logs.\n\n## Overview\n\nSome overview.\n\n## License\n\nMIT.\n"
         res1 = run(written(scratch, "R1.md", body_no_install), "--no-voice")
         assert "no-install" in ids(res1)
         assert "no-code-block" in ids(res1)
+        assert "long" not in ids(res1)
 
         # 2. heavy-header (16 nonblank lines before pitch)
         filler = "\n".join("Line %d" % i for i in range(16))
@@ -387,6 +388,14 @@ def test_positive_no_install_heavy_header_toc_missing_very_long_no_code_block():
         res3 = run(written(scratch, "R3.md", body_long), "--no-voice")
         assert "toc-missing" in ids(res3)
         assert "very-long" in ids(res3)
+        assert "long" not in ids(res3)  # tiers are mutually exclusive
+
+        # 4. long (>3612 words but <=6040): p75 tier only, never both
+        paragraphs4 = "\n\n".join(" ".join(["word"] * 50) for _ in range(80))  # 4000 words
+        body_mid = "# Tool\n\nTool is a fast parser for structured text.\n\n## Install\n\n```sh\npip install tool\n```\n\n## Section 1\n\n" + paragraphs4 + "\n\n## License\n\nMIT.\n"
+        res4 = run(written(scratch, "R4.md", body_mid), "--no-voice")
+        assert "long" in ids(res4)
+        assert "very-long" not in ids(res4)
     finally:
         shutil.rmtree(scratch, ignore_errors=True)
 

@@ -7,6 +7,7 @@
 Write and edit in **your** voice, not a chatbot's.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![CI](https://github.com/whit3rabbit/rabbit-writes/actions/workflows/ci.yml/badge.svg)](https://github.com/whit3rabbit/rabbit-writes/actions/workflows/ci.yml)
 
 [Install](#install) • [Run it](#run-it) • [Voice Setup](#first-thing-to-do-make-it-sound-like-you) • [What's in it](#whats-in-it) • [Three Bands](#three-bands-never-conflated) • [What It Will Not Do](#what-it-will-not-do) • [Verify Rewrite](#verify-a-rewrite) • [README Skill](#write-a-readme-with-it) • [Reading Notes](#distill-reading-notes-with-it) • [Tests](#tests) • [Where This Came From](#where-this-came-from) • [Contributing](#contributing-a-voice) • [License](#license)
 
@@ -21,11 +22,11 @@ The voice is data. Swap it, edit it, blend two of them, or write your own from a
 
 ## Skills
 
-- rabbit-writes: The main skill that simplifies, rewrites, and audits prose.
-- rabbit-readme-improver: The main skill that simplifies, rewrites, and audits README.md files. Trained on over 1k of top GitHub README.md files.
-- rabbit-rewrites: The main skill that uses another local LLM to rewrite text to a specific voice.
-- rabbit-reads: The main skill that distills a book, paper, or thesis into per-concept cheatsheets.
-- voice-setup: The main skill that builds, measures, edits, blends, or switches a voice profile.
+- **rabbit-writes**: drafts, converts, de-slops, or audits prose against your voice profile.
+- **rabbit-readme-improver**: drafts or audits a README against patterns measured from 100 trending GitHub repos.
+- **rabbit-rewrites**: applies the flagged fixes through a small local model, so the document never leaves the machine.
+- **rabbit-reads**: distills a book, paper, or thesis into per-concept cheatsheets.
+- **voice-setup**: builds, measures, edits, blends, or switches voice profiles.
 
 
 ## Install
@@ -134,9 +135,13 @@ The custom-skill upload on claude.ai takes one skill per zip, so the plugin also
 python3 scripts/package_skills.py
 ```
 
-That writes `dist/rabbit-writes.zip`, `dist/voice-setup.zip`, `dist/rabbit-readme-improver.zip`, `dist/rabbit-reads.zip`, and `dist/rabbit-rewrites.zip`. Upload the ones you want. Each stands alone: the four satellite skills carry their own copy of the engine (`scan.py`, `verify.py`, `rwlib/`, its data files), their own `voices/` snapshot, and a `SKILL.md` rewritten at package time so every path resolves inside the archive rather than through `${CLAUDE_PLUGIN_ROOT}`.
+That writes `dist/rabbit-writes.zip`, `dist/voice-setup.zip`, `dist/rabbit-readme-improver.zip`, `dist/rabbit-reads.zip`, and `dist/rabbit-rewrites.zip`. Upload the ones you want.
 
-The isolation is the tradeoff. Two uploaded skills cannot share voices: each carries its own `voices/` copy, and a profile built inside one never reaches another. The plugin install above is the integrated path, one engine and one voices directory for all five skills. `python3 scripts/test_package_skills.py` extracts each archive outside the repo and runs what it ships, which is what keeps the standalone claim true.
+Each stands alone: the four satellite skills carry their own copy of the engine (`scan.py`, `verify.py`, `rwlib/`, its data files), their own `voices/` snapshot, and a `SKILL.md` rewritten at package time so every path resolves inside the archive rather than through `${CLAUDE_PLUGIN_ROOT}`.
+
+The isolation is the tradeoff. Two uploaded skills cannot share voices: each carries its own `voices/` copy, and a profile built inside one never reaches another. The plugin install above is the integrated path, one engine and one voices directory for all five skills.
+
+`python3 scripts/test_package_skills.py` extracts each archive outside the repo and runs what it ships, which is what keeps the standalone claim true.
 
 </details>
 
@@ -267,7 +272,9 @@ The voice halves are separate hooks, `readme-check-voice` and `rabbit-scan-voice
 
 Override `args` with `[--voice-rules, .writing/dana.rules.json]` to name one by hand instead, relative to your repository root.
 
-One P0 to know about before enabling `rabbit-scan` unscoped: a chat citation marker is checked against the raw text rather than the exempted copy, so a document that quotes one in backticks to warn about it blocks the commit. The markers themselves are listed in `skills/rabbit-writes/references/patterns.md`, which scores 5 P0s of its own for exactly this reason.
+One P0 to know about before enabling `rabbit-scan` unscoped: a chat citation marker is checked against the raw text rather than the exempted copy, so a document that quotes one in backticks to warn about it blocks the commit.
+
+The markers themselves are listed in `skills/rabbit-writes/references/patterns.md`, which scores 5 P0s of its own for exactly this reason.
 
 Two ways out, and the second is usually better than scoping the hook:
 
@@ -275,7 +282,9 @@ Two ways out, and the second is usually better than scoping the hook:
 <!-- rabbit-allow: citation-leak (this page catalogues the markers) -->
 ```
 
-That goes in the document and applies to that file. The reason is not optional: without one the suppression does not apply and raises a P1 of its own. The finding is still printed, with the reason and the line that allowed it, and one that covers nothing is reported so stale suppressions do not accumulate. Only the exit code changes. `files:` is the blunter tool and stays right for a directory of generated markdown nobody wrote.
+That goes in the document and applies to that file. The reason is not optional: without one the suppression does not apply and raises a P1 of its own.
+
+The finding is still printed either way, with the reason and the line that allowed it. A suppression that covers nothing is reported too, so stale ones do not accumulate. Only the exit code changes. `files:` is the blunter tool and stays right for a directory of generated markdown nobody wrote.
 
 ## Point it at a document
 
@@ -289,7 +298,9 @@ That goes in the document and applies to that file. The reason is not optional: 
 | **draft** | prose that does not exist yet | n/a |
 | **ste** | this held to ASD-STE100, the aerospace controlled-language standard | nothing, it reports |
 
-The counted half of that last one is not a mode you ask for. Sentences over the word cap, paragraphs over six sentences, a condition trailing its command, and semicolons are all things Python counts better than a language model does, so they run in every scan, at P1 and P2, under the register's own measured allowances. `--ste` adds the vocabulary half. `--no-ste` turns off both.
+The counted half of that last one is not a mode you ask for. Sentences over the word cap, paragraphs over six sentences, a condition trailing its command, and semicolons are all things Python counts better than a language model does, so they run in every scan, at P1 and P2, under the register's own measured allowances.
+
+`--ste` adds the vocabulary half. `--no-ste` turns off both.
 
 Point it at something you wrote, without saying how far to go, and it measures the gap before touching anything:
 
@@ -357,7 +368,9 @@ Taste is boundaries: roughly 80% of a working profile is **refusals** (what you 
 
 ### Case Study: Satoshi Nakamoto Voice Profile
 
-For a full empirical walkthrough of extracting and testing a voice profile from real-world writings (62k words across the Bitcoin whitepaper, cryptography mailing list emails, and forum posts), see [**`docs/SATOSHI_VOICE.md`**](docs/SATOSHI_VOICE.md). It documents the stylometric metrics (sentence distributions, 97.5% double-spacing after periods, British orthography), machine rules, oracle discrimination testing against contemporary cypherpunks, and cross-voice rewrites.
+[**`docs/SATOSHI_VOICE.md`**](docs/SATOSHI_VOICE.md) is a full empirical walkthrough: extracting and testing a voice profile from real-world writings. The source is 62k words across the Bitcoin whitepaper, cryptography mailing list emails, and forum posts.
+
+It documents the stylometric metrics (sentence distributions, 97.5% double-spacing after periods, British orthography), machine rules, oracle discrimination testing against contemporary cypherpunks, and cross-voice rewrites.
 
 The oracle sorted all 15 benchmark documents correctly (6 authentic, 9 not), measured against this one profile's fingerprint rather than as a general authorship classifier.
 
@@ -396,11 +409,13 @@ You can switch between installed profiles (`whit3rabbit`, `satoshi`, or your own
 
 Five skills.
 
-**`rabbit-writes`**: the writing skill, and the engine it runs on. Four modes, listed above.
+**`rabbit-writes`**: the writing skill, and the engine it runs on. Five modes, listed above.
 
 Underneath sit 63 patterns in a priority-tiered catalog, a false-positive discipline, register profiles, Orwell and Simplified Technical English as a positive craft layer, a 33-item self-check, and two scripts. The engine half knows nothing about any particular person.
 
-**`voice-setup`**: builds, measures, edits, blends, and switches voice profiles. Ships `measure_voice.py`, which takes three or four things you wrote and prints the aggregate, the spread between samples, the profile block ready to paste, and a starter `mechanics` object with the count behind every line. It stops if a sample carries a P0, because a tell that reaches a profile is then reproduced on purpose.
+**`voice-setup`**: builds, measures, edits, blends, and switches voice profiles. Ships `measure_voice.py`, which takes three or four things you wrote and prints the aggregate, the spread between samples, the profile block ready to paste, and a starter `mechanics` object with the count behind every line.
+
+It stops if a sample carries a P0, because a tell that reaches a profile is then reproduced on purpose.
 
 It reports the distributions an average hides, too: sentence openers, connectors, the contractions you actually use, and how each sample ends.
 
@@ -408,15 +423,25 @@ It also writes a **voice fingerprint**. Every voice rule is a refusal, and a dra
 
 `scan.py --voice` then reports how far a document is from that. P2, never a build failure, because sounding unlike yourself is sometimes the point. `skills/rabbit-writes/references/voice.md` has the reading.
 
-And once the profile exists, `audit_voice.py` turns it back on the corpus it came from: it exits 1 when one of your own rules fires on your own prose, suggests the fix with the measured number behind it, and reports (without judging) which samples sit outside the fingerprint band, whether the corpus holds two sentence registers, and which engine tells are false positives over you.
+And once the profile exists, `audit_voice.py` turns it back on the corpus it came from. It exits 1 when one of your own rules fires on your own prose.
+
+It also suggests the fix, with the measured number behind it. It reports, without judging, which samples sit outside the fingerprint band and whether the corpus holds two sentence registers. And it names the engine tells that are false positives on your own writing.
 
 **`rabbit-readme-improver`**: drafts or audits a `README.md` against patterns measured from 100 real GitHub repos (section order, sentence length, badge and link conventions) instead of generic advice, in your voice rather than a generated open-source register. Ships `readme_check.py`, which checks structure, links, badges, claims, and the active voice in one pass. The full study is in `docs/README_WRITEUP.md`.
 
-**`rabbit-reads`**: distills a book, paper, or thesis into per-concept cheatsheets, a `<book-slug>-notes/` folder of 40-70 line markdown documents plus a README index. The source arrives as pdf, docx, doc, rtf, html, odt, epub, md, or txt, and `extract_text.py` normalizes it to plain text under `scratch/`, where the intermediates stay. `map_structure.py` maps the source's structure to section line ranges, the concept set comes from that map, and subagents write the individual documents. The notes paraphrase the source and never quote it. `check_notes.py` verifies the finished set mechanically and can run the `rabbit-writes` scanner over it, and the book types (non-fiction, fiction, arxiv paper, thesis) are data files under `references/book-types/`, so adding one is a new file there rather than a code change.
+**`rabbit-reads`**: distills a book, paper, or thesis into per-concept cheatsheets, a `<book-slug>-notes/` folder of 40-70 line markdown documents plus a README index.
 
-**`rabbit-rewrites`**: rewrites the passages the engine flagged using a small local model instead of a frontier one, over any OpenAI-compatible endpoint (llama.cpp's `llama-server`, Ollama, LM Studio, vLLM, OpenRouter). The document is never sent. A tell sits in a sentence, so one request carries that sentence plus the rule it broke, which is roughly 150 tokens whatever the file's length, and a 4k-context model on a Raspberry Pi is enough for a 10,000-word draft.
+The source arrives as pdf, docx, doc, rtf, html, odt, epub, md, or txt, and `extract_text.py` normalizes it to plain text under `scratch/`, where the intermediates stay. `map_structure.py` maps the source's structure to section line ranges, the concept set comes from that map, and subagents write the individual documents.
 
-Every reply is gated: it has to survive `verify.py`, lose the phrase it was sent to remove, and lower the total finding count, or it is retried with the reason attached and then abandoned with the original left in place. A document carrying a concealed instruction is refused before the first request, since a rewriter is exactly what that text is addressed to. `bench.py` scores any endpoint against a fixed twelve-passage battery through the same gate, so "which model is good enough" is a number rather than an opinion.
+The notes paraphrase the source and never quote it. `check_notes.py` verifies the finished set mechanically and can run the `rabbit-writes` scanner over it, and the book types (non-fiction, fiction, arxiv paper, thesis) are data files under `references/book-types/`, so adding one is a new file there rather than a code change.
+
+**`rabbit-rewrites`**: rewrites the passages the engine flagged using a small local model instead of a frontier one. Any OpenAI-compatible endpoint works: llama.cpp's `llama-server`, Ollama, LM Studio, vLLM, OpenRouter. The document is never sent.
+
+A tell sits in a sentence, so one request carries just that sentence plus the rule it broke. That is roughly 150 tokens whatever the file's length, which is why a 4k-context model on a Raspberry Pi handles a 10,000-word draft.
+
+Every reply is gated: it has to survive `verify.py`, lose the phrase it was sent to remove, and lower the total finding count, or it is retried with the reason attached and then abandoned with the original left in place.
+
+A document carrying a concealed instruction is refused before the first request, since a rewriter is exactly what that text is addressed to. `bench.py` scores any endpoint against a fixed twelve-passage battery through the same gate, so "which model is good enough" is a number rather than an opinion.
 
 ```
 rabbit-writes/
@@ -480,7 +505,7 @@ rabbit-writes/
 | **fingerprint** | evidence the text came out of a chat tool | `utm_source=chatgpt.com`, a zero-width space, "I hope this helps!" |
 | **craft** | bad writing regardless of author | `utilize`, a hedge stack, uniform paragraphs |
 
-Keeping them apart is the point. Presenting a wordiness fix as evidence about who wrote something is the most common failure in this category of tool, and it is the one that gets people accused of things.
+Keeping them apart is the point. Presenting a wordiness fix as evidence about who wrote something is the most common failure in this category of tool. It is also the one that gets people accused of things.
 
 ```bash
 python3 skills/rabbit-writes/scripts/scan.py draft.md \
@@ -489,7 +514,9 @@ python3 skills/rabbit-writes/scripts/scan.py draft.md \
 
 A register profile (`--profile chat`, `--profile docs`) relaxes the general rules. It never relaxes a voice rule. Lowercase and loose punctuation are fine off the clock. "Circle back" never is.
 
-The register is also the document form. `chat`, `informal`, `blog`, and `formal` are a formality ladder that an email, a chat message, a newsletter, or an essay maps onto, and `references/forms/` holds one file per form saying what slots that form has. Those files give constraints and never example phrases, because a form file that supplied a greeting would open every user's email the same way.
+The register is also the document form. `chat`, `informal`, `blog`, and `formal` are a formality ladder. An email, a chat message, a newsletter, or an essay maps onto one of them. `references/forms/` holds one file per form, saying what slots that form has.
+
+Those files give constraints and never example phrases, because a form file that supplied a greeting would open every user's email the same way.
 
 ## What it will not do
 
@@ -502,7 +529,7 @@ The register is also the document form. `chat`, `informal`, `blog`, and `formal`
 
 - Work in a language other than English. Every tier list, contraction rule, sentence boundary, and stylometric band here is calibrated on English prose. Point it at Japanese or Arabic and it will still print numbers, and they will not mean anything. It says so: a document whose letters are mostly non-ASCII gets a note at the top of the report. It is a note and not a failure, because a bilingual README with an English quickstart deserves an answer for the English half.
 
-You may not add a fact or a stance. That constraint is what separates restoring a voice from installing one. Form is a different axis: converting a document into your voice reorders sections, splits paragraphs, and rewrites sentences whole, because a voice profile is mostly structural and a word swap cannot apply "lead with the conclusion".
+You may not add a fact or a stance. That constraint is what separates restoring a voice from installing one. Form is a different axis. A conversion reorders sections, splits paragraphs, and rewrites sentences whole, because a voice profile is mostly structural. A word swap cannot apply "lead with the conclusion".
 
 ## Verify a rewrite
 
@@ -511,9 +538,9 @@ python3 skills/rabbit-writes/scripts/verify.py original.md rewritten.md
 python3 skills/rabbit-writes/scripts/verify.py original.md converted.md --allow-structure
 ```
 
-Exits non-zero if the rewrite altered a code block, frontmatter, a table row, a block quote, inline code, a URL, a file path, or the heading structure, or if it added em dashes or ended with more tells than it started with. `deslop` and `voice` both write to files, so a broken promise there would otherwise be silent.
+Exits non-zero if the rewrite altered anything protected: code blocks, frontmatter, table rows, block quotes, inline code, URLs, file paths, or the heading structure. It also fails on added em dashes, or on ending with more tells than it started with. `deslop` and `voice` both write to files, so a broken promise there would otherwise be silent.
 
-`--allow-structure` is for `voice` only. A conversion reorders sections and rewrites headings because the profile told it to, and without the flag it fails its own verification for doing its job. The flag moves those two checks into a reported list. Everything else stays hard.
+`--allow-structure` is for `voice` only. A conversion reorders sections and rewrites headings because the profile told it to. Without the flag it fails its own verification for doing its job. The flag moves those two checks into a reported list. Everything else stays hard.
 
 ## Write a README with it
 
@@ -547,7 +574,7 @@ The structural rule: **pitch → fastest path to running it → depth → commun
 
 The highest-impact single fix in an audit: whatever sits between the top of the file and the first sentence that says what the thing is. Every README flagged as an anti-pattern buried its description under a hero image, a badge wall, or sponsor content.
 
-**The caveat, since the skill demands one of everybody else.** The corpus is 100 repos by trailing-quarter star growth as of August 2026, which skews hard toward AI-agent tooling and developer CLIs. A Python data-science library or a corporate SDK may well converge somewhere else.
+**The caveat, since the skill demands one of everybody else.** The corpus is 100 repos chosen by trailing-quarter star growth as of August 2026. That selection skews hard toward AI-agent tooling and developer CLIs. A Python data-science library or a corporate SDK may well converge somewhere else.
 
 Heading classification is keyword-based and sentence splitting is a regex, so read the numbers as directionally right, not exact. `docs/README_WRITEUP.md` has the methodology, the ranked table, and its own limitations section. `docs/readme-analysis/` has the raw per-repo data.
 
@@ -567,7 +594,7 @@ Three modes, picked from what you ask for:
 | **extend** | existing notes folder needs more coverage | new concept docs matching the existing template and an updated index |
 | **verify** | "check these notes" or unverified folder | structural, template, and voice checks via `check_notes.py` |
 
-The structural rule: **cut by concept, not by chapter.** A single concept can span multiple chapters, and one file per chapter produces low-density summaries rather than reference docs you can work from.
+The structural rule: **cut by concept, not by chapter.** A single concept can span multiple chapters. One file per chapter produces low-density summaries rather than reference docs you can work from.
 
 Each concept doc follows a structured template tailored to the book type (`non-fiction`, `fiction`, `arxiv-paper`, or `thesis`):
 - Concept statement
@@ -590,7 +617,7 @@ python3 skills/rabbit-rewrites/tests/run.py        # the model battery, and the 
 
 `run.py` needs nothing installed, which is the same promise the scripts make. `pytest` collects the same files if you have it, and `run.py -k <substring>` selects by name.
 
-The calibration fixtures assert that known slop scores high, known human prose scores zero, and a third sample with no flagged vocabulary at all still trips the uniformity detector because every sentence is the same length. Vocabulary and rhythm are independent axes, and that third fixture is the one that matters.
+The calibration fixtures assert that known slop scores high and known human prose scores zero. A third sample with no flagged vocabulary at all still trips the uniformity detector because every sentence is the same length. Vocabulary and rhythm are independent axes, and that third fixture is the one that matters.
 
 `tests/test_invariants.py` is a different kind of test. Half the engine reports a line number taken from a blanked copy of the document, which only works because blanking preserves length.
 

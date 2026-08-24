@@ -28,7 +28,7 @@ Orwell's sixth rule outranks everything below. If a flagged word is the right wo
 
 ## What this skill claims
 
-These patterns are more common in machine text. They are not proof of anything. Detector audits find false-positive rates above 60% on non-native English writers (Liang et al., Stanford, *Patterns*, 2023) and misclassification above 70% on open-source detectors (Jabarian & Imas, BFI 2025-116). Paraphrase drops detection accuracy by roughly 88% (arXiv:2506.07001).
+These patterns are more common in machine text. They are not proof of anything. Detector audits find false-positive rates above 60% on non-native English writers (Liang et al., Stanford, *Patterns*, 2023). Open-source detectors show misclassification above 70% (Jabarian & Imas, BFI 2025-116). Paraphrase drops detection accuracy by roughly 88% (arXiv:2506.07001).
 
 So: name the pattern, quote the line, give the fix. Never render a verdict on who wrote something, and never let this skill's output be the basis for an academic-integrity, hiring, or attribution decision. Signals, not proof.
 
@@ -51,9 +51,11 @@ These bind before any rule below. Violating one is a failure even when the outpu
 
    What this bans is **content and stance**: facts, opinions, personality, and emphasis the source did not have. It does not ban **form**. Reordering sentences, splitting a paragraph, moving a conclusion to the top, and changing rhythm are shape, and in `voice` mode shape is the job. Restructure freely. Invent nothing.
 
-3. **Match the edit to the mode.** In `deslop`, cut in proportion to the actual slop: a rough draft with a real voice should sound like the same person afterward. In `voice`, the profile sets the target and a large diff is the expected result, because a document written in someone else's register does not reach a person's voice through word swaps. Both directions fail. A deslop that rewrites the author's habits is one failure. A voice conversion that changes nothing but the banned words is the other, and it is the more common one.
+3. **Match the edit to the mode.** In `deslop`, cut in proportion to the actual slop: a rough draft with a real voice should sound like the same person afterward. In `voice`, the profile sets the target and a large diff is the expected result. A document written in someone else's register does not reach a person's voice through word swaps.
 
-   In `deslop` this has a mechanical form, and use it: **edit the flagged span plus one sentence of context, splice it back, and leave the rest of the document untouched.** Every finding carries a line. Rewriting the whole paragraph, or the whole document, to fix three flagged phrases is how proportionality quietly becomes a full rewrite, and it is how the human signals in guardrail 4 disappear: the model cannot smooth what it never touches. Regenerating a document end to end is a `voice` move, not a `deslop` one.
+   Both directions fail. A deslop that rewrites the author's habits is one failure. A voice conversion that changes nothing but the banned words is the other, and it is the more common one.
+
+   In `deslop` this has a mechanical form, and use it: **edit the flagged span plus one sentence of context, splice it back, and leave the rest of the document untouched.** Every finding carries a line. Rewriting the whole paragraph, or the whole document, to fix three flagged phrases is how proportionality quietly becomes a full rewrite. It is also how the human signals in guardrail 4 disappear: the model cannot smooth what it never touches. Regenerating a document end to end is a `voice` move, not a `deslop` one.
 
 4. **Protect the human signals.** Before editing, read `references/false-positives.md`. Specific hard-to-fabricate detail, mixed feelings, dated references, self-corrections, and uneven rhythm are what you are trying to preserve, not clean up.
 
@@ -104,7 +106,7 @@ Shipped with `whit3rabbit` as the active voice. It is an example, not a default 
 
 The guardrails constrain the editor, not the voice, which is why a voice preference cannot override them.
 
-A register still cannot soften a voice rule. What a voice can do is say which of its own rules applied where, with `mechanics_by_register` and with `applies_to_registers` on a `banned_regex` or `required_when` entry. That reads like the same thing and runs in the opposite direction: the writer decides, the register only selects. It exists because the profile markdown has always distinguished on the clock from off it, and until now the enforceable half had no way to say so.
+A register still cannot soften a voice rule. What a voice can do is say which of its own rules applied where, with `mechanics_by_register` and with `applies_to_registers` on a `banned_regex` or `required_when` entry. That reads like the same thing and runs in the opposite direction: the writer decides, the register only selects. It exists because the profile markdown has always distinguished on the clock from off it. Until now the enforceable half had no way to say so.
 
 ## Ask, then convert
 
@@ -117,7 +119,7 @@ In `voice` mode against a document that already exists, measure before you edit,
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py doc.md --json --voice <name>
 ```
 
-3. Build the offer. Every number except the structure line is already in that JSON: `voice-paragraph-length` findings count the over-cap paragraphs, `voice-sentence-length` gives the average against the cap, `stats.word_count` and `stats.burstiness` give the rest, and every banned word or punctuation hit is itemised. The structure line is judgment from your read.
+3. Build the offer. Every number except the structure line is already in that JSON. `voice-paragraph-length` findings count the over-cap paragraphs, and `voice-sentence-length` gives the average against the cap. `stats.word_count` and `stats.burstiness` give the rest. Every banned word or punctuation hit is itemised. The structure line is judgment from your read.
 4. Ask in this shape, with real numbers:
 
 ```
@@ -133,17 +135,19 @@ Converting to whit3rabbit's voice means:
 Full conversion, or just the 11 mechanical hits?
 ```
 
-The first four lines are exact counts and should be stated exactly. The size line is not: it is derived by summing the words in spans a pass would delete outright, so give it as a band rounded to 5% with its basis beside it. A flat "-15%" claims a precision the method does not have, and most profiles ask for exact numbers on anything serious.
+The first four lines are exact counts and should be stated exactly. The size line is different. It sums the words in spans a pass would delete outright. Give it as a band rounded to 5%, with its basis beside it. A flat "-15%" claims a precision the method does not have, and most profiles ask for exact numbers on anything serious.
 
 A profile may carry one fingerprint per register as well as a general one, as `voices/<name>.<register>.fingerprint.json`. `scan.py` and `attain.py` prefer the register's own and fall back to the general one, and `attain.py` prints which file it used. Build one with `measure_voice.py --register <name>`, from samples in that register only: a fingerprint averaged over somebody's chat messages and their essays describes neither.
 
 The distance line only exists when the profile has a fingerprint beside it, which not every profile does. It comes from `voice_distance` in the same JSON, and its `contributors` are the markers to name. Leave the line out rather than inventing it, and never state it as a verdict about who wrote the document. It measures register, and `references/voice.md` has the reading.
 
-Skip the question, and say which depth you chose and why, when the user already asked for a full rewrite, when the document is under about 120 words (the scan's own reliability floor, and the diff is cheap enough to just show), or when another skill called this one.
+Skip the question in three cases, and say which depth you chose and why. One: the user already asked for a full rewrite. Two: the document is under about 120 words (the scan's own reliability floor, and the diff is cheap enough to just show). Three: another skill called this one.
 
 ## Converting an existing document
 
-**Plan first, then execute the plan.** Two passes, not one. Pass 1 writes down what will move, in the largest-unit-first order below, and nothing else. Pass 2 does it. Compliance drops as the number of simultaneous instructions rises, which is the argument `references/craft.md` already makes for splitting a conversion into narrower passes, and this is the same argument one step further: deciding and writing at once is how a conversion quietly becomes a word swap while the model is busy holding eight hundred lines of rules in mind.
+**Plan first, then execute the plan.** Two passes, not one. Pass 1 writes down what will move, in the largest-unit-first order below, and nothing else. Pass 2 does it.
+
+Compliance drops as the number of simultaneous instructions rises. `references/craft.md` makes that argument for splitting a conversion into narrower passes, and this is the same argument one step further. Deciding and writing at once is how a conversion quietly becomes a word swap while the model holds eight hundred lines of rules in mind.
 
 The plan is short and it is specific. Which paragraphs move, split, or merge. Which sections reorder. Which sentences the profile's connectors reach. And where the profile has a fingerprint, the shape each paragraph is aiming at:
 
@@ -155,7 +159,9 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/attain.py doc.md --vo
   para 3    5 sentences   at least 1 under 9w, at least 1 over 29w, median around 16w, spread about 9
 ```
 
-That is a band and never a script. "Vary your sentences" is a weak instruction and always has been, and it survives every vocabulary fix because it is not a constraint. A target drawn from this writer's own measured distribution is one. Do not read it as a per-sentence quota: hitting the median on every sentence is the uniformity the profile exists to avoid, and chopping a sentence in half to reach the short one is the manufactured rhythm `references/patterns.md` section 52 forbids.
+That is a band and never a script. "Vary your sentences" is a weak instruction and always has been, and it survives every vocabulary fix because it is not a constraint. A target drawn from this writer's own measured distribution is one.
+
+Do not read it as a per-sentence quota. Hitting the median on every sentence is the uniformity the profile exists to avoid. Chopping a sentence in half to reach the short one is the manufactured rhythm `references/patterns.md` section 52 forbids.
 
 Then execute, largest unit first, so a later pass does not undo an earlier one.
 
@@ -178,7 +184,7 @@ Then execute, largest unit first, so a later pass does not undo an earlier one.
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/verify.py original.md converted.md --allow-structure
 ```
 
-`--allow-structure` is required here and only here. Without it, `verify.py` treats a changed or added heading as a violation, which is correct for `deslop` and would fail every conversion that did its job. The flag moves those two checks into a reported list. Code, tables, quotes, URLs, added em dashes, and the tell counter stay hard.
+`--allow-structure` is required here and only here. Without it, `verify.py` treats a changed or added heading as a violation. That is correct for `deslop`, and it would fail every conversion that did its job. The flag moves those two checks into a reported list. Code, tables, quotes, URLs, added em dashes, and the tell counter stay hard.
 
 Report in those same four bands plus the word delta, so the user can see whether the conversion was structural or only lexical. A report that lists only word swaps after a full conversion means step 1 did not happen.
 
@@ -188,23 +194,33 @@ Report in those same four bands plus the word delta, so the user can see whether
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/attain.py original.md converted.md --voice <name>
 ```
 
-It prints the distance both ways and each of the six measures with the gap in the writer's own sample sd, signed, because "10 sd under" and "10 sd over" call for opposite edits. Its verdict is the thing to report. `flat` is the one that matters: the distance barely moved and no measure moved a full sd, which is a pass that cleared eleven mechanical hits and left the register alone. That is the shallow conversion no rule-by-rule report can see, because every rule passed.
+It prints the distance both ways, plus each of the six measures with its gap in the writer's own sample sd. The gap is signed: "10 sd under" and "10 sd over" call for opposite edits. Its verdict is the thing to report.
+
+`flat` is the one that matters: the distance barely moved and no measure moved a full sd. That is a pass that cleared eleven mechanical hits and left the register alone. It is the shallow conversion no rule-by-rule report can see, because every rule passed.
 
 `missed` is not a failure. A measure the document cannot reach without inventing content is guardrail 1 working, and saying so is the right answer. Say it rather than chasing the number: the measure is a signal, never a target to game.
 
-Read `voice-caricature` the same way and in the other direction. It fires when the output is *more* characteristic than the writer's own samples, which is the overshoot `references/false-positives.md` calls a new fingerprint rather than the absence of one. Two measures past their envelope, away from the population norm. It is P2 and never a defect, because a writer is allowed to write their most characteristic piece.
+Read `voice-caricature` the same way and in the other direction. It fires when the output is *more* characteristic than the writer's own samples. That overshoot is what `references/false-positives.md` calls a new fingerprint rather than the absence of one. Two measures past their envelope, away from the population norm. It is P2 and never a defect, because a writer is allowed to write their most characteristic piece.
 
-**Cap the loop at two passes.** Convert, scan with the voice rules, fix only the violations, verify. Not a fresh rewrite each time: regenerating the whole document per iteration is how drift accumulates, and the third pass is where a conversion turns into a paraphrase of a paraphrase. If two passes have not reached it, say what is left and why rather than going again.
+**Cap the loop at two passes.** Convert, scan with the voice rules, fix only the violations, verify. Not a fresh rewrite each time.
+
+Regenerating the whole document per iteration is how drift accumulates, and the third pass is where a conversion turns into a paraphrase of a paraphrase. If two passes have not reached it, say what is left and why rather than going again.
 
 ## Workflow
 
 **1. Frame it.** Who is this for, and where does it land? If unclear and the user is present, ask that one question. Always hold the default frame: *write for a smart non-expert who has not seen the thing you are describing.*
 
-**2. Set the register, which is also the form.** Infer it, or take it from the user. The set is a formality spine, `chat` to `informal` to `blog` (the default) to `formal`, plus four genre columns, `technical-blog`, `docs`, `linkedin`, and `academic`, and it decides which general rules apply at full strength. `references/context.md` has the signals and the tolerance matrix, and `references/forms/` has what the document's own shape asks for. Most profiles also define their own register axis, on the clock versus off, and the profile's version wins where both apply.
+**2. Set the register, which is also the form.** Infer it, or take it from the user. The set is a formality spine, `chat` to `informal` to `blog` (the default) to `formal`, plus four genre columns: `technical-blog`, `docs`, `linkedin`, and `academic`. It decides which general rules apply at full strength.
 
-`scan.py --profile auto` mechanizes this inference for the handful of forms with a structural tell strong enough to trust unattended: academic (three distinct IMRaD sections, numbered or not), docs (Prerequisites/Installation/Usage/Steps/Verification headings, skipped for a file named README.md), linkedin (a trailing hashtag line), and formal by way of email or letter shape (a greeting, then a signoff). It is opt-in, has to be named, and falls back to `blog` rather than guess when nothing matches. Chat and technical-blog were both tried against real documents and dropped: chat's only candidate signal (short, no headings, no greeting) fired on a plain blog paragraph, and technical-blog's (fenced code plus a number with a unit) misdetected most of the 100-README calibration corpus. Everything past that five-register set is still a judgment call, the same as before this flag existed.
+`references/context.md` has the signals and the tolerance matrix, and `references/forms/` has what the document's own shape asks for. Most profiles also define their own register axis, on the clock versus off, and the profile's version wins where both apply.
 
-The academic threshold is three sections rather than two, and the difference is one document: at two, a README carrying `Test Results` and `Limitations` reads as a paper. The cost is measured and it is real. Against 19 papers' own section titles, three catches 17. The two it misses are a computer-science paper using Method and Experiments and a humanities paper whose middle sections are named after its argument, and both fall through to the default the way any unclassified document does.
+`scan.py --profile auto` mechanizes this inference for the handful of forms with a structural tell strong enough to trust unattended. Academic needs three distinct IMRaD sections, numbered or not. Docs needs Prerequisites/Installation/Usage/Steps/Verification headings, skipped for a file named README.md, and linkedin wants a trailing hashtag line. Formal arrives by way of email or letter shape: a greeting, then a signoff. It is opt-in, has to be named, and falls back to `blog` rather than guess when nothing matches.
+
+Chat and technical-blog were both tried against real documents and dropped. Chat's only candidate signal (short, no headings, no greeting) fired on a plain blog paragraph. Technical-blog's (fenced code plus a number with a unit) misdetected most of the 100-README calibration corpus. Everything past that five-register set is still a judgment call, the same as before this flag existed.
+
+The academic threshold is three sections rather than two, and the difference is one document. At two, a README carrying `Test Results` and `Limitations` reads as a paper. The cost is measured and it is real.
+
+Against 19 papers' own section titles, three catches 17. The two it misses are a computer-science paper using Method and Experiments and a humanities paper whose middle sections are named after its argument. Both fall through to the default the way any unclassified document does.
 
 **3. Load the voice.** As above. Hold the profile's Hard nos in mind, they are the part a reader notices first.
 
@@ -232,21 +248,25 @@ python3 $RW/verify.py before.md after.md               # did the edit break a pr
 python3 $RW/attain.py before.md after.md --voice dana  # did the conversion land
 ```
 
-Prefer `--voice` over spelling out a `--voice-rules` path. `auto` runs the same resolution order the rest of the plugin uses, `.rabbit-voice` beside the document, then the working directory, then `voices/ACTIVE`, so a repo that pins its own house voice gets it without you knowing the path. Naming a profile and `--voice-rules` behave the same as each other: both exit 2 when the profile will not read, because scanning on without the rules that were asked for reports a clean voice band on a document nobody checked. `--voice auto` finding nothing is a note and still exits 0, since plenty of repos have no profile.
+Prefer `--voice` over spelling out a `--voice-rules` path. `auto` runs the same resolution order the rest of the plugin uses: `.rabbit-voice` beside the document, then the working directory, then `voices/ACTIVE`. A repo that pins its own house voice gets it without you knowing the path.
+
+Naming a profile and `--voice-rules` behave the same as each other. Both exit 2 when the profile will not read. Scanning on without the rules that were asked for reports a clean voice band on a document nobody checked. `--voice auto` finding nothing is a note and still exits 0, since plenty of repos have no profile.
 
 Outside a plugin install `${CLAUDE_PLUGIN_ROOT}` is unset, which turns every path above into an absolute path that does not exist. If that happens, resolve `scripts/scan.py` relative to this file's own directory instead.
 
-The script owns what a script does better than you: hidden unicode, AI tracking parameters, chat-citation leaks, unfilled placeholders, em-dash rate, tiered vocabulary density, burstiness, type-token ratio, sentence-length variation, trigram repetition. It reports a reliability level, because under ~120 words the numbers mean little. Treat every hit as a candidate, not a verdict.
+The script owns what a script does better than you. Its checks cover hidden unicode, AI tracking parameters, chat-citation leaks, unfilled placeholders, and em-dash rate. They also cover tiered vocabulary density, burstiness, type-token ratio, sentence-length variation, and trigram repetition. It reports a reliability level, because under ~120 words the numbers mean little. Treat every hit as a candidate, not a verdict.
 
-It also reports a note when a document's letters are mostly non-ASCII. Every band and tier list here is calibrated on English, so on a Japanese or Arabic document the numbers describe the English parts and guess at the rest. Repeat that note in your report. Never present a stylometric number about non-English prose as a finding.
+It also reports a note when a document's letters are mostly non-ASCII. Every band and tier list here is calibrated on English. On a Japanese or Arabic document, the numbers describe the English parts and guess at the rest. Repeat that note in your report. Never present a stylometric number about non-English prose as a finding.
 
-**Run `--apply-safe` before you start editing.** It applies only the edits with exactly one correct answer, hidden characters, tracking parameters, and this voice's own single-word substitutions, then runs `verify.py` on its own output. It is a dry run without `--write`. Doing that work by hand is how a `sed` job turns into a paraphrase, and every span it touches is one less thing in your diff. Everything needing judgment stays report-only and is still yours.
+**Run `--apply-safe` before you start editing.** It applies only the edits with exactly one correct answer: hidden characters, tracking parameters, and this voice's own single-word substitutions. Then it runs `verify.py` on its own output. It is a dry run without `--write`.
+
+Doing that work by hand is how a `sed` job turns into a paraphrase, and every span it touches is one less thing in your diff. Everything needing judgment stays report-only and is still yours.
 
 **5. Read the catalog for what the scan cannot see.** `references/patterns.md` holds the merged pattern set with before/after pairs, grouped P0 / P1 / P2. On a quick pass, do P0 and P1 only.
 
 **6. Edit, convert, or report,** per the mode table. In `voice` mode, offer first, then follow the conversion order above. In `draft` mode, work from `references/craft.md`, and when the request names a document form ("write me an email", "a note to the team", "a post"), read `references/forms/<form>.md` first. The form decides the skeleton before the voice decides anything inside it.
 
-A form file gives slots and constraints and never an example phrase, on purpose. If the profile has nothing for a slot, the slot stays plain or stays empty. A form file that supplied a default greeting would open every user's email the same way, which is a shared fingerprint at the genre level and the failure `references/false-positives.md` describes at the persona level.
+A form file gives slots and constraints and never an example phrase, on purpose. If the profile has nothing for a slot, the slot stays plain or stays empty. A form file that supplied a default greeting would open every user's email the same way. That is a shared fingerprint at the genre level, and the failure `references/false-positives.md` describes at the persona level.
 
 **7. Self-check.** Grade your own output against `references/checklist.md`, then the profile's own final check. Answer each item yes or no. Fix every no, then re-check. Stop after the second pass.
 
@@ -258,7 +278,13 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/verify.py original.md
 
 Non-zero exit means the rewrite altered something on the do-not-touch list, added more tells than it removed, or dropped a fact. It is a brake, not a target: it cannot tell you an edit was too shallow, which is what `attain.py` and guardrail 3 are for.
 
-**It checks the facts now, and that is guardrail 1 with something behind it.** Numbers, dates and quotations are compared as multisets, and a number in the source that is not in the rewrite fails. Reformatting does not: a date compares as its ISO form, so a `date_format` conversion passes, `10-20%` and "10 to 20 percent" are one fact, and `1,200` and `1200` are one number. Both directions are reported, and only the loss fails, because a rewrite that turns "the last two years" into "2024 and 2025" is deriving a number the source carried rather than inventing one. `--allow-facts` downgrades the whole check to a report, and it exists for a profile that spells numbers out, which no regex can model. Named entities are listed and never fail, for the reason `references/false-positives.md` gives about every crude signal.
+**It checks the facts now, and that is guardrail 1 with something behind it.** Numbers, dates, and quotations are compared as multisets, and a number in the source that is not in the rewrite fails.
+
+Reformatting does not. A date compares as its ISO form, so a `date_format` conversion passes. `10-20%` and "10 to 20 percent" are one fact, and `1,200` and `1200` are one number.
+
+Both directions are reported, and only the loss fails. A rewrite that turns "the last two years" into "2024 and 2025" is deriving a number the source carried rather than inventing one.
+
+`--allow-facts` downgrades the whole check to a report, and it exists for a profile that spells numbers out, which no regex can model. Named entities are listed and never fail, for the reason `references/false-positives.md` gives about every crude signal.
 
 It also does not see every path. A file path is tracked only when it has an extension, because an extensionless one is indistinguishable from "and/or" or "TCP/IP" by regex. `voices/ACTIVE` is still on the do-not-touch list in guardrail 6. Nothing mechanical is watching it, so you are.
 
@@ -266,17 +292,19 @@ Image alt text is the other thing it does not watch, and that one is deliberate 
 
 ## Suppressing a finding you have decided to keep
 
-Some documents trip a rule on purpose. A page that quotes a chat citation marker to warn about it raises `citation-leak`, because that pattern is checked against the raw text so a marker pasted into a block quote cannot hide. Until now the only answer was `files:` on the hook, which turns the check off for whole paths, or `--no-verify`, which turns off everything.
+Some documents trip a rule on purpose. A page that quotes a chat citation marker to warn about it raises `citation-leak`. That pattern is checked against the raw text, so a marker pasted into a block quote cannot hide. Until now the only answer was `files:` on the hook, which turns the check off for whole paths, or `--no-verify`, which turns off everything.
 
 ```markdown
 <!-- rabbit-allow: citation-leak (this page catalogues the markers) -->
 ```
 
-The reason is not optional. Without one the suppression does not apply and it raises a P1 of its own, because the entire value of the mechanism is that somebody had to write down why.
+The reason is not optional. Without one the suppression does not apply, and it raises a P1 of its own. The entire value of the mechanism is that somebody had to write down why.
 
-Nothing is hidden. A suppressed finding still appears in the report, under its own heading, with the reason and the line that allowed it, and it still appears in `--json` carrying a `suppressed` key. What changes is the exit code. A fingerprint P0 is evidence about how a file was made, and a mechanism that made evidence vanish quietly would be worse than the scoping it replaces. A suppression that covers nothing is reported too, at P2, so a stale one does not sit there for a year covering a rule nobody is breaking.
+Nothing is hidden. A suppressed finding still appears in the report, under its own heading, with the reason and the line that allowed it. It still appears in `--json` carrying a `suppressed` key. What changes is the exit code.
 
-It applies to the whole file, for the ids it names. This repository does not use it on `references/patterns.md`, whose five P0s `PROOF.md` publishes on purpose: a tool that suppresses its own findings to look clean is doing the thing this plugin exists to criticize. The mechanism is for adopters who have made that call for themselves, in writing.
+A fingerprint P0 is evidence about how a file was made. A mechanism that made evidence vanish quietly would be worse than the scoping it replaces. A suppression that covers nothing is reported too, at P2, so a stale one does not linger over a rule nobody is breaking.
+
+It applies to the whole file, for the ids it names. This repository does not use it on `references/patterns.md`, whose five P0s `PROOF.md` publishes on purpose. A tool that suppresses its own findings to look clean is doing the thing this plugin exists to criticize. The mechanism is for adopters who have made that call for themselves, in writing.
 
 ## The five moves that do most of the work
 
@@ -352,11 +380,11 @@ Take the style from the user, or from the venue they name, or read it off the do
 
 Three rules bind whatever the style.
 
-1. **Guardrail 1 covers citations, and it is the one that matters most here.** Never write a reference for a work you have not been given. A plausible author, a plausible year, and a plausible DOI assemble into a citation that survives every check in this engine and fails the first reader who looks it up. If a claim needs a source and no source is in hand, say the claim needs a source and leave it unsourced.
+1. **Guardrail 1 covers citations, and it is the one that matters most here.** Never write a reference for a work you have not been given. A plausible author, a plausible year, and a plausible DOI assemble into a citation. It survives every check in this engine and fails the first reader who looks it up. If a claim needs a source and no source is in hand, say the claim needs a source and leave it unsourced.
 
 2. **Every in-text citation has a reference entry, and the entry says what the in-text form says.** This is the direction a reader checks. Nothing mechanical here verifies it.
 
-3. **A citation is on the do-not-touch list.** Guardrail 6 already covers attributed quotations, and a reference entry is the same kind of object: reformatting one from a style you were not asked for is an edit nobody requested. `verify.py` compares numbers, dates, and quotations as multisets, so a rewrite that drops a page range or a year fails the fact check rather than passing quietly.
+3. **A citation is on the do-not-touch list.** Guardrail 6 already covers attributed quotations, and a reference entry is the same kind of object. Reformatting one from a style you were not asked for is an edit nobody requested. `verify.py` compares numbers, dates, and quotations as multisets. A rewrite that drops a page range or a year fails the fact check rather than passing quietly.
 
 ## Output shapes
 
@@ -364,9 +392,9 @@ Three rules bind whatever the style.
 
 **deslop.** (1) Findings, (2) the cleaned text or the edited spans, (3) what changed, (4) a corrective pass. If pass 4 changed anything, say plainly that pass 4 is the deliverable.
 
-**voice.** The offer first. Then, at the chosen depth, the converted text or the spans, and a report in the four conversion bands (structure, paragraph, sentence, word) plus the word delta.
+**voice.** The offer first. Then come the converted text or the spans, at the chosen depth. The report uses the four conversion bands (structure, paragraph, sentence, word) plus the word delta.
 
-**ste.** Findings only, no rewrite. The five counted structural checks (sentence limits, paragraph limits, condition order, semicolons) plus the advisory vocabulary band (modals, banned verbs, phrasal verbs, passive voice, unapproved words). Report grouped by rule, with each finding naming the STE guideline and showing the plain replacement.
+**ste.** Findings only, no rewrite. The five counted structural checks (sentence limits, paragraph limits, condition order, semicolons) come first. Then the advisory vocabulary band (modals, banned verbs, phrasal verbs, passive voice, unapproved words). Report grouped by rule, with each finding naming the STE guideline and showing the plain replacement.
 
 **draft.** The prose. Nothing else unless asked.
 
@@ -386,7 +414,7 @@ The voice is data, not code. Nothing in this skill knows anything about a partic
 echo "dana" > ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices/ACTIVE
 ```
 
-**Anything else about profiles belongs to `voice-setup`:** creating one from an interview, deriving one from writing samples, blending two, adjusting one that missed, and the rule for what belongs in a profile versus in the engine. Invoke that skill rather than reproducing its procedure here.
+**Anything else about profiles belongs to `voice-setup`:** creating one from an interview, deriving one from writing samples, blending two, adjusting one that missed. It also owns the rule for what belongs in a profile versus in the engine. Invoke that skill rather than reproducing its procedure here.
 
 A team can keep several profiles in `voices/` and switch per task. A per-project override works too: the nearest `.rabbit-voice`, searched upward from the document's directory or the working directory to the repository root, wins over `voices/ACTIVE`.
 

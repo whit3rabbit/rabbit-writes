@@ -1,5 +1,5 @@
 {
-  "_source": "/Users/whit3rabbit/Documents/GitHub/rabbit-writes/skills/rabbit-writes/scripts/ste_dictionary_full.json",
+  "_source": "skills/rabbit-writes/scripts/ste_dictionary_full.json",
   "_comment": "One row per ASD-STE100 word the dictionary does not approve, with its first-listed approved alternative. See this script's own docstring for the extraction rule and what it leaves out.",
   "candidates": [
     {

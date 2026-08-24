@@ -727,12 +727,18 @@ def check_prose_shape(raw, findings, stats):
                 "paragraphs and tables rather than prose blocks."))
 
     pct = CORPUS["word_count_percentiles"]
+    # Mutually exclusive tiers: p90 wins so a document never gets both.
     if stats["prose_words"] > pct["p90"]:
         findings.append(finding(
             "very-long", "%d words, above the corpus 90th percentile (%d)"
             % (stats["prose_words"], pct["p90"]), "P2", 1,
             "Long is fine when it is depth after a real quickstart. Check the quickstart is "
             "still on the first screen, and move reference material to docs/."))
+    elif stats["prose_words"] > pct["p75"]:
+        findings.append(finding(
+            "long", "%d words, above the corpus 75th percentile (%d)"
+            % (stats["prose_words"], pct["p75"]), "P2", 1,
+            "Reference material belongs in docs/. Keep the quickstart on the first screen."))
 
 
 # ---------------------------------------------------------------------------
@@ -980,13 +986,12 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None,
                                "no-install", "install-late", "no-license",
                                "license-not-last", "license-long"}
         findings = [f for f in findings if f["id"] not in SECTION_FINDING_IDS]
-
     if fragment:
         # In fragment mode, ignore whole-document structure requirements
         FRAGMENT_EXEMPT_IDS = {
             "no-pitch", "pitch-buried", "heavy-header", "no-install", "install-late",
             "no-license", "license-not-last", "license-long", "license-file-missing",
-            "toc-missing", "toc-unneeded", "very-long"
+            "toc-missing", "toc-unneeded", "long", "very-long"
         }
         findings = [f for f in findings if f["id"] not in FRAGMENT_EXEMPT_IDS]
 
