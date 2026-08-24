@@ -96,7 +96,7 @@ VERDICTS_THAT_FAIL_CHECK = ("regressed", "flat")
 
 def _read(path, label, examples):
     try:
-        with open(path, encoding="utf-8") as fh:
+        with open(path, encoding="utf-8-sig") as fh:
             return fh.read()
     except OSError as exc:
         print(cli_error.format_file_error(
@@ -154,7 +154,14 @@ def compare(before, after, fingerprint, tolerance):
 
     rows, summary = {}, {"on_target": 0, "missed": 0, "regressed": 0,
                          "unmeasured": 0}
-    reliable = after["words"] >= stylometry.RELIABLE_WORDS
+    # A short `before` is exactly as unreliable as a short `after`: its
+    # sd_off feeds `measure_verdict`, `_is_flat`, and `_delta_regressed`
+    # the same way after's does, and a document that is already inside the
+    # band because it is nine words long is sampling noise, not a landed
+    # conversion. `before is None` (nothing to compare against) is not this
+    # case and stays reliable on its own words alone.
+    reliable = (after["words"] >= stylometry.RELIABLE_WORDS
+               and (before is None or before["words"] >= stylometry.RELIABLE_WORDS))
     for name in stylometry.MEASURES:
         gap = after_gaps.get(name, {})
         prior = before_gaps.get(name, {})

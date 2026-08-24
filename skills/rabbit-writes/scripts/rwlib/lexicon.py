@@ -115,6 +115,24 @@ def version(path=LEXICON_PATH):
     return load(path).get("version")
 
 
+def pattern_source(finding_id, path=LEXICON_PATH):
+    """The raw `rx` string a catalogue entry carries, for a caller outside
+    scan.py that needs the same alternation without a second hardcoded copy.
+
+    artifacts.py's AI_PARAM_RX is the one caller today: the provider list
+    inside `ai-utm`'s pattern used to be typed out a second time over there,
+    and the two drifted apart from having no way to notice they should agree.
+    Raises rather than returning None on a missing id, the same reasoning as
+    synthetic_priority above: a caller reaching for a pattern that got
+    renamed should fail at import time, not compile an empty alternation and
+    match nothing forever.
+    """
+    for p in load(path).get("patterns", []):
+        if p.get("id") == finding_id:
+            return p["rx"]
+    raise KeyError("no pattern named %r in %s" % (finding_id, path))
+
+
 def word_regex(entries):
     """Whole-word alternation, longest first so `game-changer` wins over `game`.
 

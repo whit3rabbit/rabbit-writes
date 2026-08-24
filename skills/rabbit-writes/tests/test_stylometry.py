@@ -418,9 +418,9 @@ def test_recording_the_register_did_not_move_the_schema():
     """Additive, so a stored fingerprint from before this key means exactly what
     it always meant: the general one. A bump would have invalidated every
     fingerprint anybody had built."""
-    assert stylometry.SCHEMA_VERSION == 2
+    assert stylometry.SCHEMA_VERSION == 3
     assert (stylometry.fingerprint(A, voice="tester", register="chat")
-            ["schema_version"] == 2)
+            ["schema_version"] == 3)
 
 
 def test_path_for_prefers_the_register_and_falls_back_to_the_general_one():

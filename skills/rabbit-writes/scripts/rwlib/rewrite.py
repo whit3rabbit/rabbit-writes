@@ -41,7 +41,7 @@ import os
 import re
 
 from . import markdown, sentences
-from .endpoint import EndpointError
+from .endpoint import EndpointError, Truncated
 from .endpoint import estimate_tokens as endpoint_estimate_tokens
 
 # Never sent to a model, each for its own reason.
@@ -253,6 +253,28 @@ def sentence_span(block_text, index):
     return 0, len(block_text)
 
 
+def preceding_sentence(block_text, index):
+    """The sentence immediately before the one covering `index`, or "".
+
+    The one line of context `user_prompt` sends: the model sees what came
+    right before the passage without being asked to rewrite it too. Same walk
+    as `sentence_span`, kept separate because that one returns offsets and
+    this one returns the previous sentence's text, and a caller after both
+    would need to unpack a three-way return either way.
+    """
+    cursor = 0
+    previous = ""
+    for sentence in sentences.split_sentences(block_text):
+        found = block_text.find(sentence, cursor)
+        if found < 0:
+            continue
+        cursor = found + len(sentence)
+        if found <= index < cursor:
+            return previous
+        previous = sentence
+    return ""
+
+
 def block_burstiness(block_text):
     """sd/mean of this block's own sentence lengths, or None below the floor.
 
@@ -313,7 +335,7 @@ def plan(text, findings, budget_tokens=None, estimate=None,
                 return b_start, b_end, b_text
         return None
 
-    def add(kind, start, end, finding):
+    def add(kind, start, end, finding, context=""):
         unit_text = text[start:end]
         if not unit_text.strip():
             unaddressable.append((finding, "resolved to an empty passage"))
@@ -334,7 +356,8 @@ def plan(text, findings, budget_tokens=None, estimate=None,
                 units[key]["kind"] = "block"
         else:
             units[key] = {"kind": kind, "start": start, "end": end,
-                          "text": unit_text, "findings": [finding]}
+                          "text": unit_text, "findings": [finding],
+                          "context": context}
 
     def prose_block(finding, block):
         if block is None:
@@ -391,8 +414,10 @@ def plan(text, findings, budget_tokens=None, estimate=None,
         if block is None:
             continue
         b_start, _b_end, b_text = block
-        s_start, s_end = sentence_span(b_text, located[0] - b_start)
-        add("span", b_start + s_start, b_start + s_end, finding)
+        b_index = located[0] - b_start
+        s_start, s_end = sentence_span(b_text, b_index)
+        context = preceding_sentence(b_text, b_index)
+        add("span", b_start + s_start, b_start + s_end, finding, context)
 
     ordered = [units[k] for k in sorted(units)]
     # A span inside a block that is also being rewritten whole would be edited
@@ -503,6 +528,15 @@ def gate(unit, candidate, scan_fn, validate_fn, injection_fn=None):
     # around its own answer.
     if _fence_count(candidate) > _fence_count(original):
         reasons.append("the rewrite added a code fence")
+    # An HTML comment the model invented, most dangerously a `rabbit-allow`
+    # suppression: the rescan below runs with suppressions honored, so a
+    # candidate that plants one gets its own remaining tells excluded from
+    # `_countable` and can pass the count check while genuinely making
+    # nothing better. Reject the shape outright rather than trying to count
+    # suppressed findings, which would also block the legitimate case of a
+    # rewrite that keeps a comment already present in the original.
+    if "<!--" in candidate and "<!--" not in original:
+        reasons.append("the rewrite added an HTML comment")
     if reasons:
         return reasons
 
@@ -576,10 +610,17 @@ def rewrite_unit(unit, endpoint, scan_fn, validate_fn, alternatives=None,
               "accepted": False}
     reason = None
     for attempt in range(attempts):
-        prompt = user_prompt(unit, alternatives, reason=reason)
+        prompt = user_prompt(unit, alternatives,
+                             context=unit.get("context", ""), reason=reason)
         try:
             raw = complete(SYSTEM_PROMPT, prompt,
                            temperature=endpoint.temperature + 0.15 * attempt)
+        except Truncated as exc:
+            # A higher temperature does not buy more output tokens, so the same
+            # oversized unit would run into the same ceiling next attempt. Stop
+            # here instead of spending two more calls confirming that.
+            record["attempts"].append(str(exc))
+            break
         except EndpointError as exc:
             # Narrow on purpose: a TypeError from a bad `complete` injection is
             # a programming error and must surface, not become an "attempt".

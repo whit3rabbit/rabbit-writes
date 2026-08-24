@@ -169,7 +169,7 @@ clean this up with my local llama.cpp server   # -> rabbit-rewrites, model mode
 The explicit forms are there for when you want to force one. The `rabbit-writes:` prefix is the plugin namespace and comes from the install. In Codex the same five are `$rabbit-writes`, `$voice-setup`, `$readme-writing`, `$rabbit-reads`, and `$rabbit-rewrites`.
 
 ```
-/rabbit-writes:rabbit-writes    # draft, convert, de-slop, or audit prose. four modes, one skill
+/rabbit-writes:rabbit-writes    # draft, convert, de-slop, or audit prose. five modes, one skill
 /rabbit-writes:voice-setup      # build, measure, edit, blend, or switch a voice profile
 /rabbit-writes:readme-writing   # draft or audit a README against the 100-repo study
 /rabbit-writes:rabbit-reads     # distill a book, paper, or thesis into per-concept cheatsheets

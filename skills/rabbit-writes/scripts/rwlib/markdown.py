@@ -39,8 +39,17 @@ CURLY_APOSTROPHE = "\u2019"
 # characters. Written as `(?:`{3,}|~{3,})` at each end, an unterminated `~~~`
 # closes against the next ``` fence and everything between them -- ordinary
 # prose -- is blanked out of every counter in the engine.
+#
+# The opening run is captured and backreferenced at the close, with `*` after
+# it rather than nothing, because CommonMark requires the closing fence be at
+# least as long as the opening one and not the same length: an opener of 4
+# backticks may still close on a run of 5. Without the backreference a 3-tick
+# closer inside a 4-tick fence's body (a nested fenced example, say) ended the
+# span early and blanked the wrong text: everything from the real 4-tick
+# closer onward stayed unblanked and reached every counter in the engine as
+# prose.
 FENCE_RX = re.compile(
-    r"^[ \t]*(?:`{3,}.*?^[ \t]*`{3,}|~{3,}.*?^[ \t]*~{3,})", re.M | re.S)
+    r"^[ \t]*(?:(`{3,}).*?^[ \t]*\1`*|(~{3,}).*?^[ \t]*\2~*)", re.M | re.S)
 # The same fences taken apart, for the corpus study, which counts languages and
 # body lines. Two patterns because they answer two questions, not because
 # anybody forgot to merge them: this one does not anchor to the line start, so
@@ -97,9 +106,36 @@ _QUOTE_PAIRS = (('"', '"'), (LEFT_DOUBLE, RIGHT_DOUBLE), (LEFT_SINGLE, RIGHT_SIN
 # phrase against a document that was only naming the phrase as an example.
 # Length is a judgement about a matched span, not about where one ends, so the
 # callers that want a floor apply their own: facts.quoted has QUOTED_MIN_WORDS.
+# The curly right-single mark closes a quotation and spells an apostrophe, and
+# those are the same character. A genuine closing quote is never immediately
+# followed by a letter and an apostrophe always is, which is the distinction
+# both halves of this fix turn on. `_closer_guard` refuses a "closer" that
+# looks like an apostrophe. `_content_class` is the half that also has to
+# change: without it, the mark inside "It's" is excluded from content the
+# same as a real closer, the greedy match cannot skip past it either way, and
+# `'It's a test'` matched nothing at all rather than the whole quotation.
+# Letting the mark back into content, but only when a letter follows, keeps
+# the positional pairing the module docstring above describes: a mark that is
+# NOT followed by a letter still ends the span, exactly as before. Neither
+# guard applies to the other two pairs in _QUOTE_PAIRS, and there is no
+# straight-single-quote pair here to carry the same problem: `'` is ASCII
+# apostrophe and closing quote both, and _QUOTE_PAIRS never pairs it with
+# itself for exactly that reason.
+def _closer_guard(b):
+    return r"(?![A-Za-z])" if b == RIGHT_SINGLE else ""
+
+
+def _content_class(a, b):
+    base = r"[^%s%s\n]" % (re.escape(a), re.escape(b))
+    if b == RIGHT_SINGLE:
+        return r"(?:%s|%s(?=[A-Za-z]))" % (base, re.escape(b))
+    return base
+
+
 QUOTED_RX = re.compile(
-    "|".join("%s((?:[^%s%s\\n]|\\n(?![ \\t]*\\n)){0,400})%s"
-             % (re.escape(a), re.escape(a), re.escape(b), re.escape(b))
+    "|".join("%s((?:%s|\\n(?![ \\t]*\\n)){0,400})%s%s"
+             % (re.escape(a), _content_class(a, b), re.escape(b),
+                _closer_guard(b))
              for a, b in _QUOTE_PAIRS))
 CURLY_QUOTE_RX = re.compile("[“”‘’]")
 

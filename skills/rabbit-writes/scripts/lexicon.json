@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "_version_note": "Bumped whenever a word, a phrase, or a pattern changes, so a published measurement can name the catalogue that produced it. scan.py --json echoes it, PROOF.md's header quotes it, and scripts/validate.py fails when the two disagree. Numbers measured against one version mean nothing against another.",
   "_comment": "Tiered vocabulary and pattern regexes for scan.py. Edit freely; scan.py reads this at runtime. Word entries are matched case-insensitively on word boundaries and cover the listed inflections.",
 
@@ -89,7 +89,8 @@
     "robust", "comprehensive", "seamless", "seamlessly", "ecosystem",
     "ecosystems", "leverage", "leverages", "leveraged", "leveraging",
     "facilitate", "facilitates", "underpin", "underpins",
-    "streamline", "streamlines", "scalable", "scalability", "dynamic"
+    "streamline", "streamlines", "scalable", "scalability",
+    "dynamic", "dynamics"
   ],
 
   "_academic_exempt_note": "Added to technical_exempt, never instead of it, for the register whose partial cells name it. Three words, and the list is short because it was cut down by measurement rather than assembled by intuition: see docs/academic-corpus/. Each survivor carries a technical sense in a paper that it does not carry in a blog post, which is the test. `paradigm` is Kuhn's and the experimental psychologist's. `transformation` is the statistician's. Rejected despite firing: `holistic`, 11 hits in fewer than two of nineteen papers, which is one author's habit rather than a register fact; `crucial`, in six papers and still an intensifier that means the same thing everywhere; `significant` and `effective`, which were on the list because a synthetic sample fired tier3-density on them and no real paper fires that rule at all.",
@@ -103,28 +104,28 @@
       "label": "Chatbot artifact",
       "band": "fingerprint",
       "priority": "P0",
-      "rx": "(?i)(?:\\b(i hope this helps|hope that helps|let me know if (you|there)|feel free to (reach out|ask)|don't hesitate to ask|would you like me to|want me to (give|show|continue)|should i continue|here is a comprehensive|(?:certainly|of course)!|absolutely[!,]\\s+here)|(?:^|[.!?]\\s+)(?:certainly|of course),)"
+      "rx": "(?i)\\b(would you like me to|want me to (give|show|continue)|should i continue|here is a comprehensive|(?:certainly|of course)!|absolutely[!,]\\s+here)"
     },
     {
       "id": "sycophancy",
       "label": "Sycophantic tone",
       "band": "fingerprint",
       "priority": "P0",
-      "rx": "(?i)(great question|excellent point|that's a (great|really insightful|fantastic)|you're absolutely right|what a (great|fantastic))"
+      "rx": "(?i)\\b(great question|excellent point|that's a (great|really insightful|fantastic)|you're absolutely right|what a (great|fantastic))\\b"
     },
     {
       "id": "cutoff-disclaimer",
       "label": "Cutoff disclaimer",
       "band": "fingerprint",
       "priority": "P0",
-      "rx": "(?i)(as of my (last|latest) (training|update|knowledge)|up to my last training|i don't have access to real-?time|based on (the )?(information provided|available information)|while specific details (about|are)|details are (limited|scarce) in (readily )?available sources)"
+      "rx": "(?i)(as of my (last|latest) (training|update|knowledge)|up to my last training|i don't have access to real-?time|while specific details (about|are)|details are (limited|scarce) in (readily )?available sources)"
     },
     {
       "id": "speculative-gapfill",
       "label": "Speculative gap-filling",
       "band": "fingerprint",
       "priority": "P0",
-      "rx": "(?i)(maintains a (relatively )?low (public )?profile|keeps? (personal )?details private|prefers to stay out of the spotlight|it is believed that|likely (grew up|began|studied|started)|appears to have (studied|worked|begun))"
+      "rx": "(?i)(maintains a (relatively )?low (public )?profile|keeps? (personal )?details private|prefers to stay out of the spotlight|it is believed that|appears to have (studied|worked|begun))"
     },
     {
       "id": "citation-leak",
@@ -170,8 +171,8 @@
       "id": "negation-runway",
       "label": "Negation runway",
       "band": "craft",
-      "priority": "P0",
-      "rx": "(?i)((it'?s|this|that|the \\w+) (is )?not (just |merely |only |simply )?(about )?[^.;!?\\n]{2,60}[,;] (it'?s|but|they'?re|rather)|not (just|merely|only) [^.;!?\\n]{2,50} but( also)? |isn'?t (the |a |about )?[^.;!?\\n]{2,50}\\.\\s+(it'?s|the real|what|that'?s)|the question isn'?t)"
+      "priority": "P1",
+      "rx": "(?i)((it'?s|this|that|the \\w+) (is )?not (just|merely|only|simply) (about )?[^.;!?\\n]{2,60}[,;] (it'?s|but|they'?re|rather)|not (just|merely|only) [^.;!?\\n]{2,50} but( also)? |isn'?t (just |merely |only |simply )(the |a |about )?[^.;!?\\n]{2,50}\\.\\s+(it'?s|the real|what|that'?s)|the question isn'?t)"
     },
     {
       "id": "rule-of-three-no",
@@ -255,7 +256,7 @@
       "label": "Acknowledgment loop",
       "band": "fingerprint",
       "priority": "P1",
-      "rx": "(?i)(you'?re asking about|to answer your question|the question of whether you)"
+      "rx": "(?i)\\b(you'?re asking about|to answer your question|the question of whether you)\\b"
     },
     {
       "id": "confidence-calibration",
@@ -290,7 +291,7 @@
       "label": "Narrated candor",
       "band": "craft",
       "priority": "P1",
-      "rx": "(?i)(i would rather flag|i'?d rather flag|i want to be upfront|to be fully transparent|rather than bury this|being honest about the limitations)"
+      "rx": "(?i)\\b(i would rather flag|i'?d rather flag|i want to be upfront|to be fully transparent|rather than bury this|being honest about the limitations)\\b"
     },
     {
       "id": "rhetorical-question",

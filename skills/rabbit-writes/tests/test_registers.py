@@ -187,6 +187,7 @@ FILLER = (
 # id with no relaxed cell, because a floor would swallow the allowance the
 # relaxed test is measuring. The test below asserts that.
 TRIGGERS = {
+    "acknowledgment-loop": ("To answer your question, here it is.", " ", "", 0),
     "boilerplate-phrase": ("The emerging sector matters here.", " ", "", 0),
     "confidence-calibration": ("It is worth noting that this holds.", " ", "", 0),
     "curly-quote": ("“", "q ", "A note about ", 0),
@@ -197,8 +198,10 @@ TRIGGERS = {
         "It may become one of the most important narratives.", " ", "", 0),
     "generic-conclusion": ("In conclusion, the work is done.", " ", "", 0),
     "hedge-stack": ("This could potentially work.", " ", "", 0),
+    "inline-header-bullet": ("- **Term**: a description on the line.", "\n", "", 0),
     "list-label-period": ("- **Label.** Text on the line.", "\n", "", 0),
     "promotional": ("The house is nestled in the hills.", " ", "", 0),
+    "reasoning-artifact": ("Let me think step by step.", " ", "", 0),
     "rhetorical-question": ("What does this mean?", "\n\n", "", 0),
     "significance-inflation": ("It stands as a testament.", " ", "", 0),
     "signposting": ("Let's dive in.", " ", "", 0),

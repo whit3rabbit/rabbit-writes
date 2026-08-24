@@ -273,6 +273,22 @@
       }
     },
     {
+      "label": "Reasoning-chain artifact",
+      "id": "reasoning-artifact",
+      "cells": {
+        "chat": {"mode": "skip"},
+        "informal": {"mode": "skip"}
+      }
+    },
+    {
+      "label": "Acknowledgment loop",
+      "id": "acknowledgment-loop",
+      "cells": {
+        "chat": {"mode": "skip"},
+        "informal": {"mode": "skip"}
+      }
+    },
+    {
       "label": "Diff-anchored writing",
       "id": "diff-anchored",
       "cells": {
@@ -283,6 +299,13 @@
     {
       "label": "List-label periods",
       "id": "list-label-period",
+      "cells": {
+        "docs": {"mode": "skip"}
+      }
+    },
+    {
+      "label": "Inline-header bullet",
+      "id": "inline-header-bullet",
       "cells": {
         "docs": {"mode": "skip"}
       }

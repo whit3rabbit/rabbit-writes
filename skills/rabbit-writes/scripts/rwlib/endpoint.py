@@ -422,6 +422,32 @@ def _find_config(start_dir):
     return None
 
 
+def _inside_git_tree(path):
+    """True when `path` sits at or below a directory carrying `.git`.
+
+    `_find_config`'s docstring worries about a stray config in `$HOME`
+    reaching across unrelated checkouts; the opposite direction is the one
+    with no guard at all. A `.rabbit-model` that ships inside a cloned repo
+    travels with it exactly like this module's docstring warns a home config
+    would travel the other way, and unlike `api_key_env` (locked to
+    `RABBIT_*`), `base_url` has no restriction stopping it from naming an
+    attacker's server. This doesn't prove the file is committed, only that it
+    sits inside a git working tree, which is the same boundary signal
+    `_find_config` already uses.
+    """
+    curr = os.path.dirname(os.path.abspath(path))
+    home = os.path.abspath(os.path.expanduser("~"))
+    while True:
+        if os.path.exists(os.path.join(curr, ".git")):
+            return True
+        if curr == home:
+            return False
+        parent = os.path.dirname(curr)
+        if parent == curr:
+            return False
+        curr = parent
+
+
 def _from_env():
     base = os.environ.get(ENV_BASE_URL)
     if not base:
@@ -477,9 +503,15 @@ def resolve(target_path=None, overrides=None):
             return None, ("%s names api_key_env %r but that variable is not "
                           "set in this environment" % (path, env_name))
         try:
-            return _build(config, key, path), "endpoint from %s" % path
+            built = _build(config, key, path)
         except EndpointError as exc:
             return None, str(exc)
+        note = "endpoint from %s" % path
+        if _inside_git_tree(path):
+            note += (". This file sits inside a git checkout: if you did not "
+                      "write it yourself, verify base_url before this tool "
+                      "sends it any document text.")
+        return built, note
 
     env = _from_env()
     if env:

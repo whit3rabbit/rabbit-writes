@@ -388,14 +388,14 @@ echo "dana" > ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/voices/ACTIVE
 
 **Anything else about profiles belongs to `voice-setup`:** creating one from an interview, deriving one from writing samples, blending two, adjusting one that missed, and the rule for what belongs in a profile versus in the engine. Invoke that skill rather than reproducing its procedure here.
 
-A team can keep several profiles in `voices/` and switch per task. A per-project override works too: if the working directory contains `.rabbit-voice`, read the voice name from there instead of from `voices/ACTIVE`.
+A team can keep several profiles in `voices/` and switch per task. A per-project override works too: the nearest `.rabbit-voice`, searched upward from the document's directory or the working directory to the repository root, wins over `voices/ACTIVE`.
 
 ## Script CLI Arguments Reference
 
 ### `scan.py`
 `python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-writes/scripts/scan.py [file] [options]`
 - `file`: (OPTIONAL, file path) Markdown document file to scan or `.docx`. Omit to read text from stdin.
-- `--profile`: (OPTIONAL, choice `auto` or register name in `registers.json`: `academic`, `blog`, `chat`, `docs`, `formal`, `informal`, `linkedin`, `technical-blog`, default: `DEFAULT`) Target register profile.
+- `--profile`: (OPTIONAL, choice `auto` or register name in `registers.json`: `academic`, `blog`, `chat`, `docs`, `formal`, `informal`, `linkedin`, `technical-blog`, default: `blog`) Target register profile.
 - `--voice`: (OPTIONAL, choice `auto` or voice name in `voices/`) Voice profile name slug to resolve and apply.
 - `--voice-rules`: (OPTIONAL, file path) Path to a `.rules.json` voice rules file.
 - `--apply-safe`: (OPTIONAL, boolean flag) Apply mechanical fixes safely to document text.
@@ -411,7 +411,7 @@ A team can keep several profiles in `voices/` and switch per task. A per-project
 - `--ste-mode`: (OPTIONAL, choice: `procedural`, `descriptive`) Force STE sentence-length limit (20 or 25 words).
 - `--apply-model`: (OPTIONAL, boolean flag) Run LLM-driven rewrite pass using local or remote model endpoint.
 - `--model-plan`: (OPTIONAL, boolean flag) Print planned LLM edits without applying them.
-- `--model-endpoint`: (OPTIONAL, string / URL) Model API endpoint URL (default: `http://localhost:11434/v1`).
+- `--model-endpoint`: (OPTIONAL, string / URL) Model API endpoint URL. No default: `.rabbit-model` or `$RABBIT_MODEL_BASE_URL` must supply one, or the flag must.
 - `--model-name`: (OPTIONAL, string) Model identifier name.
 - `--model-limit`: (OPTIONAL, integer) Maximum findings to target per rewrite iteration.
 - `--model-attempts`: (OPTIONAL, integer, default: `3`) Maximum verification attempts before stopping.
@@ -435,9 +435,6 @@ A team can keep several profiles in `voices/` and switch per task. A per-project
 - `--voice-rules`: (OPTIONAL, file path) Path to a `.rules.json` voice rules file.
 - `--profile`: (OPTIONAL, choice: `academic`, `blog`, `chat`, `docs`, `formal`, `informal`, `linkedin`, `technical-blog`) Register name for fingerprint comparison.
 - `--tolerance`: (OPTIONAL, float, default: `1.5`) Tolerance threshold in sample standard deviations (`rwlib.stylometry.ATTAIN_TOLERANCE`).
-- `--ste`: (OPTIONAL, boolean flag) Include STE structural checks in report.
-- `--no-ste`: (OPTIONAL, boolean flag) Silence STE checks.
-- `--ste-mode`: (OPTIONAL, choice: `procedural`, `descriptive`) Force STE sentence-length limit.
 - `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON payload.
 - `--check`: (OPTIONAL, boolean flag) Exit 1 if verdict is `regressed` or `flat`.
 - `--plan`: (OPTIONAL, boolean flag) Output sentence-shape targets for conversion planning.

@@ -87,7 +87,17 @@ except ImportError:
     from rwlib.voices import strip_rules_suffix
     from rwlib.markdown import CURLY_APOSTROPHE
 
-SCHEMA_VERSION = 2
+# Bumped for the sentences.py split fix (mark-then-closer, and a forced
+# boundary at each list item): both change what sentence lengths a fingerprint
+# was measured over, which is what this version exists to catch. A fingerprint
+# stamped 2 was measured with the old splitter and distance() refuses it
+# rather than silently comparing against numbers that no longer mean what they
+# used to. voices/john.fingerprint.json and every voices/satoshi.*.fingerprint.json
+# in this repo are stamped 2 as of this bump and need `measure_voice.py
+# --write-fingerprint` rerun from their original samples before voice-distance
+# reports for them again; scan.py's apply_voice_distance already degrades this
+# to a stderr note rather than a crash.
+SCHEMA_VERSION = 3
 
 # The file that sits beside a profile's rules. scan.py looks for it there and
 # runs without one, which is the only sane default: a fingerprint costs the

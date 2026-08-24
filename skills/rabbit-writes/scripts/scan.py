@@ -1322,6 +1322,12 @@ def run_apply_safe(text, path, voice_rules, write, to_stdout=False,
             print("This is a bug in the fixer, not in your document. Report it.",
                   file=sys.stderr)
             return 1
+        if verdict is None:
+            print("scan: verify.py not found beside this script, so these "
+                  "edits cannot be checked against the preservation rules. "
+                  "Refusing to print --apply-safe output unverified.",
+                  file=sys.stderr)
+            return 2
         sys.stdout.write(fixed)
         return 0
 
@@ -1358,6 +1364,12 @@ def run_apply_safe(text, path, voice_rules, write, to_stdout=False,
         print("\nDry run. Nothing written. Pass --write to apply, or pipe "
               "--apply-safe --stdout into a diff.")
         return 0
+    if verdict is None:
+        print("\nRefusing to write: verify.py is missing, so these edits "
+              "cannot be checked against the preservation rules. Copy "
+              "verify.py back beside scan.py, or drop --write to review the "
+              "edits above without applying them.")
+        return 2
     if not path:
         examples = [
             "python3 scan.py draft.md",
@@ -1854,7 +1866,7 @@ def main():
             return 2
     elif args.file:
         try:
-            with open(args.file, encoding="utf-8") as fh:
+            with open(args.file, encoding="utf-8-sig") as fh:
                 text = fh.read()
                 newlines = fh.newlines
         except OSError as exc:

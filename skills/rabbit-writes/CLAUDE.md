@@ -54,7 +54,7 @@ python3 skills/rabbit-writes/scripts/attain.py <source> <target> --voice whit3ra
 
 ## Structure & Architecture
 
-- **`SKILL.md`**: Frontmatter definition and operational guidelines. Defines guardrails and four modes (`detect`, `deslop`, `voice`, `draft`). Mode table and guardrails are pinned by repo validator (`scripts/validate.py`).
+- **`SKILL.md`**: Frontmatter definition and operational guidelines. Defines guardrails and five modes (`detect`, `deslop`, `voice`, `draft`, `ste`). Mode table and guardrails are pinned by repo validator (`scripts/validate.py`).
 - **`PROOF.md`**: Measured self-scan numbers and voice-band calibration tables.
 - **`scripts/`**:
   - `scan.py`: Main CLI tool and engine scanner.

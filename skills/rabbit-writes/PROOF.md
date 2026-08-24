@@ -19,49 +19,49 @@ Run it from `skills/rabbit-writes/`. It covers every row in the table below, inc
 
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 5, registers 4, measured 23 August 2026, seventeenth pass)
+## Result (v0.1.0, lexicon 6, registers 4, measured 23 August 2026, eighteenth pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 4,934 | 0 | 0 | 0 | 0.71 | 0.71 | 0.0 |
-| `PROOF.md` | 9,354 | 0 | 0 | **1** | 0.58 | 0.72 | 0.0 |
-| `references/patterns.md` | 3,942 | **5** | **15** | **4** | 0.87 | 0.77 | 1.8 |
+| `SKILL.md` | 4,870 | 0 | 0 | 0 | 0.72 | 0.71 | 0.0 |
+| `PROOF.md` | 9,232 | 0 | 0 | **3** | 0.57 | 0.72 | 0.0 |
+| `references/patterns.md` | 3,977 | **5** | **15** | **4** | 0.70 | 0.77 | 1.8 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 883 | 0 | 0 | **9** | 0.65 | 0.71 | 0.0 |
-| `references/context.md` | 720 | 0 | 0 | 0 | 0.68 | 0.78 | 0.0 |
-| `references/voice.md` | 1,799 | 0 | 0 | 0 | 0.76 | 0.71 | 0.0 |
-| `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.70 | 0.77 | 0.0 |
-| `references/checklist.md` | 748 | 0 | 0 | 0 | 0.49 | 0.73 | 0.0 |
-| `references/ste.md` | 1,244 | 0 | 0 | 0 | 0.57 | 0.70 | 0.0 |
-| `references/forms/abstract.md` | 571 | 0 | 0 | **5** | 0.70 | 0.71 | 0.0 |
-| `references/forms/blog.md` | 400 | 0 | 0 | **4** | 0.81 | 0.71 | 0.0 |
-| `references/forms/case-study.md` | 498 | 0 | 0 | **8** | 0.70 | 0.70 | 0.0 |
-| `references/forms/chat.md` | 489 | 0 | 0 | **4** | 0.82 | 0.70 | 0.0 |
-| `references/forms/docs.md` | 547 | 0 | 0 | **6** | 0.66 | 0.70 | 0.0 |
-| `references/forms/email.md` | 590 | 0 | 0 | **5** | 0.76 | 0.69 | 0.0 |
-| `references/forms/essay.md` | 520 | 0 | 0 | **5** | 0.86 | 0.67 | 0.0 |
+| `references/context.md` | 720 | 0 | 0 | 0 | 0.69 | 0.78 | 0.0 |
+| `references/voice.md` | 1,799 | 0 | 0 | 0 | 0.71 | 0.71 | 0.0 |
+| `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.72 | 0.77 | 0.0 |
+| `references/checklist.md` | 755 | 0 | 0 | 0 | 0.51 | 0.73 | 0.0 |
+| `references/ste.md` | 1,260 | 0 | 0 | 0 | 0.61 | 0.70 | 0.0 |
+| `references/forms/abstract.md` | 571 | 0 | 0 | **5** | 0.71 | 0.71 | 0.0 |
+| `references/forms/blog.md` | 400 | 0 | 0 | **4** | 0.86 | 0.71 | 0.0 |
+| `references/forms/case-study.md` | 498 | 0 | 0 | **8** | 0.71 | 0.70 | 0.0 |
+| `references/forms/chat.md` | 489 | 0 | 0 | **4** | 0.86 | 0.70 | 0.0 |
+| `references/forms/docs.md` | 547 | 0 | 0 | **6** | 0.63 | 0.70 | 0.0 |
+| `references/forms/email.md` | 590 | 0 | 0 | **5** | 0.77 | 0.69 | 0.0 |
+| `references/forms/essay.md` | 520 | 0 | 0 | **5** | 0.84 | 0.67 | 0.0 |
 | `references/forms/executive-summary.md` | 465 | 0 | 0 | **5** | 0.57 | 0.64 | 0.0 |
-| `references/forms/incident-report.md` | 619 | 0 | 0 | **9** | 0.74 | 0.75 | 0.0 |
+| `references/forms/incident-report.md` | 619 | 0 | 0 | **9** | 0.76 | 0.75 | 0.0 |
 | `references/forms/letter.md` | 521 | 0 | 0 | **8** | 0.91 | 0.71 | 0.0 |
-| `references/forms/linkedin.md` | 570 | 0 | 0 | **7** | 0.75 | 0.71 | 0.0 |
+| `references/forms/linkedin.md` | 570 | 0 | 0 | **7** | 0.82 | 0.71 | 0.0 |
 | `references/forms/literature-review.md` | 680 | 0 | 0 | **9** | 0.70 | 0.70 | 0.0 |
-| `references/forms/memo.md` | 477 | 0 | 0 | **5** | 0.63 | 0.69 | 0.0 |
+| `references/forms/memo.md` | 477 | 0 | 0 | **5** | 0.67 | 0.69 | 0.0 |
 | `references/forms/pentest-report.md` | 677 | 0 | 0 | **8** | 0.65 | 0.74 | 0.0 |
 | `references/forms/proposal.md` | 553 | 0 | 0 | **8** | 0.70 | 0.70 | 0.0 |
 | `references/forms/research-paper.md` | 781 | 0 | 0 | **9** | 0.73 | 0.71 | 0.0 |
-| `references/forms/security-advisory.md` | 613 | 0 | 0 | **10** | 0.78 | 0.74 | 0.0 |
-| `references/forms/substack.md` | 601 | 0 | 0 | **6** | 0.75 | 0.69 | 0.0 |
-| `references/forms/technical-blog.md` | 461 | 0 | 0 | **6** | 0.71 | 0.72 | 0.0 |
-| `references/forms/technical-report.md` | 567 | 0 | 0 | **9** | 0.77 | 0.69 | 0.0 |
+| `references/forms/security-advisory.md` | 613 | 0 | 0 | **10** | 0.79 | 0.74 | 0.0 |
+| `references/forms/substack.md` | 601 | 0 | 0 | **6** | 0.78 | 0.69 | 0.0 |
+| `references/forms/technical-blog.md` | 461 | 0 | 0 | **6** | 0.72 | 0.72 | 0.0 |
+| `references/forms/technical-report.md` | 567 | 0 | 0 | **9** | 0.78 | 0.69 | 0.0 |
 | `references/forms/thesis-chapter.md` | 620 | 0 | 0 | **7** | 0.74 | 0.69 | 0.0 |
 | `references/forms/whitepaper.md` | 508 | 0 | 0 | **8** | 0.82 | 0.73 | 0.0 |
-| `references/citations/apa7.md` | 719 | 0 | 0 | 0 | 0.65 | 0.67 | 0.0 |
-| `references/citations/chicago17.md` | 690 | 0 | 0 | 0 | 0.69 | 0.67 | 0.0 |
-| `references/citations/ieee.md` | 671 | 0 | 0 | 0 | 0.66 | 0.70 | 0.0 |
-| `references/citations/mla9.md` | 685 | 0 | 0 | 0 | 0.63 | 0.69 | 0.0 |
-| `voices/whit3rabbit.md` | 1,558 | 0 | 0 | **10** | 0.69 | 0.78 | 0.0 |
-| `../voice-setup/SKILL.md` | 3,686 | 0 | 0 | 0 | 0.65 | 0.72 | 0.0 |
-| `../readme-writing/SKILL.md` | 2,514 | 0 | 0 | 0 | 0.63 | 0.73 | 0.0 |
+| `references/citations/apa7.md` | 719 | 0 | 0 | 0 | 0.67 | 0.67 | 0.0 |
+| `references/citations/chicago17.md` | 690 | 0 | 0 | 0 | 0.73 | 0.67 | 0.0 |
+| `references/citations/ieee.md` | 671 | 0 | 0 | 0 | 0.68 | 0.70 | 0.0 |
+| `references/citations/mla9.md` | 685 | 0 | 0 | 0 | 0.68 | 0.69 | 0.0 |
+| `voices/whit3rabbit.md` | 1,558 | 0 | 0 | **10** | 0.68 | 0.78 | 0.0 |
+| `../voice-setup/SKILL.md` | 3,532 | 0 | 0 | 0 | 0.65 | 0.72 | 0.0 |
+| `../readme-writing/SKILL.md` | 2,514 | 0 | 0 | 0 | 0.64 | 0.73 | 0.0 |
 | `../rabbit-reads/SKILL.md` | 1,134 | 0 | 0 | **1** | 0.64 | 0.68 | 0.0 |
 | `../rabbit-rewrites/SKILL.md` | 866 | 0 | 0 | 0 | 0.62 | 0.70 | 0.0 |
 

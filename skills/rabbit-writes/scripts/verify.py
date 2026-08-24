@@ -8,7 +8,7 @@ add em dashes or leave a draft with more tells than it started with. Edit mode
 writes to files, so a broken promise there is silent and destructive. This is
 what checks them.
 
-Three of those checks are narrower than the promise, and those narrowings are
+Two of those checks are narrower than the promise, and those narrowings are
 measured rather than assumed. A file path is tracked only when it carries an
 extension, for the reason spelled out at PATH_RX. Headings are ATX-only (`# Title`),
 matching `rwlib.markdown.HEADING_RX`.
@@ -200,10 +200,11 @@ def extract(text):
     # already made.
     fact_text = blank_entities(HTML_TAG_RX.sub(blank, unquoted))
     return {
-        "fences": FENCE_RX.findall(text),
-        # finditer, not findall: the span pattern captures its backtick
-        # delimiter for the backreference, and findall would return that group
-        # instead of the span.
+        # finditer, not findall: both patterns capture their own delimiter for
+        # a backreference (the closing fence has to be at least as long as the
+        # opener, the closing backtick run has to match the opener's), and
+        # findall would return that group instead of the whole span.
+        "fences": [m.group(0) for m in FENCE_RX.finditer(text)],
         "inline_code": [m.group(0) for m in INLINE_CODE_RX.finditer(text)],
         "frontmatter": (FRONTMATTER_RX.search(text).group(1)
                         if FRONTMATTER_RX.search(text) else None),
@@ -469,7 +470,7 @@ def main():
     args = ap.parse_args()
 
     try:
-        with open(args.original, encoding="utf-8") as fh:
+        with open(args.original, encoding="utf-8-sig") as fh:
             original = fh.read()
     except OSError as exc:
         print(cli_error.format_file_error(
@@ -479,7 +480,7 @@ def main():
         return 2
 
     try:
-        with open(args.rewritten, encoding="utf-8") as fh:
+        with open(args.rewritten, encoding="utf-8-sig") as fh:
             rewritten = fh.read()
     except OSError as exc:
         print(cli_error.format_file_error(

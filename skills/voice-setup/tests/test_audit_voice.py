@@ -405,10 +405,13 @@ def test_known_contamination_threshold():
             samples = []
             for i in range(n_samples):
                 text = _doc(A_POOL, seed_offset=i)
-                # "of course," is a sentence-initial chatbot-artifact P0 in the engine lexicon.
-                text = text.replace("I think the", "Of course, I think the", 1)
+                # "of course!" is a chatbot-artifact P0 in the engine lexicon.
+                # The comma form ("Of course, I think...") used to be too: it
+                # narrowed out after firing on ordinary published prose that
+                # opens a sentence with a calm "Of course," contrast.
+                text = text.replace("I think the", "Of course! I think the", 1)
                 if per_sample > 1:
-                    text = text.replace("I said the", "Of course, I said the", 1)
+                    text = text.replace("I said the", "Of course! I said the", 1)
                 samples.append(_sample(tmp, text))
             js, err, code = run_cmd(AUDIT_VOICE, "tester", *samples,
                                     "--voices-dir", voices, "--json")

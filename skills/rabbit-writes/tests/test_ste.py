@@ -48,8 +48,11 @@ def test_count_words_basics():
     # 50mb = 1 word (number with unit), file = 1 word
     assert count_words("50mb file") == 2
     assert count_words("real-time system") == 2
-    # Markdown links are stripped, link text not counted
-    assert count_words("[click here](https://example.com)") == 0
+    # Markdown links: the URL is stripped, the visible link text is counted
+    # (a reader sees "click here", not the address it points to)
+    assert count_words("[click here](https://example.com)") == 2
+    # Image alt text is stripped whole: it is not visible body text
+    assert count_words("![a screenshot of the app](https://example.com/x.png)") == 0
     # HTML tags stripped
     assert count_words("<strong>bold</strong> text") == 2
 

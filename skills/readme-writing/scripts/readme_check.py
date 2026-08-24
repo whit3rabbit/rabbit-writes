@@ -1008,7 +1008,7 @@ def main():
     args = ap.parse_args()
 
     try:
-        with open(args.file, encoding="utf-8") as fh:
+        with open(args.file, encoding="utf-8-sig") as fh:
             raw = fh.read()
     except OSError as exc:
         print(cli_error.format_file_error(

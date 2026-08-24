@@ -169,11 +169,82 @@ HIDING_CSS = (r"(?:display\s*:\s*none"
 # The body is unbounded on purpose. A character ceiling here is an evasion the
 # attacker controls: pad the hidden element past the ceiling and the element
 # stops matching, which drops a P0 `injection-hidden-directive` to the P2 that
-# only sees the visible text. Nothing here nests a quantifier, so the
-# non-greedy run to the closing tag is linear and needs no ceiling.
-CONCEAL_ELEMENT_RX = re.compile(
+# only sees the visible text. A plain non-greedy `.*?</(?P=tag)>` has the same
+# evasion under a different shape: `<div style="display:none"><div>x</div>
+# payload</div>` stops at the FIRST same-name closer, leaving `payload` outside
+# the concealed span. `_matching_close` below tracks same-tag nesting depth
+# instead, so the match always reaches the closer that actually balances the
+# opener. Still linear: each scan only advances through the open/close tokens
+# of the one tag name in play, never both directions at once.
+CONCEAL_ELEMENT_OPEN_RX = re.compile(
     r"(?is)<(?P<tag>\w+)[^>]*style=[\"'][^\"']*" + HIDING_CSS +
-    r"[^\"']*[\"'][^>]*>.*?</(?P=tag)\s*>")
+    r"[^\"']*[\"'][^>]*?(?P<selfclose>/)?>")
+
+
+def _matching_close(text, tag, search_from):
+    """Index just past the `</tag>` that balances an opener ending at
+    `search_from`, honoring nested same-name tags. None if it never closes."""
+    open_rx = re.compile(r"(?is)<%s\b[^>]*?(/)?>" % re.escape(tag))
+    close_rx = re.compile(r"(?is)</%s\s*>" % re.escape(tag))
+    depth, pos = 1, search_from
+    while True:
+        next_open = open_rx.search(text, pos)
+        next_close = close_rx.search(text, pos)
+        if next_close is None:
+            return None
+        if next_open and next_open.start() < next_close.start():
+            if not next_open.group(1):
+                depth += 1
+            pos = next_open.end()
+            continue
+        depth -= 1
+        pos = next_close.end()
+        if depth == 0:
+            return pos
+
+
+class _ConcealElementMatch:
+    def __init__(self, start, end, text):
+        self._start, self._end, self._text = start, end, text
+
+    def start(self):
+        return self._start
+
+    def end(self):
+        return self._end
+
+    def group(self, n=0):
+        return self._text
+
+    def groupdict(self):
+        return {}
+
+
+class _ConcealElementFinder:
+    """`.finditer`-compatible wrapper so `_concealed()` can treat this the same
+    as every other entry in CONCEALMENT, despite needing depth-aware matching
+    a single compiled regex cannot do."""
+
+    @staticmethod
+    def finditer(text):
+        pos = 0
+        while True:
+            m = CONCEAL_ELEMENT_OPEN_RX.search(text, pos)
+            if m is None:
+                return
+            if m.group("selfclose"):
+                # No body to conceal; CONCEAL_TAG_RX already covers this shape.
+                pos = m.end()
+                continue
+            end = _matching_close(text, m.group("tag"), m.end())
+            if end is None:
+                pos = m.end()
+                continue
+            yield _ConcealElementMatch(m.start(), end, text[m.start():end])
+            pos = end
+
+
+CONCEAL_ELEMENT_RX = _ConcealElementFinder()
 
 # The same hiding on a tag that never closes: `<img style="display:none"
 # alt="...">`. The tag itself is the span, which is where alt and title live.
@@ -302,7 +373,51 @@ def tag_runs(text):
             run = []
     if run:
         out.append((start, "".join(run)))
-    return [(at, msg) for at, msg in out
+    return _readable_runs(out)
+
+
+# A Tags-block character spelled as its own decimal or hex HTML entity, e.g.
+# `&#917601;` or `&#xE0061;`, renders identically to the literal character in
+# any browser but is plain ASCII to a regex scanning raw codepoints: the whole
+# `_hidden-unicode` P1 sweep in scan.py already reports these one entity at a
+# time, but tag_runs() above never saw them as the message they decode to, so
+# a smuggled instruction spelled this way scored P1 noise instead of the P0
+# this band exists to raise. Entities are matched as tokens rather than
+# decoded with html.unescape() up front so the offsets stay in raw-text space;
+# decoding first would shift every position after the first multi-digit
+# entity and break line_of(raw, at) for the finding.
+_NUMERIC_ENTITY_RX = re.compile(r"&#[xX]?[0-9a-fA-F]+;")
+
+
+def _entity_codepoint(entity):
+    body = entity[2:-1]
+    return int(body[1:], 16) if body[:1] in ("x", "X") else int(body)
+
+
+def entity_tag_runs(text):
+    """[(offset, decoded)] for every run of Tags-block characters spelled out
+    as consecutive numeric HTML entities rather than as literal codepoints."""
+    out, run, start, pos = [], [], 0, 0
+    for m in _NUMERIC_ENTITY_RX.finditer(text):
+        if run and m.start() != pos:
+            out.append((start, "".join(run)))
+            run = []
+        point = _entity_codepoint(m.group(0))
+        if TAG_BLOCK_LO <= point <= TAG_BLOCK_HI:
+            if not run:
+                start = m.start()
+            run.append(chr(point - TAG_BLOCK_LO))
+        elif run:
+            out.append((start, "".join(run)))
+            run = []
+        pos = m.end()
+    if run:
+        out.append((start, "".join(run)))
+    return _readable_runs(out)
+
+
+def _readable_runs(runs):
+    return [(at, msg) for at, msg in runs
             if msg.isprintable()
             and len(msg.strip()) >= MIN_TAG_CHARS
             and len(msg.split()) >= MIN_TAG_WORDS]
@@ -378,7 +493,7 @@ def scan(raw):
                         "one look at why it is here." % kind))
             claimed.append((start, end))
 
-    for at, message in tag_runs(raw):
+    for at, message in tag_runs(raw) + entity_tag_runs(raw):
         findings.append(make(
             TAG_SMUGGLING_ID,
             "Invisible Unicode-tag text decoding to %r" % _flat(message, 40),

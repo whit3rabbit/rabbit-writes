@@ -27,6 +27,8 @@ Stdlib only, 3.9+.
 import re
 import unicodedata
 
+from .lexicon import pattern_source
+
 HIDDEN_UNICODE = {
     "\u200b": "zero-width space",
     "\u200c": "zero-width non-joiner",
@@ -214,9 +216,15 @@ def unlisted_invisibles(text):
 # Tracking parameters an AI tool appends to a link it hands out. Anchored, so
 # only a whole query parameter matches and a URL that happens to contain the
 # substring elsewhere is left alone.
-AI_PARAM_RX = re.compile(
-    r"(utm_source=(chatgpt|openai|copilot|claude|perplexity|gemini)[a-z.]*"
-    r"|referrer=grok\.com)\Z", re.I)
+#
+# Built from lexicon.json's "ai-utm" pattern rather than typed out a second
+# time: that entry is what scan.py reports a finding off, this is what
+# norm_url actually rewrites, and the two used to carry the same provider
+# list independently, which is exactly the drift this repo's own "one home
+# per fact" convention exists to forbid. `\Z` is added here because this
+# pattern's job is narrower than the detector's: it has to match nothing but
+# a complete query parameter, never a substring inside one.
+AI_PARAM_RX = re.compile(pattern_source("ai-utm") + r"\Z")
 
 
 def norm_url(url):

@@ -28,6 +28,26 @@ ABBREV_RX = re.compile(
 
 WORD_RX = re.compile(r"[A-Za-z][A-Za-z'\-]*")
 
+# A closer allowed between the terminal mark and the split: `said "no." Then`
+# and `(finally!) The` both end a sentence with a quote or paren after the
+# mark, not before it. Python's lookbehind has to be fixed-width, so this is
+# two lookbehinds of different widths joined by alternation rather than one
+# variable-width assertion.
+_CLOSER = "[\"'\u2019\u201d\\)\\]]"
+SENTENCE_SPLIT_RX = re.compile(
+    r"(?:(?<=[.!?])|(?<=[.!?]" + _CLOSER + r"))[\s\n]+")
+
+# A forced boundary at the start of every list item, on the SENTENCE_SENTINEL-
+# protected text below (so a numbered marker's own period, already turned into
+# a sentinel by the substitution two lines down, is matched by its sentinel
+# form rather than by a literal period). Without this, a bulleted list with no
+# terminal punctuation on any item reads as one sentence spanning the whole
+# list: nothing here ends in [.!?], so SENTENCE_SPLIT_RX never fires between
+# items. The words themselves are still counted (markdown.strip_for_stats
+# keeps list text on purpose), only the sentence-length shape was wrong.
+_LIST_BOUNDARY_RX = re.compile(
+    r"(?m)(?=^\s*(?:[-*+]\s|\d+\)\s|\d+" + SENTENCE_SENTINEL + r"))")
+
 
 def split_sentences(text):
     """Sentences, with the periods that are not sentence ends held back."""
@@ -42,7 +62,10 @@ def split_sentences(text):
     # fingerprint, so a change here is a fingerprint schema change.
     protected = re.sub(r"\b([A-Z])\.", r"\1" + SENTENCE_SENTINEL, protected)
     protected = re.sub(r"(?m)^\s*(\d+)\.", r"\1" + SENTENCE_SENTINEL, protected)
-    parts = re.split(r"(?<=[.!?])[\s\n]+", protected)
+    parts = []
+    for chunk in _LIST_BOUNDARY_RX.split(protected):
+        if chunk:
+            parts.extend(SENTENCE_SPLIT_RX.split(chunk))
     return [p.replace(SENTENCE_SENTINEL, ".").strip() for p in parts if p.strip()]
 
 

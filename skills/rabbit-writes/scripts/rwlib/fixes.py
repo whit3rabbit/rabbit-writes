@@ -40,6 +40,7 @@ import re
 from .artifacts import (AI_PARAM_RX, HIDDEN_UNICODE, SPACE_LIKE_TOLERANCE,
                         SPACE_LIKE_UNICODE, TAG_NAME, TAG_RX, ZERO_WIDTH,
                         norm_url, occurrences, range_occurrences)
+from . import inflect
 from .injection import tag_runs
 from .markdown import (BLOCKQUOTE_RX, FENCE_RX, FRONTMATTER_RX, HEADING_RX,
                        INLINE_CODE_RX, PATH_RX, QUOTED_RX, TABLE_ROW_RX,
@@ -88,6 +89,32 @@ def is_mechanical_substitution(value):
     if not isinstance(value, str) or not SUBSTITUTION_RX.match(value.strip()):
         return False
     return value.strip().split()[0].lower() not in INSTRUCTION_OPENERS
+
+
+def substitution_forms(term, replacement):
+    """[(term_form, replacement_form), ...], the base pair plus their regular
+    inflections when both sides are a single word.
+
+    A profile that maps `leverage` to `use` was, before this, only ever
+    catching the bare lemma: `leverages` and `leveraging` matched nothing and
+    verify.py's own preservation check had nothing to say about it either,
+    because the rule silently never fired. inflect.py's plural/past/gerund
+    functions apply the same regular suffix to both sides, so `leveraging`
+    pairs with `using` rather than with the base replacement stuffed where a
+    gerund belongs. Scoped to one word each side: a multi-word phrase like
+    `at the end of the day` has no single slot to inflect, and guessing one
+    is exactly the kind of guess that should stay a human's call instead of
+    landing in --apply-safe.
+    """
+    term, replacement = term.strip(), replacement.strip()
+    pairs = [(term, replacement)]
+    if " " in term or " " in replacement:
+        return pairs
+    for form_fn in (inflect.plural, inflect.past, inflect.gerund):
+        term_form = form_fn(term)
+        if term_form != term:
+            pairs.append((term_form, form_fn(replacement)))
+    return pairs
 
 
 def span_mask(text, patterns=PROTECTED_PATTERNS):
@@ -267,9 +294,13 @@ def plan(text, voice_rules=None):
 
     # 5. The writer's own preferred substitutions, where they are substitutions.
     subs = (voice_rules or {}).get("preferred_substitutions", {})
-    for term, replacement in sorted(subs.items(), key=lambda kv: -len(kv[0])):
-        if not is_mechanical_substitution(replacement):
-            continue
+    substitution_pairs = sorted(
+        ((form_term, form_repl)
+         for term, replacement in subs.items()
+         if is_mechanical_substitution(replacement)
+         for form_term, form_repl in substitution_forms(term, replacement)),
+        key=lambda pair: -len(pair[0]))
+    for term, replacement in substitution_pairs:
         # The gap between the words of a multi-word term flexes across one line
         # break and no further. A blank line is a paragraph boundary, and a
         # term matched across one spliced two paragraphs into a sentence. The

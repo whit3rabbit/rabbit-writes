@@ -79,7 +79,15 @@ DATE_ISO_RX = re.compile(r"\b(\d{4})-(\d{2})-(\d{2})\b")
 # Left to the bare-number pass, `v1.2.3` decomposes into 1.2 and 3, and a
 # rewrite that writes it without the `v` reads as two facts changing. Largest
 # single carve-out over the corpus: 789 of 5,780 prose numbers, 14%.
-VERSION_RX = re.compile(r"\bv?\d+\.\d+(?:\.\d+)*\b")
+#
+# The two lookbehinds guard the one shape that carve-out never covered: a bare
+# `12.5` still reads as a version by default, calibrated behaviour this repo's
+# own corpus measurement backs, but `$3,200.50` does not, and without a guard
+# the version pass claims its `.50` tail as `200.50` before PERCENT_RX or the
+# comma-grouped number pass ever sees it, splitting one fact ($3,200.50) into
+# a fabricated version number plus a stray `3,`. `(?<!\$)` catches the
+# no-comma case (`$12.5`), `(?<!,)` catches the tail of a comma-grouped one.
+VERSION_RX = re.compile(r"(?<!\$)(?<!,)\bv?\d+\.\d+(?:\.\d+)*\b")
 
 # "10-20%", "10 to 20 percent". One fact with two numbers in it, and the two
 # spellings are the same fact. 403 over the corpus, 7%.
@@ -235,8 +243,12 @@ def numbers(text):
     Ordered passes, each consuming its span so a later one never sees it. The
     order carries the argument: dates are eaten first and never emitted, because
     `dates()` owns them and a reformatted date must not read as two numbers
-    moving. A version has to be claimed before the decimal inside it, and a
-    range before its two endpoints.
+    moving. A range is claimed before its two endpoints, and a percent before
+    the version pass, because VERSION_RX's own decimal shape is a strict
+    subset of both: unclaimed, `10-20%` fragments into a range plus a stray
+    `20` read as a version, and `12.5%` (or `12.5 percent`) loses its percent
+    sign entirely to a version number that was never there. A version still
+    has to be claimed before the bare-decimal pass beneath it.
     """
     out = []
     # Consumed and never emitted: a date is dates()' fact, and a percent-encoded
@@ -252,11 +264,11 @@ def numbers(text):
             out.append((canon(m), m.group(0).strip()))
         spans.extend((m.start(), m.end()) for m in found)
 
-    take(VERSION_RX, lambda m: "version:" + m.group(0).lstrip("vV"))
     take(RANGE_RX, lambda m: "range:%s-%s%s"
          % (canonical_number(m.group(1)), canonical_number(m.group(2)),
             "%" if m.group(3) else ""))
     take(PERCENT_RX, lambda m: canonical_number(m.group(1)) + "%")
+    take(VERSION_RX, lambda m: "version:" + m.group(0).lstrip("vV"))
     take(ORDINAL_RX, lambda m: canonical_number(m.group(1)))
     take(NUMBER_RX, lambda m: canonical_number(m.group(0)))
     return out

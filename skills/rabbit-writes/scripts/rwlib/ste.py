@@ -144,8 +144,13 @@ def count_words(text):
     # Strip code spans
     stripped = re.sub(r"`[^`]+`", "", text)
 
-    # Strip markdown links and images
-    stripped = re.sub(r"!?\[[^\]]*\]\([^\)]*\)", "", stripped)
+    # Strip markdown images whole (alt text is not visible body text a reader
+    # counts), but keep a link's visible text and drop only the URL: "See
+    # [the config file](path) for details" reads as five visible words, and
+    # dropping the whole match undercounted every sentence that links to
+    # something.
+    stripped = re.sub(r"!\[[^\]]*\]\([^\)]*\)", "", stripped)
+    stripped = re.sub(r"\[([^\]]*)\]\([^\)]*\)", r"\1", stripped)
     # Strip HTML tags
     stripped = re.sub(r"<[^>]+>", "", stripped)
 
@@ -242,8 +247,18 @@ def _ensure_regexes():
 
     # Match -ing form used as verb after a comma (gerund clause, not noun):
     # "..., making it easy to ...", which STE bans.
+    #
+    # The exclusion list is words that end in "-ing" by spelling accident
+    # rather than by being a gerund: "something", "nothing", "morning" are
+    # nouns, and "including" and "following" are prepositions in this exact
+    # slot ("a list of items, including the config file"), not a verb opening
+    # a clause. Unguarded, every one of them matched a comma-then-preposition
+    # or comma-then-noun that has nothing to do with the rule this pattern
+    # exists to catch.
     _ING_VERB_AFTER_COMMA_RX = re.compile(
-        r",\s+([A-Za-z]+ing)\b(?:\s+(?:that|you|we|they|the|this|these|a|an|"
+        r",\s+(?!(?:including|following|according|something|nothing|"
+        r"anything|everything|morning|evening)\b)"
+        r"([A-Za-z]+ing)\b(?:\s+(?:that|you|we|they|the|this|these|a|an|"
         r"to|not|it|them|him|her|us|me|be|been|being|get|gets|got|make|makes|"
         r"made|have|has|had|do|does|did|will|would|can|could|should|may|"
         r"might|must))+(?:\s+[A-Za-z]+\b){0,6}",
@@ -294,11 +309,22 @@ def _build_ai_slop_rx(lex):
     slop = [k for k in lex.get("ai_slop", {}) if not k.startswith("_")]
     if not slop:
         return re.compile(r"(?!)")
-    patterns = sorted((re.escape(k.replace("_", " ")) for k in slop),
-                      key=len, reverse=True)
+    # A trailing \b only means something after a word character: "e.g." ends
+    # on a literal period, and \b there requires a word character next, which
+    # the space or comma that follows it in real prose is not, so "e.g." (and
+    # "i.e.") never matched at all. The period already stops an accidental
+    # partial-word hit on its own, which is what \b is for, so an entry
+    # ending in punctuation skips the trailing \b instead of silently never
+    # firing.
+    alternatives = []
+    for k in slop:
+        term = k.replace("_", " ")
+        boundary = r"\b" if term[-1:].isalnum() else ""
+        alternatives.append(re.escape(term) + boundary)
+    alternatives.sort(key=len, reverse=True)
     # Case-insensitive like every other STE regex: "Simply run it." is the
     # sentence-initial position these fillers actually sit in.
-    return re.compile(r"(?i)\b(" + "|".join(patterns) + r")\b")
+    return re.compile(r"(?i)\b(" + "|".join(alternatives) + r")")
 
 
 # ---------------------------------------------------------------------------

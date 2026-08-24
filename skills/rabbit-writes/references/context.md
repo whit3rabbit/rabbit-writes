@@ -61,8 +61,11 @@ Rules not listed apply at full strength everywhere.
 | Tier-3 density | skip | strict | strict | strict | **partial**, see below | **partial**, see below | skip | **partial**, see below |
 | Confidence calibration | skip | strict | strict | strict | strict | strict | strict | relaxed (14/19 papers) |
 | Signposting | skip | strict | strict | strict | strict | strict | strict | strict |
+| Reasoning-chain artifact | skip | skip | strict | strict | strict | strict | strict | strict |
+| Acknowledgment loop | skip | skip | strict | strict | strict | strict | strict | strict |
 | Diff-anchored writing | strict | strict | strict | strict | skip | skip | strict | strict |
 | List-label periods | strict | strict | strict | strict | strict | skip | strict | strict |
+| Inline-header bullet | strict | strict | strict | strict | strict | skip | strict | strict |
 | Low burstiness | strict | strict | strict | strict | strict | strict | strict | skip |
 | Trigram repetition | strict | strict | strict | strict | strict | strict | strict | skip |
 | STE sentence length (procedural) | skip | skip | relaxed | strict | relaxed | relaxed | skip | relaxed |

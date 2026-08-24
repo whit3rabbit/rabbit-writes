@@ -16,10 +16,24 @@ injection-hidden-text at P1 past the same eight-word floor, and this module
 only supplies the docx spellings of concealment. The finding's `line` is the
 paragraph number, which is the nearest thing a .docx has.
 
+Headers, footers, footnotes, endnotes, and comments are their own zip members
+(`word/header*.xml`, `word/footer*.xml`, `word/footnotes.xml`,
+`word/endnotes.xml`, `word/comments.xml`), not part of `word/document.xml`,
+and each is scanned for hidden runs the same way: a comment field is the
+classic Word injection vector, sitting in a part a rendered page never shows
+at all. Their text does not join `visible`, because a footer or a reviewer's
+comment is not body prose and folding it in would hand the ordinary sentence
+scan artifacts like a page-number footer as if it were a sentence somebody
+wrote. Detection is the contract here, not transcription.
+
 Out of scope, on purpose: styles.xml (a hidden *style* applied by reference),
-themed or near-background colors, text boxes layered behind images, and the
-OLE-era .doc format. Each needs either a style resolver or a renderer, and the
-module says so here rather than silently half-covering them.
+themed or near-background colors, text boxes layered behind images,
+`docProps/core.xml` (title/subject/keywords metadata a reader never sees
+rendered, and a real vector, but a different XML schema and a different
+judgement about what "visible" means for a field nobody scrolls to), and the
+OLE-era .doc format. Each needs either a style resolver, a renderer, or its
+own classification, and the module says so here rather than silently
+half-covering them.
 
 Stdlib only, 3.9+.
 """
@@ -117,18 +131,86 @@ def _judge(kind, text, paragraph):
                 "why it is here." % (kind, paragraph))
 
 
+# Every part beside word/document.xml that carries the same wordprocessingml
+# paragraph/run shape and is worth scanning for hidden runs. header*.xml and
+# footer*.xml are numbered (header1.xml, header2.xml, ...) because a document
+# can carry a different one per section or per first/odd/even page, so this is
+# a glob rather than a fixed name the way the other three are.
+_HEADER_FOOTER_GLOBS = ("word/header", "word/footer")
+_FIXED_PARTS = ("word/footnotes.xml", "word/endnotes.xml", "word/comments.xml")
+
+
+def _paragraphs(root, default_kind=None):
+    """[(paragraph_number, [(kind_or_None, text), ...]), ...], one entry per
+    <w:p>, in document order. The one walk of the tree both `visible` text and
+    hidden-run findings are built from, for word/document.xml and for every
+    side part alike.
+
+    `default_kind` is what an otherwise ordinary run counts as when nothing
+    marks it vanish/white/tiny. Every part but comments leaves it None: a
+    header, footer, footnote, or endnote is genuinely rendered somewhere on
+    the page, so only styling makes a run in one of them hidden, the same
+    question `_hidden_kind` already answers for the body. A comment is
+    different in kind rather than in degree: Word never renders it inline at
+    all, it shows in a side panel a reader can leave closed, so the concealment
+    is the comment itself and every run in one counts as hidden whether or not
+    it also carries vanish or white-on-white styling.
+    """
+    out = []
+    for paragraph, para in enumerate(root.iter(W + "p"), start=1):
+        parts = []
+        for run in para.iter(W + "r"):
+            text = "".join(t.text or "" for t in run.iter(W + "t"))
+            if not text:
+                continue
+            kind = _hidden_kind(run.find(W + "rPr")) or default_kind
+            parts.append((kind, text))
+        out.append((paragraph, parts))
+    return out
+
+
+def _hidden_findings(paragraphs, part_label=None):
+    """Findings for every hidden run `_paragraphs` found. `part_label` folds
+    into the finding's `kind` so a hit in a comment reads differently from one
+    in the body; None reproduces the body's own wording exactly."""
+    findings = []
+    for paragraph, parts in paragraphs:
+        stretch_kind, stretch = None, []
+        for kind, text in parts + [(None, "")]:
+            if kind is not None and kind == stretch_kind:
+                stretch.append(text)
+                continue
+            if stretch_kind is not None:
+                label = ("%s in %s" % (stretch_kind, part_label)
+                         if part_label else stretch_kind)
+                finding = _judge(label, "".join(stretch), paragraph)
+                if finding:
+                    findings.append(finding)
+            stretch_kind, stretch = kind, [text]
+    return findings
+
+
 def extract(path):
     """(visible_text, findings) for one .docx.
 
     The visible text comes back paragraph per line, ready for the ordinary
-    prose scan; the findings cover every run the file itself declares hidden.
-    Adjacent hidden runs of one kind are judged as one stretch, because Word
-    splits runs mid-sentence on any formatting hiccup and a directive should
-    not escape by being split across two of them.
+    prose scan; the findings cover every run the file itself declares hidden,
+    in word/document.xml and in every header, footer, footnote, endnote, and
+    comment part the file carries. Adjacent hidden runs of one kind are judged
+    as one stretch, because Word splits runs mid-sentence on any formatting
+    hiccup and a directive should not escape by being split across two of
+    them.
     """
     try:
         with zipfile.ZipFile(path) as zf:
             xml = zf.read("word/document.xml")
+            names = zf.namelist()
+            side_parts = [
+                (name, zf.read(name)) for name in sorted(names)
+                if name in _FIXED_PARTS
+                or any(name.startswith(g) and name.endswith(".xml")
+                      for g in _HEADER_FOOTER_GLOBS)
+            ]
     except (OSError, KeyError, zipfile.BadZipFile) as exc:
         raise DocxError("%s is not a readable .docx: %s" % (path, exc))
     try:
@@ -136,27 +218,28 @@ def extract(path):
     except ElementTree.ParseError as exc:
         raise DocxError("%s: word/document.xml did not parse: %s" % (path, exc))
 
-    visible, findings = [], []
-    for paragraph, para in enumerate(root.iter(W + "p"), start=1):
-        parts = []          # (kind or None, text), in document order
-        for run in para.iter(W + "r"):
-            text = "".join(t.text or "" for t in run.iter(W + "t"))
-            if not text:
-                continue
-            parts.append((_hidden_kind(run.find(W + "rPr")), text))
+    body_paragraphs = _paragraphs(root)
+    visible = ["".join(t for kind, t in parts if kind is None)
+              for _paragraph, parts in body_paragraphs]
+    findings = _hidden_findings(body_paragraphs)
 
-        visible.append("".join(t for kind, t in parts if kind is None))
-
-        stretch_kind, stretch = None, []
-        for kind, text in parts + [(None, "")]:
-            if kind is not None and kind == stretch_kind:
-                stretch.append(text)
-                continue
-            if stretch_kind is not None:
-                finding = _judge(stretch_kind, "".join(stretch), paragraph)
-                if finding:
-                    findings.append(finding)
-            stretch_kind, stretch = kind, [text]
+    for name, xml_bytes in side_parts:
+        try:
+            side_root = ElementTree.fromstring(xml_bytes)
+        except ElementTree.ParseError:
+            # A part that fails to parse costs its own coverage, not the
+            # whole extraction: word/document.xml already parsed clean, and
+            # refusing the file over a malformed footer is a worse outcome
+            # than scanning everything else.
+            continue
+        is_comment = "comments" in name
+        label = ("a header" if "header" in name else
+                 "a footer" if "footer" in name else
+                 "a footnote" if "footnotes" in name else
+                 "an endnote" if "endnotes" in name else "a comment")
+        default_kind = "review comment" if is_comment else None
+        paragraphs = _paragraphs(side_root, default_kind=default_kind)
+        findings.extend(_hidden_findings(paragraphs, label))
 
     text = "\n\n".join(p for p in visible if p.strip())
     return (text + "\n" if text else ""), findings
