@@ -310,9 +310,9 @@ def find(text, rx, pattern_id, label, band, priority, findings, allowed=0):
 # alternation buys over putting U+FE0F in the class.
 EMOJI_RX = re.compile(
     "[" "\U0001F300-\U0001FAFF" "\u2600-\u27BF" "\U0001F900-\U0001F9FF"
-    "\u2B00-\u2BFF" "]\uFE0F?"
+    "\u2B00-\u2BFF" "\U0001F1E6-\U0001F1FF" "\U0001F004\U0001F0CF" "]\uFE0F?"
     "|[0-9#*]\uFE0F?\u20E3"
-    "|[\u00A9\u00AE\u2122]\uFE0F")
+    "|[\u00A9\u00AE\u2122\u2194-\u2199\u21A9-\u21AA\u231A-\u231B\u23E9-\u23FA\u25AA-\u25FE\u2934-\u2935]\uFE0F")
 # Two lookbehinds rather than one, because `re` fixes their width: with only the
 # one-space form, a two-space typist's emphatic fragments were never checked at
 # all, which is a rule that silently does not apply to whoever writes that way.
@@ -362,7 +362,8 @@ OXFORD_PRESENT_RX = re.compile(
     % OXFORD_CLAUSE_OPENER)
 OXFORD_MAX_REPORTED = 5
 
-LIST_DASH_RX = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+(?:\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\)|`[^`]+`)\s*[—–]\s")
+LIST_DASH_RX = re.compile(
+    r"^\s*(?:[-*+]|\d+[.)])\s+(?:\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\)|`[^`]+`)\s*(?:[—–]|&[mn]dash;|&#821[12];)\s")
 
 
 def in_list_typography(text, index):
@@ -374,7 +375,10 @@ def in_list_typography(text, index):
     list item leading with an inline-code term still reads as a list item.
     Blanking preserves length, so the offsets line up."""
     start = text.rfind("\n", 0, index) + 1
-    return bool(LIST_DASH_RX.match(text[start:index + 2]))
+    end = text.find("\n", index)
+    if end < 0:
+        end = len(text)
+    return bool(LIST_DASH_RX.match(text[start:end]))
 
 
 def voice_finding(rules_id, label, priority, line, match, excerpt_text):
@@ -528,27 +532,35 @@ def apply_voice_rules(scored, raw_text, rules, stats, findings):
                 "voice-date-format", "Spelled date (voice wants ISO)", default,
                 line_of(scored, m.start()), m.group(0), "Write it as 2025-09-12."))
 
-    cap = mech.get("max_paragraph_sentences")
-    if cap:
+    _p_cap = mech.get("max_paragraph_sentences")
+    try:
+        p_cap_val = int(_p_cap) if _p_cap is not None else 0
+    except (ValueError, TypeError):
+        p_cap_val = 0
+    if p_cap_val > 0:
         offset = 0
         for para in re.split(r"(\n\s*\n)", scored):
             body = para.strip()
             if body and is_prose_block(body):
                 n = len(split_sentences(body))
-                if n > int(cap):
+                if n > p_cap_val:
                     findings.append(voice_finding(
                         "voice-paragraph-length",
-                        "Paragraph of %d sentences (voice cap %s)" % (n, cap),
+                        "Paragraph of %d sentences (voice cap %s)" % (n, _p_cap),
                         default, line_of(scored, offset), "%d sentences" % n,
                         "Break it. Dense blocks read as machine output."))
             offset += len(para)
 
-    cap = mech.get("max_avg_sentence_words")
-    if cap and stats.get("avg_sentence_words", 0) > float(cap):
+    _a_cap = mech.get("max_avg_sentence_words")
+    try:
+        a_cap_val = float(_a_cap) if _a_cap is not None else 0.0
+    except (ValueError, TypeError):
+        a_cap_val = 0.0
+    if a_cap_val > 0 and stats.get("avg_sentence_words", 0) > a_cap_val:
         findings.append(voice_finding(
             "voice-sentence-length",
             "Average sentence %.1f words (voice cap %s)"
-            % (stats["avg_sentence_words"], cap), default, 1,
+            % (stats["avg_sentence_words"], _a_cap), default, 1,
             "avg sentence length", "This writer writes shorter than this."))
 
     # Word and phrase bans. Flattened through rwlib.inflect, which turns an
@@ -761,8 +773,13 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
         # A profile that sets its own paragraph cap has ruled on paragraph
         # length (voice-paragraph-length enforces it); the STE 6.6 copy
         # would double-report the same block.
-        if mech.get("max_paragraph_sentences"):
-            skip.add("ste-paragraph-sentences")
+        _p_cap = mech.get("max_paragraph_sentences")
+        if _p_cap is not None:
+            try:
+                if int(_p_cap) > 0:
+                    skip.add("ste-paragraph-sentences")
+            except (ValueError, TypeError):
+                pass
         # A per-sentence cap replaces the STE 20/25 caps outright, in both
         # directions: stricter than STE is the writer's choice, looser
         # keeps the monsters flagged past the profile's own number.
@@ -950,7 +967,8 @@ def scan(raw_text, profile=None, exempt=True, voice_rules=None,
                 findings.append(findings_mod.make(
                     "tier2-cluster",
                     "Tier-2 cluster (%d in one paragraph)" % len(hits),
-                    "craft", SYNTH("tier2-cluster"), line_of(scored, offset),
+                    "craft", SYNTH("tier2-cluster"),
+                    line_of(scored, offset + hits[0].start()),
                     match=", ".join(sorted({h.group(0).lower() for h in hits})),
                     excerpt=excerpt(para, hits[0].start(), hits[-1].end())))
             offset += len(para)
@@ -1806,6 +1824,20 @@ def main():
             parser=ap, examples=examples), file=sys.stderr)
         return 2
 
+    if args.ste_mode and args.no_ste:
+        print(cli_error.format_llm_error(
+            "scan.py",
+            "--ste-mode cannot be combined with --no-ste: --no-ste disables STE checks entirely.",
+            parser=ap, examples=examples), file=sys.stderr)
+        return 2
+
+    if args.write and args.stdout:
+        print(cli_error.format_llm_error(
+            "scan.py",
+            "--write and --stdout cannot be combined: --write modifies the file in place and --stdout prints to standard output.",
+            parser=ap, examples=examples), file=sys.stderr)
+        return 2
+
     if args.sarif_uri and not args.sarif:
         print(cli_error.format_llm_error(
             "scan.py",
@@ -1860,7 +1892,7 @@ def main():
             with open(args.file, encoding="utf-8-sig") as fh:
                 text = fh.read()
                 newlines = fh.newlines
-        except OSError as exc:
+        except (OSError, UnicodeDecodeError) as exc:
             print(cli_error.format_file_error(
                 "scan.py", args.file, "file", expected_type="file path",
                 details=str(exc), examples=examples

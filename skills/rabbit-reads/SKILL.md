@@ -52,9 +52,9 @@ Then confirm the outline it prints against the source's own table of contents be
 
 **3. Plan the doc set.** Read the mapped sections and cut them into concepts, per the book type's grain. Produce one line per proposed file: the slug, the source sections it draws on, its kind marker. Show the whole list and get the user's confirmation before anything is written. A wrong cut is cheapest to fix here, and this is the one artifact the user signs off on.
 
-**4. Fan out.** Build one subagent per batch from `references/fanout-prompt.md`. Each subagent gets the source path, its assigned line range, and its exact output filenames, and reads nothing else; paste in the `{LAYOUT}` constraints from the chosen layout file. Launch every subagent in a single message so they run concurrently, then collect their one-line receipts. The book-type file sets how many docs a batch carries.
+**4. Fan out.** Build one subagent per batch from `references/fanout-prompt.md`. Each subagent gets the source path, its assigned line range, its exact output filenames, and the `{LAYOUT}` constraints from the chosen layout file, and reads nothing else. Launch every subagent in a single message so they run concurrently, then collect their one-line receipts. The book-type file sets how many docs a batch carries.
 
-**5. Write the index.** Per the layout: the flat cheatsheets layout takes a README Doc/Source/Kind table, one row per doc, ordered by the source's own order with a reading-order note when the spine is not chapter order; the obsidian layout takes an `index.md` Map of Content linking every concept exactly once, beside its `topics/`, `chapters/`, and `summary.md` spine notes.
+**5. Write the index.** Per the layout: the flat cheatsheets layout takes a README Doc/Source/Kind table, one row per doc, ordered by the source's own order with a reading-order note when the spine is not chapter order. The obsidian layout takes an `index.md` Map of Content linking every concept exactly once, beside its `topics/`, `chapters/`, and `summary.md` spine notes.
 
 **6. Verify.**
 
@@ -95,7 +95,7 @@ Infer the type from the source and say which you picked. Ask when it is ambiguou
 
 ## Layouts
 
-The layout decides the folder shape around the docs: which file indexes them, whether links are markdown or wikilinks, whether every doc carries a frontmatter block, and which spine notes (chapter maps, topic entries, a whole-source summary) sit beside them. One file per layout, under `references/layouts/`; it composes with the book type, which keeps governing doc content:
+The layout decides the folder shape around the docs: which file indexes them, whether links are markdown or wikilinks, whether every doc carries a frontmatter block, and which spine notes (chapter maps, topic entries, a whole-source summary) sit beside them. One file per layout, under `references/layouts/`. It composes with the book type, which keeps governing doc content:
 
 | Layout file | Index | Links | Folders |
 |---|---|---|---|
@@ -115,10 +115,10 @@ Default to `cheatsheets`. Choose `obsidian` when the ask names Obsidian, a vault
 
 #### `extract_text.py`
 `python3 ${CLAUDE_PLUGIN_ROOT}/skills/rabbit-reads/scripts/extract_text.py <source>... [--out PATH] [--stdout]`
-- `<source>`: (REQUIRED, one or more file paths, directory paths, or globs) The document(s) to normalize: txt, md, docx, pdf, doc, rtf, html, odt, or epub. Several merge in the order given, each behind a demarcation line, described by a `<out>.manifest.json`; several require `--out`.
+- `<source>`: (REQUIRED, at least one path) The document(s) to normalize: txt, md, docx, pdf, doc, rtf, html, odt, or epub. Several merge in the order given, each behind a demarcation line, described by a `<out>.manifest.json`, and several require `--out`.
 - `--out`: (OPTIONAL, file path) Write the normalized text to this path. Required when several sources are given.
 - `--stdout`: (OPTIONAL, boolean flag) Print the normalized text instead of writing it. Single-source only.
-- `--check`: (OPTIONAL, boolean flag) Report which converters (`pdftotext`, `textutil`) are installed and which input formats are therefore usable. Processes nothing, always exits 0.
+- `--check`: (OPTIONAL, boolean flag) Report which converters `pdftotext` and `textutil` are installed and which input formats are therefore usable. Processes nothing, always exits 0.
 
 
 #### `map_structure.py`

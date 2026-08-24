@@ -348,7 +348,7 @@ def blend(left, right, weight=0.5, name=None):
     out = dict(heavier)
 
     for key in LIST_UNION_KEYS:
-        out[key] = _union(left.get(key, []), right.get(key, []))
+        out[key] = _union(lighter.get(key, []), heavier.get(key, []))
     for key in LIST_BY_ID_KEYS:
         # By id, heavier last so it wins a collision. An id in one profile only
         # survives either way, which is the union the Never rule asks for.
@@ -453,11 +453,15 @@ def installed(voices_dir=None):
 
 
 def _first_line(path):
-    """The first line of a one-line control file, or "" if it is empty."""
+    """The first non-comment line of a one-line control file, or "" if it is empty."""
     try:
         with open(path, encoding="utf-8") as fh:
-            return fh.read().strip()
-    except OSError:
+            for line in fh:
+                s = line.strip()
+                if s and not s.startswith("#"):
+                    return s
+            return ""
+    except (OSError, UnicodeDecodeError):
         return ""
 
 
@@ -532,8 +536,10 @@ def resolve(target_path=None, voices_dir=None):
                None)
     if pin:
         name = _first_line(pin)
+        if not name or os.path.basename(name) != name or ".." in name:
+            return None, name, ("%s names invalid voice name %r" % (pin, name))
         rules = os.path.join(voices_dir, name + RULES_SUFFIX)
-        if os.path.exists(rules):
+        if os.path.abspath(rules).startswith(os.path.abspath(voices_dir) + os.sep) and os.path.exists(rules):
             return rules, name, "voice pinned by %s" % pin
         return None, name, ("%s names %r but voices/%s.rules.json does not exist"
                             % (pin, name, name))
@@ -541,8 +547,10 @@ def resolve(target_path=None, voices_dir=None):
     active = os.path.join(voices_dir, "ACTIVE")
     name = _first_line(active) if os.path.exists(active) else ""
     if name:
+        if not name or os.path.basename(name) != name or ".." in name:
+            return None, name, ("active voice %r is an invalid voice name" % name)
         rules = os.path.join(voices_dir, name + RULES_SUFFIX)
-        if os.path.exists(rules):
+        if os.path.abspath(rules).startswith(os.path.abspath(voices_dir) + os.sep) and os.path.exists(rules):
             return rules, name, None
         return None, name, ("active voice %r has no .rules.json, so none of its rules are "
                             "mechanically enforced" % name)

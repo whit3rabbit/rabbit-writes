@@ -53,6 +53,7 @@ Carve-outs, because the skill instructs these edits:
 """
 
 import argparse
+from collections import Counter
 import json
 import os
 import re
@@ -199,6 +200,7 @@ def extract(text):
     # protecting it verbatim here would contradict the decision this file
     # already made.
     fact_text = blank_entities(HTML_TAG_RX.sub(blank, unquoted))
+    fm_match = FRONTMATTER_RX.search(text)
     return {
         # finditer, not findall: both patterns capture their own delimiter for
         # a backreference (the closing fence has to be at least as long as the
@@ -206,8 +208,7 @@ def extract(text):
         # findall would return that group instead of the whole span.
         "fences": [m.group(0) for m in FENCE_RX.finditer(text)],
         "inline_code": [m.group(0) for m in INLINE_CODE_RX.finditer(text)],
-        "frontmatter": (FRONTMATTER_RX.search(text).group(1)
-                        if FRONTMATTER_RX.search(text) else None),
+        "frontmatter": fm_match.group(1) if fm_match else None,
         "tables": TABLE_ROW_RX.findall(prose),
         "blockquotes": BLOCKQUOTE_RX.findall(prose),
         "headings": HEADING_RX.findall(prose),
@@ -277,11 +278,11 @@ def count_tells(text):
 
 def multiset_lost(before, after):
     """Items present in `before` that are missing from `after`, counting duplicates."""
-    remaining = list(after)
+    counts = Counter(after)
     lost = []
     for item in before:
-        if item in remaining:
-            remaining.remove(item)
+        if counts[item] > 0:
+            counts[item] -= 1
         else:
             lost.append(item)
     return lost
@@ -305,8 +306,8 @@ def fact_delta(a, b):
     for key in ("numbers", "dates", "quotes", "entities"):
         out["%s_before" % key] = len(a[key])
         out["%s_after" % key] = len(b[key])
-        out["%s_lost" % key] = multiset_lost(a[key], b[key])[:8]
-        out["%s_added" % key] = multiset_lost(b[key], a[key])[:8]
+        out["%s_lost" % key] = multiset_lost(a[key], b[key])
+        out["%s_added" % key] = multiset_lost(b[key], a[key])
     return out
 
 
@@ -465,14 +466,15 @@ def main():
                     help="report added em dashes under structure changes instead of "
                          "failing on them. For a voice profile (like john) that uses "
                          "em dashes authentically")
-    ap.add_argument("--voice", help="voice profile name (e.g. john). If the profile allows em dashes, enables dash allowance")
-    ap.add_argument("--voice-rules", help="path to custom voice rules JSON file")
+    vg = ap.add_mutually_exclusive_group()
+    vg.add_argument("--voice", help="voice profile name (e.g. john). If the profile allows em dashes, enables dash allowance")
+    vg.add_argument("--voice-rules", help="path to custom voice rules JSON file")
     args = ap.parse_args()
 
     try:
         with open(args.original, encoding="utf-8-sig") as fh:
             original = fh.read()
-    except OSError as exc:
+    except (OSError, UnicodeDecodeError) as exc:
         print(cli_error.format_file_error(
             "verify.py", args.original, "original", expected_type="file path",
             details=str(exc), examples=examples
@@ -482,7 +484,7 @@ def main():
     try:
         with open(args.rewritten, encoding="utf-8-sig") as fh:
             rewritten = fh.read()
-    except OSError as exc:
+    except (OSError, UnicodeDecodeError) as exc:
         print(cli_error.format_file_error(
             "verify.py", args.rewritten, "rewritten", expected_type="file path",
             details=str(exc), examples=examples

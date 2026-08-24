@@ -117,7 +117,7 @@ def skip_table(path=REGISTERS_PATH):
     out = {r: set() for r in registers(path)}
     for rule, register, cell in _cells(path):
         if rule["id"] and cell["mode"] in ("skip", "p0-only"):
-            out[register].add(rule["id"])
+            out.setdefault(register, set()).add(rule["id"])
     return {r: ids for r, ids in out.items() if ids}
 
 
@@ -132,7 +132,7 @@ def relax_table(path=REGISTERS_PATH):
     out = {r: {} for r in registers(path)}
     for rule, register, cell in _cells(path):
         if rule["id"] and cell["mode"] == "relaxed" and "allowance" in cell:
-            out[register][rule["id"]] = cell["allowance"]
+            out.setdefault(register, {})[rule["id"]] = cell["allowance"]
     return {r: ids for r, ids in out.items() if ids}
 
 
@@ -188,7 +188,8 @@ def unimplemented_rules(path=REGISTERS_PATH):
 # letter opener.
 _GREETING_RX = re.compile(
     r"(?im)^\s*(hi|hello|hey|dear|greetings|good (morning|afternoon|evening))"
-    r"\b[^\n]{0,40}[,:]?\s*$")
+    r"(?:\s+[A-Z][\w.'-]*(?:\s+[A-Z][\w.'-]*)?|\s+there|\s+all|\s+team|\s+everyone)?"
+    r"\s*[,:]\s*$")
 _SIGNOFF_RX = re.compile(
     r"(?im)^\s*(sincerely|regards|best regards|best|thanks|thank you|cheers|"
     r"yours|yours truly|yours sincerely)[,]?\s*$"
@@ -465,7 +466,7 @@ def render_table(path=REGISTERS_PATH):
 
 
 def _split_doc(text):
-    """(before, table_block, after) around the rendered table in context.md."""
+    """(head, body, tail, table) around the rendered table in context.md."""
     head, sep, rest = text.partition(MATRIX_HEADING)
     if not sep:
         raise ValueError("%s has no %r section" % (CONTEXT_MD, MATRIX_HEADING))
@@ -490,8 +491,16 @@ def write_doc(doc_path=CONTEXT_MD, path=REGISTERS_PATH):
     new = render_table(path)
     if current == new:
         return False
+    lines = body.splitlines(True)
+    table_indices = [i for i, ln in enumerate(lines) if ln.lstrip().startswith("|")]
+    if table_indices:
+        start_idx = table_indices[0]
+        end_idx = table_indices[-1] + 1
+        new_body = "".join(lines[:start_idx]) + new + "\n" + "".join(lines[end_idx:])
+    else:
+        new_body = body.replace(current, new)
     with open(doc_path, "w", encoding="utf-8") as fh:
-        fh.write(head + body.replace(current, new) + tail)
+        fh.write(head + new_body + tail)
     return True
 
 

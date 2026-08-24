@@ -122,7 +122,7 @@ def build(findings, uri, tool_name, tool_version=None, information_uri=None,
         })
 
     results = []
-    is_docx = uri.endswith(".docx")
+    is_docx = uri.lower().endswith((".docx", ".docm", ".dotx", ".dotm"))
     for f in findings:
         loc = {"artifactLocation": {"uri": uri}}
         if not is_docx:

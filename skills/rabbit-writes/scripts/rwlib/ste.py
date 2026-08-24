@@ -647,13 +647,16 @@ def check_condition_order(text):
     findings = []
     for i, line in enumerate(text.split("\n"), 1):
         for m in _CONDITION_ORDER_RX.finditer(line):
+            match_str = m.group(0)
+            if re.search(r"\b(?:is|are|was|were|has been|have been|will be)\b", match_str, re.I):
+                continue
             findings.append({
                 "id": "ste-condition-order",
                 "label": "condition after command verb",
                 "band": "craft",
                 "priority": ste_priority("ste-condition-order"),
                 "line": i,
-                "match": m.group(0)[:80],
+                "match": match_str[:80],
                 "excerpt": ("STE requires conditions BEFORE the command. "
                             "Rewrite: move the 'if/when/unless' clause to "
                             "the start. Example: 'If the flag is set, do X' "
@@ -754,9 +757,20 @@ def check_phrasal_verbs(text):
 # Passive voice checks
 # ---------------------------------------------------------------------------
 
-def check_passive(text):
-    """Flag passive voice constructions.
+_PASSIVE_NON_PARTICIPLES = frozenset({
+    "often", "green", "seven", "even", "open", "screen", "queen", "alien",
+    "citizen", "kitchen", "garden", "sudden", "heaven", "listen", "happen",
+    "chicken", "golden", "wooden", "rotten", "sacred", "wicked", "naked",
+    "crooked", "ragged", "hundred", "speed", "seed", "need", "bleed",
+    "breed", "creed", "greed", "deed", "proceed", "exceed", "succeed",
+    "then", "when", "men", "women", "children", "eleven", "dozen", "bed"
+})
 
+
+def check_passive(text):
+    """Flag passive voice constructions (auxiliary + past participle).
+
+    STE rule: use active voice.
     No per-line code guard here: this module receives the exempted copy, so
     code spans and fences are already blanked. The first version skipped any
     line carrying a backtick pair, which silenced "The value `x` was
@@ -766,6 +780,9 @@ def check_passive(text):
     findings = []
     for i, line in enumerate(text.split("\n"), 1):
         for m in _PASSIVE_RX.finditer(line):
+            participle = m.group(2).lower()
+            if participle in _PASSIVE_NON_PARTICIPLES:
+                continue
             findings.append({
                 "id": "ste-passive",
                 "label": "passive voice",
@@ -851,7 +868,8 @@ def check_dictionary_vocabulary(text):
     for i, line in enumerate(text.split("\n"), 1):
         for m in _DICTIONARY_VOCAB_RX.finditer(line):
             word = m.group(0)
-            alt = vocab.get(word.lower())
+            norm_word = re.sub(r"\s+", " ", word.lower())
+            alt = vocab.get(norm_word)
             if not alt:
                 continue
             findings.append({

@@ -160,7 +160,7 @@ HIDING_CSS = (r"(?:display\s*:\s*none"
               r"|clip-path\s*:\s*inset\s*\(\s*100\s*%"
               r"|clip\s*:\s*rect\s*\(\s*0\b"
               r"|transform\s*:\s*scale\s*\(\s*0(?!\.\d*[1-9])"
-              r"|(?:width|height)\s*:\s*0(?:px)?\s*[;\"'])")
+              r"|(?:width|height)\s*:\s*0(?:px)?(?=[;\"'\s]|$))")
 
 # The whole element, opening tag through closing tag, because the payload sits
 # in the body and the hiding sits in the attribute. A regex that captured only
@@ -386,12 +386,15 @@ def tag_runs(text):
 # decoded with html.unescape() up front so the offsets stay in raw-text space;
 # decoding first would shift every position after the first multi-digit
 # entity and break line_of(raw, at) for the finding.
-_NUMERIC_ENTITY_RX = re.compile(r"&#[xX]?[0-9a-fA-F]+;")
+_NUMERIC_ENTITY_RX = re.compile(r"&#(?:[xX][0-9a-fA-F]+|[0-9]+);")
 
 
 def _entity_codepoint(entity):
     body = entity[2:-1]
-    return int(body[1:], 16) if body[:1] in ("x", "X") else int(body)
+    try:
+        return int(body[1:], 16) if body[:1] in ("x", "X") else int(body, 10)
+    except ValueError:
+        return -1
 
 
 def entity_tag_runs(text):
@@ -417,10 +420,15 @@ def entity_tag_runs(text):
 
 
 def _readable_runs(runs):
-    return [(at, msg) for at, msg in runs
-            if msg.isprintable()
-            and len(msg.strip()) >= MIN_TAG_CHARS
-            and len(msg.split()) >= MIN_TAG_WORDS]
+    out = []
+    for at, msg in runs:
+        # Strip language tag framing control characters (e.g. U+E0001 / \x01, U+E007F / \x7f)
+        cleaned = "".join(c for c in msg if c.isprintable() or c in " \t\n\r")
+        if cleaned and all(c.isprintable() or c in " \t\n\r" for c in cleaned):
+            core = cleaned.strip()
+            if len(core) >= MIN_TAG_CHARS and len(core.split()) >= MIN_TAG_WORDS:
+                out.append((at, msg))
+    return out
 
 
 # --------------------------------------------------------------------------

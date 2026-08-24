@@ -411,11 +411,13 @@ def is_prose_block(block):
     lead-in plus one or two bullets is still a paragraph with a list under it,
     which is why that half is a majority rather than any bullet at all.
     """
-    lines = [ln for ln in block.strip().split("\n") if ln.strip()]
+    lines = [ln for ln in block.split("\n") if ln.strip()]
     if not lines:
         return False
+    if lines[0].startswith(("    ", "\t")):
+        return False
     first = lines[0].lstrip()
-    if first.startswith(("#", ">", "|", "```", "    ")):
+    if first.startswith(("#", ">", "|", "```")):
         return False
     if LIST_ITEM_RX.match(lines[0]):
         return False

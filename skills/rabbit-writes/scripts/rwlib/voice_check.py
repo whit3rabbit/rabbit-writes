@@ -156,18 +156,33 @@ def check_rules(rules_path, voices_dir=None):
 
     known_registers = set(registers_mod.registers())
 
-    for key, message in voices_mod.mechanic_problems(rules.get("mechanics", {})):
-        out.append(_finding(FAIL, "%s: mechanics.%s %s" % (name, key, message)))
-    for register, overrides in rules.get("mechanics_by_register", {}).items():
-        if register not in known_registers:
-            out.append(_finding(FAIL, "%s: mechanics_by_register names %r, "
-                                "which is not a register (%s). A typo here is "
-                                "a rule that silently stops applying."
-                                % (name, register,
-                                   ", ".join(sorted(known_registers)))))
-        for key, message in voices_mod.mechanic_problems(overrides):
-            out.append(_finding(FAIL, "%s: mechanics_by_register.%s.%s %s"
-                                % (name, register, key, message)))
+    mechanics = rules.get("mechanics", {})
+    if not isinstance(mechanics, dict):
+        out.append(_finding(FAIL, "%s: mechanics must be an object, not %s"
+                            % (name, type(mechanics).__name__)))
+    else:
+        for key, message in voices_mod.mechanic_problems(mechanics):
+            out.append(_finding(FAIL, "%s: mechanics.%s %s" % (name, key, message)))
+
+    mbr = rules.get("mechanics_by_register", {})
+    if not isinstance(mbr, dict):
+        out.append(_finding(FAIL, "%s: mechanics_by_register must be an object, not %s"
+                            % (name, type(mbr).__name__)))
+    else:
+        for register, overrides in mbr.items():
+            if register not in known_registers:
+                out.append(_finding(FAIL, "%s: mechanics_by_register names %r, "
+                                    "which is not a register (%s). A typo here is "
+                                    "a rule that silently stops applying."
+                                    % (name, register,
+                                       ", ".join(sorted(known_registers)))))
+            if not isinstance(overrides, dict):
+                out.append(_finding(FAIL, "%s: mechanics_by_register.%s must be an object, not %s"
+                                    % (name, register, type(overrides).__name__)))
+            else:
+                for key, message in voices_mod.mechanic_problems(overrides):
+                    out.append(_finding(FAIL, "%s: mechanics_by_register.%s.%s %s"
+                                        % (name, register, key, message)))
 
     # engine_exemptions is fed straight into scan.py's suppression pass as a
     # synthetic rabbit-allow entry (see scan.py), with no other place in the
@@ -196,36 +211,43 @@ def check_rules(rules_path, voices_dir=None):
         out += _ban_list_problems(name, key, rules.get(key, []))
 
     seen_ids = set()
-    for entry in rules.get("banned_regex", []):
-        eid = entry.get("id")
-        if not eid or "rx" not in entry:
-            out.append(_finding(FAIL, "%s: a banned_regex entry needs id and "
-                                "rx (%s)" % (name, json.dumps(entry)[:80])))
-            continue
-        if eid in seen_ids:
-            out.append(_finding(FAIL, "%s: two banned_regex entries share the "
-                                "id %r, and a later one wins on merge" % (name, eid)))
-        seen_ids.add(eid)
-        try:
-            rx = re.compile(entry["rx"])
-        except re.error as exc:
-            out.append(_finding(FAIL, "%s: regex %s does not compile: %s"
-                                % (name, eid, exc)))
-            rx = None
-        priority = entry.get("priority")
-        if priority is not None and priority not in voices_mod.PRIORITY_ORDER:
-            out.append(_finding(FAIL, "%s: %s has priority %r, not one of %s"
-                                % (name, eid, priority,
-                                   ", ".join(voices_mod.PRIORITY_ORDER))))
-        out += _register_scope(name, eid, entry, known_registers)
-        # An optional worked example, and the cheapest proof a pattern does
-        # what its author thinks. build_voice.py runs it through scan.py as
-        # well, which is the end-to-end half; this catches it without one.
-        example = entry.get("example")
-        if rx is not None and example is not None and not rx.search(example):
-            out.append(_finding(FAIL, "%s: %s does not match its own example "
-                                "%r, so the rule cannot fire on the text its "
-                                "author wrote it for" % (name, eid, example)))
+    b_regex = rules.get("banned_regex", [])
+    if not isinstance(b_regex, list):
+        out.append(_finding(FAIL, "%s: banned_regex must be a list" % name))
+    else:
+        for entry in b_regex:
+            if not isinstance(entry, dict):
+                out.append(_finding(FAIL, "%s: banned_regex entry must be an object (%r)" % (name, entry)))
+                continue
+            eid = entry.get("id")
+            if not eid or "rx" not in entry:
+                out.append(_finding(FAIL, "%s: a banned_regex entry needs id and "
+                                    "rx (%s)" % (name, json.dumps(entry)[:80])))
+                continue
+            if eid in seen_ids:
+                out.append(_finding(FAIL, "%s: two banned_regex entries share the "
+                                    "id %r, and a later one wins on merge" % (name, eid)))
+            seen_ids.add(eid)
+            try:
+                rx = re.compile(entry["rx"])
+            except re.error as exc:
+                out.append(_finding(FAIL, "%s: regex %s does not compile: %s"
+                                    % (name, eid, exc)))
+                rx = None
+            priority = entry.get("priority")
+            if priority is not None and priority not in voices_mod.PRIORITY_ORDER:
+                out.append(_finding(FAIL, "%s: %s has priority %r, not one of %s"
+                                    % (name, eid, priority,
+                                       ", ".join(voices_mod.PRIORITY_ORDER))))
+            out += _register_scope(name, eid, entry, known_registers)
+            # An optional worked example, and the cheapest proof a pattern does
+            # what its author thinks. build_voice.py runs it through scan.py as
+            # well, which is the end-to-end half; this catches it without one.
+            example = entry.get("example")
+            if rx is not None and example is not None and not rx.search(example):
+                out.append(_finding(FAIL, "%s: %s does not match its own example "
+                                    "%r, so the rule cannot fire on the text its "
+                                    "author wrote it for" % (name, eid, example)))
 
     for entry in rules.get("required_when", []):
         eid = entry.get("id", "?")
@@ -296,7 +318,20 @@ def check_rules(rules_path, voices_dir=None):
                                 "honouring" % (name, eid,
                                                ", ".join(SIGNATURE_THRESHOLDS))))
         floor, cap = entry.get("min_per_1000w"), entry.get("max_per_1000w")
-        if floor is not None and cap is not None and float(floor) >= float(cap):
+        floor_num, cap_num = None, None
+        if floor is not None:
+            try:
+                floor_num = float(floor)
+            except (ValueError, TypeError):
+                out.append(_finding(FAIL, "%s: signature move %s min_per_1000w is not a number: %r"
+                                    % (name, eid, floor)))
+        if cap is not None:
+            try:
+                cap_num = float(cap)
+            except (ValueError, TypeError):
+                out.append(_finding(FAIL, "%s: signature move %s max_per_1000w is not a number: %r"
+                                    % (name, eid, cap)))
+        if floor_num is not None and cap_num is not None and floor_num >= cap_num:
             out.append(_finding(FAIL, "%s: signature move %s has floor %s and "
                                 "cap %s, so no document can satisfy both"
                                 % (name, eid, floor, cap)))
@@ -316,10 +351,11 @@ def check_rules(rules_path, voices_dir=None):
         out.append(_finding(FAIL, "%s: default_priority is %r, not one of %s"
                             % (name, default, ", ".join(voices_mod.PRIORITY_ORDER))))
 
+    mechanics_dict = rules.get("mechanics", {}) if isinstance(rules.get("mechanics"), dict) else {}
     enforced = (len(rules.get("banned_words", []))
                 + len(rules.get("banned_phrases", []))
                 + len(rules.get("banned_regex", []))
-                + len([k for k, v in rules.get("mechanics", {}).items()
+                + len([k for k, v in mechanics_dict.items()
                        if not k.startswith("_") and v not in ("allow", "any")]))
     if not enforced:
         out.append(_finding(NOTE, "%s enforces nothing mechanically. Valid, and "
@@ -491,7 +527,7 @@ def _measure_problems(data):
             out.append("`sentence_shape.%s` is not a share" % field)
     medians = shape.get("per_sample_median")
     if not isinstance(medians, list) or (n_samples is not None
-                                         and len(medians) != n_samples):
+                                         and not (1 <= len(medians) <= n_samples)):
         out.append("`sentence_shape.per_sample_median` has %s entries for %s "
                    "samples" % (len(medians) if isinstance(medians, list)
                                 else "no", n_samples))

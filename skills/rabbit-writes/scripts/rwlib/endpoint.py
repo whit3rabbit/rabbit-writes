@@ -124,27 +124,37 @@ class Truncated(EndpointError):
     """
 
 
-def _scrub(text, secret=None):
-    """Strip key shapes from server output, plus `secret` itself when given.
+import urllib.parse
 
-    The two regexes only know the common shapes, and a server that echoes an
+
+def _scrub(text, secret=None):
+    """Strip key shapes and URL credentials from server output, plus `secret` itself when given.
+
+    The regexes only know the common shapes, and a server that echoes an
     Anthropic-, HF-, or custom-shaped key back in an error body matches
     neither. The exact key cannot false-positive, so callers that hold one
     pass it in.
     """
     text = _KEY_RX.sub(r"\1...", text or "")
     text = _BEARER_RX.sub(r"\1...", text)
+    text = re.sub(r"(https?://[^:/@]+:)[^@]+(@)", r"\1...\2", text)
     if secret and len(secret) >= 8:
         text = text.replace(secret, secret[:4] + "...")
     return text
 
 
 def _host_of(url):
-    # Bracket branch first: alternation is ordered, and `[^/:]+` happily eats
-    # the lone `[` of an IPv6 literal, which made every bracketed entry in
-    # LOOPBACK_HOSTS unreachable.
-    m = re.match(r"(?i)^(https?)://(\[[^\]]+\]|[^/:]+)", url or "")
-    return (m.group(1).lower(), m.group(2).lower()) if m else (None, None)
+    try:
+        parsed = urllib.parse.urlsplit(url or "")
+        scheme = parsed.scheme.lower() if parsed.scheme else None
+        if not parsed.netloc and not parsed.scheme:
+            return (None, None)
+        hostname = parsed.hostname.lower() if parsed.hostname else None
+        if hostname and ":" in hostname:
+            hostname = f"[{hostname}]"
+        return (scheme, hostname)
+    except Exception:
+        return (None, None)
 
 
 def estimate_tokens(text):
@@ -213,7 +223,7 @@ class Endpoint:
     def describe(self):
         """One line for a report. Never carries the key, only whether there is one."""
         return "%s @ %s (%s, ctx %d)" % (
-            self.model, self.base_url,
+            self.model, _scrub(self.base_url),
             "keyed" if self.api_key else "no key", self.context_tokens)
 
     # The budget a caller has for one unit: the context, less what the model is
@@ -384,16 +394,20 @@ def problems(config, source=CONFIG_NAME):
         out.append("%s: `model` is required. A local llama-server ignores the "
                    "string and still needs one: any name will do." % source)
     for key in ("context_tokens", "max_output_tokens", "timeout"):
-        if key in config and not isinstance(config[key], int):
-            out.append("%s: `%s` must be a whole number" % (source, key))
-    if "temperature" in config and not isinstance(config["temperature"], (int, float)):
-        out.append("%s: `temperature` must be a number" % source)
+        if key in config:
+            val = config[key]
+            if isinstance(val, bool) or not isinstance(val, int) or val <= 0:
+                out.append("%s: `%s` must be a positive integer" % (source, key))
+    if "temperature" in config:
+        val = config["temperature"]
+        if isinstance(val, bool) or not isinstance(val, (int, float)) or not (0.0 <= val <= 2.0):
+            out.append("%s: `temperature` must be a number between 0.0 and 2.0" % source)
     for key in ("allow_insecure", "disable_thinking"):
         if key in config and not isinstance(config[key], bool):
             out.append("%s: `%s` must be true or false" % (source, key))
     ctx = config.get("context_tokens", DEFAULT_CONTEXT_TOKENS)
     out_cap = config.get("max_output_tokens", DEFAULT_MAX_OUTPUT_TOKENS)
-    if isinstance(ctx, int) and isinstance(out_cap, int) and out_cap >= ctx:
+    if isinstance(ctx, int) and not isinstance(ctx, bool) and isinstance(out_cap, int) and not isinstance(out_cap, bool) and out_cap >= ctx:
         out.append("%s: `max_output_tokens` (%d) leaves no room in "
                    "`context_tokens` (%d) for the text being rewritten"
                    % (source, out_cap, ctx))

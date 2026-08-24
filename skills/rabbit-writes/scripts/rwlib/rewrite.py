@@ -250,7 +250,7 @@ def sentence_span(block_text, index):
         cursor = found + len(sentence)
         if found <= index < cursor:
             return found, cursor
-    return 0, len(block_text)
+    return 0, len(block_text.rstrip())
 
 
 def preceding_sentence(block_text, index):
@@ -340,7 +340,7 @@ def plan(text, findings, budget_tokens=None, estimate=None,
         if not unit_text.strip():
             unaddressable.append((finding, "resolved to an empty passage"))
             return
-        if budget_tokens and estimate(unit_text) > budget_tokens:
+        if budget_tokens is not None and estimate(unit_text) > budget_tokens:
             unaddressable.append(
                 (finding, "the %s is %d estimated tokens, past the %d this "
                           "endpoint has room for"
@@ -387,8 +387,11 @@ def plan(text, findings, budget_tokens=None, estimate=None,
                 continue
             candidates = [(s, e, t) for s, e, t in block_list
                           if markdown.is_prose_block(t)]
-            uniform = [(s, e, t) for s, e, t in candidates
-                       if (block_burstiness(t) or 1.0) < burstiness_floor]
+            uniform = []
+            for s, e, t in candidates:
+                bb = block_burstiness(t)
+                if bb is not None and bb < burstiness_floor:
+                    uniform.append((s, e, t))
             if not uniform:
                 unaddressable.append(
                     (finding, "no single paragraph is uniform on its own, so "
@@ -426,7 +429,7 @@ def plan(text, findings, budget_tokens=None, estimate=None,
     covered = [(u["start"], u["end"]) for u in ordered if u["kind"] == "block"]
     kept = []
     for unit in ordered:
-        if unit["kind"] == "span" and any(s <= unit["start"] and unit["end"] <= e
+        if unit["kind"] == "span" and any(max(s, unit["start"]) < min(e, unit["end"])
                                           for s, e in covered):
             continue
         kept.append(unit)
@@ -646,9 +649,15 @@ def splice(text, records):
     Back to front, so an earlier edit never moves a later one's offsets.
     """
     out = text
-    for record in sorted((r for r in records if r["accepted"]),
-                         key=lambda r: r["start"], reverse=True):
+    accepted = sorted((r for r in records if r["accepted"]),
+                      key=lambda r: r["start"], reverse=True)
+    last_start = len(text) + 1
+    for record in accepted:
+        if record["end"] > last_start:
+            # Overlaps with an edit that occurs later in text
+            continue
         out = out[:record["start"]] + record["after"] + out[record["end"]:]
+        last_start = record["start"]
     return out
 
 
@@ -684,8 +693,9 @@ def run(text, findings, endpoint, scan_fn, validate_fn, injection_fn=None,
         estimate=estimate, burstiness_floor=burstiness_floor)
     if limit:
         for unit in units[limit:]:
-            unaddressable.append((unit["findings"][0],
-                                  "past the --model-limit of %d units" % limit))
+            for finding in unit["findings"]:
+                unaddressable.append((finding,
+                                      "past the --model-limit of %d units" % limit))
         units = units[:limit]
 
     records = []
@@ -701,5 +711,5 @@ def run(text, findings, endpoint, scan_fn, validate_fn, injection_fn=None,
                 "records": records, "unaddressable": unaddressable,
                 "verdict": verdict}
     return {"ok": True, "refused": None, "blocking": [], "text": spliced,
-            "records": records, "unaddressable": unaddressable,
-            "verdict": verdict}
+                "records": records, "unaddressable": unaddressable,
+                "verdict": verdict}

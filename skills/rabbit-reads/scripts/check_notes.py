@@ -744,7 +744,7 @@ def spine_problems(lines, lo, hi):
     return problems
 
 
-def scan_problems(path, voice_rules, profile=SCAN_PROFILE):
+def scan_problems(path, voice_rules, profile=SCAN_PROFILE, safety_only=False):
     """One scan.py --check --json per doc, through the engine's own CLI.
 
     Structured findings, not the human report. This used to grep the P0 block
@@ -757,6 +757,11 @@ def scan_problems(path, voice_rules, profile=SCAN_PROFILE):
     Any other non-zero is the scanner failing to run, which is a problem here
     too: a clean report over a scan that never executed is the exact failure
     precommit.py refuses.
+
+    safety_only narrows a run to the safety band: the concealed-directive and
+    injection findings nobody may suppress or opt out of. It is what makes
+    that band always-on without paying for the full battery on every check;
+    --scan keeps running everything and forwards the voice profile.
     """
     if not os.path.isfile(SCAN_PATH):
         return [("scan", "no scan.py resolved beside or above this script")]
@@ -769,19 +774,21 @@ def scan_problems(path, voice_rules, profile=SCAN_PROFILE):
         return []
     out = result.stdout.decode("utf-8", "replace")
     if result.returncode == 1:
-        return p0_problems(out)
+        return findings_from_payload(out, safety_only)
     err = result.stderr.decode("utf-8", "replace").strip().splitlines()
     return [("scan", "scan.py exited %d: %s"
              % (result.returncode, err[-1][:120] if err else "no output"))]
 
 
-def p0_problems(scan_stdout):
-    """The unsuppressed P0 findings out of a scan.py --json payload.
+def findings_from_payload(scan_stdout, safety_only=False):
+    """The reportable findings out of a scan.py --json payload.
 
     A suppressed finding is skipped for the reason rwlib.suppress gives: it
     stays in the payload so nothing is silently dropped, and it does not fail
     the run it was allowed for. That is the same test both of the engine's own
-    --check paths apply.
+    --check paths apply. safety_only keeps just the safety band, which no
+    suppression and no flag combination can turn off here; everything else
+    waits for --scan or a voice profile run.
     """
     try:
         payload = json.loads(scan_stdout)
@@ -795,13 +802,15 @@ def p0_problems(scan_stdout):
     for f in payload.get("findings", []):
         if f.get("priority") != "P0" or "suppressed" in f:
             continue
+        if safety_only and f.get("band") != "safety":
+            continue
         out.append(("scan", ("%s L%s %s: %s"
                              % (f.get("id", "?"), f.get("line", "?"),
                                 f.get("label", ""),
                                 f.get("match", "")))[:300]))
     if not out:
-        return [("scan", "scan.py exited 1 with no unsuppressed P0 in its "
-                         "payload, rerun it directly")]
+        return [("scan", "scan.py exited 1 with no reportable unsuppressed P0 "
+                         "in its payload, rerun it directly")]
     return out
 
 
@@ -827,19 +836,17 @@ def main(argv=None):
                     help="the index file inside notes_dir "
                          "(default: README.md)")
     ap.add_argument("--scan", action="store_true",
-                    help="also run scan.py --check over every doc, under the "
-                         "%s register" % SCAN_PROFILE)
+                    help="run the full scanner battery over every doc, under "
+                         "the %s register. Without it, the safety band still "
+                         "always runs" % SCAN_PROFILE)
     ap.add_argument("--voice-rules", metavar="PATH",
-                    help="forwarded to scan.py, only with --scan")
+                    help="forwarded to the scanner, with or without --scan")
     ap.add_argument("--source", metavar="PATH",
                     help="the normalized source text, under scratch/. Every "
                          "doc is checked for spans of %d or more words lifted "
                          "from it word for word" % VERBATIM_WORDS)
     ap.add_argument("--json", action="store_true", help="machine-readable output")
     args = ap.parse_args(argv)
-
-    if args.voice_rules and not args.scan:
-        return die_usage("--voice-rules only does something with --scan")
     if (args.min_lines is not None and args.max_lines is not None
             and args.min_lines > args.max_lines):
         return die_usage("--min-lines %d is above --max-lines %d"
@@ -932,10 +939,12 @@ def main(argv=None):
             findings.append((name, check, detail))
         for check, detail in verbatim_problems(lines, windows):
             findings.append((name, check, detail))
-        if args.scan:
-            for check, detail in scan_problems(
-                    os.path.join(args.notes_dir, name), args.voice_rules):
-                findings.append((name, check, detail))
+        # The safety band is unsuppressible: it runs on every check. --scan
+        # is the only way to pay for the full battery and the voice profile.
+        for check, detail in scan_problems(
+                os.path.join(args.notes_dir, name), args.voice_rules,
+                safety_only=not args.scan):
+            findings.append((name, check, detail))
 
     for name in freeform:
         try:
@@ -948,6 +957,10 @@ def main(argv=None):
         for check, detail in check_freeform(name, lines):
             findings.append((name, check, detail))
         for check, detail in verbatim_problems(lines, windows):
+            findings.append((name, check, detail))
+        for check, detail in scan_problems(
+                os.path.join(args.notes_dir, name), args.voice_rules,
+                safety_only=not args.scan):
             findings.append((name, check, detail))
 
     for name, kind, lo, hi in spine_notes:

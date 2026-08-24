@@ -753,14 +753,14 @@ def measure_gaps(fp, measured, tolerance=ATTAIN_TOLERANCE):
         sd_used = max(entry["sd"], ATTAIN_SD_FLOOR_FRACTION * abs(entry["mean"]))
         row["sd_used"] = round(sd_used, 3)
         gap = value - entry["mean"]
-        if sd_used == 0:
+        if row["sd_used"] == 0:
             # Mean and sd both zero: a writer who never does the thing at all,
             # em_dashes_per_1k being the case that actually happens. Any nonzero
             # value is off, and sd_off stays null rather than reporting an
             # infinity a report would have to special-case anyway.
             row["within"] = gap == 0
         else:
-            row["sd_off"] = round(gap / sd_used, 2)
+            row["sd_off"] = round(gap / row["sd_used"], 2)
             row["within"] = abs(row["sd_off"]) <= tolerance
         out[m] = row
     return out
@@ -894,7 +894,13 @@ def distance(fp, text):
                          "measure_voice.py" % exc)
     d, contributors = _delta(mean, _floored(mean, sd), doc_rates)
 
-    band_max = fp["self_distance"]["max"]
+    try:
+        band_max = fp["self_distance"]["max"]
+        band = dict(fp["self_distance"])
+    except (KeyError, TypeError) as exc:
+        raise ValueError("fingerprint is missing self_distance. It was written by a "
+                         "different version: regenerate it with measure_voice.py")
+
     if d <= band_max:
         verdict = "in_range"
     elif d <= 1.5 * band_max:
@@ -909,7 +915,7 @@ def distance(fp, text):
         "schema_version": SCHEMA_VERSION,
         "voice": fp.get("voice"),
         "delta": round(d, 3),
-        "band": dict(fp["self_distance"]),
+        "band": band,
         "verdict": verdict,
         "words": n,
         "reliable": n >= RELIABLE_WORDS,
@@ -971,6 +977,8 @@ def load(path):
 
 
 def save(fp, path):
-    with open(path, "w", encoding="utf-8") as fh:
+    tmp_path = path + ".tmp"
+    with open(tmp_path, "w", encoding="utf-8") as fh:
         json.dump(fp, fh, indent=2, sort_keys=False)
         fh.write("\n")
+    os.replace(tmp_path, path)

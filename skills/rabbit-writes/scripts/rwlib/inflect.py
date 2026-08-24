@@ -166,6 +166,11 @@ INVARIANT_OR_S_SINGULARS = {
     "census", "radius", "syllabus", "bus"
 }
 
+IE_SINGULAR_NOUNS = {
+    "movie", "cookie", "brownie", "zombie", "rookie", "hippie", "sweetie",
+    "pixie", "goalie", "junkie", "lassie", "tie", "pie", "lie", "die"
+}
+
 
 def singular(noun):
     """A grouping key for a countable noun, so a plural and its singular
@@ -175,9 +180,11 @@ def singular(noun):
     are left alone.
     """
     n = noun.lower()
-    if n in INVARIANT_OR_S_SINGULARS:
+    if n in INVARIANT_OR_S_SINGULARS or n in IE_SINGULAR_NOUNS:
         return n
     if n.endswith("ies") and len(n) > 4:
+        if n[:-1] in IE_SINGULAR_NOUNS:
+            return n[:-1]
         return n[:-3] + "y"
     if n.endswith(("sses", "shes", "ches", "xes", "zes")):
         return n[:-2]

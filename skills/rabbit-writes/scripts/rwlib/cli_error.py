@@ -24,8 +24,9 @@ def format_llm_error(script_name, error_message, parser=None, examples=None):
     out.append(f"Script: {script_name}")
 
     if parser and parser.description:
-        desc_line = parser.description.strip().splitlines()[0]
-        out.append(f"Description: {desc_line}")
+        desc_lines = parser.description.strip().splitlines()
+        if desc_lines:
+            out.append(f"Description: {desc_lines[0]}")
 
     if parser and hasattr(parser, "_actions"):
         out.append("\nREQUIRED & OPTIONAL PARAMETERS:")
@@ -53,7 +54,7 @@ def format_llm_error(script_name, error_message, parser=None, examples=None):
 
             help_text = action.help or "No description provided."
             default_info = ""
-            if not is_required and action.default not in (None, argparse.SUPPRESS, False):
+            if not is_required and action.default not in (None, argparse.SUPPRESS) and action.default is not False:
                 default_info = f" (default: {action.default})"
 
             out.append(f"  - {name_str} ({status}, type: {type_str}){default_info}")

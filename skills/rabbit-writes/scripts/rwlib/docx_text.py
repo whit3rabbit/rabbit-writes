@@ -86,7 +86,7 @@ def _toggled(rpr, tag):
     # w:vanish is a toggle property: present means on, unless w:val says off.
     el = rpr.find(W + tag)
     return (el is not None
-            and el.get(W + "val", "true").lower() not in ("false", "0", "none"))
+            and el.get(W + "val", "true").lower() not in ("false", "0", "off", "none"))
 
 
 def _hidden_kind(rpr):

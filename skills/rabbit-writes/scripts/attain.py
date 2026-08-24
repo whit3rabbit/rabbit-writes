@@ -55,6 +55,7 @@ Stdlib only, 3.9+.
 import argparse
 import json
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -98,7 +99,7 @@ def _read(path, label, examples):
     try:
         with open(path, encoding="utf-8-sig") as fh:
             return fh.read()
-    except OSError as exc:
+    except (OSError, UnicodeDecodeError) as exc:
         print(cli_error.format_file_error(
             "attain.py", path, label, expected_type="file path",
             details=str(exc), examples=examples), file=sys.stderr)
@@ -183,7 +184,7 @@ def compare(before, after, fingerprint, tolerance):
             "verdict": verdict,
         }
 
-    band = fingerprint["self_distance"]["max"]
+    band = (fingerprint.get("self_distance") or {}).get("max", 0.0)
     a_delta = after["distance"]["delta"]
     b_delta = before["distance"]["delta"] if before else None
 
@@ -244,10 +245,11 @@ def _is_flat(before_delta, after_delta, band, rows):
 def report(result, voice, fingerprint, tolerance, plan_for=None,
            fingerprint_path=None, register=None):
     fp = fingerprint
+    band_max = (fp.get("self_distance") or {}).get("max", 0.0)
     out = ["voice attainment: %s   (%d samples, %d measures, band max %.2f, "
            "tolerance %.1f sd)"
            % (voice, fp.get("n_samples", 0), len(fp.get("measures") or {}),
-              fp["self_distance"]["max"], tolerance)]
+              band_max, tolerance)]
     # Which fingerprint, named rather than implied. Once a register can have its
     # own, "the profile's fingerprint" is no longer one file, and a reader
     # comparing two runs has no way to tell which target moved.
@@ -380,7 +382,7 @@ def paragraph_sentence_counts(text):
     """
     prose = scan_mod.strip_for_stats(text)
     out = []
-    for block in prose.split("\n\n"):
+    for block in re.split(r"\n\s*\n", prose):
         if block.strip():
             n = len(scan_mod.split_sentences(block))
             if n:

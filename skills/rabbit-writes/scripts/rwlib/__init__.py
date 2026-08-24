@@ -25,6 +25,7 @@ Modules:
     injection   the safety band: concealed text, and text aimed at an agent.
     language    the English-only scope check. Warns, never fails.
     lexicon     the pattern catalogue, its version, and the regex builders.
+    links       reference-link definition discovery and bracket/parenthesis balancing.
     markdown    spans: fences, links, images, tables, quotes, dashes, badges.
     registers   the tolerance matrix, read from registers.json.
     rewrite     model-backed rewriting, one finding at a time, behind the gate.
