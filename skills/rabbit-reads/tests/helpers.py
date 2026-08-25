@@ -91,7 +91,8 @@ def run(cmd_args, cwd=None):
     argv = list(cmd_args)
     if argv and argv[0].endswith(".py"):
         argv.insert(0, sys.executable)
-    res = subprocess.run(argv, capture_output=True, text=True, cwd=cwd)
+    res = subprocess.run(argv, capture_output=True, text=True,
+                         encoding="utf-8", cwd=cwd)
     return res.returncode, res.stdout, res.stderr
 
 
@@ -101,7 +102,8 @@ def run_env(cmd_args, cwd=None, env=None):
     argv = list(cmd_args)
     if argv and argv[0].endswith(".py"):
         argv.insert(0, sys.executable)
-    res = subprocess.run(argv, capture_output=True, text=True, cwd=cwd, env=env)
+    res = subprocess.run(argv, capture_output=True, text=True,
+                         encoding="utf-8", cwd=cwd, env=env)
     return res.returncode, res.stdout, res.stderr
 
 

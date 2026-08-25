@@ -473,7 +473,24 @@ def expand_sources(entries):
     return files
 
 
+def _force_utf8_streams():
+    """Reconfigure stdout/stderr to UTF-8.
+
+    This tool's whole job is surfacing text a document is hiding, including
+    tag-smuggled characters `injection.py` decodes and prints in a finding's
+    label. Windows defaults a piped or redirected stream to the system
+    codepage (often cp1252), which raises `UnicodeEncodeError` on anything
+    outside Latin-1, crashing before the finding it exists to report ever
+    reaches the caller. `reconfigure` is a no-op on a stream that is already
+    UTF-8, which every other platform's default already is.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
+
+
 def main(argv=None):
+    _force_utf8_streams()
     ap = cli_error.LLMArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
