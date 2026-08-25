@@ -498,6 +498,11 @@ def build_voice_command(here=None):
     `resolve` calls this on every `--voice auto` scan, so the guard is not
     hypothetical: a plugin installed on C: and a document open on D: would have
     turned a note into a traceback.
+
+    Shown with forward slashes even on Windows, where `relpath` returns
+    backslashes: this is a command line, not a filesystem path, and `python3`
+    accepts either separator, so normalizing keeps the printed command
+    identical across platforms instead of leaking `os.sep` into the message.
     """
     path = build_voice_path(here)
     if path is None:
@@ -509,6 +514,8 @@ def build_voice_command(here=None):
         shown = path
     if shown.startswith(".."):
         shown = path
+    else:
+        shown = shown.replace(os.sep, "/")
     return "run `python3 %s --check <name> --activate` once" % shown
 
 
