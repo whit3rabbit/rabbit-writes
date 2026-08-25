@@ -3,7 +3,7 @@ name: rabbit-readme-improver
 description: Draft a new README.md, or audit and improve an existing one, using patterns measured from 100 real, currently-trending GitHub repos rather than generic advice, and written in the user's own saved voice rather than a generated open-source register. Use when the user asks to write a README, create a project README, improve or clean up their README, review a README against best practices, add badges or a table of contents, restructure a README's sections, make a README look more professional, or make one sound like they wrote it. Covers new-project READMEs and edits to existing files.
 license: MIT
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # README writing
@@ -65,7 +65,7 @@ Load the active profile before drafting:
 2. **Read `voices/<name>.md` in full.** Not skimmed, and not skipped because the script exists. This is the half of the profile no regex can reach: structure habits, how this person calibrates certainty, how much warmth they carry, what they refuse to put their name on, and their own final check. `readme_check.py` cannot apply any of it.
 3. `voices/<name>.rules.json` is the mechanically checkable subset, and `readme_check.py` picks it up automatically. Passing it is the floor, not the goal. A document can clear every rule in that file and still sound nothing like the person, which is the failure this skill is trying to avoid.
 
-When there is no `ACTIVE` and no `.rabbit-voice` pin, `readme_check.py` enforces no voice rules and notes that no profile is active. It will not silently enforce an example profile. Say so in your report, write in the project's existing register or a neutral technical tone, and offer `voice-setup` to create or activate a profile (`python3 skills/voice-setup/scripts/build_voice.py --activate <name>`). With several profiles installed and none active, ask which one instead of picking.
+When there is no `ACTIVE` and no `.rabbit-voice` pin, `readme_check.py` enforces no voice rules and notes that no profile is active. It will not silently enforce an example profile. Say so in your report, write in the project's existing register or a neutral technical tone, and offer `voice-setup` to create or activate a profile (`python3 skills/voice-setup/scripts/build_voice.py --check <name> --activate`). With several profiles installed and none active, ask which one instead of picking.
 
 If no profile exists at all, say so, write in the project's existing register, and offer `voice-setup`. Don't invent a personality to fill the gap. A generic "friendly open-source" register is itself a recognizable voice, and installing one uninvited is the failure `rabbit-writes` exists to prevent.
 

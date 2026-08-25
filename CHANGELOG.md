@@ -11,8 +11,88 @@ here.
 The fifth adds an opt-in ASD-STE100 layer and the transcript-mined tier
 phrases that bump the lexicon to version 5. The sixth turns the counted half
 of that layer on by default and gives the registers their tolerances for it.
+The seventh puts a voice in force between invocations, through the two host
+features that reach every turn rather than only the ones somebody asked for.
 The 100-repo corpus regression, the calibration fixtures, and every published
-self-scan number were re-run after all six.
+self-scan number were re-run after all seven.
+
+### A voice that holds between invocations
+
+A profile applied when somebody ran a skill, and the pre-commit hooks applied
+one at commit. In between, the model wrote in its own register and the writer
+asked again every turn. Two Claude Code features close that gap and the plugin
+now ships both, with the install path deciding which half a person gets.
+
+- **`output-styles/rabbit-writes.md` and `hooks/hooks.json` at the plugin
+  root.** Auto-discovered when the plugin is enabled, declared in no manifest,
+  and they write nothing into anybody's files. The style is the ordering
+  contract (verdict in sentence one, no coined shorthand, no chatbot cadence)
+  and it is opt-in through `/config`. `force-for-plugin` is deliberately
+  absent, because it overrides the user's own choice on every session a plugin
+  is enabled and this one is enabled far more often than prose gets written.
+  `keep-coding-instructions: true` is deliberately present, because it
+  defaults to false and a style shipped without it drops Claude Code's
+  software-engineering instructions for anybody who picks it in a code
+  repository. `check_output_styles` requires the one and refuses the other.
+
+- **`rwlib/outputstyle.py` renders a voice profile as an output style.** The
+  refusals, the mechanics with the profile's own numbers, the swaps, the
+  contrastive pairs, and two sections lifted verbatim from the markdown. The
+  long-form judgment stays out: it would be thousands of tokens on every
+  request in every session, and the skill loads the whole profile at the
+  moment somebody is actually writing. `signature_moves` stays out too, for
+  the reason the engine already caps `voice-signature-underuse` at P2. A rule
+  telling an editor to *add* a move installs a tic, and a system prompt is a
+  stronger push than any finding.
+
+- **`skills/rabbit-writes/scripts/claude_hook.py`** answers two events. At
+  `SessionStart` it names the active voice, or says none is and which command
+  claims one, which is the first time that fact reaches anybody without
+  running a scanner. At `PostToolUse` on `Write` and `Edit` it scans the
+  markdown that was just written and hands the findings back through
+  `additionalContext`, the only channel that reaches the model in the turn
+  that wrote the file. It exits 0 by every path, including unparseable stdin
+  and a scanner that raised, and it is silent on a clean scan, a non-prose
+  extension, and P2-only findings.
+
+- **`skills/voice-setup/scripts/install_host.py`** is for the install paths
+  with no plugin, where the only way to reach the same two features is to
+  write into the user's own configuration. `--dry-run` prints every write and
+  touches nothing, and the skill's instructions require showing that to the
+  user before the real thing. It refuses to rewrite a settings file it could
+  not parse, backs the file up before its first edit, and records every path
+  written with its hash. `--uninstall` reverses it from that record: it
+  restores the previous `outputStyle` rather than deleting the key, removes
+  only hook entries naming this plugin's runner, and refuses to delete a style
+  file edited by hand since it was written.
+
+- **`check_plugin_hooks` holds the two install paths together**, comparing
+  the shipped `hooks.json` against `install_host.py`'s `HOOK_SPECS`, so a hook
+  in one and not the other fails the build rather than giving a plugin user
+  and a loose-skill user different behaviour.
+
+- **Fixed: the command a fresh install was told to run did not work.**
+  `voices.resolve` printed `build_voice.py --activate <name>`, and `--activate`
+  is a flag on that command's required mode group rather than a mode, so the
+  invocation exited 2 on `one of the arguments --scaffold --check is required`.
+  It was the single line between a fresh install and an enforced voice, in
+  four places, and nothing checked that it parsed. It does now.
+
+- **Fixed: the path in that same note was wrong in every packaged bundle.**
+  It was written repo-relative, and a bundle puts `voices.py` at
+  `<bundle>/scripts/rwlib/` with no `skills/` above it, so the command named a
+  file that was not there. `package_skills.py` rewrites markdown paths per
+  bundle layout and never touches a string inside Python, so neither half of
+  this was going to be caught upstream. `voices.build_voice_command()` resolves
+  the script from `__file__` across both layouts that carry it and prints it
+  relative to the working directory when it stays inside it, so a checkout root
+  gets the same line it always had. Where the script is genuinely absent, which
+  is four of the five bundles, the note names the `voice-setup` skill rather
+  than a path that would not resolve.
+
+- **Fixed: `satoshi.md` used an em dash while `satoshi.rules.json` forbids
+  them.** One character, in the section the style renderer lifts, so the
+  generated style said "never use an em dash" three lines under one.
 
 ### OpenClaw, ClawHub, and Hermes
 

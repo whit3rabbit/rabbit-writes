@@ -4,7 +4,7 @@ description: Write, edit, or audit prose in a specific person's saved voice, or 
 license: MIT
 compatibility: Python 3.9+ (any harness), stdlib only. Nothing to install.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Rabbit writes
@@ -91,9 +91,16 @@ Before drafting or editing anything:
 2. Read `voices/<name>.md` **in full**. That is the voice profile, and it is now the authority on style. It holds what no regex reaches: argument order, connectors, opener and closer logic, certainty calibration, warmth, humor, and the profile's own final check.
 3. `voices/<name>.rules.json` is the mechanically checkable subset. `scripts/scan.py --voice-rules` enforces it. Passing it is the floor, not the goal: a document can clear every rule in that file and still sound like nobody.
 
-If `voices/ACTIVE` is missing or names a profile that does not exist, say so and offer the `voice-setup` skill. Do not silently fall back to a different person's voice. Writing in the wrong person's register is worse than asking.
+**When nothing resolves, offer and then wait.** `voices/ACTIVE` ships empty on purpose, so this is the state a fresh install is in rather than an error. Do not silently fall back to a different person's voice, and do not silently activate one either. Writing in the wrong person's register is worse than asking. Say all four of these in one go:
 
-Shipped with `whit3rabbit` as the active voice. It is an example, not a default worth keeping. Anyone can replace it.
+1. That no voice is active, and that prose will be checked against craft rules only until one is.
+2. Which profiles are installed. The scanner's own note names them, and the profiles that ship are examples rather than anybody's.
+3. That `voices/ACTIVE` is the file that decides, and a `.rabbit-voice` in the user's own repository beats it.
+4. The offer: name a profile to activate, or build one with `voice-setup`.
+
+Activate only after the user picks one, and hand that to the `voice-setup` skill rather than editing `voices/ACTIVE` by hand. It runs the profile's own check first, and it refuses to activate one that fails.
+
+If `voices/ACTIVE` names a profile that does not exist, that is a different case and it is a failure: somebody wrote a name and got it wrong. Say which name, and do not pick a neighbour.
 
 ### Precedence
 

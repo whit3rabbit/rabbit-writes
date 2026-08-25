@@ -63,16 +63,22 @@ class sandbox(object):
             ROOT, self.dest,
             ignore=shutil.ignore_patterns(".git", "__pycache__", "dist",
                                           ".pytest_cache", "docs", "scratch"))
-        self._saved = (validate.ROOT, validate.SKILLS, validate.problems,
+        self._saved = (validate.ROOT, validate.SKILLS,
+                       validate.VOICE_SETUP_SCRIPTS, validate.problems,
                        validate.notes)
         validate.ROOT = self.dest
         validate.SKILLS = os.path.join(self.dest, "skills")
+        # check_plugin_hooks() loads install_host.py from this constant
+        # directly rather than re-deriving it from validate.SKILLS, so it has
+        # to be repointed too or it silently execs the real on-disk file.
+        validate.VOICE_SETUP_SCRIPTS = os.path.join(
+            validate.SKILLS, "voice-setup", "scripts")
         validate.problems = []
         validate.notes = []
         return self
 
     def __exit__(self, *exc):
-        (validate.ROOT, validate.SKILLS,
+        (validate.ROOT, validate.SKILLS, validate.VOICE_SETUP_SCRIPTS,
          validate.problems, validate.notes) = self._saved
         shutil.rmtree(self.tmp, ignore_errors=True)
         return False
@@ -335,6 +341,87 @@ def test_an_unknown_link_syntax_is_reported():
         validate.check_layout_files()
         assert s.reported("neither markdown nor wikilink"), \
             str(validate.problems)
+
+
+# --------------------------------------------------------------------------
+# the host-integration checks
+# --------------------------------------------------------------------------
+
+STYLE = os.path.join("output-styles", "rabbit-writes.md")
+HOOKS = os.path.join("hooks", "hooks.json")
+
+
+def test_the_host_checks_pass_the_shipped_files():
+    """The baseline for both. Without it the mutations below prove nothing."""
+    with sandbox() as s:
+        validate.check_output_styles()
+        validate.check_plugin_hooks()
+        assert not validate.problems, str(validate.problems)
+        assert s.reported("") == []
+
+
+def test_a_style_dropping_keep_coding_instructions_is_reported():
+    """The key defaults to false in the host, which silently strips Claude
+    Code's engineering instructions for anybody who picks the style."""
+    with sandbox() as s:
+        s.edit(STYLE, "keep-coding-instructions: true\n", "")
+        validate.check_output_styles()
+        assert s.reported("keep-coding-instructions"), str(validate.problems)
+
+
+def test_a_style_forcing_itself_on_the_plugin_is_reported():
+    """force-for-plugin overrides whatever style the user picked, every
+    session the plugin is enabled."""
+    with sandbox() as s:
+        s.edit(STYLE, "keep-coding-instructions: true",
+               "keep-coding-instructions: true\nforce-for-plugin: true")
+        validate.check_output_styles()
+        assert s.reported("force-for-plugin"), str(validate.problems)
+
+
+def test_an_invented_style_frontmatter_key_is_reported():
+    with sandbox() as s:
+        s.edit(STYLE, "keep-coding-instructions: true",
+               "keep-coding-instructions: true\npriority: high")
+        validate.check_output_styles()
+        assert s.reported("which Claude Code does not read"), \
+            str(validate.problems)
+
+
+def test_a_hook_naming_a_missing_command_is_reported():
+    """A settings entry pointing at nothing is a hook the host reports as
+    failing on every event, which is the loud half of this check."""
+    with sandbox() as s:
+        s.edit(HOOKS, "scripts/claude_hook.py", "scripts/no_such_hook.py")
+        validate.check_plugin_hooks()
+        assert s.reported("which does not exist"), str(validate.problems)
+
+
+def test_a_misspelled_hook_event_is_reported():
+    """The quiet half: a hook that simply never fires."""
+    with sandbox() as s:
+        s.edit(HOOKS, '"SessionStart"', '"SessionStarted"')
+        validate.check_plugin_hooks()
+        assert s.reported("not a Claude Code"), str(validate.problems)
+
+
+def test_a_hook_with_no_plugin_root_is_reported():
+    """A bare path does not resolve from the consuming repository, which is
+    the working directory a hook actually runs in."""
+    with sandbox() as s:
+        s.edit(HOOKS, "${CLAUDE_PLUGIN_ROOT}/skills", "skills")
+        validate.check_plugin_hooks()
+        assert s.reported("cannot resolve"), str(validate.problems)
+
+
+def test_the_two_install_paths_drifting_apart_is_reported():
+    """hooks/hooks.json and install_host.py are one feature reaching two
+    install paths. A hook in one and not the other is a plugin user and a
+    loose-skill user getting different behaviour."""
+    with sandbox() as s:
+        s.edit(HOOKS, '"matcher": "Write|Edit",', '"matcher": "Write",')
+        validate.check_plugin_hooks()
+        assert s.reported("would behave differently"), str(validate.problems)
 
 
 TESTS = [(name, fn) for name, fn in sorted(globals().items())

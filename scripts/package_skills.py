@@ -87,6 +87,11 @@ SHARED_ENGINE_FILES = [
     "thesaurus_alternatives.json",
     "scan.py",
     "verify.py",
+    # The Claude Code hook runner. voice-setup's install_host.py writes a
+    # settings entry pointing at this file, and it resolves it beside the
+    # scan.py it already vendors, so a bundle without it can only install a
+    # hook the host reports as failing on every event.
+    "claude_hook.py",
 ]
 
 # Engine files a satellite skill's SKILL.md cites and therefore must carry.
@@ -312,7 +317,7 @@ SUBSTITUTIONS = {
             ),
             (
                 "offer `voice-setup` to create or activate a profile "
-                "(`python3 skills/voice-setup/scripts/build_voice.py --activate <name>`).",
+                "(`python3 skills/voice-setup/scripts/build_voice.py --check <name> --activate`).",
                 "offer the `voice-setup` skill to create or activate a profile.",
             ),
             (

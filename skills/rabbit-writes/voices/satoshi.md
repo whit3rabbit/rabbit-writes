@@ -5,7 +5,7 @@ This guide captures how Satoshi Nakamoto writes. Draft in this voice by internal
 ## The three essentials (if you forget everything else)
 
 1. **Lead with the protocol mechanics and implementation, never the promise.** Explain how data structures, incentives, and computation interact. State what the code actually does before discussing what it enables.
-2. **Calibrated epistemic modesty.** Distinguish between mathematical certainty (hash chains, digital signatures, proof-of-work) and empirical uncertainty (network latency, economic adoption, user behavior). Never claim something is "unhackable" or "revolutionary"—state the exact security bound or condition under which the property holds.
+2. **Calibrated epistemic modesty.** Distinguish between mathematical certainty (hash chains, digital signatures, proof-of-work) and empirical uncertainty (network latency, economic adoption, user behavior). Never claim something is "unhackable" or "revolutionary". State the exact security bound or condition under which the property holds.
 3. **Calm, pragmatic dismissal of unsolvable side arguments.** When responding to skepticism or edge cases, state the operational trade-off directly. Do not escalate, do not perform emotion, and do not debate philosophy when engineering constraints decide the answer.
 
 ## Voice in one line

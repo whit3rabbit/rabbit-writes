@@ -3,7 +3,7 @@ name: voice-setup
 description: Build, measure, edit, or switch a personal writing voice profile for the rabbit-writes plugin. Three ways in, from writing samples, from an interview, or from both together, which is the one to recommend. Use when the user wants to teach the system how they write, create their own writing style, set up or replace a voice, capture their tone, analyze documents they wrote to extract a voice, be interviewed about their style, change whose voice is active, blend two voices, or convert their writing samples into a reusable style profile. Also use when a draft "doesn't sound like me" and the saved profile needs correcting.
 license: MIT
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Voice setup
@@ -290,6 +290,34 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/build_voice.py --check 
 
 Activation is refused when the check fails, and when the profile lives outside the plugin's `voices/`, because `ACTIVE` holds a name and resolves it there. The script prints what it replaced. Never switch the active voice without saying so.
 
+## Put the voice in force between invocations
+
+A profile applies when somebody runs a skill, and the pre-commit hooks apply one at commit. Between those two moments the model writes in its own register. Claude Code closes that gap two ways, and **which one you use is decided by how the plugin was installed, not by preference**:
+
+| Install | What to do |
+|---|---|
+| Claude Code plugin (`/plugin install`, or `--plugin-dir`) | Nothing. The host discovers `output-styles/` and `hooks/hooks.json` at the plugin root on its own. Point the user at `/config` to pick a style |
+| Loose skills, a symlink into `~/.claude/skills/`, anything with no plugin | `install_host.py`, below |
+| Codex, or claude.ai skill uploads | Neither. Output styles and this hook schema are Claude Code's. Say so rather than running the installer and reporting success |
+
+An output style is the system prompt, so it holds every turn. The generated one carries the profile's refusals, its mechanics, its swaps, and its contrastive pairs. It leaves out the long-form judgment, which would be thousands of tokens on every request. The skill loads the whole profile at the moment it is worth paying for.
+
+**This writes into the user's own configuration, so ask first.** Three steps, in this order, and never fold them into one:
+
+1. Run `--status`, so both of you can see what is there now.
+2. Run `--install --dry-run` and show the user every line of it. It names each file, the hook command, and what `outputStyle` is being changed from.
+3. Ask for a yes, and run `--install` only after you get one.
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/install_host.py --status
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/install_host.py --install --dry-run
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/install_host.py --install
+```
+
+Two things worth telling the user afterwards. An output style is read once at session start, so it takes effect after `/clear` or in a new session. And `--uninstall` reverses all of it. It restores whatever `outputStyle` was set before, and it drops only the hook entries naming this plugin's runner. It refuses to delete a style file edited by hand since it was written.
+
+Rebuild the generated style after any change to the profile, by running `--install` again. It is a snapshot, not a live read, so a rule added to the rules file today is not in force until then.
+
 ## Deliver the result
 
 Show the person their profile and say plainly what you inferred versus what they told you. Inferred rules are the ones most likely to be wrong, and they are the ones worth correcting on day one.
@@ -334,6 +362,15 @@ Then offer a live test. Have them give you something real to draft, run it throu
 - `samples`: (REQUIRED, one or more file paths) Documents this writer actually wrote, whole documents rather than chunks.
 - `--register`: (OPTIONAL, choice: register name) Register to scan the samples as (default: the scanner's default).
 - `--json`: (OPTIONAL, boolean flag) Output machine-readable JSON payload, with the exit code echoed inside it.
+
+### `install_host.py`
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/install_host.py --status|--install|--uninstall [options]`
+- `--status`: (REQUIRED choice) Report what is installed, where, and whether any installed file has been edited by hand since.
+- `--install`: (REQUIRED choice) Write the output styles, add the hooks, and record what was written.
+- `--uninstall`: (REQUIRED choice) Remove exactly what `--install` wrote, restoring the previous `outputStyle`.
+- `--scope`: (OPTIONAL, choice: `user`, `project`, default: `user`) `user` writes `~/.claude`, `project` writes `.claude` in the working directory.
+- `--dry-run`: (OPTIONAL, boolean flag) Print every write and touch nothing. Show this to the user before running `--install`.
+- `--force`: (OPTIONAL, boolean flag) On `--uninstall`, delete style files that have been edited since they were written.
 
 ### `thesaurus_check.py`
 Internal validation helper for checking `thesaurus.json` data shape integrity.

@@ -58,6 +58,37 @@ The three environment variables, also declared in each skill's frontmatter:
 - `RABBIT_MODEL_API_KEY`, a key for a remote endpoint. Read only under
   `--apply-model`, and never logged or persisted.
 
+## Writes outside the bundle
+
+One script writes outside its own directory, and a scanner should flag it, so
+here is exactly what it is.
+
+`scripts/install_host.py`, in the voice-setup bundle, wires the active writing
+voice into Claude Code by writing an output style and two hook entries into
+the user's own `~/.claude`. It runs only when a person runs it, only under
+`--install`, and it is not reachable from a scan, from a rewrite, or from any
+other script here. Nothing calls it.
+
+- It writes four paths and no others: two markdown files under
+  `~/.claude/output-styles/`, the `hooks` and `outputStyle` keys inside
+  `~/.claude/settings.json`, and a record of those at
+  `~/.claude/rabbit-writes-host.json`.
+- `--dry-run` prints every one of them and writes nothing, and the skill's
+  own instructions require showing that output to the user before running the
+  real thing.
+- It copies `settings.json` to `settings.json.rabbit-bak` before its first
+  edit, and it refuses to rewrite a settings file it could not parse.
+- `--uninstall` reverses it from the record, restoring the previous
+  `outputStyle` rather than deleting the key, and removing only hook entries
+  naming this bundle's own runner.
+- It reads nothing else out of the user's configuration, sends nothing
+  anywhere, and the content it writes is generated from the voice profile in
+  this bundle's `voices/` directory.
+
+The hook it installs, `scripts/claude_hook.py`, runs the same prose scan the
+rest of the bundle runs, on files the editor just wrote, and prints findings.
+It exits 0 on every path by design and can neither block nor modify anything.
+
 ## How to check these claims
 
 The source repository is `github.com/whit3rabbit/rabbit-writes`, under MIT.

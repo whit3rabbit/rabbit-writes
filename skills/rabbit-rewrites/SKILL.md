@@ -3,7 +3,7 @@ name: rabbit-rewrites
 description: Rewrite the prose the engine flagged using a small local model over an OpenAI-compatible endpoint, instead of spending a frontier model on it. Use when the user wants to de-slop or humanize a draft offline, on a Raspberry Pi, in CI, or in a pre-commit hook, mentions llama.cpp, llama-server, Ollama, LM Studio, vLLM, or OpenRouter for writing work, asks which local model is good enough to clean up their writing, wants rewriting that costs no API tokens, or asks to benchmark or compare models on a rewriting task. Covers endpoint setup, planning what would be sent, applying gated rewrites in place, and measuring a model's pass rate.
 license: MIT
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Model-backed rewriting

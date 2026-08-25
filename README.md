@@ -84,6 +84,30 @@ Both hosts also pick a skill implicitly when your request matches its descriptio
 </details>
 
 <details>
+<summary><b>Holding the voice between invocations (Claude Code)</b></summary>
+
+A skill applies your voice when you run it, and the pre-commit hooks apply it at commit. In between, the model writes in its own register and you ask again every turn. Two Claude Code features close that gap, and this plugin ships both:
+
+- `output-styles/rabbit-writes.md`, a style that puts the verdict first and strips the chatbot cadence. Pick it under **Output style** in `/config`.
+- `hooks/hooks.json`, which names your active voice at session start and scans any `.md` the editor writes.
+
+**On a plugin install there is nothing to do.** Claude Code discovers both directories when the plugin is enabled. Neither is forced on you: the style is opt-in through `/config`, and the hook exits silently unless it has a P0 or P1 to report.
+
+On a loose-skill or symlink install there is no plugin for the host to read those from, so one command writes them into `~/.claude` instead:
+
+```bash
+python3 skills/voice-setup/scripts/install_host.py --install --dry-run
+```
+
+That prints every file it would write, the hook command, and what it would change `outputStyle` from. Drop `--dry-run` to apply, `--scope project` to write `.claude/` here instead of your home directory, and `--uninstall` to reverse it. The uninstall restores your previous `outputStyle` rather than dropping the key, and removes only the hook entries naming this plugin.
+
+`--install` also generates a style from your active voice, carrying that profile's refusals, mechanics, and swaps. Rerun it after you edit the profile: the style is a snapshot, not a live read.
+
+None of this applies to Codex or to claude.ai skill uploads. Output styles and this hook schema are Claude Code's.
+
+</details>
+
+<details>
 <summary><b>Working on the plugin itself</b></summary>
 
 For a session or two, point Claude Code at the clone and skip installing anything:

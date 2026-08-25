@@ -27,6 +27,7 @@ Modules:
     lexicon     the pattern catalogue, its version, and the regex builders.
     links       reference-link definition discovery and bracket/parenthesis balancing.
     markdown    spans: fences, links, images, tables, quotes, dashes, badges.
+    outputstyle a voice profile, rendered as a Claude Code output style.
     registers   the tolerance matrix, read from registers.json.
     rewrite     model-backed rewriting, one finding at a time, behind the gate.
     sarif       findings as SARIF 2.1.0, for PR annotations.
@@ -47,6 +48,7 @@ from .voices import load_scan
 __all__ = [
     "artifacts", "cli_error", "corpus", "docx_text", "endpoint", "facts",
     "findings", "fixes", "inflect", "injection", "language", "lexicon",
-    "links", "markdown", "registers", "rewrite", "sarif", "sections", "sentences",
+    "links", "markdown", "outputstyle", "registers", "rewrite", "sarif",
+    "sections", "sentences",
     "ste", "stylometry", "suppress", "voice_check", "voices"
 ]

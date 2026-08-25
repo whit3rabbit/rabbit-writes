@@ -452,6 +452,66 @@ def installed(voices_dir=None):
                   if f.endswith(RULES_SUFFIX) and not f.startswith("TEMPLATE"))
 
 
+def build_voice_path(here=None):
+    """Where `build_voice.py` actually is from here, or None if it is nowhere.
+
+    The note below tells somebody with no active voice how to get one, and for
+    the life of that message it named a repo-relative path. That path is right
+    in a checkout and wrong everywhere else: a packaged bundle puts this file
+    at `<bundle>/scripts/rwlib/voices.py`, so there is no `skills/voice-setup/`
+    to find and the command a user was told to run does not exist.
+
+    `package_skills.py` rewrites markdown paths per bundle layout and does not
+    touch strings inside Python, so nothing upstream was going to catch this.
+
+    Two candidates, matching the two layouts that ship the script:
+
+        <bundle>/scripts/build_voice.py            vendored beside this rwlib
+        <skills>/voice-setup/scripts/build_voice.py  a checkout, or loose skills
+
+    Returning None is a real answer rather than a failure. Four of the five
+    bundles vendor `rwlib` without `build_voice.py`, because only voice-setup
+    builds profiles, so in those there is no path to name and the caller says
+    which skill to reach for instead.
+    """
+    here = here or HERE
+    scripts_dir = os.path.dirname(here)             # .../scripts
+    skills_dir = os.path.dirname(os.path.dirname(scripts_dir))
+    for candidate in (os.path.join(scripts_dir, "build_voice.py"),
+                      os.path.join(skills_dir, "voice-setup", "scripts",
+                                   "build_voice.py")):
+        if os.path.isfile(candidate):
+            return candidate
+    return None
+
+
+def build_voice_command(here=None):
+    """The sentence telling somebody how to claim a voice, path and all.
+
+    Printed relative to the working directory when it stays inside it, which
+    is what makes it copy-pasteable from a checkout root and keeps the message
+    identical to the one this repository has always printed. An absolute path
+    otherwise, because a `../../..` prefix is worse than a long path and a
+    wrong path is worse than both.
+
+    `relpath` raises on Windows when the two paths are on different drives, and
+    `resolve` calls this on every `--voice auto` scan, so the guard is not
+    hypothetical: a plugin installed on C: and a document open on D: would have
+    turned a note into a traceback.
+    """
+    path = build_voice_path(here)
+    if path is None:
+        return ("activate one through the `voice-setup` skill, which is where "
+                "`build_voice.py` lives")
+    try:
+        shown = os.path.relpath(path, os.getcwd())
+    except (ValueError, OSError):
+        shown = path
+    if shown.startswith(".."):
+        shown = path
+    return "run `python3 %s --check <name> --activate` once" % shown
+
+
 def _first_line(path):
     """The first non-comment line of a one-line control file, or "" if it is empty."""
     try:
@@ -561,12 +621,11 @@ def resolve(target_path=None, voices_dir=None):
     if others:
         return None, None, (
             "%s and %d profile%s installed (%s), none of them chosen. Nothing "
-            "is enforced until one is: run `python3 skills/voice-setup/scripts/"
-            "build_voice.py --activate <name>` once, drop a `.rabbit-voice` "
+            "is enforced until one is: %s, drop a `.rabbit-voice` "
             "holding the name in your repository, or pass --voice-rules <path>. "
             "The profiles that ship with this plugin are examples, not yours."
             % (why, len(others), " is" if len(others) == 1 else "s are",
-               ", ".join(others)))
+               ", ".join(others), build_voice_command()))
     return None, None, ("%s and no profile is installed, prose checked against "
                         "craft rules only" % why)
 

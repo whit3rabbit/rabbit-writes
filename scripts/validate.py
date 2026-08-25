@@ -11,6 +11,7 @@ import importlib.util
 import json
 import os
 import re
+import shlex
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -215,8 +216,9 @@ def check_voices():
     # backs, and `--voice auto` reports it as a note nobody reads under a hook.
     active_path = os.path.join(VOICES, "ACTIVE")
     if not os.path.exists(active_path):
-        fail("voices/ACTIVE is missing; build_voice.py --activate writes it and "
-             "resolve() reads it, so the file itself should exist even empty")
+        fail("voices/ACTIVE is missing; build_voice.py --check <name> --activate "
+             "writes it and resolve() reads it, so the file itself should exist "
+             "even empty")
     else:
         with open(active_path, encoding="utf-8") as fh:
             active = fh.read().strip()
@@ -1369,6 +1371,7 @@ def check_cli_error_handling():
         os.path.join(SKILLS, "voice-setup", "scripts", "learn_edits.py"),
         os.path.join(SKILLS, "voice-setup", "scripts", "measure_voice.py"),
         os.path.join(SKILLS, "voice-setup", "scripts", "audit_voice.py"),
+        os.path.join(SKILLS, "voice-setup", "scripts", "install_host.py"),
         os.path.join(SKILLS, "rabbit-reads", "scripts", "extract_text.py"),
         os.path.join(SKILLS, "rabbit-reads", "scripts", "map_structure.py"),
         os.path.join(SKILLS, "rabbit-reads", "scripts", "check_notes.py"),
@@ -1453,7 +1456,11 @@ def check_packaging_metadata():
     else:
         with open(security_path, encoding="utf-8") as fh:
             security = fh.read()
-        for phrase in ("MIT-0", "RABBIT_MODEL_BASE_URL"):
+        # install_host.py is the one thing here that writes outside the
+        # bundle, so a clawhub scan will flag it and this file is what answers.
+        # Pinned by name: dropping the section is the drift that turns a
+        # documented write into an undeclared one.
+        for phrase in ("MIT-0", "RABBIT_MODEL_BASE_URL", "install_host.py"):
             if phrase not in security:
                 fail("scripts/packaging/SECURITY_CLAWHUB.md does not name %s"
                      % phrase)
@@ -1662,6 +1669,174 @@ def check_layout_files():
     notes.append("layouts: %d file(s) shaping rabbit-reads output" % len(names))
 
 
+# Every hook event Claude Code defines. Pinned as a literal for the same reason
+# SCHEMA_URLS is: nothing at build time reads it back, and a typo in an event
+# name is a hook the host silently never fires. Not the full list the docs
+# carry, only the ones a hook here could plausibly want.
+HOOK_EVENTS = {
+    "SessionStart", "SessionEnd", "Setup", "UserPromptSubmit",
+    "UserPromptExpansion", "Stop", "StopFailure", "PreToolUse", "PostToolUse",
+    "PostToolUseFailure", "PostToolBatch", "PermissionRequest",
+    "PermissionDenied", "Notification", "PreCompact", "PostCompact",
+    "SubagentStart", "SubagentStop",
+}
+
+PLUGIN_ROOT_VAR = "${CLAUDE_PLUGIN_ROOT}"
+
+
+def check_output_styles():
+    """The styles shipped at the plugin root, against what the host reads.
+
+    Two failures worth catching and neither shows up until somebody has been
+    running with a wrong style for a week.
+
+    `keep-coding-instructions` defaults to **false** in the host, which drops
+    Claude Code's own software-engineering instructions from the system prompt.
+    A prose style is enabled in coding repositories, so a style shipped without
+    the key turns every coding session into a writing session and the symptom
+    arrives three turns later as work that was scoped strangely.
+
+    `force-for-plugin` applies a style automatically whenever the plugin is
+    enabled and overrides whatever the user picked. This plugin is enabled all
+    the time and prose is written some of the time, so it is refused outright
+    rather than left to a reviewer to notice.
+
+    The frontmatter vocabulary comes from `rwlib/outputstyle.py`, which writes
+    the generated styles, so the shipped file and the generated one cannot
+    disagree about which keys exist.
+    """
+    styles_dir = os.path.join(ROOT, "output-styles")
+    if not os.path.isdir(styles_dir):
+        fail("output-styles/ is missing. The plugin ships its baseline output "
+             "style there and Claude Code discovers the directory by name")
+        return
+    from rwlib import outputstyle as outputstyle_mod
+
+    names = sorted(n for n in os.listdir(styles_dir) if n.endswith(".md"))
+    if not names:
+        fail("output-styles/ holds no .md file")
+        return
+    for name in names:
+        rel = os.path.join("output-styles", name)
+        text = read("output-styles", name)
+        m = re.match(r"^---\n(.*?)\n---\n", text, re.S)
+        if not m:
+            fail("%s has no frontmatter block. An output style is frontmatter "
+                 "then the instructions to add to the system prompt" % rel)
+            continue
+        keys = {}
+        for line in m.group(1).splitlines():
+            km = re.match(r"^([A-Za-z][A-Za-z0-9-]*):\s*(.*)$", line)
+            if km:
+                keys[km.group(1)] = km.group(2).strip()
+        for key in sorted(set(keys) - set(outputstyle_mod.FRONTMATTER_KEYS)):
+            fail("%s sets frontmatter key %r, which Claude Code does not read. "
+                 "Known: %s" % (rel, key,
+                                ", ".join(outputstyle_mod.FRONTMATTER_KEYS)))
+        if keys.get("keep-coding-instructions") != "true":
+            fail("%s does not set `keep-coding-instructions: true`. It defaults "
+                 "to false, which drops Claude Code's software-engineering "
+                 "instructions from the system prompt for everybody who picks "
+                 "this style in a coding repository" % rel)
+        if "force-for-plugin" in keys:
+            fail("%s sets force-for-plugin. That overrides the user's own "
+                 "outputStyle whenever this plugin is enabled, and this plugin "
+                 "is enabled far more often than prose is written. Opting in "
+                 "through /config is the intended cost" % rel)
+        if not text[m.end():].strip():
+            fail("%s has frontmatter and no body" % rel)
+    notes.append("output styles: %d shipped at the plugin root" % len(names))
+
+
+def check_plugin_hooks():
+    """hooks/hooks.json, and whether the runner it names is actually there.
+
+    Claude Code auto-discovers this file when the plugin is enabled, so nothing
+    declares it and nothing else validates it. A misspelled event name is a
+    hook that never fires, and a command naming a path that does not exist is a
+    hook the host reports as failing on every single event, which is the
+    louder of the two and still not caught anywhere else.
+
+    The events and matchers here are checked against
+    `install_host.py`'s `HOOK_SPECS`, because the plugin install and the
+    loose-skill install are the same feature reaching two install paths, and a
+    user moving between them should not get different behaviour.
+    """
+    path = os.path.join(ROOT, "hooks", "hooks.json")
+    if not os.path.exists(path):
+        fail("hooks/hooks.json is missing. Claude Code discovers a plugin's "
+             "hooks from that path by name")
+        return
+    try:
+        data = json.loads(read("hooks", "hooks.json"))
+    except ValueError as exc:
+        fail("hooks/hooks.json is not valid JSON: %s" % exc)
+        return
+    hooks = data.get("hooks")
+    if not isinstance(hooks, dict) or not hooks:
+        fail("hooks/hooks.json has no `hooks` object")
+        return
+
+    shipped = set()
+    count = 0
+    for event, groups in sorted(hooks.items()):
+        if event not in HOOK_EVENTS:
+            fail("hooks/hooks.json names event %r, which is not a Claude Code "
+                 "hook event. A misspelled event is a hook that never fires"
+                 % event)
+        if not isinstance(groups, list):
+            fail("hooks/hooks.json: %s does not hold a list" % event)
+            continue
+        for group in groups:
+            for hook in (group.get("hooks") or []):
+                count += 1
+                command = hook.get("command", "")
+                if PLUGIN_ROOT_VAR not in command:
+                    fail("hooks/hooks.json: the %s command does not use %s, so "
+                         "it cannot resolve from the consuming repository, "
+                         "which is where a hook runs"
+                         % (event, PLUGIN_ROOT_VAR))
+                    continue
+                try:
+                    target = shlex.split(command)[-1]
+                except ValueError as exc:
+                    fail("hooks/hooks.json: the %s command %r does not parse "
+                         "as a shell command: %s" % (event, command, exc))
+                    continue
+                target = target.replace(PLUGIN_ROOT_VAR, ROOT)
+                if not os.path.isfile(target):
+                    fail("hooks/hooks.json: the %s command names %s, which does "
+                         "not exist" % (event, target))
+                shipped.add((event, group.get("matcher"), hook.get("timeout")))
+
+    # The other half of the same fact.
+    try:
+        spec = importlib.util.spec_from_file_location(
+            "rw_install_host",
+            os.path.join(VOICE_SETUP_SCRIPTS, "install_host.py"))
+        install_host = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(install_host)
+    except (Exception, SystemExit) as exc:
+        fail("could not load skills/voice-setup/scripts/install_host.py: %s"
+             % exc)
+        return
+    declared = {(s["event"], s["matcher"], s["timeout"])
+                for s in install_host.HOOK_SPECS}
+    for entry in sorted(declared - shipped, key=lambda e: (e[0], str(e[1]))):
+        fail("install_host.py installs a %s hook (matcher %r, timeout %r) "
+             "that hooks/hooks.json does not ship, so the plugin install and "
+             "the loose-skill install would behave differently" % entry)
+    for entry in sorted(shipped - declared, key=lambda e: (e[0], str(e[1]))):
+        fail("hooks/hooks.json ships a %s hook (matcher %r, timeout %r) that "
+             "install_host.py does not install, so the plugin install and the "
+             "loose-skill install would behave differently" % entry)
+    if not os.path.isfile(install_host.HOOK_RUNNER):
+        fail("install_host.py resolves its hook runner to %s, which does not "
+             "exist" % install_host.HOOK_RUNNER)
+    notes.append("plugin hooks: %d command(s) over %d event(s)"
+                 % (count, len(hooks)))
+
+
 # Guarded so the module can be imported without running the repository sweep.
 # A check that never fires is worth nothing, and until this guard existed the
 # only way to find out whether one fires was to break the repository on purpose
@@ -1694,6 +1869,8 @@ CHECKS = (
     check_cross_references,
     check_cli_error_handling,
     check_packaging_metadata,
+    check_output_styles,
+    check_plugin_hooks,
 )
 
 def main():
