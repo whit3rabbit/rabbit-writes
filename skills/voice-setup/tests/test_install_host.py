@@ -87,11 +87,17 @@ class home(object):
             return json.load(fh)
 
     def files(self):
+        """Relative paths under `.claude`, always forward-slashed.
+
+        `os.path.relpath` returns backslash-joined paths on Windows, and the
+        callers here compare against forward-slash literals like
+        "output-styles/rabbit-writes.md".
+        """
         out = []
         for root, _dirs, names in os.walk(self.claude):
             for name in names:
-                out.append(os.path.relpath(os.path.join(root, name),
-                                           self.claude))
+                rel = os.path.relpath(os.path.join(root, name), self.claude)
+                out.append(rel.replace(os.sep, "/"))
         return sorted(out)
 
     def run(self, *args):
