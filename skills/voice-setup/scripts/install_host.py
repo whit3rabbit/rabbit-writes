@@ -127,10 +127,23 @@ EXAMPLES = [
 # Where things live
 
 
+def _home_dir():
+    """The user's home directory, honoring `$HOME` even on Windows.
+
+    `os.path.expanduser("~")` on Windows prefers `USERPROFILE`, then falls
+    back to `HOMEDRIVE`+`HOMEPATH`, and only reaches `HOME` if neither of
+    those is set. A CI runner has `HOMEDRIVE`/`HOMEPATH` set for the real
+    account, so `tests/test_install_host.py` popping just `USERPROFILE` and
+    setting `HOME` to a throwaway directory was silently landing every write
+    in the real `~/.claude` on Windows instead.
+    """
+    return os.environ.get("HOME") or os.path.expanduser("~")
+
+
 def scope_root(scope):
     if scope == "project":
         return os.path.join(os.getcwd(), ".claude")
-    return os.path.join(os.path.expanduser("~"), ".claude")
+    return os.path.join(_home_dir(), ".claude")
 
 
 def hook_command():
