@@ -3,7 +3,7 @@ name: rabbit-readme-improver
 description: Draft a new README.md, or audit and improve an existing one, using patterns measured from 100 real, currently-trending GitHub repos rather than generic advice, and written in the user's own saved voice rather than a generated open-source register. Use when the user asks to write a README, create a project README, improve or clean up their README, review a README against best practices, add badges or a table of contents, restructure a README's sections, make a README look more professional, or make one sound like they wrote it. Covers new-project READMEs and edits to existing files.
 license: MIT
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # README writing

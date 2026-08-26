@@ -3,7 +3,7 @@ name: rabbit-claude-md
 description: Audit, tighten, and restructure CLAUDE.md and AGENTS.md memory files so the root file stays a short "where am I" plus rules instead of a changelog. Use when the user asks to audit, improve, clean up, shrink, or split a CLAUDE.md or AGENTS.md, says their memory file is too long, stale, or being ignored, wants gotchas moved to docs or per-module memory files, or mentions CLAUDE.md / AGENTS.md maintenance or project memory. Reports named failure modes with evidence and a per-item disposition plan before touching anything, and holds the prose to the active voice profile.
 license: MIT
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # CLAUDE.md and AGENTS.md improvement
