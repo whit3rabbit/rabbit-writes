@@ -18,7 +18,7 @@ The profile wins every conflict. The guardrails below are the one exception, and
 
 A rewrite that clears every flag and reads sterile has failed. So has one that scrubs a real writer's habits into house style.
 
-**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` below means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `rabbit-readme-improver`, `rabbit-reads`, `rabbit-rewrites`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
+**Paths.** `${CLAUDE_PLUGIN_ROOT}/skills/` below means the directory holding this skill and its siblings (`rabbit-writes`, `voice-setup`, `rabbit-readme-improver`, `rabbit-reads`, `rabbit-rewrites`, `rabbit-claude-md`). Claude Code expands the variable. On a host that doesn't, such as Codex, resolve it that way by hand.
 
 ## The override
 

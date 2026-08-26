@@ -9,7 +9,7 @@ Write and edit in **your** voice, not a chatbot's.
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![CI](https://github.com/whit3rabbit/rabbit-writes/actions/workflows/ci.yml/badge.svg)](https://github.com/whit3rabbit/rabbit-writes/actions/workflows/ci.yml)
 
-[Install](#install) • [Run it](#run-it) • [Voice Setup](#first-thing-to-do-make-it-sound-like-you) • [What's in it](#whats-in-it) • [Three Bands](#three-bands-never-conflated) • [What It Will Not Do](#what-it-will-not-do) • [Verify Rewrite](#verify-a-rewrite) • [README Skill](#write-a-readme-with-it) • [Reading Notes](#distill-reading-notes-with-it) • [Tests](#tests) • [Where This Came From](#where-this-came-from) • [Contributing](#contributing-a-voice) • [License](#license)
+[Install](#install) • [Run it](#run-it) • [Voice Setup](#first-thing-to-do-make-it-sound-like-you) • [What's in it](#whats-in-it) • [Three Bands](#three-bands-never-conflated) • [What It Will Not Do](#what-it-will-not-do) • [Verify Rewrite](#verify-a-rewrite) • [README Skill](#write-a-readme-with-it) • [Reading Notes](#distill-reading-notes-with-it) • [Memory Files](#audit-claudemd-and-agentsmd-with-it) • [Tests](#tests) • [Where This Came From](#where-this-came-from) • [Contributing](#contributing-a-voice) • [License](#license)
 
 </div>
 
@@ -26,6 +26,7 @@ The voice is data. Swap it, edit it, blend two of them, or write your own from a
 - **rabbit-readme-improver**: drafts or audits a README against patterns measured from 100 trending GitHub repos.
 - **rabbit-rewrites**: applies the flagged fixes through a small local model, so the document never leaves the machine.
 - **rabbit-reads**: distills a book, paper, or thesis into per-concept cheatsheets.
+- **rabbit-claude-md**: audits and restructures CLAUDE.md and AGENTS.md files, named failure modes and a disposition plan instead of grades, with moved depth going to `.claude/docs/`.
 - **voice-setup**: builds, measures, edits, blends, or switches voice profiles.
 
 
@@ -47,7 +48,7 @@ codex plugin marketplace add whit3rabbit/rabbit-writes
 codex plugin add rabbit-writes@rabbit-writes
 ```
 
-In Claude Code, `/reload-plugins` applies the install without a restart. In Codex, restart. Then confirm the five skills loaded: `claude plugin list | grep rabbit-writes`, or `/skills` in Codex.
+In Claude Code, `/reload-plugins` applies the install without a restart. In Codex, restart. Then confirm the six skills loaded: `claude plugin list | grep rabbit-writes`, or `/skills` in Codex.
 
 Python 3.9+ with the standard library, and only if you want the scripts. Nothing to build.
 
@@ -126,7 +127,7 @@ git clone https://github.com/whit3rabbit/rabbit-writes
 ln -s "$PWD/rabbit-writes" ~/.claude/skills/rabbit-writes
 ```
 
-The `.claude-plugin/` manifests come along with it, so that loads as `rabbit-writes@skills-dir` rather than as five loose skills, and `${CLAUDE_PLUGIN_ROOT}` still resolves. It picks up edits without a reinstall. Don't run both installs at once: two copies of the same five skills means every request matches twice.
+The `.claude-plugin/` manifests come along with it, so that loads as `rabbit-writes@skills-dir` rather than as six loose skills, and `${CLAUDE_PLUGIN_ROOT}` still resolves. It picks up edits without a reinstall. Don't run both installs at once: two copies of the same six skills means every request matches twice.
 
 </details>
 
@@ -139,12 +140,12 @@ Codex scans `~/.agents/skills/` for user-level skills and `.agents/skills/` at a
 git clone https://github.com/whit3rabbit/rabbit-writes
 cd rabbit-writes
 mkdir -p ~/.agents/skills
-for s in rabbit-writes voice-setup rabbit-readme-improver rabbit-reads rabbit-rewrites; do
+for s in rabbit-writes voice-setup rabbit-readme-improver rabbit-reads rabbit-rewrites rabbit-claude-md; do
   ln -s "$PWD/skills/$s" ~/.agents/skills/$s
 done
 ```
 
-Symlink all five. They call each other: `rabbit-readme-improver` runs the `rabbit-writes` scanner against the active voice, and both read the profiles under `rabbit-writes/voices/`. `scripts/readme_check.py` resolves its siblings by walking up from its own path, so that layout works.
+Symlink all six. They call each other: `rabbit-readme-improver` runs the `rabbit-writes` scanner against the active voice, and both read the profiles under `rabbit-writes/voices/`. `scripts/readme_check.py` resolves its siblings by walking up from its own path, so that layout works.
 
 What you lose is `docs/`, which sits at the repo root outside every skill folder. The study behind `rabbit-readme-improver` is then only in the clone. Nothing breaks, `references/patterns.md` carries the same numbers.
 
@@ -153,17 +154,17 @@ What you lose is `docs/`, which sits at the repo root outside every skill folder
 <details>
 <summary><b>claude.ai, as standalone skill uploads</b></summary>
 
-The custom-skill upload on claude.ai takes one skill per zip, so the plugin also packages as five isolated archives:
+The custom-skill upload on claude.ai takes one skill per zip, so the plugin also packages as six isolated archives:
 
 ```bash
 python3 scripts/package_skills.py
 ```
 
-That writes `dist/rabbit-writes.zip`, `dist/voice-setup.zip`, `dist/rabbit-readme-improver.zip`, `dist/rabbit-reads.zip`, and `dist/rabbit-rewrites.zip`. Upload the ones you want.
+That writes `dist/rabbit-writes.zip`, `dist/voice-setup.zip`, `dist/rabbit-readme-improver.zip`, `dist/rabbit-reads.zip`, `dist/rabbit-rewrites.zip`, and `dist/rabbit-claude-md.zip`. Upload the ones you want.
 
-Each stands alone: the four satellite skills carry their own copy of the engine (`scan.py`, `verify.py`, `rwlib/`, its data files), their own `voices/` snapshot, and a `SKILL.md` rewritten at package time so every path resolves inside the archive rather than through `${CLAUDE_PLUGIN_ROOT}`.
+Each stands alone: the five satellite skills carry their own copy of the engine (`scan.py`, `verify.py`, `rwlib/`, its data files), their own `voices/` snapshot, and a `SKILL.md` rewritten at package time so every path resolves inside the archive rather than through `${CLAUDE_PLUGIN_ROOT}`.
 
-The isolation is the tradeoff. Two uploaded skills cannot share voices: each carries its own `voices/` copy, and a profile built inside one never reaches another. The plugin install above is the integrated path, one engine and one voices directory for all five skills.
+The isolation is the tradeoff. Two uploaded skills cannot share voices: each carries its own `voices/` copy, and a profile built inside one never reaches another. The plugin install above is the integrated path, one engine and one voices directory for all six skills.
 
 `python3 scripts/test_package_skills.py` extracts each archive outside the repo and runs what it ships, which is what keeps the standalone claim true.
 
@@ -178,7 +179,7 @@ The same packager emits one folder per skill for the hosts that install folders 
 python3 scripts/package_skills.py --target clawhub
 ```
 
-That writes `dist/clawhub/<skill>/` for each of the five. Copy a folder into your OpenClaw workspace skills directory and restart the gateway, or into `~/.hermes/skills/` for Hermes. Each folder stands alone the way the zips do.
+That writes `dist/clawhub/<skill>/` for each of the six. Copy a folder into your OpenClaw workspace skills directory and restart the gateway, or into `~/.hermes/skills/` for Hermes. Each folder stands alone the way the zips do.
 
 Publishing to ClawHub goes through a wrapper that rebuilds every folder through its gate first and prints what it will run:
 
@@ -202,9 +203,10 @@ set up my writing voice from these 3 posts     # -> voice-setup, sample mode
 my README is a mess, fix the section order     # -> rabbit-readme-improver, audit mode
 turn this PDF into a concept doc set           # -> rabbit-reads, distill mode
 clean this up with my local llama.cpp server   # -> rabbit-rewrites, model mode
+audit my CLAUDE.md and trim the changelog      # -> rabbit-claude-md, audit mode
 ```
 
-The explicit forms are there for when you want to force one. The `rabbit-writes:` prefix is the plugin namespace and comes from the install. In Codex the same five are `$rabbit-writes`, `$voice-setup`, `$rabbit-readme-improver`, `$rabbit-reads`, and `$rabbit-rewrites`.
+The explicit forms are there for when you want to force one. The `rabbit-writes:` prefix is the plugin namespace and comes from the install. In Codex the same six are `$rabbit-writes`, `$voice-setup`, `$rabbit-readme-improver`, `$rabbit-reads`, `$rabbit-rewrites`, and `$rabbit-claude-md`.
 
 ```
 /rabbit-writes:rabbit-writes    # draft, convert, de-slop, or audit prose. five modes, one skill
@@ -212,6 +214,7 @@ The explicit forms are there for when you want to force one. The `rabbit-writes:
 /rabbit-writes:rabbit-readme-improver   # draft or audit a README against the 100-repo study
 /rabbit-writes:rabbit-reads     # distill a book, paper, or thesis into per-concept cheatsheets
 /rabbit-writes:rabbit-rewrites  # de-slop through a small local model, gated by the engine's own checks
+/rabbit-writes:rabbit-claude-md # audit or restructure CLAUDE.md and AGENTS.md files, findings and dispositions, no grades
 ```
 
 The scripts run from a shell, not from a skill. Stdlib only, Python 3.9+:
@@ -431,7 +434,7 @@ You can switch between installed profiles (`whit3rabbit`, `satoshi`, or your own
 
 ## What's in it
 
-Five skills.
+Six skills.
 
 **`rabbit-writes`**: the writing skill, and the engine it runs on. Five modes, listed above.
 
@@ -466,6 +469,12 @@ A tell sits in a sentence, so one request carries just that sentence plus the ru
 Every reply is gated: it has to survive `verify.py`, lose the phrase it was sent to remove, and lower the total finding count, or it is retried with the reason attached and then abandoned with the original left in place.
 
 A document carrying a concealed instruction is refused before the first request, since a rewriter is exactly what that text is addressed to. `bench.py` scores any endpoint against a fixed twelve-passage battery through the same gate, so "which model is good enough" is a number rather than an opinion.
+
+**`rabbit-claude-md`**: audits and restructures the CLAUDE.md and AGENTS.md memory files agent harnesses load into every session. No grades. The report names failure modes with evidence: changelog drift, wrong altitude, derivable-from-code, bullet bloat, emphasis inflation, dead commands, duplicate homes. Every line then gets one of six dispositions, from keep through move-to-docs to delete.
+
+`claude_check.py` does the mechanical half. It measures sizes, bullet and emphasis budgets, fenced commands pointing at missing paths, unresolved `@path` imports, and duplicate lines across files. The judgment half (would deleting this line cause Claude to make mistakes?) stays with the skill. Prose goes through the same engine as everything else, at register `docs`, under the active voice.
+
+Nothing is edited before the report, and nothing moves without approval. Deep context goes to `.claude/docs/` with a link back, keeping the repo's own `docs/` for its users. Module facts go to a CLAUDE.md inside that module. The root file stays what it should have been: a map plus rules.
 
 ```
 rabbit-writes/
@@ -517,6 +526,12 @@ rabbit-writes/
       SKILL.md
       scripts/              bench.py, scores an endpoint against battery.json
       tests/                the battery's own guards, and the bench math
+    rabbit-claude-md/
+      SKILL.md
+      CLAUDE.md
+      references/           criteria.md, templates.md, restructure.md
+      scripts/              _bootstrap.py, claude_check.py
+      tests/                structure checks, discovery, thresholds, engine merge
 ```
 
 ## Three bands, never conflated
@@ -629,6 +644,26 @@ Each concept doc follows a structured template tailored to the book type (`non-f
 
 Intermediates are normalized to plain text under a gitignored `scratch/` directory, subagents generate the docs in parallel, and notes strictly paraphrase the source without verbatim copying.
 
+## Audit CLAUDE.md and AGENTS.md with it
+
+`rabbit-claude-md` audits and tightens the memory files AI agent harnesses (Claude Code, OpenAI Codex) load into every session. It replaces subjective scores with named failure modes and a six-way disposition plan.
+
+```
+/rabbit-writes:rabbit-claude-md        # or just: "audit my CLAUDE.md", "shrink AGENTS.md"
+```
+
+Three modes, picked from what you ask for:
+
+| Mode | Trigger | Delivers |
+|---|---|---|
+| **audit** | "audit my CLAUDE.md", "check AGENTS.md", "is this any good" | named findings with evidence and a per-item disposition table (keep, tighten, merge, move-to-docs, move-to-module, delete), no edits |
+| **improve** | "fix it", "tighten it", "update it" | the audit report, then targeted diffs applied after approval |
+| **restructure** | oversized or mixed-altitude file, "split this up" | the audit report, then a move plan (depth to `.claude/docs/`, module facts to subdirectories) applied after approval |
+
+The structural rule: **a memory file is a map plus rules, not a changelog or a codebase summary.** Every line must pass the removal test: would deleting it cause the agent to make mistakes?
+
+`claude_check.py` handles the mechanical checks (line counts, oversized bullets, emphasis budgets, dead fenced commands, missing file targets, unresolved `@path` imports, duplicate lines across files), while the skill performs the judgment pass on altitude, derivability, and currency. Deep context moves to `.claude/docs/` with link-backs, preserving the project's own `docs/` for human users.
+
 ## Tests
 
 ```bash
@@ -637,6 +672,7 @@ python3 skills/rabbit-writes/tests/run.py          # engine, voice, verifier, fi
 python3 skills/rabbit-readme-improver/tests/run.py         # structure, links, voice, 100-repo regression
 python3 skills/rabbit-reads/tests/run.py           # extraction, structure mapping, notes battery
 python3 skills/rabbit-rewrites/tests/run.py        # the model battery, and the bench that scores against it
+python3 skills/rabbit-claude-md/tests/run.py       # CLAUDE.md and AGENTS.md structure checks, discovery, engine merge
 ```
 
 `run.py` needs nothing installed, which is the same promise the scripts make. `pytest` collects the same files if you have it, and `run.py -k <substring>` selects by name.

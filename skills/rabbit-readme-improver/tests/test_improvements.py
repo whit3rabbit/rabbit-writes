@@ -12,7 +12,7 @@ import os
 import shutil
 import tempfile
 
-from helpers import Repo, check_module, ids, run, written
+from helpers import Repo, check_module, ids, run, sample, written
 
 
 def repo_root():
@@ -363,3 +363,11 @@ def test_vague_link_text_strips_punctuation():
     finally:
         shutil.rmtree(scratch, ignore_errors=True)
 
+
+
+def test_no_ste_runs_and_silences_the_readability_caps():
+    """--no-ste crashed for a release: scan.scan's ste= tri-state raises on
+    the None the flag used to pass, and nothing ran the flag. The half worth
+    pinning is that the run completes and no ste- id survives."""
+    result = run(sample("good-readme.md"), "--no-voice", "--no-ste")
+    assert not any(i.startswith("ste-") for i in ids(result)), ids(result)

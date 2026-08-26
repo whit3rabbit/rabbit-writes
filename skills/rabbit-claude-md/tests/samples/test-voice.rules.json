@@ -1,0 +1,26 @@
+{
+  "voice": "test-voice",
+  "description": "Fixture only. Enforcement is tested against this rather than against a shipped profile, so the suite stays true whoever the plugin ships or whoever is active.",
+  "default_priority": "P0",
+  "mechanics": {
+    "em_dash": "forbid",
+    "semicolon": "forbid",
+    "emoji": "forbid",
+    "max_paragraph_sentences": 5
+  },
+  "banned_words": ["furthermore"],
+  "banned_phrases": ["at the end of the day"],
+  "required_when": [
+    {
+      "id": "missing-closer",
+      "label": "Missing closer",
+      "applies_to_registers": ["chat", "blog"],
+      "any_of_rx": ["(?im)^\\s*thanks,"],
+      "priority": "P2",
+      "note": "Gated to correspondence registers. A README at register docs must never trip this."
+    }
+  ],
+  "preferred_substitutions": {
+    "furthermore": "also"
+  }
+}

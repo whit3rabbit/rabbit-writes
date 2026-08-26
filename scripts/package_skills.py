@@ -52,7 +52,7 @@ DIST_DIR = os.path.join(ROOT, "dist")
 MAX_FILES = 200
 
 SKILL_NAMES = ["rabbit-writes", "voice-setup", "rabbit-readme-improver",
-               "rabbit-reads", "rabbit-rewrites"]
+               "rabbit-reads", "rabbit-rewrites", "rabbit-claude-md"]
 
 PLUGIN_VAR = "${CLAUDE_PLUGIN_ROOT}"
 
@@ -103,6 +103,10 @@ EXTRA_VENDOR = {
     ],
     "voice-setup": [
         (os.path.join("references", "voice.md"), os.path.join("references", "voice.md")),
+    ],
+    "rabbit-claude-md": [
+        (os.path.join("references", "craft.md"), os.path.join("references", "craft.md")),
+        (os.path.join("references", "ste.md"), os.path.join("references", "ste.md")),
     ],
 }
 
@@ -211,7 +215,8 @@ IGNORE_FILES = {
 # wording difference ("below means" in rabbit-writes, "means" elsewhere).
 _PATHS_OLD_TAIL = (
     "the directory holding this skill and its siblings (`rabbit-writes`, "
-    "`voice-setup`, `rabbit-readme-improver`, `rabbit-reads`, `rabbit-rewrites`). "
+    "`voice-setup`, `rabbit-readme-improver`, `rabbit-reads`, `rabbit-rewrites`, "
+    "`rabbit-claude-md`). "
     "Claude Code expands "
     "the variable. On a host that doesn't, such as Codex, resolve it that "
     "way by hand."
@@ -354,6 +359,14 @@ SUBSTITUTIONS = {
         ],
     },
     "rabbit-rewrites": {
+        "SKILL.md": [
+            (
+                "**Paths.** `" + PLUGIN_VAR + "/skills/` means " + _PATHS_OLD_TAIL,
+                "%(paths)s",
+            ),
+        ],
+    },
+    "rabbit-claude-md": {
         "SKILL.md": [
             (
                 "**Paths.** `" + PLUGIN_VAR + "/skills/` means " + _PATHS_OLD_TAIL,

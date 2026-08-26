@@ -10,7 +10,7 @@
     {
       "name": "rabbit-writes",
       "source": "./",
-      "description": "Write and edit in your own voice, not a chatbot's. Ships five skills: rabbit-writes (draft, convert, de-slop, or audit prose in the active voice, five modes over a shared detection and craft engine), voice-setup (build or swap a voice profile), rabbit-readme-improver (draft or audit a README.md against patterns measured from 100 real GitHub repos), rabbit-reads (distill a book, paper, or thesis into per-concept cheatsheets with structure mapping and subagent fan-out), and rabbit-rewrites (drive a small local model through the engine's own gate, one finding at a time).",
+      "description": "Write and edit in your own voice, not a chatbot's. Ships six skills: rabbit-writes (draft, convert, de-slop, or audit prose in the active voice, five modes over a shared detection and craft engine), voice-setup (build or swap a voice profile), rabbit-readme-improver (draft or audit a README.md against patterns measured from 100 real GitHub repos), rabbit-reads (distill a book, paper, or thesis into per-concept cheatsheets with structure mapping and subagent fan-out), rabbit-rewrites (drive a small local model through the engine's own gate, one finding at a time), and rabbit-claude-md (audit and restructure CLAUDE.md and AGENTS.md memory files: named failure modes and a disposition plan instead of grades, with moves to .claude/docs/ and per-module memory files).",
       "category": "productivity",
       "license": "MIT",
       "author": {

@@ -1,6 +1,6 @@
 # rabbit-writes
 
-Claude Code / Codex plugin. Five skills (`rabbit-writes`, `voice-setup`, `rabbit-readme-improver`, `rabbit-reads`, `rabbit-rewrites`) over one prose engine in `skills/rabbit-writes/{references,scripts}`, with `rabbit-reads` verifying the notes it writes through the engine's scanner and `rabbit-rewrites` driving a small local model through the engine's own gate.
+Claude Code / Codex plugin. Six skills (`rabbit-writes`, `voice-setup`, `rabbit-readme-improver`, `rabbit-reads`, `rabbit-rewrites`, `rabbit-claude-md`) over one prose engine in `skills/rabbit-writes/{references,scripts}`, with `rabbit-reads` verifying the notes it writes through the engine's scanner, `rabbit-rewrites` driving a small local model through the engine's own gate, and `rabbit-claude-md` auditing CLAUDE.md and AGENTS.md memory files through the same engine.
 
 ## Verify before shipping
 
@@ -12,6 +12,7 @@ python3 skills/rabbit-readme-improver/tests/run.py           # structure, links,
 python3 skills/voice-setup/tests/run.py              # scaffolding, thesaurus, edit-learning
 python3 skills/rabbit-reads/tests/run.py             # extraction, structure mapping, notes battery
 python3 skills/rabbit-rewrites/tests/run.py          # the model battery, and the bench that scores against it
+python3 skills/rabbit-claude-md/tests/run.py         # CLAUDE.md and AGENTS.md structure checks, discovery, thresholds, engine merge
 python3 scripts/detector-corpus/test_corpus_harness.py   # the corpus harness, network stubbed
 python3 scripts/academic-research/test_academic_harness.py   # the academic corpus pipeline, over synthetic JATS
 python3 scripts/thesaurus-research/test_thesaurus_harness.py   # the thesaurus pipeline, over synthetic datasets

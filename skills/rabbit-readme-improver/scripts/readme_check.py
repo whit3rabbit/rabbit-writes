@@ -968,7 +968,11 @@ def check_readme(raw, readme_path, use_voice=True, voice_rules=None,
                 notes.append("read %s too, the rules file is only the "
                              "regex-checkable subset of it" % profile)
 
-    ste_mode = None if no_ste else "mechanical"
+    # scan.scan's ste= is a tri-state and raises on anything else, None
+    # included, so --no-ste has to say "off" in so many words. It passed None
+    # for a release and nothing ran the flag, which turned --no-ste into a
+    # traceback instead of a quieter report.
+    ste_mode = "off" if no_ste else "mechanical"
     prose_findings, prose_stats, note, rules = run_prose_scan(
         raw, rules_path, required=bool(use_voice and voice_rules), ste=ste_mode)
     if note:

@@ -22,6 +22,7 @@ Usage:
 Exit code: 0 when every check fired as expected, 1 otherwise.
 """
 
+import json
 import os
 import shutil
 import sys
@@ -280,9 +281,15 @@ def test_an_undeclared_endpoint_env_var_is_reported():
 
 
 def test_a_drifted_skill_version_is_reported():
+    # The current version comes from plugin.json rather than a literal: the
+    # pair was hardcoded once, and after the 0.2.0 bump the fixture replaced
+    # a string that no longer existed and the test failed on a clean tree.
+    with open(os.path.join(ROOT, ".claude-plugin", "plugin.json"),
+              encoding="utf-8") as fh:
+        current = json.load(fh)["version"]
     with sandbox() as s:
         s.edit(os.path.join("skills", "voice-setup", "SKILL.md"),
-               'version: "0.1.0"', 'version: "0.2.0"')
+               'version: "%s"' % current, 'version: "0.0.1-drifted"')
         validate.check_packaging_metadata()
         assert s.reported("skills/voice-setup/SKILL.md says version"), \
             "no report: %s" % validate.problems

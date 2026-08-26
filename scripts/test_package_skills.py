@@ -326,6 +326,28 @@ def test_readme_check_runs_and_finds_its_voices_dir():
           json.dumps(payload)[:300])
 
 
+def test_claude_check_runs_standalone_and_flags_a_dead_path():
+    """The rabbit-claude-md zip's checker must resolve its vendored engine and
+    still see the tree around the file: a dead fenced path needs both."""
+    ensure_built()
+    proj = os.path.join(WORK, "claude-project")
+    os.makedirs(os.path.join(proj, ".git"), exist_ok=True)
+    write(os.path.join(proj, "CLAUDE.md"),
+          "# t\n\n```bash\npython3 scripts/gone.py\n```\n")
+    # -B, because this test sorts alphabetically before the zip-vs-folder
+    # comparison and a bytecode cache written into the extracted tree reads
+    # there as files the folder build dropped.
+    r = run(["-B", installed("rabbit-claude-md", "scripts", "claude_check.py"),
+             "CLAUDE.md", "--json", "--no-voice"], cwd=proj)
+    payload = json.loads(r.stdout or "{}")
+    found = [f["id"] for e in payload.get("files", [])
+             for f in e.get("findings", [])]
+    check("claude_check.py runs standalone",
+          r.returncode == 0, (r.stderr or r.stdout)[:300])
+    check("the vendored engine and bootstrap flag a dead fenced path",
+          "claudemd-dead-path" in found, json.dumps(payload)[:300])
+
+
 def test_rabbit_reads_extracts_maps_and_checks_standalone():
     ensure_built()
     book = os.path.join(CWD, "reads-book.txt")

@@ -76,6 +76,19 @@
       ]
     },
     {
+      "root": "skills/rabbit-claude-md/scripts",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
+      ]
+    },
+    {
+      "root": "skills/rabbit-claude-md/tests",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts",
+        "skills/rabbit-claude-md/scripts"
+      ]
+    },
+    {
       "root": "scripts/detector-corpus",
       "extraPaths": [
         "skills/rabbit-writes/scripts"

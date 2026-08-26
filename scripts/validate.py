@@ -183,7 +183,7 @@ def check_skills():
 
         found.append(name)
     for required in ("rabbit-writes", "voice-setup", "rabbit-readme-improver",
-                     "rabbit-reads", "rabbit-rewrites"):
+                     "rabbit-reads", "rabbit-rewrites", "rabbit-claude-md"):
         if required not in found:
             fail("expected skill missing: %s" % required)
     notes.append("skills: %s (no duplicate headings)" % ", ".join(found))
@@ -900,7 +900,8 @@ def check_scripts_compile():
                 "voice-setup/scripts/audit_voice.py",
                 "rabbit-reads/scripts/extract_text.py",
                 "rabbit-reads/scripts/map_structure.py",
-                "rabbit-reads/scripts/check_notes.py"):
+                "rabbit-reads/scripts/check_notes.py",
+                "rabbit-claude-md/scripts/claude_check.py"):
         path = os.path.join(SKILLS, rel)
         if not os.path.exists(path):
             continue
@@ -1376,6 +1377,7 @@ def check_cli_error_handling():
         os.path.join(SKILLS, "rabbit-reads", "scripts", "map_structure.py"),
         os.path.join(SKILLS, "rabbit-reads", "scripts", "check_notes.py"),
         os.path.join(SKILLS, "rabbit-rewrites", "scripts", "bench.py"),
+        os.path.join(SKILLS, "rabbit-claude-md", "scripts", "claude_check.py"),
         os.path.join(ROOT, "scripts", "precommit.py"),
         os.path.join(ROOT, "scripts", "detector-corpus", "add_sample.py"),
         os.path.join(ROOT, "scripts", "detector-corpus", "score.py"),

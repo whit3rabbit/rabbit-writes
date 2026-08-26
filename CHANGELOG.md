@@ -14,7 +14,32 @@ of that layer on by default and gives the registers their tolerances for it.
 The seventh puts a voice in force between invocations, through the two host
 features that reach every turn rather than only the ones somebody asked for.
 The 100-repo corpus regression, the calibration fixtures, and every published
-self-scan number were re-run after all seven.
+self-scan number were re-run after all seven. An eighth pass adds a sixth
+skill, `rabbit-claude-md`, for CLAUDE.md and AGENTS.md memory files without touching the engine.
+
+### rabbit-claude-md: a sixth skill, for CLAUDE.md and AGENTS.md files
+
+- Audits and restructures the memory files AI agent harnesses (Claude Code, OpenAI Codex) load every session.
+  Supports `CLAUDE.md`, `CLAUDE.local.md`, `.claude.md`, and `AGENTS.md`, `AGENTS.override.md`, `.agents.md`.
+  If only `AGENTS.md` is present, offers a recommendation to symlink `CLAUDE.md -> AGENTS.md` for Claude Code.
+  No grades: the report names failure modes with evidence and gives every
+  line one of six dispositions (keep, tighten, merge, move-to-docs,
+  move-to-module, delete), and nothing is edited before the report. Moved
+  depth defaults to `.claude/docs/`, so agent context never litters the
+  repository's own `docs/`.
+- `claude_check.py` carries the mechanical half as `claudemd-*` structure
+  findings: oversize, bullet length, emphasis budget, dead fenced paths,
+  unresolved `@path` imports, duplicate lines across files, and
+  changelog-drift tells. Engine findings merge in at register `docs` under
+  the active voice, with one suppression pass over both halves. No
+  `claudemd-*` id is ever P0, so `--check` blocks only on the safety band.
+- Thresholds live in one place, the script's `LIMITS` dict, pinned by
+  boundary tests built from the constants. There is no CLAUDE.md corpus,
+  and the docstring says so.
+- `readme_check.py --no-ste` crashed: it passed `None` into `scan.scan`'s
+  tri-state `ste=`, which raises on anything but its three strings, and
+  nothing ran the flag. Both checkers now say `"off"`, with a regression
+  test apiece.
 
 ### A voice that holds between invocations
 

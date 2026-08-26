@@ -24,7 +24,7 @@ So the order is: finish `## Unreleased`, publish, then retitle it to
   `publish_clawhub.py` passes as `--version`, and ClawHub requires semver.
 - Every `skills/*/SKILL.md` repeats it under `metadata.version`.
   `check_packaging_metadata` in `scripts/validate.py` fails the build when
-  any of the five disagrees with plugin.json, so a missed edit is a caught
+  any of the six disagrees with plugin.json, so a missed edit is a caught
   error rather than a published mismatch.
 - `CHANGELOG.md` carries the human version heading.
 
@@ -150,7 +150,7 @@ belongs before this step, not after.
 
 1. Finish `## Unreleased` in `CHANGELOG.md`.
 2. Bump `version` in `.claude-plugin/plugin.json` and `metadata.version` in
-   all five `skills/*/SKILL.md` (`validate.py` catches a miss).
+   all six `skills/*/SKILL.md` (`validate.py` catches a miss).
 3. Run the full "Verify before shipping" block in `CLAUDE.md`, plus
    `claude plugin validate .`.
 4. `python3 scripts/publish_clawhub.py --dry-run`, read the printed argv,
