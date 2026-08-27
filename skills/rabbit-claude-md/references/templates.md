@@ -32,9 +32,23 @@ Lives inside the directory it describes and loads when Claude works there. That 
 - `.claude/docs/` for anything deep enough to have a topic name.
 - Cross-package workflow (build order, shared tooling) stays in the root, because no single package owns it.
 
+## Serving two harnesses: CLAUDE.md and AGENTS.md
+
+A repository worked by both Claude Code and an AGENTS.md-reading harness keeps one real file and symlinks the other name to it (`ln -s AGENTS.md CLAUDE.md`, or the reverse). Two real files with the same content drift the day one gets edited, and the duplicate check will say so. The checker states the symlink at the top of its report so a reader knows both names are one file.
+
 ## CLAUDE.local.md and .claude.local.md
 
 Personal and gitignored: machine quirks, private paths, individual preferences. Anything a teammate would need belongs in the checked-in file instead. The audit reads local files when asked, and never proposes moving shared facts into one.
+
+## Where open work lives, and where it does not
+
+A memory file states standing rules, not what is left to do. Goals, roadmaps, and TODOs belong in one of three places, depending on who needs to see them and whether they are shared. `TODO.md` at the repository root holds shared, short-lived work items. The project's existing issue tracker takes over when one is already in use, so open work has one home rather than two. `CLAUDE.local.md` is for personal, machine-specific items only, never for anything a teammate needs to see.
+
+`claude_check.py`'s `claudemd-todo-marker` and `claudemd-session-state` findings are the mechanical tell. Where exactly it goes is a question for the user, not a default the skill picks.
+
+## Where an occasional workflow lives, and where it does not
+
+A multi-step procedure that only comes up sometimes (a release checklist, a migration playbook, a rarely-run diagnostic) does not need to load every session to be useful. It belongs in a `.claude/commands/<name>.md` slash command, a `.claude/agents/<name>.md` subagent, or a plugin skill, whichever the harness already uses, with at most a one-line pointer left in the memory file. `claude_check.py`'s harness-inventory note lists which of these surfaces already exist in the tree, so the workflow lands beside the ones already there rather than starting a second convention.
 
 ## Files that receive moved content
 

@@ -23,19 +23,40 @@ skill, `rabbit-claude-md`, for CLAUDE.md and AGENTS.md memory files without touc
   Supports `CLAUDE.md`, `CLAUDE.local.md`, `.claude.md`, and `AGENTS.md`, `AGENTS.override.md`, `.agents.md`.
   If only `AGENTS.md` is present, offers a recommendation to symlink `CLAUDE.md -> AGENTS.md` for Claude Code.
   No grades: the report names failure modes with evidence and gives every
-  line one of six dispositions (keep, tighten, merge, move-to-docs,
-  move-to-module, delete), and nothing is edited before the report. Moved
-  depth defaults to `.claude/docs/`, so agent context never litters the
-  repository's own `docs/`.
+  line one of eight dispositions (keep, tighten, merge, move-to-docs,
+  move-to-module, move-to-skill, move-to-todo, delete), and nothing is
+  edited before the report. Moved depth defaults to `.claude/docs/`, so
+  agent context never litters the repository's own `docs/`.
 - `claude_check.py` carries the mechanical half as `claudemd-*` structure
-  findings: oversize, bullet length, emphasis budget, dead fenced paths,
-  unresolved `@path` imports, duplicate lines across files, and
-  changelog-drift tells. Engine findings merge in at register `docs` under
-  the active voice, with one suppression pass over both halves. No
-  `claudemd-*` id is ever P0, so `--check` blocks only on the safety band.
+  findings: oversize, by line count and, independently, by raw character
+  count against the ~40,000-character ceiling commonly recommended for a
+  memory file. A missing one-line description under the title. Bullet
+  length and emphasis budget. Dead fenced paths and dead `/slash-command`
+  references. Unresolved `@path` imports, and the effective size an import
+  pulls in beyond what the file's own size band catches. Duplicate lines
+  across files, including a same-directory CLAUDE.md/AGENTS.md pair that
+  should be a symlink instead. Changelog-drift tells. Forward-looking
+  session state (TODO/FIXME/WIP markers, roadmap and in-progress phrasing)
+  and over-verification instructions the model already performs
+  unprompted, both evidence for a move-to-todo or a cut rather than a
+  verdict. For the root memory file only, three more facts land as notes:
+  unmentioned top-level directories, what harness config exists
+  (`.claude/settings.json`, `.mcp.json`, `.claude/commands/`,
+  `.claude/agents/`), and how long ago the file last changed against the
+  repository's own commit activity. `--global` folds `~/.claude/CLAUDE.md`
+  and `~/.codex/AGENTS.md` into the duplicate check, read-only. Engine
+  findings merge in at register `docs` under the active voice, with one
+  suppression pass over both halves. No `claudemd-*` id is ever P0, so
+  `--check` blocks only on the safety band.
 - Thresholds live in one place, the script's `LIMITS` dict, pinned by
   boundary tests built from the constants. There is no CLAUDE.md corpus,
   and the docstring says so.
+- A memory file that is a symlink to its other-harness name (CLAUDE.md to
+  AGENTS.md, or the reverse) is stated at the top of its report, treated as
+  one file, and never counted against the duplicate check. A file linking
+  into a `.claude/docs` that `.gitignore` hides raises
+  `claudemd-docs-ignored`, because those links are dead for anyone cloning
+  the repository.
 - `readme_check.py --no-ste` crashed: it passed `None` into `scan.scan`'s
   tri-state `ste=`, which raises on anything but its three strings, and
   nothing ran the flag. Both checkers now say `"off"`, with a regression

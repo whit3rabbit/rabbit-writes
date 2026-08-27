@@ -3,7 +3,7 @@ name: voice-setup
 description: Build, measure, edit, or switch a personal writing voice profile for the rabbit-writes plugin. Three ways in, from writing samples, from an interview, or from both together, which is the one to recommend. Use when the user wants to teach the system how they write, create their own writing style, set up or replace a voice, capture their tone, analyze documents they wrote to extract a voice, be interviewed about their style, change whose voice is active, blend two voices, or convert their writing samples into a reusable style profile. Also use when a draft "doesn't sound like me" and the saved profile needs correcting.
 license: MIT
 metadata:
-  version: "0.3.0"
+  version: "0.4.0"
 ---
 
 # Voice setup

@@ -80,6 +80,10 @@ node_modules/
 CLAUDE.local.md
 .claude.local.md
 .claude/settings.local.json
+# Worktrees Claude Code creates for isolated agents, machine-local state.
+# .claude itself stays tracked: .claude/docs/ is shared context the root
+# CLAUDE.md links to, and ignoring the directory would hide it from clones.
+.claude/worktrees/
 
 # Labeled-corpus texts. The manifest commits a SHA-256, a source URL, and an
 # archive URL for each sample; the prose itself stays with whoever wrote it.

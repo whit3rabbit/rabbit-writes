@@ -109,3 +109,17 @@ def test_duplicate_requires_two_files_and_min_length():
         assert "pkg/CLAUDE.md" in dups[0]["excerpt"], dups[0]
     finally:
         tree.close()
+
+
+def test_docs_ignored_fires_only_when_gitignore_hides_claude():
+    body = "# t\n\nDeep dive: [packaging](.claude/docs/packaging.md)\n"
+    for ignore, want in (("scratch/\n.claude/\n", 1), ("scratch/\n", 0)):
+        tree = Tree({"CLAUDE.md": body, ".gitignore": ignore,
+                     ".claude/docs/packaging.md": "# packaging\n"})
+        try:
+            result = run(tree.file("CLAUDE.md"), "--no-voice")
+            got = [f for e in result["files"] for f in e["findings"]
+                   if f["id"] == "claudemd-docs-ignored"]
+            assert len(got) == want, (ignore, got)
+        finally:
+            tree.close()

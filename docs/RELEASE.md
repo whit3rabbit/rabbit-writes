@@ -32,6 +32,15 @@ So the order is: finish `## Unreleased`, publish, then retitle it to
 the engine's data rather than the release, and `validate.py` holds them to
 `PROOF.md` on its own schedule. Do not bump them as part of a release.
 
+The bump is also what makes the release reach marketplace installs. Claude
+Code caches an installed plugin by version, under
+`~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/`, and
+`claude plugin update` at an unchanged version keeps that copy as it is.
+The 0.3.0 bump exists because a new skill was pushed, the marketplace clone
+picked it up, and every install stayed on the five-skill 0.2.0 cache until
+the version moved. Nothing lands for users, new skills included, without a
+bump.
+
 ## 3. CI, and what it cannot run
 
 `.github/workflows/ci.yml` runs on every push to `main` and every pull
@@ -49,8 +58,8 @@ Three things a release needs that CI does not run:
   hand before tagging.
 - The packaging battery (`scripts/test_package_skills.py`), the mutation
   tests for the validator itself (`scripts/test_validate_checks.py`), the
-  `rabbit-rewrites` suite, and the `academic-research` harness are hand-run
-  today. The full local battery is the "Verify before shipping" block in
+  `rabbit-rewrites` and `rabbit-claude-md` suites, and the
+  `academic-research` harness are hand-run today. The full local battery is the "Verify before shipping" block in
   `CLAUDE.md`, and a release runs all of it.
 - `scripts/publish_clawhub.py --dry-run`, which exits 1 under `CI` on
   purpose. Publishing is a human act with a logged-in account.
@@ -101,6 +110,11 @@ Commit the changelog retitle (`## Unreleased` becomes
 belongs before this step, not after.
 
 ## Why the packaging is shaped the way it is
+
+The internals behind these bullets, `OPENCLAW_ENV_DESCRIPTIONS`, the
+`SECURITY_CLAWHUB.md` source, and what `check_packaging_metadata` pins,
+live in `.claude/docs/packaging.md`. This section is the release-facing
+reasoning.
 
 - **One member list, two outputs.** `iter_members` in
   `scripts/package_skills.py` yields each bundle's files once, and the zip

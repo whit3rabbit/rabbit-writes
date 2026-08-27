@@ -84,21 +84,43 @@ def test_agents_md_discovery_when_no_claude_md():
         tree.close()
 
 
-def test_claude_md_precedence_in_sweep_and_duplicate_detection():
-    shared = "- The deploy pipeline reads its channel list from the release manifest file."
+def test_both_harnesses_are_swept_and_overlap_is_flagged():
+    # 200+ characters of shared substantial content, so the overlap ratio
+    # clears DUAL_HARNESS_OVERLAP rather than one borrowed sentence.
+    shared_lines = "\n".join(
+        "- Shared standing rule number %d about how this repository works." % i
+        for i in range(6))
     tree = Tree({
-        "CLAUDE.md": "# root\n\n%s\n" % shared,
-        "AGENTS.md": "# agents\n\n%s\n" % shared,
+        "CLAUDE.md": "# root\n\nWhat this is.\n\n%s\n" % shared_lines,
+        "AGENTS.md": "# agents\n\nWhat this is.\n\n%s\n" % shared_lines,
     })
     try:
-        # Sweep prioritizes CLAUDE.md
         result = run(tree.path, "--no-voice")
-        assert len(result["files"]) == 1
-        assert result["files"][0]["file"] == "CLAUDE.md"
-        # Duplicate detection across both memory files still works
-        dups = [f for f in result["files"][0]["findings"]
+        files = sorted(e["file"] for e in result["files"])
+        assert files == ["AGENTS.md", "CLAUDE.md"], (
+            "both harnesses have real content and both must be audited", files)
+
+        by_file = {e["file"]: e for e in result["files"]}
+        dups = [f for f in by_file["CLAUDE.md"]["findings"]
                 if f["id"] == "claudemd-duplicate"]
         assert dups, "CLAUDE.md should find duplicates in AGENTS.md"
+
+        for name in ("CLAUDE.md", "AGENTS.md"):
+            dual = [f for f in by_file[name]["findings"]
+                    if f["id"] == "claudemd-dual-harness"]
+            assert dual, "%s: heavy overlap should suggest a symlink" % name
+    finally:
+        tree.close()
+
+
+def test_symlinked_pair_never_raises_dual_harness():
+    tree = Tree({"AGENTS.md": "# t\n\nWhat this is, in one line.\n"})
+    os.symlink("AGENTS.md", os.path.join(tree.path, "CLAUDE.md"))
+    try:
+        result = run(tree.path, "--no-voice")
+        found = [f for e in result["files"] for f in e["findings"]
+                 if f["id"] == "claudemd-dual-harness"]
+        assert found == [], "a symlinked pair is one file, not two to merge"
     finally:
         tree.close()
 
@@ -122,3 +144,21 @@ def test_single_agents_md_companion_check():
     finally:
         tree2.close()
 
+
+
+def test_symlinked_pair_is_noted_and_not_a_duplicate():
+    shared = ("- The deploy pipeline reads its channel list from the "
+              "release manifest file.")
+    tree = Tree({"AGENTS.md": "# t\n\n%s\n" % shared})
+    os.symlink("AGENTS.md", os.path.join(tree.path, "CLAUDE.md"))
+    try:
+        result = run(tree.file("CLAUDE.md"), "--no-voice")
+        entry = result["files"][0]
+        assert any("symlink to AGENTS.md" in n for n in entry["notes"]), (
+            entry["notes"])
+        dups = [f for f in entry["findings"]
+                if f["id"] == "claudemd-duplicate"]
+        assert dups == [], ("one file with two names is not a duplication",
+                            dups)
+    finally:
+        tree.close()

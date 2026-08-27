@@ -27,6 +27,25 @@ def test_oversize_reports_at_both_bands():
     assert str(p1) in at_p1[0]["excerpt"] or str(p1) in at_p1[0]["label"]
 
 
+def test_char_budget_reports_at_both_bands_independent_of_line_count():
+    mod = check_module()
+    p2, p1 = mod.LIMITS["char_budget_p2"], mod.LIMITS["char_budget_p1"]
+
+    def _chars(n):
+        # One long line: proves the character check fires on its own axis,
+        # not as a side effect of the line-count bands.
+        findings, stats = [], {}
+        mod.check_char_budget("x" * n, findings, stats)
+        assert stats["char_count"] == n
+        return findings
+
+    assert _chars(p2) == []
+    at_p2 = _chars(p2 + 1)
+    assert [f["priority"] for f in at_p2] == ["P2"], at_p2
+    at_p1 = _chars(p1 + 1)
+    assert [f["priority"] for f in at_p1] == ["P1"], at_p1
+
+
 def test_bullet_cap_is_exact():
     mod = check_module()
     cap = mod.LIMITS["bullet_words"]
