@@ -79,7 +79,7 @@ def test_a_fetch_that_matches_writes_the_text():
     directory = tempfile.mkdtemp(prefix="rabbit-corpus-")
     real = fetch_samples.fetch
     try:
-        fetch_samples.fetch = lambda url, field=None: (corpus_io.extract_text(PAGE), None)
+        fetch_samples.fetch = lambda url, field=None, prov=None: (corpus_io.extract_text(PAGE), None)
         row = fetch_samples.process(sample(), False, False, texts_dir=directory)
         check("a matching fetch is recorded as fetched",
               row["action"] == "fetched", str(row))
@@ -100,7 +100,7 @@ def test_a_mismatch_does_not_overwrite_a_good_copy():
         good = os.path.join(directory, "human-0001.txt")
         with open(good, "w", encoding="utf-8") as fh:
             fh.write(corpus_io.extract_text(PAGE))
-        fetch_samples.fetch = lambda url, field=None: ("something else entirely\n", None)
+        fetch_samples.fetch = lambda url, field=None, prov=None: ("something else entirely\n", None)
         row = fetch_samples.process(entry, True, False, texts_dir=directory)
         check("a mismatch is reported as one", row["action"] == "mismatch", str(row))
         with open(good, encoding="utf-8") as fh:
@@ -132,7 +132,7 @@ def test_a_non_http_url_is_refused():
     for bad in ("file:///etc/passwd", "ftp://example.dev/x", "javascript:x"):
         entry = sample()
         entry["provenance"]["archive_url"] = bad
-        url, why = fetch_samples.fetchable(entry)
+        url, why, _prov = fetch_samples.fetchable(entry)
         check("refuses %s" % bad.split(":")[0], url is None and "scheme" in (why or ""),
               str((url, why)))
 
@@ -302,7 +302,7 @@ def test_a_dataset_sample_without_a_revision_is_rejected():
     issues = corpus_io.problems({"samples": [loose]}, ("chat",))
     check("a missing revision is a problem",
           any("revision" in i for i in issues), str(issues))
-    url, why = fetch_samples.fetchable(loose)
+    url, why, _prov = fetch_samples.fetchable(loose)
     check("and it is not fetchable", url is None and "revision" in (why or ""),
           str((url, why)))
 
@@ -366,6 +366,148 @@ def test_a_viewer_response_is_read_as_json_not_as_html():
         _, err2 = fetch_samples.fetch(fetch_samples.DATASETS_SERVER + "?x=1", "nope")
         check("a column that is not there is an error, not a guess",
               err2 is not None and "nope" in err2, str(err2))
+    finally:
+        urllib.request.urlopen = real
+
+
+
+def generated_dataset_sample(**overrides):
+    """The attributed shape: a pinned github-jsonl row whose body carries the
+    model's own signature. `prompt` is absent on purpose, because a scraped
+    pull request never saw one."""
+    entry = {
+        "id": "gen-lb-20260824-r4",
+        "label": "generated",
+        "register": "docs",
+        "words": 300,
+        "sha256": "0" * 64,
+        "provenance": {
+            "dataset": "louisabraham/load-bearing",
+            "revision": "2a233f653fd72b431850b957b2d28c5c4dbdbaa6",
+            "loader": "github-jsonl",
+            "path": "data/days/2026-08-24.jsonl",
+            "split": "2026-08-24",
+            "row": 4,
+            "field": "body",
+            "collected": "2026-08-27",
+            "license": "MIT (author-confirmed, no LICENSE file at pinning time)",
+            "why_credible": "the body carries the literal Claude Code footer",
+            "model": "claude (self-attributed: Claude Code footer in the body)",
+            "generated": "2026-08-24",
+        },
+    }
+    entry.update(overrides)
+    return entry
+
+
+def test_an_attributed_generated_dataset_sample_validates():
+    issues = corpus_io.problems({"samples": [generated_dataset_sample()]},
+                                ("chat", "docs"))
+    check("a footer-attributed row validates as generated",
+          not issues, str(issues))
+    no_footer = generated_dataset_sample()
+    del no_footer["provenance"]["why_credible"]
+    issues = corpus_io.problems({"samples": [no_footer]}, ("chat", "docs"))
+    check("the attribution basis is required, not optional",
+          any("why_credible" in i for i in issues), str(issues))
+
+
+def test_a_prompted_generated_sample_still_requires_the_prompt():
+    prompted = generated_dataset_sample()
+    prompted["provenance"] = {"model": "claude-sonnet-4-5",
+                              "generated": "2026-08-11"}
+    issues = corpus_io.problems({"samples": [prompted]}, ("chat",))
+    check("a prompted sample without its prompt is rejected",
+          any("prompt" in i for i in issues), str(issues))
+
+
+def test_the_github_jsonl_url_pins_commit_and_path():
+    url = fetch_samples.github_jsonl_url(generated_dataset_sample()["provenance"])
+    expected = ("https://raw.githubusercontent.com/louisabraham/load-bearing/"
+                "2a233f653fd72b431850b957b2d28c5c4dbdbaa6/"
+                "data/days/2026-08-24.jsonl")
+    check("the URL is repo, commit, path, in that order", url == expected, url)
+
+
+def test_a_dataset_generated_sample_is_refetchable_a_prompted_one_is_not():
+    url, why, _prov = fetch_samples.fetchable(generated_dataset_sample())
+    check("an attributed dataset row is refetchable, not regenerated",
+          url == fetch_samples.github_jsonl_url(
+              generated_dataset_sample()["provenance"]) and why is None,
+          str((url, why)))
+    row = fetch_samples.process(
+        sample("gen-0001", label="generated",
+               provenance={"model": "claude-sonnet-4-5", "prompt": "write",
+                           "generated": "2026-08-11"}),
+        False, True)
+    check("a prompted generated sample is still skipped",
+          row["action"] == "skipped" and "regenerating" in row.get("note", ""),
+          str(row))
+
+
+def test_a_github_jsonl_response_is_read_as_one_row():
+    """raw.githubusercontent serves text/plain, so the row cannot be picked by
+    content type: the loader key decides, the named line is decoded, and the
+    named column is the text that gets hashed."""
+    import json as _json
+    import urllib.request
+
+    lines = [_json.dumps({"ts": "2026-08-24T05:45:00Z", "repo": "a/b",
+                          "author": "who", "body": "First body."}),
+             _json.dumps({"ts": "2026-08-24T06:00:00Z", "repo": "c/d",
+                          "author": "who", "body": "The second body."})]
+    payload = ("\n".join(lines) + "\n").encode("utf-8")
+
+    class FakeHeaders:
+        def get_content_charset(self):
+            return "utf-8"
+
+        def get_content_type(self):
+            return "text/plain"
+
+    class FakeResponse:
+        headers = FakeHeaders()
+
+        def __init__(self):
+            self.rest = payload
+
+        def read(self, n=None):
+            take, self.rest = self.rest[:n], self.rest[n:]
+            return take
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+    prov = generated_dataset_sample()["provenance"]
+    real = urllib.request.urlopen
+    try:
+        urllib.request.urlopen = lambda *a, **k: FakeResponse()
+        first = dict(prov, row=0)
+        text, err = fetch_samples.fetch(
+            fetch_samples.github_jsonl_url(first), first.get("field"), first)
+        check("the named line is the text that gets hashed",
+              err is None and text.strip() == "First body.", str((text, err)))
+        second = dict(prov, row=1)
+        text, err = fetch_samples.fetch(
+            fetch_samples.github_jsonl_url(second), second.get("field"),
+            second)
+        check("and the pin selects the row, not the first line always",
+              err is None and text.strip() == "The second body.",
+              str((text, err)))
+        past = dict(prov, row=9)
+        _, err = fetch_samples.fetch(
+            fetch_samples.github_jsonl_url(past), past.get("field"), past)
+        check("a row past the end of the file is an error",
+              err is not None and "outside" in err, str(err))
+        nofield = dict(prov, row=0)
+        del nofield["field"]
+        _, err = fetch_samples.fetch(
+            fetch_samples.github_jsonl_url(nofield), None, nofield)
+        check("a github-jsonl row with no named column is an error",
+              err is not None and "field" in err, str(err))
     finally:
         urllib.request.urlopen = real
 

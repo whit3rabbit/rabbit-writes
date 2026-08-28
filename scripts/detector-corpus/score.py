@@ -139,6 +139,15 @@ def report(buckets, threshold, present, missing, moved):
             out.append("Flagged: %s. Read them. Every one is either a bug in a "
                        "pattern or a document that earned it."
                        % ", ".join(human["ids"][:12]))
+    generated = buckets.get("all", {}).get("generated")
+    if generated:
+        out.append("Read the generated row the other way round: %d of %d "
+                   "documents the engine has generation evidence for were "
+                   "flagged at %s, which is the detection rate. A dataset "
+                   "sample's evidence is the row's own attribution rather "
+                   "than a recorded prompt, and vocabulary marks sit at P1, "
+                   "so run --band P1 before reading a low P0 rate as a miss."
+                   % (generated["flagged"], generated["n"], threshold))
     if missing:
         out.append("")
         out.append("%d sample(s) in the manifest have no text here, so they are "

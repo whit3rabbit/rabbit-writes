@@ -21,6 +21,13 @@ Labels:
                 chat-based generators. The bar is an archive capture, not an
                 author's word.
     generated   prose produced by a named model, with the prompt recorded.
+                A dataset-generated sample is the second shape: prose from a
+                pinned dataset row that carries the model's own attribution
+                (a Claude Code footer in a pull-request body), where the
+                prompt is unknowable and `why_credible` records the
+                attribution basis instead. `model` names the basis rather
+                than a model id, `generated` is the row's own date, and
+                `collected` is the dataset snapshot date.
 
 A sample with no provenance is not a sample. `problems()` rejects it, and
 score.py refuses to publish a rate over a set that does not validate.
@@ -78,6 +85,15 @@ REQUIRED_GENERATED_PROVENANCE = ("model", "prompt", "generated")
 # is exactly the sort of thing that has to be recorded rather than remembered.
 REQUIRED_DATASET_PROVENANCE = ("dataset", "revision", "split", "row",
                                "collected", "license", "why_credible")
+
+# The generated-label counterpart. A prompted sample records the prompt,
+# which is the whole reproduction story for text somebody generated here. A
+# dataset sample cannot: the prompt is whatever a stranger typed months ago
+# and the corpus never saw it. What makes the label evidence instead is the
+# row's own attribution, which `why_credible` carries, plus the same
+# dataset/revision/split/row pinning a human dataset sample needs.
+REQUIRED_GENERATED_DATASET_PROVENANCE = (REQUIRED_DATASET_PROVENANCE
+                                         + ("model", "generated"))
 
 
 def human_provenance_kind(provenance):
@@ -262,7 +278,12 @@ def problems(manifest, registers=()):
 
         prov = sample["provenance"]
         if sample["label"] != "human":
-            required = REQUIRED_GENERATED_PROVENANCE
+            # A generated sample from a pinned dataset row swaps the prompt
+            # for the row pinning plus the attribution basis, the same trade
+            # the human dataset shape makes for its archive capture.
+            required = (REQUIRED_GENERATED_DATASET_PROVENANCE
+                        if human_provenance_kind(prov) == "dataset"
+                        else REQUIRED_GENERATED_PROVENANCE)
         else:
             kind = human_provenance_kind(prov)
             if kind is None:

@@ -14,6 +14,16 @@ Register one text in the labeled corpus.
         --model claude-sonnet-4-5 --generated 2026-08-11 \\
         --prompt "Write a 700-word blog post about distributed locking"
 
+    python3 add_sample.py PR_BODY.txt \\
+        --id gen-lb-20260824-r4 --label generated --register docs \\
+        --model "claude (self-attributed: Claude Code footer in the body)" \\
+        --generated 2026-08-24 \\
+        --dataset louisabraham/load-bearing --revision <40-hex commit> \\
+        --loader github-jsonl --path data/days/2026-08-24.jsonl \\
+        --split 2026-08-24 --row 4 --field body \\
+        --collected 2026-08-27 --license "MIT (author-confirmed)" \\
+        --why-credible "the body carries the literal Claude Code footer"
+
 The text is copied into docs/detector-corpus/texts/, which git ignores, and its
 SHA-256 goes in the manifest. That split is the whole design: the claim is
 public and checkable, the prose stays with whoever owns it. See corpus_io.py.
@@ -65,6 +75,30 @@ def main():
     ap.add_argument("--model", help="for a generated sample")
     ap.add_argument("--prompt", help="for a generated sample, verbatim")
     ap.add_argument("--generated", help="YYYY-MM-DD, for a generated sample")
+    ap.add_argument("--dataset",
+                    help="dataset provenance: the dataset a row is pinned in, "
+                         "as owner/name (human or generated samples)")
+    ap.add_argument("--revision",
+                    help="dataset provenance: the immutable revision the hash "
+                         "was taken at. A Hub commit sha, or a 40-hex git "
+                         "commit for github-jsonl")
+    ap.add_argument("--config", help="dataset provenance: the Hub config, if "
+                                     "the dataset has more than one")
+    ap.add_argument("--split", help="dataset provenance: the split, or the "
+                                    "day for github-jsonl")
+    ap.add_argument("--row", help="dataset provenance: the 0-based row index, "
+                                  "or the 0-based line for github-jsonl")
+    ap.add_argument("--field", help="dataset provenance: the column holding "
+                                    "the text")
+    ap.add_argument("--loader", help="dataset provenance: 'github-jsonl' for a "
+                                     "raw.githubusercontent JSONL pin. Absent "
+                                     "means the Hub datasets-viewer")
+    ap.add_argument("--path", help="github-jsonl provenance: the file's path "
+                                   "inside the repository")
+    ap.add_argument("--collected", help="dataset provenance: YYYY-MM-DD the "
+                                        "snapshot was gathered")
+    ap.add_argument("--license", help="dataset provenance: the terms the "
+                                      "dataset ships under")
     ap.add_argument("--notes")
     args = ap.parse_args()
 
@@ -84,7 +118,12 @@ def main():
     provenance = {"source_url": args.source_url, "archive_url": args.archive_url,
                   "published": args.published, "why_credible": args.why_credible,
                   "model": args.model, "prompt": args.prompt,
-                  "generated": args.generated, "notes": args.notes}
+                  "generated": args.generated, "dataset": args.dataset,
+                  "revision": args.revision, "config": args.config,
+                  "split": args.split, "row": args.row, "field": args.field,
+                  "loader": args.loader, "path": args.path,
+                  "collected": args.collected, "license": args.license,
+                  "notes": args.notes}
     sample = {
         "id": args.id,
         "label": args.label,

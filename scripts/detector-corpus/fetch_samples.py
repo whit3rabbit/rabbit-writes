@@ -90,6 +90,7 @@ ALLOWED_SCHEMES = ("http://", "https://")
 # reorders them next year still yields the row the hash was taken over. A
 # dataset reference without a revision is a name, not a citation.
 DATASETS_SERVER = "https://datasets-server.huggingface.co/rows"
+RAW_GITHUB = "https://raw.githubusercontent.com/"
 
 
 def dataset_row_url(prov):
@@ -105,32 +106,59 @@ def dataset_row_url(prov):
     return "%s?%s" % (DATASETS_SERVER, query)
 
 
+def github_jsonl_url(prov):
+    """The raw.githubusercontent URL for one pinned file of one repo.
+
+    Used when `loader` is `github-jsonl`: the dataset lives in a git
+    repository rather than on the Hub, so the row pin is repo, 40-hex commit
+    sha, in-repository path, and 0-based line index, and the URL is built
+    from data rather than convention so the manifest records every piece of
+    it. A commit sha is immutable the way a Hub revision is, which is what
+    makes a refetch reproduce the same bytes.
+    """
+    return "%s%s/%s/%s" % (RAW_GITHUB, prov["dataset"], prov["revision"],
+                           prov["path"])
+
+
 def fetchable(sample):
-    """(url, why_not). What to request for this sample, if anything.
+    """(url, why_not, prov). What to request for this sample, if anything.
 
     For an archive sample the archive URL beats the source URL: a live page can
     be edited, and a sample whose credibility rests on "it was published in
     2019" has to be read from something captured in 2019.
 
-    For a dataset sample it is one row of a pinned revision, through the viewer
-    API.
+    For a dataset sample it is one row of a pinned revision, through the
+    viewer API, or one line of a pinned file when the loader is github-jsonl.
+
+    A prompted generated sample is not refetchable: regeneration is a
+    different act from retrieval and this script will not do it silently. A
+    dataset-generated sample is, because its text is a row lookup like any
+    other dataset sample's, and the attribution that labels it is in the row.
     """
-    if sample["label"] != "human":
-        return None, ("generated: refetching means regenerating from the "
-                      "recorded prompt, which this script will not do silently")
     prov = sample.get("provenance", {})
+    if sample["label"] != "human" and not (
+            corpus_io.human_provenance_kind(prov) == "dataset"):
+        return None, ("generated: refetching means regenerating from the "
+                      "recorded prompt, which this script will not do "
+                      "silently"), prov
     if corpus_io.human_provenance_kind(prov) == "dataset":
-        missing = [k for k in ("dataset", "split", "row", "revision")
-                   if not str(prov.get(k, "")).strip()]
+        needed = ("dataset", "split", "row", "revision")
+        if prov.get("loader") == "github-jsonl":
+            needed = ("dataset", "revision", "path", "row")
+        missing = [k for k in needed if not str(prov.get(k, "")).strip()]
         if missing:
-            return None, "dataset provenance is missing %s" % ", ".join(missing)
-        return dataset_row_url(prov), None
+            return None, ("dataset provenance is missing %s"
+                          % ", ".join(missing)), prov
+        if prov.get("loader") == "github-jsonl":
+            return github_jsonl_url(prov), None, prov
+        return dataset_row_url(prov), None, prov
     url = prov.get("archive_url") or prov.get("source_url")
     if not url:
-        return None, "no archive_url or source_url in the manifest"
+        return None, "no archive_url or source_url in the manifest", prov
     if not url.lower().startswith(ALLOWED_SCHEMES):
-        return None, "refusing scheme in %r, only http and https are followed" % url[:40]
-    return url, None
+        return None, ("refusing scheme in %r, only http and https are "
+                      "followed" % url[:40]), prov
+    return url, None, prov
 
 
 def _read_bounded(response, cap):
@@ -149,13 +177,16 @@ def _read_bounded(response, cap):
     return b"".join(chunks)
 
 
-def fetch(url, field=None):
+def fetch(url, field=None, prov=None):
     """(text, error).
 
     HTML goes through corpus_io.extract_text. A datasets-viewer response is
     already JSON holding the text, so it is read out of the named column
     instead: running an HTML extractor over a JSON payload would hash the
-    payload rather than the prose.
+    payload rather than the prose. A github-jsonl response is the raw text of
+    a pinned file, so the named row is json-decoded out of its line, which
+    raw.githubusercontent serves as text/plain and the content type cannot
+    distinguish from any other file.
     """
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     try:
@@ -169,6 +200,25 @@ def fetch(url, field=None):
         body = raw.decode(charset, errors="replace")
     except LookupError:
         body = raw.decode("utf-8", errors="replace")
+
+    if prov and prov.get("loader") == "github-jsonl":
+        lines = [line for line in body.splitlines() if line.strip()]
+        try:
+            row_index = int(prov.get("row"))
+        except (TypeError, ValueError):
+            return None, "github-jsonl provenance has a non-integer row"
+        if not 0 <= row_index < len(lines):
+            return None, ("row %d is outside the %d record(s) the pinned "
+                          "file holds" % (row_index, len(lines)))
+        try:
+            record = json.loads(lines[row_index])
+        except ValueError as exc:
+            return None, "the pinned row is not JSON: %s" % exc
+        column = prov.get("field") or field
+        if not column or column not in record:
+            return None, ("provenance names no `field`, or one the record "
+                          "lacks. Keys: %s" % ", ".join(sorted(record)))
+        return corpus_io.normalize(str(record[column])), None
 
     if url.startswith(DATASETS_SERVER) or content_type == "application/json":
         try:
@@ -212,7 +262,7 @@ def process(sample, refetch, dry_run, texts_dir=None):
         row["action"] = "kept"
         return row
 
-    url, why_not = fetchable(sample)
+    url, why_not, prov = fetchable(sample)
     if url is None:
         row["action"] = "skipped"
         row["note"] = why_not
@@ -223,7 +273,7 @@ def process(sample, refetch, dry_run, texts_dir=None):
         row["action"] = "would fetch"
         return row
 
-    text, error = fetch(url, sample.get("provenance", {}).get("field"))
+    text, error = fetch(url, prov.get("field"), prov)
     if text is None:
         row["action"] = "failed"
         row["note"] = error
