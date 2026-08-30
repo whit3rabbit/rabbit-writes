@@ -59,6 +59,13 @@ def test_every_malformed_input_exits_zero_and_says_nothing():
          "tool_input with no file_path"),
         ('{"hook_event_name": "PostToolUse", "tool_input": '
          '{"file_path": "/no/such/file.md"}}', "a file that is not there"),
+        ('{"hook_event_name": "PreToolUse", "tool_name": "Bash"}',
+         "a Bash call with no tool_input"),
+        ('{"hook_event_name": "PreToolUse", "tool_name": "Bash", '
+         '"tool_input": "nope"}', "tool_input that is not an object"),
+        ('{"hook_event_name": "PreToolUse", "tool_name": "Write", '
+         '"tool_input": {"command": "git commit -m x"}}',
+         "a git commit that did not go through Bash"),
     ]
     for payload, why in cases:
         out, code = run(payload)
@@ -245,6 +252,102 @@ def test_the_note_names_the_skill_when_the_script_is_not_bundled():
     assert "voice-setup" in command, command
     assert "python3" not in command, (
         "the fallback offers a command that names no script: %r" % command)
+
+
+def test_a_heredoc_commit_loses_its_attribution_trailer():
+    """The heredoc form this repo's own commit convention writes: the trailer
+    is not the user's words, and anthropics/claude-code#66504 is people
+    asking Claude Code to stop writing it in."""
+    command = ('git commit -m "$(cat <<\'EOF\'\n'
+               'fix: tighten the parser\n\n'
+               'Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\n'
+               'EOF\n)"')
+    out, code = run({"hook_event_name": "PreToolUse", "tool_name": "Bash",
+                     "tool_input": {"command": command}}, cwd=helpers.ROOT)
+    assert code == 0, code
+    doc = json.loads(out)
+    new_command = doc["hookSpecificOutput"]["updatedInput"]["command"]
+    assert "Co-Authored-By" not in new_command, new_command
+    assert "fix: tighten the parser" in new_command, new_command
+
+
+def test_a_heredoc_commit_gets_its_single_answer_swap_applied():
+    """`--apply-safe` runs inside the rewrite, so a voice's own single-word
+    substitution lands the same way it would on a file. This repo pins
+    whit3rabbit, whose profile swaps `utilize` for `use`."""
+    command = ('git commit -m "$(cat <<\'EOF\'\n'
+               'fix: we utilize the cache here\n'
+               'EOF\n)"')
+    out, code = run({"hook_event_name": "PreToolUse", "tool_name": "Bash",
+                     "tool_input": {"command": command}}, cwd=helpers.ROOT)
+    assert code == 0, code
+    doc = json.loads(out)
+    new_command = doc["hookSpecificOutput"]["updatedInput"]["command"]
+    assert "we use the cache here" in new_command, new_command
+    assert "utilize" not in new_command, new_command
+
+
+def test_a_plain_quoted_commit_message_is_cleaned_too():
+    """Not every commit uses the heredoc form. A plain `-m "..."` still gets
+    its trailer stripped, as long as the cleaned text carries no unescaped
+    copy of the quote character that opened it."""
+    command = ('git commit -m "fix: we utilize the parser here\n\n'
+               'Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>"')
+    out, code = run({"hook_event_name": "PreToolUse", "tool_name": "Bash",
+                     "tool_input": {"command": command}}, cwd=helpers.ROOT)
+    assert code == 0, code
+    doc = json.loads(out)
+    new_command = doc["hookSpecificOutput"]["updatedInput"]["command"]
+    assert "Co-Authored-By" not in new_command, new_command
+    assert "we use the parser here" in new_command, new_command
+
+
+def test_a_gh_pr_create_body_loses_the_footer_and_the_trailer():
+    """`gh pr create --body`, the other command this hook watches. Both the
+    emoji footer and the trailer are host-written, never the user's words."""
+    command = ('gh pr create --title "fix: thing" --body "$(cat <<\'EOF\'\n'
+               '## Summary\n- did the thing\n\n'
+               '\U0001f916 Generated with [Claude Code](https://claude.ai/code)\n\n'
+               'Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\n'
+               'EOF\n)"')
+    out, code = run({"hook_event_name": "PreToolUse", "tool_name": "Bash",
+                     "tool_input": {"command": command}}, cwd=helpers.ROOT)
+    assert code == 0, code
+    doc = json.loads(out)
+    new_command = doc["hookSpecificOutput"]["updatedInput"]["command"]
+    assert "Generated with" not in new_command, new_command
+    assert "Co-Authored-By" not in new_command, new_command
+    assert "## Summary" in new_command, new_command
+    assert "fix: thing" in new_command, new_command
+
+
+def test_a_message_with_nothing_to_clean_is_silent():
+    """The rule everywhere else in this file, applied to the third event: no
+    JSON at all unless the command actually changed."""
+    command = 'git commit -m "fix: tighten the parser"'
+    out, code = run({"hook_event_name": "PreToolUse", "tool_name": "Bash",
+                     "tool_input": {"command": command}}, cwd=helpers.ROOT)
+    assert code == 0, code
+    assert out == "", out
+
+
+def test_pre_tool_use_ignores_everything_that_is_not_a_commit_or_a_pr():
+    """A no-message amend, an unrelated command, a non-Bash tool, and a
+    command with no tool_input at all: every one of these is a real shape a
+    session produces, and none of them should ever be rewritten."""
+    cases = [
+        {"tool_name": "Bash", "tool_input": {"command": "git status"}},
+        {"tool_name": "Bash",
+         "tool_input": {"command": "git commit --amend --no-edit"}},
+        {"tool_name": "Read", "tool_input": {"command": "git commit -m x"}},
+        {"tool_name": "Bash", "tool_input": {}},
+        {"tool_name": "Bash"},
+    ]
+    for tool_input in cases:
+        out, code = run({"hook_event_name": "PreToolUse", **tool_input},
+                        cwd=helpers.ROOT)
+        assert code == 0, (tool_input, code)
+        assert out == "", (tool_input, out)
 
 
 def test_the_repository_still_prints_the_relative_path_it_always_did():

@@ -109,6 +109,7 @@ BACKUP_SUFFIX = ".rabbit-bak"
 # not get different behaviour.
 HOOK_SPECS = (
     {"event": "SessionStart", "matcher": None, "timeout": 15},
+    {"event": "PreToolUse", "matcher": "Bash", "timeout": 25},
     {"event": "PostToolUse", "matcher": "Write|Edit", "timeout": 30},
 )
 

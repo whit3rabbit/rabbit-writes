@@ -189,7 +189,7 @@ The naive form of that rule does not work and the number is worth knowing: "any 
 
 A blend has two halves, and only one of them is a script.
 
-**The rules file is mechanical.** `python3 scripts/rwlib/voices.py --blend a b --weight 0.7` prints the blended rules on stdout and its conflicts on stderr. Bans union, so the stricter refusal wins, because refusals are the load-bearing part. Every mechanic with a stricter side takes it whatever the weight says: a blend that can drop a refusal is a blend nobody can rely on, and the weight is a statement about emphasis rather than permission. The lineage is written into the file as a `blend` key.
+**The rules file is mechanical.** `python3 scripts/rwlib/voices.py --blend a b --weight 0.7` prints the blended rules on stdout and its conflicts on stderr. Bans union, so the stricter refusal wins, because refusals are the part that has to hold. Every mechanic with a stricter side takes it whatever the weight says: a blend that can drop a refusal is a blend nobody can rely on, and the weight is a statement about emphasis rather than permission. The lineage is written into the file as a `blend` key.
 
 The weight only breaks genuine ties, where one profile wants `require` and the other `forbid`, or one writes `dmy` and the other `mdy`. Those are reported by name, because silently picking one writer's date format out of two is a choice the person whose name goes on the profile has to see.
 

@@ -1,0 +1,1672 @@
+{
+  "schema_version": 1,
+  "generated": {
+    "lexicon_version_at_generation": 6,
+    "dataset": {
+      "commit": "2a233f653fd72b431850b957b2d28c5c4dbdbaa6",
+      "sha256": "15fa8ad1857d9b3ed2ae1818308e658e312c28d8878da3e324a05c89f42d22fa",
+      "url": "https://raw.githubusercontent.com/louisabraham/load-bearing/2a233f653fd72b431850b957b2d28c5c4dbdbaa6/analysis.js"
+    },
+    "thresholds": {
+      "lift_min": 15.0,
+      "trend_ratio_min": 3.0,
+      "trend_weeks": 12,
+      "late_floor_zero_early": 1.0,
+      "corpus_flag_docs": 5,
+      "family_limit": 100
+    }
+  },
+  "families": [
+    {
+      "stem": "load-bearing",
+      "forms": [
+        "load-bearing"
+      ],
+      "lift": 123.04,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 6.167,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 3,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "quietly",
+      "forms": [
+        "quietly"
+      ],
+      "lift": 62.77,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 3.917,
+        "ratio": 47.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 8,
+        "hits": 8,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "survived",
+      "forms": [
+        "survived",
+        "survives"
+      ],
+      "lift": 61.52,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 3.75,
+        "ratio": 45.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 9,
+        "hits": 11,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "latent",
+      "forms": [
+        "latent"
+      ],
+      "lift": 39.55,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 5.5,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 4,
+        "hits": 4,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "genuine",
+      "forms": [
+        "genuine"
+      ],
+      "lift": 38.53,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 10.5,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 4,
+        "hits": 6,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "seam",
+      "forms": [
+        "seam"
+      ],
+      "lift": 37.25,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 14.0,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 3,
+        "hits": 4,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "genuinely",
+      "forms": [
+        "genuinely"
+      ],
+      "lift": 36.8,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 10.167,
+        "ratio": null
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 11,
+        "hits": 13,
+        "new_tier2_clusters": 2
+      }
+    },
+    {
+      "stem": "ladder",
+      "forms": [
+        "ladder"
+      ],
+      "lift": 36.59,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 5.167,
+        "ratio": null
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 5,
+        "hits": 8,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "carries",
+      "forms": [
+        "carried",
+        "carries",
+        "carrying"
+      ],
+      "lift": 35.9,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 33.583,
+        "ratio": 403.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 15,
+        "hits": 25,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "pre-fix",
+      "forms": [
+        "pre-fix"
+      ],
+      "lift": 35.78,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.917,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 0,
+        "hits": 0,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "byte-identical",
+      "forms": [
+        "byte-identical"
+      ],
+      "lift": 34.93,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 16.5,
+        "ratio": null
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 6,
+        "hits": 7,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "halves",
+      "forms": [
+        "halves"
+      ],
+      "lift": 32.64,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.75,
+        "ratio": null
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 8,
+        "hits": 8,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "refusal",
+      "forms": [
+        "refusal"
+      ],
+      "lift": 29.45,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 7.25,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 3,
+        "hits": 5,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "stamped",
+      "forms": [
+        "stamped"
+      ],
+      "lift": 26.99,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.75,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 0,
+        "hits": 0,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "asserted",
+      "forms": [
+        "asserted"
+      ],
+      "lift": 26.74,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 12.333,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 1,
+        "hits": 1,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "deliberately",
+      "forms": [
+        "deliberately"
+      ],
+      "lift": 25.83,
+      "trend": {
+        "early_mean": 0.25,
+        "late_mean": 35.167,
+        "ratio": 140.7
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 7,
+        "hits": 8,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "untouched",
+      "forms": [
+        "untouched"
+      ],
+      "lift": 25.49,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 35.0,
+        "ratio": 420.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 9,
+        "hits": 10,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "collapses",
+      "forms": [
+        "collapses"
+      ],
+      "lift": 25.34,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 4.5,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 3,
+        "hits": 4,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "folds",
+      "forms": [
+        "folds"
+      ],
+      "lift": 25.29,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 3.583,
+        "ratio": 43.0
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 1,
+        "hits": 1,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "loses",
+      "forms": [
+        "loses"
+      ],
+      "lift": 24.95,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.667,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 3,
+        "hits": 3,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "loudly",
+      "forms": [
+        "loudly"
+      ],
+      "lift": 24.75,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.5,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 2,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "half",
+      "forms": [
+        "half"
+      ],
+      "lift": 24.24,
+      "trend": {
+        "early_mean": 0.583,
+        "late_mean": 18.167,
+        "ratio": 31.1
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 3,
+        "hits": 12,
+        "new_tier2_clusters": 2
+      }
+    },
+    {
+      "stem": "inert",
+      "forms": [
+        "inert"
+      ],
+      "lift": 24.17,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 6.333,
+        "ratio": 76.0
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 1,
+        "hits": 1,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "gained",
+      "forms": [
+        "gained"
+      ],
+      "lift": 24.01,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 3.667,
+        "ratio": 44.0
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 6,
+        "new_tier2_clusters": 2
+      }
+    },
+    {
+      "stem": "precedent",
+      "forms": [
+        "precedent"
+      ],
+      "lift": 23.14,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.083,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 1,
+        "hits": 1,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "alone",
+      "forms": [
+        "alone"
+      ],
+      "lift": 22.95,
+      "trend": {
+        "early_mean": 0.167,
+        "late_mean": 20.167,
+        "ratio": 121.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 19,
+        "hits": 24,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "ceiling",
+      "forms": [
+        "ceiling"
+      ],
+      "lift": 22.6,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 8.25,
+        "ratio": null
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 8,
+        "hits": 8,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "fan-out",
+      "forms": [
+        "fan-out"
+      ],
+      "lift": 22.6,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.083,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 3,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "landed",
+      "forms": [
+        "landed",
+        "lands"
+      ],
+      "lift": 22.2,
+      "trend": {
+        "early_mean": 0.333,
+        "late_mean": 13.75,
+        "ratio": 41.2
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 22,
+        "hits": 46,
+        "new_tier2_clusters": 7
+      }
+    },
+    {
+      "stem": "reproduces",
+      "forms": [
+        "reproduces"
+      ],
+      "lift": 22.18,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.583,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 2,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "deliberate",
+      "forms": [
+        "deliberate"
+      ],
+      "lift": 21.61,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 8.75,
+        "ratio": null
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 5,
+        "hits": 7,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "leg",
+      "forms": [
+        "leg"
+      ],
+      "lift": 21.52,
+      "trend": {
+        "early_mean": 0.167,
+        "late_mean": 5.583,
+        "ratio": 33.5
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 0,
+        "hits": 0,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "cheap",
+      "forms": [
+        "cheap"
+      ],
+      "lift": 21.34,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 4.0,
+        "ratio": null
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 7,
+        "hits": 25,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "symptom",
+      "forms": [
+        "symptom"
+      ],
+      "lift": 21.34,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.5,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 2,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "fires",
+      "forms": [
+        "fired",
+        "fires"
+      ],
+      "lift": 21.32,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 15.5,
+        "ratio": 186.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 12,
+        "hits": 27,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "nothing",
+      "forms": [
+        "nothing"
+      ],
+      "lift": 21.3,
+      "trend": {
+        "early_mean": 2.25,
+        "late_mean": 83.833,
+        "ratio": 37.3
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 31,
+        "hits": 63,
+        "new_tier2_clusters": 6
+      }
+    },
+    {
+      "stem": "refuses",
+      "forms": [
+        "refuses"
+      ],
+      "lift": 21.16,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 9.583,
+        "ratio": 115.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 5,
+        "hits": 10,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "holds",
+      "forms": [
+        "holds"
+      ],
+      "lift": 20.98,
+      "trend": {
+        "early_mean": 0.75,
+        "late_mean": 21.833,
+        "ratio": 29.1
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 9,
+        "hits": 22,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "throwaway",
+      "forms": [
+        "throwaway"
+      ],
+      "lift": 20.72,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.75,
+        "ratio": null
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 5,
+        "hits": 5,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "beside",
+      "forms": [
+        "beside"
+      ],
+      "lift": 20.48,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 7.5,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 3,
+        "hits": 5,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "refused",
+      "forms": [
+        "refused"
+      ],
+      "lift": 20.24,
+      "trend": {
+        "early_mean": 0.167,
+        "late_mean": 9.917,
+        "ratio": 59.5
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 5,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "divergence",
+      "forms": [
+        "divergence"
+      ],
+      "lift": 20.18,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 5.25,
+        "ratio": 63.0
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 4,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "honest",
+      "forms": [
+        "honest"
+      ],
+      "lift": 20.12,
+      "trend": {
+        "early_mean": 0.167,
+        "late_mean": 14.167,
+        "ratio": 85.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 18,
+        "hits": 29,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "degrades",
+      "forms": [
+        "degrades"
+      ],
+      "lift": 20.09,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 4.833,
+        "ratio": null
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 5,
+        "hits": 5,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "incl",
+      "forms": [
+        "incl"
+      ],
+      "lift": 19.54,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 12.583,
+        "ratio": 151.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 6,
+        "hits": 10,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "sits",
+      "forms": [
+        "sits"
+      ],
+      "lift": 19.32,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 8.25,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 2,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "defects",
+      "forms": [
+        "defects"
+      ],
+      "lift": 19.1,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 5.75,
+        "ratio": 69.0
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 3,
+        "hits": 5,
+        "new_tier2_clusters": 2
+      }
+    },
+    {
+      "stem": "worse",
+      "forms": [
+        "worse"
+      ],
+      "lift": 19.1,
+      "trend": {
+        "early_mean": 0.5,
+        "late_mean": 5.333,
+        "ratio": 10.7
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 0,
+        "hits": 0,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "fabricated",
+      "forms": [
+        "fabricated"
+      ],
+      "lift": 18.83,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.833,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 3,
+        "hits": 6,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "recovers",
+      "forms": [
+        "recovers"
+      ],
+      "lift": 18.46,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.0,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 4,
+        "hits": 4,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "whose",
+      "forms": [
+        "whose"
+      ],
+      "lift": 18.41,
+      "trend": {
+        "early_mean": 0.833,
+        "late_mean": 26.25,
+        "ratio": 31.5
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 15,
+        "hits": 22,
+        "new_tier2_clusters": 2
+      }
+    },
+    {
+      "stem": "sweep",
+      "forms": [
+        "sweep"
+      ],
+      "lift": 18.24,
+      "trend": {
+        "early_mean": 0.25,
+        "late_mean": 19.0,
+        "ratio": 76.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 8,
+        "hits": 18,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "arms",
+      "forms": [
+        "arms"
+      ],
+      "lift": 18.0,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 3.25,
+        "ratio": 39.0
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 4,
+        "hits": 6,
+        "new_tier2_clusters": 3
+      }
+    },
+    {
+      "stem": "sitting",
+      "forms": [
+        "sitting"
+      ],
+      "lift": 17.89,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 2.5,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 3,
+        "hits": 4,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "shipped",
+      "forms": [
+        "shipped"
+      ],
+      "lift": 17.75,
+      "trend": {
+        "early_mean": 0.25,
+        "late_mean": 23.0,
+        "ratio": 92.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 16,
+        "hits": 49,
+        "new_tier2_clusters": 5
+      }
+    },
+    {
+      "stem": "hole",
+      "forms": [
+        "hole"
+      ],
+      "lift": 17.67,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 4.25,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 2,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "ever",
+      "forms": [
+        "ever"
+      ],
+      "lift": 17.51,
+      "trend": {
+        "early_mean": 0.583,
+        "late_mean": 20.0,
+        "ratio": 34.3
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 14,
+        "hits": 17,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "nobody",
+      "forms": [
+        "nobody"
+      ],
+      "lift": 17.37,
+      "trend": {
+        "early_mean": 0.333,
+        "late_mean": 6.583,
+        "ratio": 19.8
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 6,
+        "hits": 9,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "wall-clock",
+      "forms": [
+        "wall-clock"
+      ],
+      "lift": 17.33,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 2.917,
+        "ratio": null
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 5,
+        "hits": 5,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "stayed",
+      "forms": [
+        "stayed",
+        "stays"
+      ],
+      "lift": 17.05,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 5.917,
+        "ratio": 71.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 34,
+        "hits": 72,
+        "new_tier2_clusters": 3
+      }
+    },
+    {
+      "stem": "siblings",
+      "forms": [
+        "siblings"
+      ],
+      "lift": 16.95,
+      "trend": {
+        "early_mean": 0.167,
+        "late_mean": 3.333,
+        "ratio": 20.0
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 2,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "straight",
+      "forms": [
+        "straight"
+      ],
+      "lift": 16.78,
+      "trend": {
+        "early_mean": 0.25,
+        "late_mean": 6.917,
+        "ratio": 27.7
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 13,
+        "hits": 23,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "glyph",
+      "forms": [
+        "glyph"
+      ],
+      "lift": 16.32,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 2.667,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 0,
+        "hits": 0,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "unit-tested",
+      "forms": [
+        "unit-tested"
+      ],
+      "lift": 16.2,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.25,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 0,
+        "hits": 0,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "grows",
+      "forms": [
+        "grows"
+      ],
+      "lift": 16.01,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 4.5,
+        "ratio": null
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 7,
+        "hits": 11,
+        "new_tier2_clusters": 3
+      }
+    },
+    {
+      "stem": "precisely",
+      "forms": [
+        "precisely"
+      ],
+      "lift": 16.01,
+      "trend": {
+        "early_mean": 0.167,
+        "late_mean": 4.083,
+        "ratio": 24.5
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 3,
+        "hits": 3,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "measured",
+      "forms": [
+        "measured"
+      ],
+      "lift": 15.94,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 27.75,
+        "ratio": null
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 15,
+        "hits": 50,
+        "new_tier2_clusters": 7
+      }
+    },
+    {
+      "stem": "lives",
+      "forms": [
+        "lives"
+      ],
+      "lift": 15.89,
+      "trend": {
+        "early_mean": 0.167,
+        "late_mean": 14.25,
+        "ratio": 85.5
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 30,
+        "hits": 56,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "criterion",
+      "forms": [
+        "criterion"
+      ],
+      "lift": 15.77,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 5.083,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 2,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "sat",
+      "forms": [
+        "sat"
+      ],
+      "lift": 15.77,
+      "trend": {
+        "early_mean": 0.333,
+        "late_mean": 5.167,
+        "ratio": 15.5
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 0,
+        "hits": 0,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "sees",
+      "forms": [
+        "sees"
+      ],
+      "lift": 15.41,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 8.167,
+        "ratio": 98.0
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 12,
+        "hits": 16,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "claimed",
+      "forms": [
+        "claimed"
+      ],
+      "lift": 15.21,
+      "trend": {
+        "early_mean": 0.083,
+        "late_mean": 8.917,
+        "ratio": 107.0
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 2,
+        "hits": 2,
+        "new_tier2_clusters": 1
+      }
+    },
+    {
+      "stem": "identically",
+      "forms": [
+        "identically"
+      ],
+      "lift": 15.07,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 7.75,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 3,
+        "hits": 5,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "standing",
+      "forms": [
+        "standing"
+      ],
+      "lift": 15.07,
+      "trend": {
+        "early_mean": 0.333,
+        "late_mean": 4.083,
+        "ratio": 12.2
+      },
+      "status": "flagged",
+      "proposed_tier": "tier2",
+      "flags": [
+        "technical-vocabulary"
+      ],
+      "note": "",
+      "corpus": {
+        "readmes": 6,
+        "hits": 7,
+        "new_tier2_clusters": 0
+      }
+    },
+    {
+      "stem": "worst",
+      "forms": [
+        "worst"
+      ],
+      "lift": 15.07,
+      "trend": {
+        "early_mean": 0.0,
+        "late_mean": 3.083,
+        "ratio": null
+      },
+      "status": "pending",
+      "proposed_tier": "tier2",
+      "flags": [],
+      "note": "",
+      "corpus": {
+        "readmes": 0,
+        "hits": 0,
+        "new_tier2_clusters": 0
+      }
+    }
+  ]
+}

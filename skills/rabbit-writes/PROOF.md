@@ -19,17 +19,17 @@ Run it from `skills/rabbit-writes/`. It covers every row in the table below, inc
 
 Every number below was measured against a particular pattern catalogue, and the heading says which one. `scan.py --json` reports `lexicon_version` and `registers_version` alongside the findings, and `scripts/validate.py` fails when this heading and `lexicon.json` disagree. A table of scores with no version on it is archaeology: somebody has to guess which catalogue produced it, and the guess is usually wrong.
 
-## Result (v0.1.0, lexicon 6, registers 4, measured 23 August 2026, eighteenth pass)
+## Result (v0.1.0, lexicon 7, registers 4, measured 27 August 2026, nineteenth pass)
 
 | File | Words | P0 | P1 | P2 | Burstiness | MATTR | Em dash / 1k |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| `SKILL.md` | 4,870 | 0 | 0 | 0 | 0.72 | 0.71 | 0.0 |
-| `PROOF.md` | 9,232 | 0 | 0 | **3** | 0.57 | 0.72 | 0.0 |
-| `references/patterns.md` | 3,977 | **5** | **15** | **4** | 0.70 | 0.77 | 1.8 |
+| `SKILL.md` | 4,999 | 0 | 0 | 0 | 0.54 | 0.71 | 0.0 |
+| `PROOF.md` | 9,584 | 0 | 0 | **3** | 0.56 | 0.72 | 0.0 |
+| `references/patterns.md` | 4,074 | **5** | **17** | **4** | 0.71 | 0.77 | 1.7 |
 | `references/false-positives.md` | 892 | 0 | 0 | 0 | 0.73 | 0.79 | 0.0 |
 | `references/injection.md` | 883 | 0 | 0 | **9** | 0.65 | 0.71 | 0.0 |
 | `references/context.md` | 720 | 0 | 0 | 0 | 0.69 | 0.78 | 0.0 |
-| `references/voice.md` | 1,799 | 0 | 0 | 0 | 0.71 | 0.71 | 0.0 |
+| `references/voice.md` | 1,802 | 0 | 0 | 0 | 0.71 | 0.71 | 0.0 |
 | `references/craft.md` | 1,069 | 0 | 0 | **7** | 0.72 | 0.77 | 0.0 |
 | `references/checklist.md` | 755 | 0 | 0 | 0 | 0.51 | 0.73 | 0.0 |
 | `references/ste.md` | 1,260 | 0 | 0 | 0 | 0.61 | 0.70 | 0.0 |
@@ -37,16 +37,16 @@ Every number below was measured against a particular pattern catalogue, and the 
 | `references/forms/blog.md` | 400 | 0 | 0 | **4** | 0.86 | 0.71 | 0.0 |
 | `references/forms/case-study.md` | 498 | 0 | 0 | **8** | 0.71 | 0.70 | 0.0 |
 | `references/forms/chat.md` | 489 | 0 | 0 | **4** | 0.86 | 0.70 | 0.0 |
-| `references/forms/docs.md` | 547 | 0 | 0 | **6** | 0.63 | 0.70 | 0.0 |
+| `references/forms/docs.md` | 571 | 0 | 0 | **6** | 0.62 | 0.69 | 0.0 |
 | `references/forms/email.md` | 590 | 0 | 0 | **5** | 0.77 | 0.69 | 0.0 |
 | `references/forms/essay.md` | 520 | 0 | 0 | **5** | 0.84 | 0.67 | 0.0 |
 | `references/forms/executive-summary.md` | 465 | 0 | 0 | **5** | 0.57 | 0.64 | 0.0 |
 | `references/forms/incident-report.md` | 619 | 0 | 0 | **9** | 0.76 | 0.75 | 0.0 |
 | `references/forms/letter.md` | 521 | 0 | 0 | **8** | 0.91 | 0.71 | 0.0 |
 | `references/forms/linkedin.md` | 570 | 0 | 0 | **7** | 0.82 | 0.71 | 0.0 |
-| `references/forms/literature-review.md` | 680 | 0 | 0 | **9** | 0.70 | 0.70 | 0.0 |
+| `references/forms/literature-review.md` | 683 | 0 | 0 | **9** | 0.70 | 0.70 | 0.0 |
 | `references/forms/memo.md` | 477 | 0 | 0 | **5** | 0.67 | 0.69 | 0.0 |
-| `references/forms/pentest-report.md` | 677 | 0 | 0 | **8** | 0.65 | 0.74 | 0.0 |
+| `references/forms/pentest-report.md` | 678 | 0 | 0 | **8** | 0.66 | 0.75 | 0.0 |
 | `references/forms/proposal.md` | 553 | 0 | 0 | **8** | 0.70 | 0.70 | 0.0 |
 | `references/forms/research-paper.md` | 781 | 0 | 0 | **9** | 0.73 | 0.71 | 0.0 |
 | `references/forms/security-advisory.md` | 613 | 0 | 0 | **10** | 0.79 | 0.74 | 0.0 |
@@ -60,14 +60,14 @@ Every number below was measured against a particular pattern catalogue, and the 
 | `references/citations/ieee.md` | 671 | 0 | 0 | 0 | 0.68 | 0.70 | 0.0 |
 | `references/citations/mla9.md` | 685 | 0 | 0 | 0 | 0.68 | 0.69 | 0.0 |
 | `voices/whit3rabbit.md` | 1,558 | 0 | 0 | **10** | 0.68 | 0.78 | 0.0 |
-| `../voice-setup/SKILL.md` | 3,532 | 0 | 0 | 0 | 0.65 | 0.72 | 0.0 |
-| `../rabbit-readme-improver/SKILL.md` | 2,514 | 0 | 0 | 0 | 0.64 | 0.73 | 0.0 |
-| `../rabbit-reads/SKILL.md` | 1,134 | 0 | 0 | **1** | 0.64 | 0.68 | 0.0 |
-| `../rabbit-rewrites/SKILL.md` | 866 | 0 | 0 | 0 | 0.62 | 0.70 | 0.0 |
+| `../voice-setup/SKILL.md` | 3,862 | 0 | 0 | 0 | 0.57 | 0.72 | 0.0 |
+| `../rabbit-readme-improver/SKILL.md` | 2,573 | 0 | 0 | 0 | 0.58 | 0.73 | 0.0 |
+| `../rabbit-reads/SKILL.md` | 1,300 | 0 | 0 | 0 | 0.64 | 0.70 | 0.0 |
+| `../rabbit-rewrites/SKILL.md` | 537 | 0 | 0 | **8** | 0.59 | 0.80 | 0.0 |
 
 **Every P2 in the `references/forms/` rows is the same finding:** a bold list label ending in a period, which is how `references/craft.md` has always written its own bullets and why it carries seven. The rule is skipped in the `docs` register and these rows are measured with no register at all, which is what the reproduce command above does.
 
-## The counted STE band, seventeenth pass
+## The counted STE band, nineteenth pass
 
 The five counted checks run in every scan now, so this is the same sweep with the flag left off. Only the files that raise something are listed, and the register is the default `blog`, whose allowances (6 sentence findings of each kind, 2 semicolons, 1 condition, 1 paragraph) come off the top of every file before it reaches this table.
 
@@ -83,24 +83,25 @@ done
 
 | File | Sentence, procedural | Sentence, descriptive | Condition order | Semicolon |
 |---|---:|---:|---:|---:|
-| `SKILL.md` | 28 | 17 | 0 | 0 |
-| `PROOF.md` | 57 | 108 | 0 | 0 |
+| `SKILL.md` | 19 | 0 | 0 | 0 |
+| `PROOF.md` | 55 | 107 | 0 | 0 |
 | `references/patterns.md` | 0 | 0 | 0 | 5 |
 | `references/false-positives.md` | 0 | 1 | 0 | 0 |
-| `references/voice.md` | 1 | 2 | 0 | 0 |
-| `references/checklist.md` | 5 | 0 | 0 | 0 |
+| `references/voice.md` | 0 | 2 | 0 | 0 |
+| `references/checklist.md` | 1 | 0 | 0 | 0 |
 | `references/ste.md` | 1 | 0 | 0 | 0 |
-| `voices/whit3rabbit.md` | 3 | 0 | 0 | 0 |
-| `../voice-setup/SKILL.md` | 12 | 16 | 1 | 0 |
-| `../rabbit-readme-improver/SKILL.md` | 7 | 10 | 0 | 0 |
-| `../rabbit-reads/SKILL.md` | 1 | 0 | 0 | 0 |
-| **Total, 41 files** | **115** | **154** | **1** | **5** |
+| `voices/whit3rabbit.md` | 1 | 0 | 0 | 0 |
+| `../voice-setup/SKILL.md` | 11 | 0 | 0 | 0 |
+| `../rabbit-readme-improver/SKILL.md` | 4 | 0 | 0 | 0 |
+| **Total, 41 files** | **92** | **110** | **0** | **5** |
 
 **Rule 6.6 raises nothing in any of these files.** Not one prose paragraph in the plugin runs past six sentences, the active voice's own cap of five doing its work. The column worth publishing here is the empty one: a check that fires on nothing here is a check whose cost is nothing here.
 
-**269 of the 275 are sentence length, and two documents carry 210 of them.** This file and `SKILL.md` are dense reference prose written in long sentences on purpose, the length the active voice's `max_avg_sentence_words: 22` measures and permits. The aerospace caps are 20 and 25 words for a maintenance manual read under time pressure by somebody whose first language may not be English. Publishing the number rather than tuning it away is the point: a writer who wants those sentences split has a list, and one who does not has `--no-ste` and a register cell.
+**202 of the 207 are sentence length, and two documents carry 181 of them.** This file and `SKILL.md` are dense reference prose written in long sentences on purpose, the length the active voice's `max_avg_sentence_words: 22` measures and permits. The aerospace caps are 20 and 25 words for a maintenance manual read under time pressure by somebody whose first language may not be English. Publishing the number rather than tuning it away is the point: a writer who wants those sentences split has a list, and one who does not has `--no-ste` and a register cell.
 
 The 5 semicolons in `references/patterns.md` have the explanation its 5 P0s have: a catalogue of the marks it bans quotes them in before-and-after examples.
+
+**The nineteenth pass shipped the `load-bearing` pattern and four tier-2 words, and each one paid for itself before landing.** The word is the top-lift vocabulary mark of the Claude PR-description corpus (`louisabraham/load-bearing`, lift 123 over 85 weeks, rising from nothing with the AI cluster), and the carve-out documented in `references/patterns.md` section 12 is now a catalogue pattern that stands itself down before exactly the four structural nouns. `quietly`, `seam`, `seams`, and `survived` joined tier 2 from the same corpus, cluster-gated at two hits per paragraph. Measured against the 100-README calibration corpus before wiring: one new `load-bearing` finding (the phuryn__pm-skills README, "surface load-bearing assumptions" in a list of Claude-skill descriptions, a true hit), one new tier-2 cluster (headroomlabs-ai__headroom, "seam" twice in one list block), zero new P0, all pinned in `tests/test_engine.py` rather than reported. The pass also picks up drift the eighteenth predated: the doc edits in the 16b0ce0 commit moved `SKILL.md` to 4,999 words and burstiness 0.54, shrank `../rabbit-rewrites/SKILL.md` to 537, and moved the STE columns with them. This file's own row shows the quiet cost of a tier-2 addition: one paragraph here used "quietly" twice, which the cluster rule reports, and the second one was reworded rather than published.
 
 **The sixteenth pass added one row and cleaned another.** `references/ste.md`
 documents the STE layer, rewritten here against the code and lexicon that
@@ -180,6 +181,8 @@ Those same three rows moved once more when the voice fingerprint landed, and for
 
 **`patterns.md` scores worst, and that is structural.** A catalog listing the words it catalogs will hit its own lexicon. Three Tier-1 words, nine `-ing` analyses, and three Tier-2 clusters all come from the vocabulary tables: the comma-separated lists of the words each rule exists to catch. Those are unquoted by design, because quoting a 36-item list would make it unreadable.
 
+**The `load-bearing` pattern found eight uses in this plugin's own prose on its first run.** That is the dataset's finding reproduced inside one repository: the word rose with the AI cluster, and this repo's reference prose had picked it up in exactly the metaphorical sense, "the exclusions are load-bearing", "the load-bearing words", "refusals are the load-bearing part". Every one was reworded rather than suppressed, which is the bar the self-scan sets for itself. `references/patterns.md` keeps two by design, the dataset-name citations in the sections that document the rule, and its row carries them beside its other deliberate hits.
+
 **The 5 P0s on `patterns.md` are the same story, one rule further on.** Line 46 lists the five chat citation markers in backticks, and `citation-leak` stopped honouring the exemption in lexicon 2, so each one now scores. That is the cost of catching a marker pasted into a block quote, which is where a real one usually lands. This file pays it in full and publishes the number.
 
 Two options were available in both cases. Quote every list entry so the exemption swallows it, or leave the number visible and explain it. The number is left visible. A tool that suppresses its own findings to look clean is doing the thing this plugin exists to criticize.
@@ -258,7 +261,7 @@ Every file is listed this time. An earlier version of this table showed five, wh
 
 | File | Voice hits | What they are |
 |---|---:|---|
-| `../rabbit-rewrites/SKILL.md` | 0 |  |
+
 | `../rabbit-readme-improver/SKILL.md` | 0 |  |
 | `references/craft.md` | 0 |  |
 | `references/forms/case-study.md` | 0 |  |
@@ -276,6 +279,8 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `references/injection.md` | 0 |  |
 | `voices/john.md` | 0 |  |
 | `references/checklist.md` | 1 | serial-comma advisory |
+| `../rabbit-reads/SKILL.md` | 1 | serial-comma advisory |
+| `../rabbit-rewrites/SKILL.md` | 1 | semicolon, inside the `TL;DR` abbreviation rather than in a sentence |
 | `references/citations/apa7.md` | 1 | serial-comma advisory |
 | `references/citations/chicago17.md` | 1 | serial-comma advisory |
 | `references/false-positives.md` | 1 | serial-comma advisory |
@@ -293,13 +298,13 @@ Every file is listed this time. An earlier version of this table showed five, wh
 | `references/forms/abstract.md` | 2 | serial-comma advisories |
 | `references/forms/pentest-report.md` | 2 | serial-comma advisories |
 | `references/voice.md` | 2 | serial-comma advisories |
-| `../rabbit-reads/SKILL.md` | 3 | serial-comma advisories |
+| `../rabbit-reads/SKILL.md` | 1 | serial-comma advisory |
 | `references/context.md` | 3 | serial-comma advisories |
 | `voices/whit3rabbit.md` | 4 | serial-comma advisories |
 | `../voice-setup/SKILL.md` | 6 | serial-comma advisories |
 | `PROOF.md` | 6 | serial-comma advisories |
 | `SKILL.md` | 6 | serial-comma advisories |
-| `voices/satoshi.md` | 12 | 1 em dash, 3 semicolons, 2 serial-comma advisories, 6 catalogue mentions in vocabulary table |
+| `voices/satoshi.md` | 11 | 3 semicolons, 3 banned words, 2 banned phrases, 1 absolute claim, 2 advisories. An authentic profile, held to the band and reported, never rewritten |
 | `references/patterns.md` | 25 | 10 em dashes, 7 semicolons, 2 one-word sentences, 6 advisories |
 
 The serial-comma rows are the `oxford_comma` mechanic, which reports at P2 and never at the voice default. It cannot tell a three-item list from a compound sentence, so it advises and says so in the finding. Counting advisories as defects would be the same error in the other direction.
@@ -417,7 +422,7 @@ produces the numbers on this page. One finding had consequences outside the repo
 33. **Nested badge links were parsed as links to the badge.** `[![PyPI](shields.io/...)](pypi.org/...)` is one of the most common shapes in this corpus. The link regex refuses a leading `!` and then matches the outer bracket, which stops at the `]` closing the alt text, so it captured `![PyPI` as the link text and the *badge image* URL as the destination. Both link counters had it, which means the study measured link style over pseudo-links. Images are blanked before links are counted now, in both the checker and the corpus script. Regenerating moved less than expected, because a badge wrapper was counted once either way: the destinations were wrong rather than the totals, and `avg_link_text_words` went from 2.16 to 2.18.
 34. **One unclosed `<table>` could fail CI.** `find_pitch` skips `<details>` and `<table>` blocks, and the depth counter has no way to know a block was never closed. A hand-written sponsor grid missing a `</table>`, which GitHub renders anyway, kept the counter positive to the end of the file, skipped every line after it, and reported `no-pitch`: a P0, and an exit 1 under `--check`, on a README whose second paragraph says exactly what the project is. A markdown heading now closes any block still open, and a second pass that ignores the blocks entirely runs only when the first found nothing.
 35. **`classify_heading` could not classify `## API`.** The keyword was written `" api"` with a leading space, to stop it matching "apiary" and "rapid", and a leading space has nothing to sit against at the start of the string. The single most obvious API heading there is fell through to `other` in both the checker and the study. Headings are padded before the test now, so a keyword can ask for a whole word by writing its own spaces, and the plural is spelled out so `Required APIs` keeps the classification it always had. `"getting started"` was also listed under both `installation` and `usage`, and installation is tested first, so the usage copy could never win a heading. It is gone.
-36. **Smaller drift, again.** `verify.py` ran its path check over inline code, so one edit to `` `scripts/scan.py` `` reported two broken promises where there was one. `--profile` took its choices from `PROFILE_SKIP`, so a register whose skip set emptied out would vanish from the CLI and from the coverage the tests get by iterating registers: there is an explicit `REGISTERS` tuple now, pinned against the tolerance matrix's own columns. `formulaic-challenges` fired on "the team faces challenges next quarter", which is a sentence rather than a tell, and now matches the formula patterns.md section 45 actually describes. The sentence splitter protected abbreviations with U+2024 ONE DOT LEADER and replaced every one of them with a period at the end, quietly rewriting any document that legitimately contained one. `check_structure` checked the position of the *first* license heading, so a README with an early licence mention and a real License section at the end was told its license is not last. `[a][b]` in prose, `matrix[i][j]` outside a code span, was reported as a reference-style link, and a reference now has to resolve against a definition before it is named. Both scanners documented exit codes they do not use.
+36. **Smaller drift, again.** `verify.py` ran its path check over inline code, so one edit to `` `scripts/scan.py` `` reported two broken promises where there was one. `--profile` took its choices from `PROFILE_SKIP`, so a register whose skip set emptied out would vanish from the CLI and from the coverage the tests get by iterating registers: there is an explicit `REGISTERS` tuple now, pinned against the tolerance matrix's own columns. `formulaic-challenges` fired on "the team faces challenges next quarter", which is a sentence rather than a tell, and now matches the formula patterns.md section 45 actually describes. The sentence splitter protected abbreviations with U+2024 ONE DOT LEADER and replaced every one of them with a period at the end, silently rewriting any document that legitimately contained one. `check_structure` checked the position of the *first* license heading, so a README with an early licence mention and a real License section at the end was told its license is not last. `[a][b]` in prose, `matrix[i][j]` outside a code span, was reported as a reference-style link, and a reference now has to resolve against a definition before it is named. Both scanners documented exit codes they do not use.
 
 ## Calibration
 
@@ -493,7 +498,7 @@ Two limits, stated rather than papered over. Spelled numbers are not tracked at 
 
 `scripts/voice-eval/` scores the whole pipeline end to end with labels nobody had to write: take a piece the writer actually wrote, deslop it into a neutral register, convert it back, and measure how much of the distance the round trip closed. The original is the answer key, so no human judgement enters the metric.
 
-**The corpus is empty, and the harness is not**, which is the same arrangement `docs/detector-corpus/` has and for the same reason. Gathering real writing from a real person with their consent is the expensive half, and a scorer written afterwards gets written to fit whatever data turned up. `scripts/voice-eval/test_eval_harness.py` runs it over synthetic triples with known answers, in CI, so the day somebody populates the corpus the arithmetic is already known to work: a round trip that landed scores above 0.9, one that moved nothing scores near 0, and one that went backwards scores negative.
+**The corpus is empty, and the harness is not**, which is the arrangement `docs/detector-corpus/` had until its generated half was populated. Gathering real writing from a real person with their consent is the expensive half, and a scorer written afterwards gets written to fit whatever data turned up. `scripts/voice-eval/test_eval_harness.py` runs it over synthetic triples with known answers, in CI, so the day somebody populates the corpus the arithmetic is already known to work: a round trip that landed scores above 0.9, one that moved nothing scores near 0, and one that went backwards scores negative.
 
 Until then, the pipeline's end-to-end behaviour rests on the fixtures in `tests/`, which own their ground truth and are not real writing. That is the same disclaimer the section below makes about the detector corpus, and it is not a smaller one.
 
@@ -529,9 +534,16 @@ The fixtures are hand-written, not drawn from a provenance-labeled corpus. Two s
 
 The harness for it now exists, in `docs/detector-corpus/` and `scripts/detector-corpus/`. It takes samples with an archive capture proving they predate 2022-11-30, stores a SHA-256 rather than the prose, refuses a human label dated after the cutoff, excludes any sample whose text no longer matches its hash, and reports the P0 false-positive rate per register with a Wilson interval. Run `python3 scripts/detector-corpus/score.py` to see it.
 
-**The corpus is empty.** The machinery works and nobody has gathered the texts, which needs network access, a few hours, and a copyright judgment about redistributing other people's writing that the hash-only design answers but does not make for anybody. `docs/detector-corpus/README.md` is the procedure.
+**The generated half is no longer empty.** Thirty attributed samples sit in the manifest: pull-request bodies carrying the literal Claude Code footer, pinned by commit sha and row in `louisabraham/load-bearing`, gathered by `scripts/claude-vocab-research/05_pick_pr_samples.py` and reviewed before registration. Measured at the nineteenth pass, lexicon 7:
 
-Two numbers are worth stating in the meantime, because they are what the current fixtures are actually worth. Zero false positives over two human samples is a rate somewhere between 0% and 66%. Zero over fifty would be somewhere under 7.2%, and 52 samples is where the upper bound crosses 7%. That gap is the whole argument for building this, and it is why the sentence below has not changed. The round numbers an earlier draft of this paragraph used were checked against `corpus_io.wilson` and two of them were wrong, which is the same lesson one paragraph up: a figure nobody recomputes is a figure that drifts.
+| Band | Flagged | Rate | 95% interval |
+|---|---:|---:|---|
+| P0 | 0 of 30 | 0.0% | 0.0% to 11.4% |
+| P1 | 9 of 30 | 30.0% | 16.7% to 47.9% |
+
+The P1 detections are em-dash-rate (5 documents), tier-1 vocabulary (2), injection-hidden-text (2), and one each of uniformity, consequence-tacking, and the new `load-bearing` pattern catching the sbomify PR's "load-bearing" in the wild, three days after the pattern was calibrated. The footer itself matches no pattern, so none of this is circular: the engine is reading the prose, not the signature.
+
+**The human half is still empty**, which needs network access, a few hours, and a copyright judgment about redistributing other people's writing that the hash-only design answers but does not make for anybody. `docs/detector-corpus/README.md` is the procedure. Zero false positives over two hand-written human samples is a rate somewhere between 0% and 66%. Zero over fifty would be somewhere under 7.2%, and 52 samples is where the upper bound crosses 7%. That gap is the whole argument for finishing the corpus, and it is why the sentence below has not changed. The round numbers an earlier draft of this paragraph used were checked against `corpus_io.wilson` and two of them were wrong, which is the same lesson one paragraph up: a figure nobody recomputes is a figure that drifts.
 
 Until the corpus is populated, treat these numbers as a regression guard, not an accuracy claim.
 

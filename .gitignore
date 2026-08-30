@@ -106,6 +106,12 @@ docs/academic-corpus/texts/
 # 01_fetch_datasets.py refetches and verifies, so nothing here needs git.
 docs/thesaurus-research/raw/
 
+# Claude-vocabulary research raw snapshot (analysis.js and day JSONLs of
+# other people's pull-request prose). claude_vocab_io.py commits each URL,
+# commit sha, SHA-256, and license, and 01_fetch_dataset.py refetches and
+# verifies, so nothing here needs git.
+docs/claude-vocab-research/raw/
+
 # Scratch directory
 scratch/
 

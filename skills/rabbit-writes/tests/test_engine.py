@@ -507,3 +507,77 @@ def test_vague_attribution_still_reports_the_uncited_papers_in_the_corpus():
         assert cell, "no vague-attribution row for %s" % register
         assert cell["docs"] == 3, "%s: %d docs" % (register, cell["docs"])
         assert cell["hits"] == 4, "%s: %d hits" % (register, cell["hits"])
+
+
+# --------------------------------------------------------------------------
+# the load-bearing carve-out and the Claude-vocabulary tier-2 additions
+#
+# The word arrived from outside: it is the top-lift mark of the Claude
+# PR-description corpus (louisabraham/load-bearing, lift 123 over 85 weeks),
+# and the carve-out documented in patterns.md section 12 is enforced by the
+# `load-bearing` catalogue pattern. quietly, seam, seams, and survived joined
+# tier 2 from the same corpus, each cluster-gated at two hits per paragraph.
+
+
+def test_load_bearing_fires_on_the_metaphor_and_not_the_wall():
+    """The negative lookahead stands the rule down before exactly the four
+    structural nouns patterns.md names, plurals included, and nowhere else.
+    Predicate position still fires ("the beam is load-bearing"), because the
+    documented rule carves out the attributive position only and the corpus
+    showed no literal predicate use in a hundred real READMEs. A hyphen-
+    compound like `missing-load-bearing` sits behind a hyphen, which the word
+    boundary already excludes."""
+    scan = scan_module()
+    cases = [
+        # (text, should the finding fire)
+        ("The load-bearing comment in this module is the cache guard.", True),
+        ("Surface load-bearing assumptions before writing the plan.", True),
+        ("The load-bearing structure of his argument is the second premise.", True),
+        ("Remove the load-bearing wall before renovating.", False),
+        ("The beam is load-bearing, so the joist spacing stays.", True),
+        ("Load-bearing beams and load-bearing joists carry the roof.", False),
+        ("A load-bearing girder spans the room.", False),
+        ("The missing-load-bearing criterion stays in criteria.md.", False),
+    ]
+    for text, should_fire in cases:
+        found = {f["id"] for f in scan.scan(text)[0]}
+        fired = "load-bearing" in found
+        assert fired == should_fire, "%r fired=%s" % (text, fired)
+
+
+def test_claude_vocabulary_calibration_over_the_100_readme_corpus():
+    """The calibration the repo demands before wiring any detector, pinned:
+    across the 100 real READMEs the carve-out pattern fires exactly once (the
+    phuryn__pm-skills README, "surface load-bearing assumptions" in a list of
+    Claude-skill descriptions, reviewed as a true hit), the four tier-2
+    additions tip exactly one new cluster (headroomlabs-ai__headroom, "seam"
+    twice in one list block), and neither id reaches P0 on any document. No
+    existence guard, deliberately: a calibration test that skips itself when
+    its corpus goes missing reads exactly like one that passes."""
+    import glob
+    scan = scan_module()
+    corpus = sorted(glob.glob(os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__))))),
+        "docs", "readme-analysis", "repos", "*", "README.md")))
+    assert len(corpus) == 100, "expected the 100-README corpus, found %d" % len(corpus)
+    new_words = ("quietly", "seam", "seams", "survived")
+    lb_docs, cluster_docs, p0_new = [], [], 0
+    for path in corpus:
+        slug = os.path.basename(os.path.dirname(path))
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            findings = scan.scan(fh.read(), ste="off")[0]
+        for finding in findings:
+            if finding["id"] == "load-bearing":
+                lb_docs.append(slug)
+                assert finding["priority"] == "P1", finding
+            if finding["id"] in ("load-bearing", "tier2-cluster") \
+                    and finding["priority"] == "P0":
+                p0_new += 1
+            if finding["id"] == "tier2-cluster":
+                matched = [w.strip() for w in finding["match"].split(",")]
+                if any(w in new_words for w in matched):
+                    cluster_docs.append(slug)
+    assert lb_docs == ["phuryn__pm-skills"], lb_docs
+    assert cluster_docs == ["headroomlabs-ai__headroom"], cluster_docs
+    assert p0_new == 0, "the new ids must never reach P0 on a stranger's document"

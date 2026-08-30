@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "_version_note": "Bumped whenever a word, a phrase, or a pattern changes, so a published measurement can name the catalogue that produced it. scan.py --json echoes it, PROOF.md's header quotes it, and scripts/validate.py fails when the two disagree. Numbers measured against one version mean nothing against another.",
   "_comment": "Tiered vocabulary and pattern regexes for scan.py. Edit freely; scan.py reads this at runtime. Word entries are matched case-insensitively on word boundaries and cover the listed inflections.",
 
@@ -72,7 +72,8 @@
     "landscape", "landscapes",
     "unpack", "unpacks", "unpacking", "complexities",
     "embrace", "embraces", "embracing",
-    "symphony", "kaleidoscope", "watershed"
+    "symphony", "kaleidoscope", "watershed",
+    "quietly", "seam", "seams", "survived"
   ],
 
   "_tier3_note": "Ordinary words, scored only at density. Nothing here may also appear in tier1: a word in both yields a P1 finding and inflates the density that produces a second one. Nothing here may be a top-200 English word either, which is why 'key' was removed: it dominated the count, and the phrase worth catching ('key turning point') is already a pattern regex.",
@@ -442,6 +443,13 @@
       "band": "craft",
       "priority": "P2",
       "rx": "(?i)\\b(was added to replace|this (function|method|class) was (added|changed|updated) to|previously,? (this|the) (code|function|approach))"
+    },
+    {
+      "id": "load-bearing",
+      "label": "Load-bearing (metaphorical)",
+      "band": "fingerprint",
+      "priority": "P1",
+      "rx": "(?i)(?<![\\w-])load[- ]bearing(?![\\w-])(?!\\s+(?:wall|beam|joist|girder)s?\\b)"
     }
   ]
 }

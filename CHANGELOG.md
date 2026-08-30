@@ -15,7 +15,74 @@ The seventh puts a voice in force between invocations, through the two host
 features that reach every turn rather than only the ones somebody asked for.
 The 100-repo corpus regression, the calibration fixtures, and every published
 self-scan number were re-run after all seven. An eighth pass adds a sixth
-skill, `rabbit-claude-md`, for CLAUDE.md and AGENTS.md memory files without touching the engine.
+skill, `rabbit-claude-md`, for CLAUDE.md and AGENTS.md memory files without touching the engine. A ninth pass ships the Claude-vocabulary work: a research pipeline over the load-bearing pull-request corpus, the `load-bearing` carve-out as a real pattern, and four corpus-calibrated tier-2 words, taking the lexicon to version 7.
+
+A tenth pass gives the voice a third host event, cleaning a commit or PR message before the shell ever runs it.
+
+### A third host event: commit and PR messages, cleaned before they run
+
+- `claude_hook.py` gains a `PreToolUse` handler, matched on `Bash`. It closes
+  anthropics/claude-code#66504 at the command level: any `Co-Authored-By:
+  Claude` trailer, session URL, or `Generated with [Claude Code]` footer a
+  host writes into a `git commit` or `gh pr create` message on its own is
+  stripped, and what is left runs through the same mechanical, single-answer
+  fixer a file gets (`scan.py --apply-safe --stdout --voice auto`), in
+  whichever voice `voices.resolve` finds active in the repository the commit
+  runs in.
+- The rewrite only ever lands through `hookSpecificOutput.updatedInput`, and
+  only in the two shapes it can prove safe: a heredoc body (`-m "$(cat
+  <<'EOF' ... EOF)"`), literal regardless of content, and a plainly quoted
+  `-m`/`--body`, rewritten only when the cleaned text carries no unescaped
+  copy of the quote that opened it. Every other shape is left alone.
+- `hooks/hooks.json` and `install_host.py`'s `HOOK_SPECS` both carry the new
+  `Bash`-matched entry, so a plugin install and a loose-skill install behave
+  the same way, and `check_plugin_hooks` keeps holding the two together.
+
+### Claude vocabulary, measured off a PR corpus
+
+- `scripts/claude-vocab-research/` is a five-stage pipeline over
+  `louisabraham/load-bearing`, a daily-sampled corpus of 47,464 pull-request
+  descriptions whose lead cluster is the vocabulary rising with AI
+  assistance. The snapshot is pinned by commit sha and SHA-256, the day
+  files the same way, and the license (MIT, author-confirmed while the
+  repository carries no LICENSE file) is recorded in the manifest rather
+  than remembered. Stages: fetch, generate candidates (lift and weekly
+  trend thresholds, inflection families, review state that survives
+  regeneration), corpus evidence over the 100-README calibration corpus,
+  merge into `lexicon.json` (the only writer besides a hand edit, refusing
+  tier-1 targets, cross-tier collisions, and uncalibrated candidates), and
+  a sample picker for the detector corpus. The committed
+  `docs/claude-vocab-research/candidates.json` is the evidence for a human
+  review, not a shipment: 75 families at lift 15+, 35 of them already
+  flagged as ordinary technical vocabulary by the corpus pass.
+- The carve-out `references/patterns.md` has documented since lexicon 6 is
+  now enforced: a `load-bearing` catalogue pattern at P1 fingerprint, stood
+  down by a negative lookahead before exactly the four structural nouns it
+  names (wall, beam, joist, girder, plurals included). Calibrated over the
+  100-README corpus before wiring: one new finding, the metaphorical use in
+  a list of Claude-skill descriptions, zero new P0, pinned in
+  `tests/test_engine.py`.
+- `quietly`, `seam`, `seams`, and `survived` joined tier 2, each
+  cluster-gated at two hits per paragraph. The additions cost exactly one
+  new cluster finding across the calibration corpus, reviewed and pinned.
+  `quietly` also closes a drift where section 14 of `references/patterns.md`
+  listed it without the lexicon carrying it.
+- The detector corpus holds its first real samples: 30 attributed
+  generated ones, PR bodies whose text carries the Claude Code footer,
+  selected from the pinned day files, reviewed, and registered with full
+  dataset provenance (commit sha, loader, path, row, field, collected,
+  license). `score.py` publishes the first detection rate: 9 of 30 at P1
+  (em-dash-rate on 5, tier-1 on 2, injection-hidden-text on 2, and one each
+  of uniformity, consequence-tacking, and the new `load-bearing` pattern
+  catching a live use three days after calibration), 0 of 30 at P0. The
+  human half stays empty, and every "the corpus is empty" claim in the repo
+  now says which half it means.
+- Eight metaphorical uses of the new pattern word in this repository's own
+  prose were reworded rather than suppressed, which is what the self-scan
+  is for. `references/patterns.md` keeps its two dataset-name citations as
+  deliberate hits beside the rest of its catalog quotations, and PROOF.md's
+  nineteenth pass carries the regenerated tables, including drift from the
+  doc edits in 16b0ce0 that the eighteenth pass predated.
 
 ### rabbit-claude-md: a sixth skill, for CLAUDE.md and AGENTS.md files
 

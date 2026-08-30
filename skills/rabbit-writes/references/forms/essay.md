@@ -11,7 +11,7 @@ An essay is the form where structure is the argument. Nothing else here rewards 
 - **Title.** One line. It names the claim or the question, not the topic.
 - **Opening.** The claim, the question, or the thing that makes the question worth asking. One of the three, and the voice decides which.
 - **Body.** Sections in an order that a reader could not shuffle without losing the argument. This is the test the form is built around, and it is the one to run before anything else: if the paragraphs could be reordered and the piece would read the same, there is no argument in it, only a list of observations about one subject.
-- **Turn.** The place where the strongest objection gets stated in its own words and answered. Optional in a short essay and load-bearing in a long one.
+- **Turn.** The place where the strongest objection gets stated in its own words and answered. Optional in a short essay and essential in a long one.
 - **Close.** What follows from the argument. Not a summary of it.
 
 Headers earn their place past roughly 1,200 words, or wherever a reader would reasonably want to leave and come back. Below that they usually mark a structure that the prose should have carried on its own, and a reader who needs a header to know where the argument turned is a reader the argument lost.

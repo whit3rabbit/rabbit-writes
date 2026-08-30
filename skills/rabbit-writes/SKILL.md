@@ -4,7 +4,7 @@ description: Write, edit, or audit prose in a specific person's saved voice, or 
 license: MIT
 compatibility: Python 3.9+ (any harness), stdlib only. Nothing to install.
 metadata:
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Rabbit writes

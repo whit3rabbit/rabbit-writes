@@ -3,7 +3,7 @@ name: voice-setup
 description: Build, measure, edit, or switch a personal writing voice profile for the rabbit-writes plugin. Three ways in, from writing samples, from an interview, or from both together, which is the one to recommend. Use when the user wants to teach the system how they write, create their own writing style, set up or replace a voice, capture their tone, analyze documents they wrote to extract a voice, be interviewed about their style, change whose voice is active, blend two voices, or convert their writing samples into a reusable style profile. Also use when a draft "doesn't sound like me" and the saved profile needs correcting.
 license: MIT
 metadata:
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Voice setup
@@ -81,7 +81,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/voice-setup/scripts/measure_voice.py sample
 
 One command. It prints a per-sample table so an outlier is visible rather than averaged away, the aggregate with the spread between samples, the **Measured from samples** block ready to paste, a starter `mechanics` object with the count behind every line, and the distributions the aggregate hides. It exits 1 if any sample carries a P0. Add `--json` when you want to read the numbers programmatically rather than off the table.
 
-The distributions are the block to read slowly. An average sentence length of 18 words describes two writers who sound nothing alike if one opens half her sentences with "But". Sentence openers, paragraph openers, connectors by group, which contractions they actually use, their hedges, their intensifiers, how each sample ends verbatim, and the load-bearing words (their top content words, counted). None of it goes in the rules file. It goes in the markdown, in their words, and it is most of what makes a profile describe a person rather than a punctuation policy.
+The distributions are the block to read slowly. An average sentence length of 18 words describes two writers who sound nothing alike if one opens half her sentences with "But". Sentence openers, paragraph openers, connectors by group, which contractions they actually use, their hedges, their intensifiers, how each sample ends verbatim, and the words that carry the most weight (their top content words, counted). None of it goes in the rules file. It goes in the markdown, in their words, and it is most of what makes a profile describe a person rather than a punctuation policy.
 
 The **words to reach for** block is a measured thesaurus. It holds pairs of a plain word the samples attest, with the count, beside the dressed-up synonyms that appear zero times, and proposes a `preferred_substitutions` block from the pairs where both halves of that evidence hold. That block is not documentation: `scan.py --apply-safe` rewrites each key to its value, so pasting it into the rules file converts an inflated draft toward this writer's vocabulary mechanically. Families where the samples use **both** halves (maybe and perhaps, but and however) print as explicit non-rules, because a substitution there would rewrite a word the writer chose, and families where the writer runs the formal direction print as inverted. The pair families live in `thesaurus.json` beside the script, versioned, and the repo validator checks their shape.
 

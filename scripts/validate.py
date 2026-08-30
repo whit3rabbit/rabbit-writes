@@ -1387,6 +1387,11 @@ def check_cli_error_handling():
         os.path.join(ROOT, "scripts", "thesaurus-research", "02_generate_candidates.py"),
         os.path.join(ROOT, "scripts", "thesaurus-research", "03_corpus_evidence.py"),
         os.path.join(ROOT, "scripts", "thesaurus-research", "04_merge_accepted.py"),
+        os.path.join(ROOT, "scripts", "claude-vocab-research", "01_fetch_dataset.py"),
+        os.path.join(ROOT, "scripts", "claude-vocab-research", "02_generate_candidates.py"),
+        os.path.join(ROOT, "scripts", "claude-vocab-research", "03_corpus_evidence.py"),
+        os.path.join(ROOT, "scripts", "claude-vocab-research", "04_merge_accepted.py"),
+        os.path.join(ROOT, "scripts", "claude-vocab-research", "05_pick_pr_samples.py"),
     ]
     for script_path in cli_scripts:
         if not os.path.exists(script_path):

@@ -17,6 +17,7 @@ python3 scripts/detector-corpus/test_corpus_harness.py   # the corpus harness, n
 python3 scripts/academic-research/test_academic_harness.py   # the academic corpus pipeline, over synthetic JATS
 python3 scripts/thesaurus-research/test_thesaurus_harness.py   # the thesaurus pipeline, over synthetic datasets
 python3 scripts/ste-research/test_ste_harness.py          # the STE dictionary-vocabulary pipeline, over synthetic entries
+python3 scripts/claude-vocab-research/test_claude_vocab_harness.py   # the Claude-vocabulary pipeline over the PR-description dataset, synthetic snapshot
 python3 scripts/voice-eval/test_eval_harness.py          # the reconstruction scorer, over stubbed triples
 python3 scripts/package_skills.py                        # package 6 isolated skill zips into dist/ for Claude custom skills upload, and one clawhub skill folder each under dist/clawhub/
 python3 scripts/test_package_skills.py                   # extract each zip outside the repo and run what it ships, the same battery over a loose plugin-layout copy, and the clawhub folders against the zips

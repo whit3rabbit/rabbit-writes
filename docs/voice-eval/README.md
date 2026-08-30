@@ -1,7 +1,8 @@
 # The reconstruction eval
 
 This directory is empty and the harness in `scripts/voice-eval/` is not. That is
-the same arrangement `docs/detector-corpus/` has, for the same reason: gathering
+the arrangement `docs/detector-corpus/` had until its generated half was
+populated, for the same reason: gathering
 real writing from a real person, with their consent, is the expensive half, and
 a scorer written afterwards gets written to fit whatever data turned up.
 

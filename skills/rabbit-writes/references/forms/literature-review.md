@@ -13,7 +13,7 @@ Three shapes, and the differences are real rather than stylistic. A **narrative*
 - **Title.** The question or the field, with the review type in it where the venue expects one.
 - **Abstract.** `forms/abstract.md` applies. For a systematic review it carries the protocol registration.
 - **Introduction.** Why this synthesis, now. What changed, or what the field keeps disagreeing about.
-- **Method.** For a systematic or scoping review this is load-bearing: databases, date range, search strings, inclusion and exclusion criteria, screening process, how disagreements were resolved, and how many records survived each stage. A flow diagram is expected. For a narrative review it is shorter and it is still stated, because a review with no stated selection is a review whose selection cannot be argued with.
+- **Method.** For a systematic or scoping review this is where the rigor lives: databases, date range, search strings, inclusion and exclusion criteria, screening process, how disagreements were resolved, and how many records survived each stage. A flow diagram is expected. For a narrative review it is shorter and it is still stated, because a review with no stated selection is a review whose selection cannot be argued with.
 - **Body.** Organized by theme, by mechanism, by method, or by chronology, and the choice is a claim about the field. Chronological is the weakest and the most common, because it is the one that requires no thesis.
 - **Synthesis.** Where the sources are put against each other rather than beside each other. This is the slot that makes it a review.
 - **Gaps.** What has not been done, specifically enough that somebody could do it.

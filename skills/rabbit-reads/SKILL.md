@@ -3,7 +3,7 @@ name: rabbit-reads
 description: Distill a book, paper, or thesis into a folder of terse per-concept cheatsheets with a README index. Use whenever the user asks to "read this PDF and turn it into a doc set", "extract the practices from this book", wants "chapter summaries", "cheatsheets" or "best-practice cards", asks for "craft notes from a novel" or "the claims and methods out of an arxiv paper", or says "make study notes from this thesis". Covers normalizing any source format to text (txt, md, docx, pdf, doc, rtf, html, odt, epub), mapping the source's structure to section line ranges, planning the doc set, fanning the writing out to subagents, and verifying the result, cut by concept and never one file per chapter.
 license: MIT
 metadata:
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Reading notes

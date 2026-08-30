@@ -80,7 +80,7 @@ numbers.
 
 Openers: `i` 400, `the` 289, `but` 223, `in` 153, `and` 125, `it` 105, `we` 90.
 Hedges: `about` 250, `around` 79, `often` 69, `i think` 46, `sometimes` 45,
-`maybe` 30. Load-bearing words: `people` 153, `years` 151, `time` 147,
+`maybe` 30. Words carrying the most weight: `people` 153, `years` 151, `time` 147,
 `know` 144, `world` 143, `life` 128.
 
 ---

@@ -126,6 +126,12 @@
       ]
     },
     {
+      "root": "scripts/claude-vocab-research",
+      "extraPaths": [
+        "skills/rabbit-writes/scripts"
+      ]
+    },
+    {
       "root": "scripts",
       "extraPaths": [
         "skills/rabbit-writes/scripts"

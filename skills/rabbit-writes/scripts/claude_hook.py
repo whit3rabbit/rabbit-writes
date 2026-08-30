@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-claude_hook.py - the Claude Code hook runner, for two events.
+claude_hook.py - the Claude Code hook runner, for three events.
 
 A skill enforces a voice when somebody invokes it, and the pre-commit hooks
 enforce one at commit. Between those two moments the model writes in its own
-register and nothing says so. These are the two host events that close that
-gap:
+register and nothing says so, and neither one ever looks at a commit message
+or a PR body. These are the host events that close both gaps:
 
   SessionStart    resolve the voice and say which profile is in force, or that
                   none is and which command claims one. A note printed by a
@@ -19,7 +19,17 @@ gap:
                   blocked commit, and here it is still the turn that wrote the
                   prose.
 
-Three rules govern everything below, and each of them is the difference between
+  PreToolUse      on Bash, when the command is `git commit` or
+                  `gh pr create`, strip the attribution trailer a host's own
+                  base prompt writes into every commit and PR body on its own
+                  (anthropics/claude-code#66504: a Co-Authored-By line, a
+                  session URL, the PR footer) and run what is left through the
+                  mechanical pass, so a stranger reading the log sees this
+                  repo's voice rather than a chatbot's trailer. Nothing else
+                  here ever sees a commit message: the pre-commit hooks scan
+                  files, not the message that describes them.
+
+Four rules govern everything below, and each of them is the difference between
 a hook people keep and a hook people delete.
 
 **Exit 0, always, and speak through JSON.** `PostToolUse` is a non-blocking
@@ -37,9 +47,18 @@ same day, and there is nothing this hook could report that is worth that.
 a clean scan, silence on a file outside the working tree. A hook that speaks on
 every file write teaches people to ignore it, which costs the P0s as well.
 
-The scan runs `scan.py --json` in a subprocess rather than importing it. The
-hook is a separate process either way, `scan.py`'s own `main()` already owns
-voice resolution, register detection, and the suppression pass, and a second
+**A rewrite only lands when it is provably safe.** `PreToolUse`'s `command`
+edit is the one place this file changes what a tool actually does rather than
+commenting on it, so it never guesses at shell quoting. A heredoc body is
+literal between its delimiters regardless of content, and a plain quoted body
+is rewritten only when the cleaned text does not itself contain the quote
+character, which would otherwise close the string early and hand the shell a
+broken command. Every other shape, including one this repo's own commit
+convention never produces, is left alone.
+
+The scan runs `scan.py` in a subprocess rather than importing it. The hook is
+a separate process either way, `scan.py`'s own `main()` already owns voice
+resolution, register detection, and the suppression pass, and a second
 in-process path through the engine is a second thing that can disagree with
 what the scanner actually reports. It costs about 0.1 seconds.
 
@@ -48,6 +67,7 @@ Stdlib only, 3.9+.
 
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -72,15 +92,51 @@ MAX_REPORTED = 8
 # against a pathological input, not a budget.
 SCAN_TIMEOUT = 25
 
+# The commands `on_pre_tool_use` looks at. A substring check, not a parse: the
+# regexes below still have to find an actual -m/--body flag before anything is
+# rewritten, so a command that merely mentions one of these (`git log --grep
+# "git commit"`) is a no-op rather than a false match.
+GIT_GH_COMMANDS = ("git commit", "gh pr create")
 
-def _emit(event, context=None, system_message=None):
+# Lines a host's own base prompt writes into a commit or PR body on its own,
+# never the user's words: the attribution trailer, a session link, and the PR
+# footer. anthropics/claude-code#66504 is people asking for exactly this.
+ATTRIBUTION_PATTERNS = (
+    re.compile(r"co-authored-by:.*claude", re.IGNORECASE),
+    re.compile(r"https?://(www\.)?claude\.ai/", re.IGNORECASE),
+    re.compile(r"https?://code\.claude\.com/", re.IGNORECASE),
+    re.compile(r"https?://(www\.)?claude\.com/claude-code", re.IGNORECASE),
+    re.compile(r"generated with \[claude code\]", re.IGNORECASE),
+)
+
+# `-m "$(cat <<'EOF' ... EOF)"` / `--body "$(cat <<'EOF' ... EOF)"`, the form
+# this repo's own commit convention (and the host's) writes. Matched, not
+# assumed: a heredoc body is literal shell content between its delimiters, so
+# splicing a cleaned replacement back in raises no quoting concern at all.
+HEREDOC_RX = re.compile(
+    r"(?P<flag>-m|--body)\s+\"\$\(cat\s*<<'?(?P<delim>[A-Za-z_]+)'?\s*\n"
+    r"(?P<body>.*?)\n(?P=delim)\s*\n?\)\"", re.DOTALL)
+
+# `-m "message"` / `-m 'message'` / `--body "..."` / `--body '...'`.
+PLAIN_RX = re.compile(
+    r"(?P<flag>-m|--body)\s+(?P<quote>[\"'])(?P<body>.*?)(?<!\\)(?P=quote)",
+    re.DOTALL)
+
+# Commit and PR messages are short. This is a backstop, the same as
+# SCAN_TIMEOUT above, sized down because the input it bounds is.
+COMMIT_TIMEOUT = 20
+
+
+def _emit(event, context=None, system_message=None, updated_input=None):
     """The one way this script speaks. Exits 0 by every path."""
     payload = {}
-    if context:
-        payload["hookSpecificOutput"] = {
-            "hookEventName": event,
-            "additionalContext": context,
-        }
+    if context or updated_input:
+        spec = {"hookEventName": event}
+        if context:
+            spec["additionalContext"] = context
+        if updated_input:
+            spec["updatedInput"] = updated_input
+        payload["hookSpecificOutput"] = spec
     if system_message:
         payload["systemMessage"] = system_message
     if payload:
@@ -202,9 +258,82 @@ def on_post_tool_use(payload):
     _emit("PostToolUse", context=_format(path, doc))
 
 
+def _strip_attribution(text):
+    """`text` with every attribution line dropped, trailing blanks collapsed."""
+    kept = [ln for ln in text.split("\n")
+            if not any(p.search(ln) for p in ATTRIBUTION_PATTERNS)]
+    while kept and not kept[-1].strip():
+        kept.pop()
+    return "\n".join(kept)
+
+
+def _mechanical_pass(text):
+    """`text` through scan.py's mechanical fixes, or unchanged on any failure.
+
+    `--apply-safe --stdout --voice auto`: the same fixer `--apply-safe --write`
+    runs on a file, over stdin instead, printing the result rather than
+    writing it. `--voice auto` is `voices.resolve`'s own order, a
+    `.rabbit-voice` in the repository the commit runs in, then that clone's
+    `voices/ACTIVE`, so this applies whoever's voice is active there rather
+    than any one profile pinned by name.
+    """
+    if not text.strip():
+        return text
+    argv = [sys.executable, SCAN_PATH, "--apply-safe", "--stdout",
+            "--voice", "auto"]
+    try:
+        proc = subprocess.run(argv, input=text.encode("utf-8"),
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.DEVNULL, timeout=COMMIT_TIMEOUT)
+    except (OSError, subprocess.SubprocessError):
+        return text
+    out = proc.stdout.decode("utf-8", "replace")
+    return out.rstrip("\n") if out.strip() else text
+
+
+def _clean_body(body):
+    return _mechanical_pass(_strip_attribution(body))
+
+
+def _rewritten_command(command):
+    """The command with its message cleaned, or None to leave it alone.
+
+    Tries the heredoc shape first, then the plain quoted one, and stops at
+    the first match: a command carries at most one -m/--body in the shapes
+    this repo's convention produces, and the two regexes are ordered so a
+    heredoc's own embedded quotes never get mistaken for the plain form.
+    """
+    for rx in (HEREDOC_RX, PLAIN_RX):
+        m = rx.search(command)
+        if not m:
+            continue
+        cleaned = _clean_body(m.group("body"))
+        if cleaned == m.group("body"):
+            return None
+        if rx is PLAIN_RX and m.group("quote") in cleaned:
+            return None
+        return command[:m.start("body")] + cleaned + command[m.end("body"):]
+    return None
+
+
+def on_pre_tool_use(payload):
+    if payload.get("tool_name") != "Bash":
+        _emit("PreToolUse")
+    tool_input = payload.get("tool_input")
+    command = tool_input.get("command") if isinstance(tool_input, dict) else None
+    if not isinstance(command, str) or not any(
+            c in command for c in GIT_GH_COMMANDS):
+        _emit("PreToolUse")
+    rewritten = _rewritten_command(command)
+    if rewritten is None:
+        _emit("PreToolUse")
+    _emit("PreToolUse", updated_input={"command": rewritten})
+
+
 HANDLERS = {
     "SessionStart": on_session_start,
     "PostToolUse": on_post_tool_use,
+    "PreToolUse": on_pre_tool_use,
 }
 
 

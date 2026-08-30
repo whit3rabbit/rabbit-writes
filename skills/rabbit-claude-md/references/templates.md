@@ -10,7 +10,7 @@ The file every session loads. Small: a map plus rules. When it grows past the si
 
 - **Title and one line of what this is.** Enough for a fresh session to orient. Not a pitch, not a feature list, not the README restated.
 - **Commands.** A fenced block of the commands Claude cannot guess: build, test, lint, run, in copy-pasteable form, each with a short comment saying what it proves. Verified against the tree, because a dead command costs trust in the live ones.
-- **Architecture pointers.** Where the load-bearing things live, as pointers rather than descriptions. A line naming the directory and its role beats a paragraph describing its contents, which the code states better.
+- **Architecture pointers.** Where the parts that matter most live, as pointers rather than descriptions. A line naming the directory and its role beats a paragraph describing its contents, which the code states better.
 - **Conventions.** Only the ones that differ from defaults: style choices, repository etiquette, branch and PR habits. Standard language conventions cost lines and change nothing.
 - **Gotchas.** Non-obvious behavior that has caused a real mistake, one line each. Depth behind any of them goes to `.claude/docs/` with a link. A gotcha section that keeps growing is a changelog forming: prune it against the removal test.
 

@@ -90,7 +90,7 @@ Both hosts also pick a skill implicitly when your request matches its descriptio
 A skill applies your voice when you run it, and the pre-commit hooks apply it at commit. In between, the model writes in its own register and you ask again every turn. Two Claude Code features close that gap, and this plugin ships both:
 
 - `output-styles/rabbit-writes.md`, a style that puts the verdict first and strips the chatbot cadence. Pick it under **Output style** in `/config`.
-- `hooks/hooks.json`, which names your active voice at session start and scans any `.md` the editor writes.
+- `hooks/hooks.json`, which names your active voice at session start, scans any `.md` the editor writes, and cleans a `git commit` or `gh pr create` message before it runs: any `Co-Authored-By: Claude` trailer, session URL, or `Generated with [Claude Code]` footer is stripped, and what is left goes through the same mechanical, single-answer fixes `--apply-safe` runs on a file, in whichever voice is active. This is the layer that guarantees the trailer never lands, whatever your `attribution` setting in `settings.json` is doing on the harness side of the same problem ([anthropics/claude-code#66504](https://github.com/anthropics/claude-code/issues/66504)).
 
 **On a plugin install there is nothing to do.** Claude Code discovers both directories when the plugin is enabled. Neither is forced on you: the style is opt-in through `/config`, and the hook exits silently unless it has a P0 or P1 to report.
 
@@ -685,7 +685,7 @@ That fact was asserted in comments in six places and checked nowhere. It is now 
 
 `skills/rabbit-writes/PROOF.md` publishes the engine scanned by its own scanner, unflattering rows included. It also says in the file that a two-sample calibration is the weakest evidence a detector can offer.
 
-`docs/detector-corpus/` replaces that with a measured false-positive rate per register, once somebody populates it. The machinery is written and the corpus is empty. The README in that directory is the procedure.
+`docs/detector-corpus/` replaces that with a measured false-positive rate per register, once somebody populates it. The machinery is written, the generated half is populated (30 attributed PR samples through the load-bearing dataset, 9 of 30 detected at P1), and the human half is a sourcing problem the README in that directory describes.
 
 ## Where this came from
 

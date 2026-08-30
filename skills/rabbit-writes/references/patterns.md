@@ -138,7 +138,7 @@ Every word in this table is in `scripts/lexicon.json` under `tier1` or `tier1_ph
 | the future looks bright / only time will tell | (cut) |
 
 **Carve-outs:**
-- `load-bearing` before a literal structural noun (wall, beam, joist, girder) is building terminology, not a tell. "The load-bearing structure of his argument" still flags.
+- `load-bearing` before a literal structural noun (wall, beam, joist, girder) is building terminology, not a tell. "The load-bearing structure of his argument" still flags. Enforced by the `load-bearing` catalogue pattern, whose negative lookahead stands the rule down exactly before those four nouns and nowhere else. The word earned its place the hard way: it is the top-lift vocabulary mark of the Claude PR-description corpus (lift 123 over 85 weeks, louisabraham/load-bearing), rising with the AI cluster from nothing rather than sitting in the language.
 - `intricate` describing physical craft, carvings, circuitry, or mechanisms (e.g. "intricate woodwork", "intricate clockwork") is literal descriptive prose.
 - `bustling` in direct travel reporting or urban descriptions where physical movement is being observed (e.g. "bustling market street").
 
@@ -166,7 +166,7 @@ Same edit, weaker claim. **These are not authorship evidence.** People reach for
 
 Fine alone. Two or more in the same paragraph, and the paragraph needs a rewrite.
 
-harness, navigate, foster, elevate, unleash, streamline, empower, bolster, spearhead, resonate, revolutionize, facilitate, underpin, nuanced, crucial, ecosystem *(metaphor)*, myriad, plethora, encompass, catalyze, reimagine, galvanize, augment, cultivate, illuminate, elucidate, juxtapose, transformative, cornerstone, paramount, poised to, burgeoning, nascent, quintessential, overarching, quietly, deeply *(in "deeply rooted", "deeply committed")*, underpinnings.
+harness, navigate, foster, elevate, unleash, streamline, empower, bolster, spearhead, resonate, revolutionize, facilitate, underpin, nuanced, crucial, ecosystem *(metaphor)*, myriad, plethora, encompass, catalyze, reimagine, galvanize, augment, cultivate, illuminate, elucidate, juxtapose, transformative, cornerstone, paramount, poised to, burgeoning, nascent, quintessential, overarching, quietly, deeply *(in "deeply rooted", "deeply committed")*, seam, survived, underpinnings. The last three arrived from the Claude PR-description corpus (louisabraham/load-bearing): `quietly` at lift 63, `survived` at 62, `seam` at 37, each measured before it was added and each costing at most one new cluster finding across the 100-README calibration corpus.
 
 The sense-dependent ones sit here rather than in section 12 for a mechanical reason: a regex sees the string, not the meaning. `leverage` *(verb)*, `landscape` *(metaphor)*, `embrace` *(metaphor)*, `symphony` and `kaleidoscope` *(metaphor)*, `unpack` / `unpacking`, `complexities`. Each is a Tier-1 tell in the sense that matters and an ordinary word otherwise: real leverage, a literal landscape, unpacking an archive. Read them as replace-on-sight when the metaphorical sense is the one in front of you.
 
@@ -579,7 +579,7 @@ This paragraph is the definition. `SKILL.md` and the checklist point at it rathe
 
 ## Paragraph-reshuffle immunity
 
-Swap two body paragraphs. Does anything break? If the order does not matter, you have a list of points, not an argument that builds. Fix structurally: give each paragraph a load-bearing connection to the one before it.
+Swap two body paragraphs. Does anything break? If the order does not matter, you have a list of points, not an argument that builds. Fix structurally: give each paragraph a connection that does real work with the one before it.
 
 ## The treadmill test
 

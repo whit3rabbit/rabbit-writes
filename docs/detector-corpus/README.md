@@ -4,10 +4,13 @@
 against one hand-written slop sample is the weakest form of evidence a detector
 can offer. It guards against a regression. It does not measure anything.
 
-This directory is the replacement, and right now it is empty. That is the state
-of the evidence and it is written down rather than glossed: the harness works,
-the protocol is here, and nobody has gathered the texts. Anyone can, including
-you, and `score.py` will publish the result the moment they do.
+This directory is the replacement, and half of it is populated. Thirty
+generated samples are registered: attributed PR bodies from the load-bearing
+dataset, each a pinned row whose text carries the Claude Code footer. The
+human half is still empty, and that is the state of the false-positive
+evidence, written down rather than glossed. Anyone can gather it, including
+you, and `score.py` publishes a rate the moment it lands. The generated half
+already publishes one: 9 of 30 detected at P1 under lexicon 7.
 
 ## What it measures
 
@@ -104,6 +107,23 @@ about X in a plain, concrete voice, no filler" produce different documents, and
 a corpus built only from the first measures the engine against slop nobody was
 trying to avoid.
 
+The second shape is a dataset row that carries the model's own attribution: a
+pull-request body ending in the literal "Generated with Claude Code" footer.
+The prompt is unknowable for scraped prose, so what stands in for it is the
+attribution itself. It is recorded in `why_credible`, with `model` naming the
+basis rather than a model id. Such a sample pins what any dataset sample pins:
+dataset, immutable revision, loader, path, split, row, and field, plus the
+collected date and license. The loader is `github-jsonl` for a pinned
+raw.githubusercontent JSONL file. The first batch comes
+from `louisabraham/load-bearing` through
+`scripts/claude-vocab-research/05_pick_pr_samples.py`, which prints the exact
+`add_sample.py` command for each candidate body after a human reads it.
+
+The footer text matches no catalogue pattern today, so scoring the engine over
+these samples is not circular. Detection has to come from the prose, not the
+signature. The day a pattern matches the footer, that changes, and the samples
+would need relabeling as trivial. That fact rides along in each sample's notes.
+
 ## Why the text is not committed
 
 Hash-only. The manifest records the source URL, the archive URL, the publication
@@ -166,6 +186,18 @@ python3 add_sample.py ~/generated/locking.txt \
   --model claude-sonnet-4-5 --generated 2026-08-11 \
   --prompt "Write a 700-word blog post about distributed locking"
 
+# an attributed dataset row (a PR body with the Claude Code footer)
+python3 add_sample.py ~/picked/gen-lb-20260824-r4.txt \
+  --id gen-lb-20260824-r4 --label generated --register docs \
+  --model "claude (self-attributed: Claude Code footer in the body)" \
+  --generated 2026-08-24 \
+  --dataset louisabraham/load-bearing \
+  --revision 2a233f653fd72b431850b957b2d28c5c4dbdbaa6 \
+  --loader github-jsonl --path data/days/2026-08-24.jsonl \
+  --split 2026-08-24 --row 4 --field body \
+  --collected 2026-08-27 --license "MIT (author-confirmed)" \
+  --why-credible "the body carries the literal Claude Code attribution footer"
+
 python3 score.py            # the rates, with intervals
 python3 score.py --verify   # hashes only
 ```
@@ -179,10 +211,12 @@ person measures how well the engine handles that person.
 
 ## What a result would change
 
-`PROOF.md` currently carries a disclaimer where a number belongs. A populated
-corpus turns the project's central honesty claim, that detector false-positive
-rates above 60% on non-native English writers are the reason this tool reports
-named findings instead of a score, from a citation of somebody else's research
-into a measurement of this engine.
+The generated half turned a disclaimer into a number already: the detection
+rate at P1 over 30 attributed PR bodies, published by `score.py` and pinned in
+`PROOF.md`. The human half is what the central honesty claim still needs: a
+populated human corpus turns "detector false-positive rates above 60% on
+non-native English writers are the reason this tool reports named findings
+instead of a score" from a citation of somebody else's research into a
+measurement of this engine.
 
-Until then the disclaimer stands, and it should.
+Until then that disclaimer stands, and it should.
