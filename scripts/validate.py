@@ -180,6 +180,20 @@ def check_codex_manifests():
              % (CODEX_MARKETPLACE_REL, codex_names, names))
     for entry in codex_market.get("plugins", []):
         source = entry.get("source")
+        if isinstance(source, dict) and "url" in source:
+            # The shipped entry is a git url rather than a local path because
+            # the plugin root is the repo root, and `codex` 0.137 cannot
+            # resolve a local source at the marketplace root: "./" strips to
+            # an empty path there and the entry is skipped, which reads as
+            # "plugin not found" (codex-rs core-plugins
+            # resolve_local_plugin_source_path). A url entry materializes the
+            # repo the way a cross-repo plugin does, on this version and on
+            # newer ones that accept "./".
+            url = source.get("url")
+            if not isinstance(url, str) or not url.startswith("https://"):
+                fail("%s plugin %r carries a non-https git source %r"
+                     % (CODEX_MARKETPLACE_REL, entry.get("name"), url))
+            continue
         path = source.get("path") if isinstance(source, dict) else source
         if not path or not os.path.isdir(os.path.join(ROOT, path)):
             fail("%s plugin %r points at missing source %r"

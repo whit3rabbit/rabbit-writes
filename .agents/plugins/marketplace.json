@@ -7,8 +7,8 @@
     {
       "name": "rabbit-writes",
       "source": {
-        "source": "local",
-        "path": "./"
+        "source": "url",
+        "url": "https://github.com/whit3rabbit/rabbit-writes.git"
       },
       "policy": {
         "installation": "AVAILABLE",

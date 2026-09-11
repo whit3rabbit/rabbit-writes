@@ -344,11 +344,15 @@ def test_a_codex_marketplace_missing_the_plugin_is_reported():
             "no report: %s" % validate.problems
 
 
-def test_a_codex_source_pointing_nowhere_is_reported():
+def test_a_codex_source_with_an_insecure_url_is_reported():
+    """The shipped entry is a git url, because codex 0.137 cannot resolve a
+    local source pointing at the marketplace root itself."""
     with sandbox() as s:
-        s.edit(CODEX_MARKET, '"path": "./"', '"path": "./no-such-dir/"')
+        s.edit(CODEX_MARKET,
+               '"url": "https://github.com/whit3rabbit/rabbit-writes.git"',
+               '"url": "ftp://insecure.example/rabbit-writes.git"')
         validate.check_codex_manifests()
-        assert s.reported("points at missing source"), str(validate.problems)
+        assert s.reported("non-https git source"), "no report: %s" % validate.problems
 
 
 def test_a_drifted_codex_version_is_reported():
