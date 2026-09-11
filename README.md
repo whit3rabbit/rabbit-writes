@@ -32,7 +32,7 @@ The voice is data. Swap it, edit it, blend two of them, or write your own from a
 
 ## Install
 
-One set of manifests, two hosts. Codex reads Claude Code's `.claude-plugin/` marketplace format, so the same repo installs as a plugin in both.
+Each host reads its own manifest set under the same repo root. Claude Code reads `.claude-plugin/`. Codex reads `.agents/plugins/marketplace.json` for the marketplace and `.codex-plugin/plugin.json` for the plugin, so the same repo installs as a plugin in both. `scripts/validate.py` keeps the three in sync.
 
 **Claude Code**, in a session:
 

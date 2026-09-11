@@ -1,0 +1,20 @@
+{
+  "name": "rabbit-writes",
+  "interface": {
+    "displayName": "Rabbit Writes"
+  },
+  "plugins": [
+    {
+      "name": "rabbit-writes",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

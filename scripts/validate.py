@@ -133,6 +133,73 @@ def check_manifests():
                  % (entry.get("name"), entry["version"], plugin.get("version")))
 
 
+# Codex discovers a repo marketplace only at `.agents/plugins/marketplace.json`
+# and reads the plugin from `.codex-plugin/plugin.json`. It never reads
+# `.claude-plugin/`, which is how a marketplace registered with zero plugins:
+# `codex plugin marketplace add` succeeded, then `codex plugin add` reported
+# "plugin not found" against a Claude marketplace.json that named the plugin
+# correctly. Both files restate facts the Claude manifests already carry, so the
+# check below pins the restatements to their homes rather than trusting them.
+CODEX_MARKETPLACE_REL = os.path.join(".agents", "plugins", "marketplace.json")
+CODEX_PLUGIN_REL = os.path.join(".codex-plugin", "plugin.json")
+
+
+def check_codex_manifests():
+    """The Codex-native manifests against the Claude ones they mirror."""
+    try:
+        plugin = json.loads(read(".claude-plugin", "plugin.json"))
+        market = json.loads(read(".claude-plugin", "marketplace.json"))
+    except (OSError, ValueError):
+        return                      # check_manifests reports these
+
+    parsed = {}
+    for rel in (CODEX_MARKETPLACE_REL, CODEX_PLUGIN_REL):
+        if not os.path.exists(os.path.join(ROOT, rel)):
+            fail("missing %s. Codex reads it instead of .claude-plugin/, so "
+                 "without it the marketplace registers empty and "
+                 "`codex plugin add` reports the plugin as not found" % rel)
+            continue
+        try:
+            parsed[rel] = json.loads(read(rel))
+        except ValueError as exc:
+            fail("%s does not parse: %s" % (rel, exc))
+    if len(parsed) != 2:
+        return
+    codex_market = parsed[CODEX_MARKETPLACE_REL]
+    codex_plugin = parsed[CODEX_PLUGIN_REL]
+
+    if codex_market.get("name") != market.get("name"):
+        fail("%s names marketplace %r, .claude-plugin/marketplace.json says %r"
+             % (CODEX_MARKETPLACE_REL, codex_market.get("name"),
+                market.get("name")))
+    names = sorted(p.get("name") for p in market.get("plugins", []))
+    codex_names = sorted(p.get("name") for p in codex_market.get("plugins", []))
+    if codex_names != names:
+        fail("%s lists plugins %r, .claude-plugin/marketplace.json lists %r. "
+             "Both hosts must offer the same plugin"
+             % (CODEX_MARKETPLACE_REL, codex_names, names))
+    for entry in codex_market.get("plugins", []):
+        source = entry.get("source")
+        path = source.get("path") if isinstance(source, dict) else source
+        if not path or not os.path.isdir(os.path.join(ROOT, path)):
+            fail("%s plugin %r points at missing source %r"
+                 % (CODEX_MARKETPLACE_REL, entry.get("name"), path))
+
+    for key in ("name", "version", "description"):
+        if codex_plugin.get(key) != plugin.get(key):
+            fail("%s %s is %r, .claude-plugin/plugin.json says %r. "
+                 ".claude-plugin/plugin.json is the one home of the plugin "
+                 "metadata"
+                 % (CODEX_PLUGIN_REL, key, codex_plugin.get(key),
+                    plugin.get(key)))
+    skills = codex_plugin.get("skills")
+    if skills and not os.path.isdir(os.path.join(ROOT, skills)):
+        fail("%s points skills at %r, which is not a directory"
+             % (CODEX_PLUGIN_REL, skills))
+    notes.append("codex manifests match the claude ones (%s at %r)"
+                 % (plugin.get("name"), skills))
+
+
 def check_skills():
     if not os.path.isdir(SKILLS):
         fail("no skills/ directory")
@@ -1851,6 +1918,7 @@ def check_plugin_hooks():
 # individual checks over fixtures instead.
 CHECKS = (
     check_manifests,
+    check_codex_manifests,
     check_skills,
     check_voices,
     check_engine,

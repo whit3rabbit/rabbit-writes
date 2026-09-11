@@ -309,6 +309,79 @@ def test_a_blanked_env_description_is_reported():
 
 
 # --------------------------------------------------------------------------
+# the codex manifest sync check
+# --------------------------------------------------------------------------
+
+CODEX_MARKET = os.path.join(".agents", "plugins", "marketplace.json")
+CODEX_PLUGIN = os.path.join(".codex-plugin", "plugin.json")
+
+
+def test_the_codex_manifest_check_passes_the_shipped_files():
+    """The baseline. Without it, every mutation below proves nothing."""
+    with sandbox() as s:
+        validate.check_codex_manifests()
+        assert not validate.problems, str(validate.problems)
+        assert s.reported("") == []
+
+
+def test_a_missing_codex_marketplace_is_reported():
+    """The failure that shipped: without `.agents/plugins/marketplace.json`,
+    Codex registers the marketplace with zero plugins and `codex plugin add`
+    reports the plugin as not found, with nothing repo-side failing."""
+    with sandbox() as s:
+        os.unlink(s.path(CODEX_MARKET))
+        validate.check_codex_manifests()
+        assert s.reported("missing"), "no report: %s" % validate.problems
+
+
+def test_a_codex_marketplace_missing_the_plugin_is_reported():
+    with sandbox() as s:
+        s.edit(CODEX_MARKET,
+               '"name": "rabbit-writes",\n      "source": {',
+               '"name": "rabbit-writes-renamed",\n      "source": {')
+        validate.check_codex_manifests()
+        assert s.reported("Both hosts must offer the same plugin"), \
+            "no report: %s" % validate.problems
+
+
+def test_a_codex_source_pointing_nowhere_is_reported():
+    with sandbox() as s:
+        s.edit(CODEX_MARKET, '"path": "./"', '"path": "./no-such-dir/"')
+        validate.check_codex_manifests()
+        assert s.reported("points at missing source"), str(validate.problems)
+
+
+def test_a_drifted_codex_version_is_reported():
+    # The current version comes from plugin.json rather than a literal, for
+    # the same reason test_a_drifted_skill_version_is_reported reads it there.
+    with open(os.path.join(ROOT, ".claude-plugin", "plugin.json"),
+              encoding="utf-8") as fh:
+        current = json.load(fh)["version"]
+    with sandbox() as s:
+        s.edit(CODEX_PLUGIN, '"version": "%s"' % current,
+               '"version": "0.0.1-drifted"')
+        validate.check_codex_manifests()
+        assert s.reported("version is"), "no report: %s" % validate.problems
+
+
+def test_a_drifted_codex_skills_path_is_reported():
+    """A skills path Codex cannot resolve is a plugin that installs with no
+    skills in it, which is the quiet half of the same failure."""
+    with sandbox() as s:
+        s.edit(CODEX_PLUGIN, '"skills": "./skills/"', '"skills": "./no-skills/"')
+        validate.check_codex_manifests()
+        assert s.reported("points skills at"), "no report: %s" % validate.problems
+
+
+def test_a_drifted_codex_marketplace_name_is_reported():
+    with sandbox() as s:
+        s.edit(CODEX_MARKET, '"name": "rabbit-writes",\n  "interface": {',
+               '"name": "other-name",\n  "interface": {')
+        validate.check_codex_manifests()
+        assert s.reported("names marketplace"), "no report: %s" % validate.problems
+
+
+# --------------------------------------------------------------------------
 # the rabbit-reads layout check
 # --------------------------------------------------------------------------
 
