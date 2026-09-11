@@ -386,6 +386,48 @@ def test_a_drifted_codex_marketplace_name_is_reported():
 
 
 # --------------------------------------------------------------------------
+# the generated AGENTS.md check
+# --------------------------------------------------------------------------
+
+def test_the_agents_md_check_passes_the_shipped_files():
+    with sandbox() as s:
+        validate.check_agents_md()
+        assert not validate.problems, str(validate.problems)
+        assert s.reported("") == []
+
+
+def test_a_stale_agents_md_is_reported():
+    """The copy is regenerated, never hand edited: any drift from the render
+    fails with the command that fixes it. A hand edit is how the mangled
+    claude-to-Codex rename shipped in the first place."""
+    with sandbox() as s:
+        s.edit("AGENTS.md", "Nothing here repeats it.",
+               "Nothing here repeats it, mostly.")
+        validate.check_agents_md()
+        assert s.reported("Run: python3 scripts/agents_md.py"), \
+            "no report: %s" % validate.problems
+
+
+def test_a_missing_agents_md_is_reported():
+    with sandbox() as s:
+        os.unlink(s.path("AGENTS.md"))
+        validate.check_agents_md()
+        assert s.reported("AGENTS.md is missing"), str(validate.problems)
+
+
+def test_a_drifted_claude_anchor_is_reported():
+    """The anchors are pinned one-to-one: a CLAUDE.md edit that rewords a
+    sentence the transform rephrases has to update scripts/agents_md.py on
+    purpose, or the render fails loudly instead of going stale."""
+    with sandbox() as s:
+        s.edit("CLAUDE.md",
+               ", loaded automatically when Claude works in that directory.",
+               ". Claude Code loads it automatically.")
+        validate.check_agents_md()
+        assert s.reported("could not render AGENTS.md"), str(validate.problems)
+
+
+# --------------------------------------------------------------------------
 # the rabbit-reads layout check
 # --------------------------------------------------------------------------
 

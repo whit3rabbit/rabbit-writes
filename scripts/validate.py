@@ -55,6 +55,7 @@ from rwlib import voice_check                   # noqa: E402
 from rwlib.lexicon import SYNTHETIC_FINDING_IDS  # noqa: E402
 from rwlib.ste import STE_FINDING_IDS  # noqa: E402
 import thesaurus_check                          # noqa: E402
+import agents_md                                # noqa: E402
 
 problems = []
 notes = []
@@ -848,6 +849,40 @@ def check_claude_md():
                      % (rel, script, positionals, required))
     notes.append("%d CLAUDE.md file(s) match registers.json and the scripts"
                  % checked)
+
+
+def check_agents_md():
+    """The generated AGENTS.md against the CLAUDE.md it is rendered from.
+
+    Codex reads AGENTS.md and never CLAUDE.md, so the instructions exist
+    twice by necessity, and the copy has already gone bad once: a mechanical
+    claude-to-Codex rename mangled the skill names and the `.claude-plugin/`
+    and `.claude/docs/` paths into things that do not exist, and nothing
+    failed. `scripts/agents_md.py` renders the one from the other, and this
+    check keeps a hand edit or a forgotten regeneration from shipping.
+    """
+    if not os.path.exists(os.path.join(ROOT, "CLAUDE.md")):
+        fail("CLAUDE.md is missing, so AGENTS.md has nothing to render from")
+        return
+    if not os.path.exists(os.path.join(ROOT, "AGENTS.md")):
+        fail("AGENTS.md is missing. Run: python3 scripts/agents_md.py")
+        return
+    with open(os.path.join(ROOT, "CLAUDE.md"), encoding="utf-8") as fh:
+        claude_md = fh.read()
+    try:
+        rendered = agents_md.render(claude_md)
+    except ValueError as exc:
+        fail("could not render AGENTS.md from CLAUDE.md: %s. Update the "
+             "anchors in scripts/agents_md.py, then run: "
+             "python3 scripts/agents_md.py" % exc)
+        return
+    with open(os.path.join(ROOT, "AGENTS.md"), encoding="utf-8") as fh:
+        shipped = fh.read()
+    if shipped != rendered:
+        fail("AGENTS.md no longer matches CLAUDE.md rendered through "
+             "scripts/agents_md.py. Run: python3 scripts/agents_md.py")
+        return
+    notes.append("AGENTS.md matches CLAUDE.md through scripts/agents_md.py")
 
 
 def python_dirs():
@@ -1952,6 +1987,7 @@ CHECKS = (
     check_layout_files,
     check_book_type_files,
     check_claude_md,
+    check_agents_md,
     check_import_paths,
     check_scripts_compile,
     check_precommit_hooks,
